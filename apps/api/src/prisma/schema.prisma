@@ -1,0 +1,166 @@
+// Prisma Schema for معامله‌یار (Mo'amele-yar) Trading Journal Platform
+
+datasource db {
+  provider = "postgresql"
+}
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["fullTextSearchPostgres"]
+}
+
+model User {
+  id             String         @id @default(uuid())
+  email          String?        @unique
+  phone          String?
+  password_hash  String
+  name           String?
+  plan           Plan           @default(FREE)
+  created_at     DateTime       @default(now())
+  accounts       Account[]
+  journalEntries JournalEntry[]
+  setups         Setup[]
+  subscriptions  Subscription[]
+  trades         Trade[]
+  importJobs     ImportJob[]
+}
+
+model Account {
+  id             String      @id @default(uuid())
+  user_id        String
+  user           User        @relation(fields: [user_id], references: [id])
+  broker_name    String?
+  account_number String?
+  currency       String      @default("USD")
+  created_at     DateTime    @default(now())
+  trades         Trade[]
+  importJobs     ImportJob[]
+}
+
+model Trade {
+  id            String       @id @default(uuid())
+  account_id    String
+  user_id       String
+  account       Account      @relation(fields: [account_id], references: [id])
+  user          User         @relation(fields: [user_id], references: [id])
+  symbol        String
+  direction     Direction
+  open_time     DateTime
+  close_time    DateTime?
+  open_price    Float
+  close_price   Float?
+  lot_size      Float
+  stop_loss     Float?
+  take_profit   Float?
+  profit_usd    Float
+  commission    Float
+  swap          Float
+  pips          Float
+  r_multiple    Float
+  tags          String[]
+  setup_id      String?
+  setup         Setup?       @relation(fields: [setup_id], references: [id])
+  emotion       Emotion?
+  notes         String?
+  ticket        Int?         // MT4/MT5 deal ticket for deduplication
+  import_source ImportSource @default(MANUAL)
+  created_at    DateTime     @default(now())
+
+  @@unique([account_id, ticket])
+}
+
+model Setup {
+  id          String    @id @default(uuid())
+  user_id     String
+  user        User      @relation(fields: [user_id], references: [id])
+  name        String
+  description String?
+  color       String?
+  created_at  DateTime  @default(now())
+  trades      Trade[]
+}
+
+model JournalEntry {
+  id         String   @id @default(uuid())
+  user_id    String
+  user       User     @relation(fields: [user_id], references: [id])
+  date       DateTime
+  body       String
+  mood       Mood?
+  created_at DateTime @default(now())
+}
+
+model ImportJob {
+  id             String       @id @default(uuid())
+  user_id        String
+  user           User         @relation(fields: [user_id], references: [id])
+  account_id     String?
+  account        Account?     @relation(fields: [account_id], references: [id])
+  filename       String
+  status         ImportStatus @default(UPLOADED)
+  rows_total     Int
+  rows_imported  Int          @default(0)
+  errors         String[]
+  created_at     DateTime     @default(now())
+}
+
+model Subscription {
+  id         String             @id @default(uuid())
+  user_id    String
+  user       User               @relation(fields: [user_id], references: [id])
+  plan       Plan
+  status     SubscriptionStatus @default(ACTIVE)
+  start_date DateTime
+  end_date   DateTime?
+  created_at DateTime           @default(now())
+}
+
+// --- Enums ---
+
+enum Direction {
+  BUY
+  SELL
+}
+
+enum Emotion {
+  FOMO
+  CONFIDENT
+  NEUTRAL
+  ANXIOUS
+  REVENGE
+}
+
+enum Mood {
+  HAPPY
+  NEUTRAL
+  STRESSED
+  ANXIOUS
+  FRUSTRATED
+}
+
+enum Plan {
+  FREE
+  STANDARD
+  PRO
+}
+
+enum ImportSource {
+  MANUAL
+  MT4_CSV
+  MT4_HTM
+  MT5_CSV
+  MT5_EA
+}
+
+enum ImportStatus {
+  UPLOADED
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  EXPIRED
+  CANCELLED
+}
