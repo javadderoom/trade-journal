@@ -207,10 +207,11 @@ void SyncTrades()
    if(StringLen(g_authHeader) > 0)
       headers += g_authHeader + "\r\n";
    
-   char[] postData = StringToCharArray(jsonPayload, CP_UTF8);
+   uchar postData[];
+   StringToCharArray(jsonPayload, postData, 0, WHOLE_ARRAY, CP_UTF8);
    ArrayResize(postData, ArraySize(postData) - 1); // Remove null terminator
    
-   char result[];
+   uchar result[];
    string resultHeaders;
    
    int response = WebRequest("POST", url, headers, 5000, postData, result, resultHeaders);
