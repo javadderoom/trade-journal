@@ -1,5 +1,3 @@
-
-
 import "./globals.scss";
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -7,12 +5,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html dir="rtl" lang="fa">
       <head>
         <title>معامله‌یار</title>
+        {/* Vazirmatn — self-hosted, no CDN (Google Fonts is blocked in Iran) */}
+        <link rel="stylesheet" href="/fonts/vazirmatn.css" />
+        {/* Material Symbols — keep CDN for icons (not blocked) */}
         <link
-          href="/fonts/Vazirmatn.woff2"
-          rel="preload"
-          as="font"
-          type="font/woff2"
-          crossOrigin="anonymous"
+          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+          rel="stylesheet"
         />
       </head>
       <body>{children}</body>

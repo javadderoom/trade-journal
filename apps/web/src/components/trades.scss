@@ -1,0 +1,975 @@
+@use '../app/variables' as *;
+
+.trades-workspace {
+  display: flex;
+  width: 100%;
+  height: calc(100vh - 64px); // Adjust based on header if any, or full height
+  background-color: $surface;
+  color: $on-surface;
+  font-family: $font-primary;
+  overflow: hidden;
+  direction: rtl;
+
+  // Custom scrollbar
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: $surface;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: $outline-variant;
+    border-radius: 4px;
+
+    &:hover {
+      background: $outline;
+    }
+  }
+}
+
+.trades-main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 24px 32px; // py-lg px-xl
+  overflow-y: auto;
+  min-height: 0;
+}
+
+// 1. Header
+.trades-page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32px; // mb-xl
+  width: 100%;
+
+  h1 {
+    font-size: 32px;
+    font-weight: 700;
+    line-height: 48px;
+    color: $on-surface;
+    margin: 0;
+  }
+
+  .header-actions {
+    display: flex;
+    gap: 16px; // gap-md
+  }
+}
+
+// Button styles
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px; // gap-xs
+  padding: 8px 16px; // py-sm px-md
+  border-radius: 8px; // rounded-lg
+  font-size: 14px; // text-label-md
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+  background: transparent;
+
+  &.btn-secondary {
+    border: 1px solid $outline-variant;
+    color: $on-surface-variant;
+    background-color: transparent;
+
+    &:hover {
+      color: $on-surface;
+      background-color: rgba($surface-variant, 0.5);
+    }
+  }
+
+  &.btn-primary {
+    background-color: $primary-container;
+    color: $on-primary-container;
+    font-weight: 700;
+    box-shadow: 0 4px 20px rgba($primary, 0.15); // glow-profit
+
+    &:hover {
+      filter: brightness(1.1);
+    }
+  }
+}
+
+// 2. Filter Bar
+.filters-bar {
+  display: flex;
+  align-items: center;
+  gap: 16px; // gap-md
+  margin-bottom: 24px; // mb-lg
+  padding: 8px; // p-sm
+  background-color: $surface-container-low;
+  border: 1px solid rgba($outline-variant, 0.5);
+  border-radius: 8px; // rounded-lg
+  width: 100%;
+  flex-wrap: wrap;
+
+  .filter-input-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 4px; // gap-xs
+    padding: 4px 16px; // py-xs px-md
+    background-color: $surface-container;
+    border-radius: 4px;
+    border: 1px solid $outline-variant;
+    transition: border-color 0.2s ease;
+
+    &:focus-within {
+      border-color: $secondary;
+    }
+
+    .filter-icon {
+      color: $on-surface-variant;
+      font-size: 18px;
+    }
+
+    input {
+      background: transparent;
+      border: none;
+      color: $on-surface;
+      font-size: 16px;
+      line-height: 24px;
+      outline: none;
+      width: 192px; // w-48
+      height: 32px; // h-8
+
+      &::placeholder {
+        color: rgba($on-surface-variant, 0.5);
+      }
+    }
+  }
+
+  .filter-select-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+
+    select {
+      appearance: none;
+      background-color: $surface-container;
+      border-radius: 4px;
+      border: 1px solid $outline-variant;
+      padding: 4px 16px;
+      padding-right: 32px;
+      font-size: 16px;
+      line-height: 24px;
+      color: $on-surface;
+      height: 40px;
+      transition: all 0.2s ease;
+      cursor: pointer;
+      outline: none;
+
+      &:focus {
+        border-color: $secondary;
+        box-shadow: 0 0 0 1px $secondary;
+      }
+    }
+
+    .select-arrow {
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: $on-surface-variant;
+      pointer-events: none;
+      font-size: 18px;
+    }
+  }
+
+  .filter-actions {
+    display: flex;
+    gap: 8px;
+    margin-right: auto; // mr-auto
+
+    .icon-btn {
+      padding: 4px 8px;
+      color: $on-surface-variant;
+      border-radius: 4px;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+
+      &:hover {
+        color: $on-surface;
+        background-color: $surface-variant;
+      }
+    }
+  }
+}
+
+// 3. Summary Bar
+.summary-bar {
+  display: flex;
+  gap: 16px; // gap-md
+  margin-bottom: 32px; // mb-xl
+
+  .summary-card {
+    display: flex;
+    align-items: center;
+    gap: 8px; // gap-sm
+    padding: 8px 24px; // py-sm px-lg
+    background-color: $surface-container;
+    border-radius: 8px;
+    border: 1px solid rgba($outline-variant, 0.5);
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+
+      &.dot-secondary {
+        background-color: $secondary;
+      }
+
+      &.dot-primary {
+        background-color: $primary;
+      }
+    }
+
+    .label {
+      font-size: 16px;
+      color: $on-surface-variant;
+    }
+
+    .value {
+      font-size: 20px;
+      font-weight: 600;
+      color: $on-surface;
+
+      .unit {
+        font-size: 12px;
+        font-weight: 400;
+        color: $on-surface-variant;
+      }
+    }
+
+    &.glow-profit-card {
+      border-color: rgba($primary, 0.2);
+      box-shadow: 0 4px 20px rgba($primary, 0.15); // glow-profit
+
+      .value {
+        color: $primary;
+      }
+    }
+
+    .card-icon {
+      color: $primary;
+      font-size: 20px;
+    }
+  }
+}
+
+// 4. Trade Table Section
+.table-section-container {
+  background-color: $surface-container-low;
+  border-radius: 12px; // rounded-xl
+  border: 1px solid $outline-variant;
+  overflow: hidden;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  min-height: 0;
+
+  .table-responsive-wrapper {
+    overflow-x: auto;
+    width: 100%;
+    flex: 1;
+    min-height: 0;
+  }
+
+  .trades-data-table {
+    width: 100%;
+    text-align: right;
+    border-collapse: collapse;
+    min-width: 1000px;
+
+    thead {
+      tr {
+        background-color: $surface-container;
+        border-bottom: 1px solid $outline-variant;
+        color: $on-surface-variant;
+        font-size: 14px;
+        font-weight: 500;
+
+        th {
+          padding: 16px; // p-md
+          white-space: nowrap;
+
+          &.sortable-th {
+            cursor: pointer;
+
+            &:hover {
+              color: $on-surface;
+            }
+          }
+
+          .sort-icon {
+            font-size: 14px;
+            vertical-align: middle;
+          }
+
+          &.checkbox-th {
+            width: 48px;
+            text-align: center;
+          }
+        }
+      }
+    }
+
+    tbody {
+      font-size: 16px;
+      color: $on-surface;
+
+      tr {
+        border-bottom: 1px solid rgba($outline-variant, 0.3);
+        transition: background-color 0.15s ease;
+        cursor: pointer;
+
+        &:hover {
+          background-color: rgba($surface-variant, 0.3);
+        }
+
+        &:last-child {
+          border-bottom: none;
+        }
+
+        &.active-row {
+          background-color: rgba($primary, 0.05);
+          position: relative;
+
+          // Border indicator on the right side of the row (RTL start)
+          td:first-child::before {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background-color: $primary;
+          }
+        }
+
+        &.open-row {
+          background-color: rgba($surface-variant, 0.1);
+        }
+
+        td {
+          padding: 16px; // p-md
+          white-space: nowrap;
+          position: relative;
+
+          &.checkbox-td {
+            text-align: center;
+          }
+
+          &.col-time {
+            color: $on-surface-variant;
+          }
+
+          &.col-symbol {
+            font-weight: 600;
+            letter-spacing: 0.02em;
+          }
+
+          &.col-number {
+            font-family: $font-primary;
+            direction: ltr;
+
+          }
+
+          &.col-profit {
+            font-family: $font-primary;
+            direction: ltr;
+            text-align: left;
+            font-weight: 700;
+
+            &.profit-positive {
+              color: $primary;
+            }
+
+            &.profit-negative {
+              color: $error;
+            }
+
+            &.profit-zero {
+              color: $on-surface-variant;
+            }
+
+            &.profit-open {
+              color: $secondary;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+// Direction badge styles
+.direction-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+
+  &.buy {
+    background-color: rgba($primary, 0.1);
+    color: $primary;
+    border: 1px solid rgba($primary, 0.2);
+  }
+
+  &.sell {
+    background-color: rgba($error, 0.1);
+    color: $error;
+    border: 1px solid rgba($error, 0.2);
+  }
+
+  .badge-icon {
+    font-size: 14px;
+  }
+}
+
+// Strategy badge
+.strategy-badge {
+  padding: 4px 8px;
+  background-color: $surface-variant;
+  border-radius: 4px;
+  color: $on-surface-variant;
+  font-size: 12px;
+}
+
+// Day-of-week badge shown next to the date in the table
+.day-badge {
+  display: inline-block;
+  margin-right: 6px;
+  padding: 2px 6px;
+  background-color: $surface-container-high;
+  border-radius: 4px;
+  color: $on-surface-variant;
+  font-size: 11px;
+  font-weight: 500;
+  vertical-align: middle;
+}
+
+// Status icons
+.status-icon {
+  font-size: 20px;
+
+  &.status-closed {
+    color: $outline;
+  }
+
+  &.status-open {
+    color: $secondary;
+    animation: pulse 2s infinite;
+  }
+}
+
+// 5. Pagination Bar
+.pagination-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 24px; // mt-lg
+  padding: 8px 0; // py-sm
+  font-size: 14px;
+  color: $on-surface-variant;
+
+  .pagination-actions {
+    display: flex;
+    align-items: center;
+    gap: 16px; // gap-md
+
+    .nav-btn {
+      padding: 4px 12px;
+      border-radius: 4px;
+      background-color: $surface-container;
+      border: 1px solid $outline-variant;
+      color: $on-surface-variant;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.2s ease;
+
+      &:hover:not(:disabled) {
+        background-color: $surface-variant;
+        color: $on-surface;
+      }
+
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
+      .btn-icon {
+        font-size: 18px;
+        vertical-align: middle;
+      }
+    }
+
+    .page-indicator {
+      color: $on-surface;
+      font-weight: 700;
+    }
+  }
+}
+
+// 6. Detail Panel (Aside Slide-out)
+.detail-panel {
+  width: 380px;
+  flex-shrink: 0;
+  background-color: $surface-container-high;
+  border-right: 1px solid $outline-variant;
+  overflow-y: auto;
+  box-shadow: -10px 0 30px rgba(0, 0, 0, 0.3);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  position: relative;
+  z-index: 10;
+  animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+
+  .panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 24px; // p-lg
+    border-bottom: 1px solid rgba($outline-variant, 0.5);
+    position: sticky;
+    top: 0;
+    background-color: rgba($surface-container-high, 0.9);
+    backdrop-filter: blur(12px);
+    z-index: 20;
+
+    .header-info {
+      display: flex;
+      align-items: center;
+      gap: 8px; // gap-sm
+
+      .icon-wrapper {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background-color: rgba($primary, 0.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: $primary;
+
+        &.sell-icon-wrapper {
+          background-color: rgba($error, 0.2);
+          color: $error;
+        }
+
+        .dir-icon {
+          font-size: 18px;
+        }
+      }
+
+      .title-text {
+        h2 {
+          font-size: 20px; // text-headline-md
+          line-height: 32px;
+          color: $on-surface;
+          margin: 0;
+          letter-spacing: 0.02em;
+        }
+
+        p {
+          font-size: 12px; // label-sm
+          color: $on-surface-variant;
+          margin: 0;
+          direction: ltr;
+          text-align: right;
+        }
+      }
+    }
+
+    .close-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background-color: $surface-variant;
+      border: none;
+      color: $on-surface;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+
+      &:hover {
+        background-color: $outline-variant;
+      }
+    }
+  }
+
+  .panel-body {
+    padding: 24px; // p-lg
+    display: flex;
+    flex-direction: column;
+    gap: 24px; // gap-lg
+    flex: 1;
+    min-height: 0;
+
+    .financial-box {
+      background-color: $surface-container;
+      border-radius: 12px;
+      padding: 16px; // p-md
+      border: 1px solid rgba($primary, 0.3);
+      box-shadow: 0 4px 20px rgba($primary, 0.15); // glow-profit
+      position: relative;
+      overflow: hidden;
+
+      &.loss-box {
+        border-color: rgba($error, 0.3);
+        box-shadow: 0 4px 20px rgba($error, 0.15);
+
+        .box-bar {
+          background-color: $error;
+        }
+
+        .pnl-value {
+          color: $error;
+        }
+
+        .stat-value {
+          color: $error;
+        }
+      }
+
+      .box-bar {
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 8px;
+        height: 100%;
+        background-color: $primary;
+      }
+
+      .box-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px; // mb-sm
+
+        .label {
+          font-size: 14px; // text-label-md
+          color: $on-surface-variant;
+        }
+
+        .status {
+          font-size: 12px; // text-label-sm
+          color: $on-surface-variant;
+        }
+      }
+
+      .pnl-value {
+        font-size: 32px; // text-headline-xl
+        font-weight: 700;
+        color: $primary;
+        letter-spacing: -0.02em;
+        margin-bottom: 8px;
+        direction: ltr;
+        text-align: right;
+      }
+
+      .metrics-grid {
+        display: flex;
+        gap: 16px; // gap-md
+        font-size: 16px;
+        color: $on-surface;
+
+        .divider {
+          width: 1px;
+          background-color: rgba($outline-variant, 0.5);
+        }
+
+        .metric-item {
+          display: flex;
+          flex-direction: column;
+
+          .stat-label {
+            font-size: 12px;
+            color: $on-surface-variant;
+          }
+
+          .stat-value {
+            font-family: $font-primary;
+            font-weight: 600;
+            color: $primary;
+          }
+        }
+      }
+    }
+
+    .details-section {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+
+      h3 {
+        font-size: 14px;
+        font-weight: 500;
+        color: $on-surface;
+        border-bottom: 1px solid rgba($outline-variant, 0.3);
+        padding-bottom: 4px;
+        margin: 0;
+      }
+
+      .details-grid {
+        display: grid;
+        grid-template-cols: 1fr 1fr;
+        row-gap: 8px;
+        font-size: 16px;
+        margin-top: 8px;
+
+        .grid-label {
+          color: $on-surface-variant;
+        }
+
+        .grid-value {
+          text-align: left;
+          color: $on-surface;
+
+          &.font-mono {
+            font-family: $font-primary;
+          }
+
+          &.direction-ltr {
+            direction: ltr;
+          }
+
+          &.value-positive {
+            color: $primary;
+          }
+
+          &.value-negative {
+            color: $error;
+          }
+        }
+      }
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+
+      label {
+        font-size: 14px;
+        color: $on-surface-variant;
+      }
+
+      select {
+        width: 100%;
+        background-color: $surface-container;
+        border-radius: 8px;
+        border: 1px solid $outline-variant;
+        padding: 12px; // p-sm
+        font-size: 16px;
+        color: $on-surface;
+        outline: none;
+        transition: border-color 0.2s ease;
+
+        &:focus {
+          border-color: $primary;
+          box-shadow: 0 0 0 1px $primary;
+        }
+      }
+
+      .tags-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 8px;
+
+        .tag {
+          display: inline-flex;
+          align-items: center;
+          gap: 4px;
+          padding: 4px 12px;
+          background-color: $surface-variant;
+          color: $on-surface;
+          border-radius: 9999px;
+          font-size: 12px;
+          border: 1px solid $outline-variant;
+          cursor: pointer;
+          transition: background-color 0.2s ease;
+
+          &:hover {
+            background-color: $outline-variant;
+          }
+
+          .tag-icon {
+            font-size: 14px;
+          }
+        }
+
+        .add-tag-btn {
+          display: inline-flex;
+          align-items: center;
+          gap: 4px;
+          padding: 4px 12px;
+          background: transparent;
+          border: 1px dashed $outline-variant;
+          color: $on-surface-variant;
+          border-radius: 9999px;
+          font-size: 12px;
+          cursor: pointer;
+          transition: all 0.2s ease;
+
+          &:hover {
+            color: $on-surface;
+            border-color: $outline;
+          }
+
+          .btn-icon {
+            font-size: 14px;
+          }
+        }
+      }
+
+      textarea {
+        width: 100%;
+        height: 120px;
+        background-color: $surface-container;
+        border-radius: 8px;
+        border: 1px solid $outline-variant;
+        padding: 16px;
+        font-size: 16px;
+        color: $on-surface;
+        outline: none;
+        resize: none;
+        transition: border-color 0.2s ease;
+
+        &:focus {
+          border-color: $secondary;
+          box-shadow: 0 0 0 1px $secondary;
+        }
+
+        &::placeholder {
+          color: rgba($on-surface-variant, 0.5);
+        }
+      }
+    }
+  }
+
+  .panel-footer {
+    padding: 16px;
+    border-top: 1px solid $outline-variant;
+    background-color: $surface-container-high;
+    margin-top: auto;
+    display: flex;
+    gap: 16px;
+
+    .btn-save {
+      flex: 1;
+      background-color: rgba($primary, 0.1);
+      color: $primary;
+      border: 1px solid rgba($primary, 0.3);
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+
+      &:hover {
+        background-color: rgba($primary, 0.2);
+      }
+    }
+
+    .btn-delete {
+      padding: 8px 16px;
+      background: transparent;
+      border: 1px solid rgba($error, 0.3);
+      color: $error;
+      border-radius: 8px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: background-color 0.2s ease;
+
+      &:hover {
+        background-color: rgba($error, 0.1);
+      }
+    }
+  }
+}
+
+// Custom Checkbox
+input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  background-color: $surface-variant;
+  border: 1px solid $outline-variant;
+  border-radius: 4px;
+  appearance: none;
+  cursor: pointer;
+  position: relative;
+  outline: none;
+  display: inline-block;
+  vertical-align: middle;
+
+  &:checked {
+    background-color: $primary;
+    border-color: $primary;
+
+    &::after {
+      content: '✓'; // check icon
+      font-weight: bold;
+      font-size: 12px;
+      color: $on-primary;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+  }
+
+  &:focus {
+    box-shadow: 0 0 0 2px rgba($primary, 0.2);
+  }
+}
+
+// Animations
+@keyframes pulse {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: .5;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(-100%);
+  }
+
+  to {
+    transform: translateX(0);
+  }
+}

@@ -1,5 +1,15 @@
 /* Global styles for Next.js App Router (SCSS) */
 @use './variables' as *;
+/* Vazirmatn is loaded via /fonts/vazirmatn.css in layout.tsx (self-hosted, no CDN) */
+
+
+/* Universal font reset — browsers don't inherit font into inputs/buttons by default */
+*,
+*::before,
+*::after {
+  font-family: $font-primary;
+  box-sizing: border-box;
+}
 
 html,
 body {
@@ -10,88 +20,109 @@ body {
 body {
   background: $background;
   color: $text;
+  font-family: $font-primary;
 }
+
 //typography:
-h1{
+h1 {
   font-family: $font-primary;
   font-size: 32px;
   font-weight: 700;
   line-height: 48px;
 }
-h2{
+
+h2 {
   font-family: $font-primary;
   font-size: 24px;
   font-weight: 700;
   line-height: 36px;
 }
-h3{
+
+h3 {
   font-family: $font-primary;
   font-size: 20px;
   font-weight: 700;
   line-height: 32px;
 }
-p.larg{
+
+p.larg {
   font-family: $font-primary;
   font-size: 18px;
   font-weight: 400;
   line-height: 28px;
 }
-p{
+
+p {
   font-family: $font-primary;
   font-size: 16px;
   font-weight: 400;
   line-height: 24px;
 }
-label{
+
+label {
   font-family: $font-primary;
   font-size: 14px;
   font-weight: 500;
   line-height: 20px;
 }
-label.small{
+
+label.small {
   font-family: $font-primary;
   font-size: 12px;
   font-weight: 500;
   line-height: 16px;
 }
+
 //rounded
-.rounded_sm{
+.rounded_sm {
   border-radius: $radius;
-} 
-.rounded{
+}
+
+.rounded {
   border-radius: $radius * 2;
 }
-.rounded_md{
+
+.rounded_md {
   border-radius: $radius * 3;
 }
-.rounded_lg{
+
+.rounded_lg {
   border-radius: $radius * 4;
 }
-.rounded_xl{
+
+.rounded_xl {
   border-radius: $radius * 6;
 }
-.rounded_full{
+
+.rounded_full {
   border-radius: 9999px;
 }
+
 //spacing
-.m-auto{
+.m-auto {
   margin: auto;
 }
-.m-xs{
-  margin: $spaceing / 2;
+
+.m-xs {
+  margin: calc($spaceing / 2);
 }
-.m{
+
+.m {
   margin: 0;
 }
-.m-sm{
+
+.m-sm {
   margin: $spaceing;
 }
-.m-md{
+
+.m-md {
   margin: $spaceing * 2;
 }
-.m-lg{
+
+.m-lg {
   margin: $spaceing * 3;
 }
-.m-xl{
+
+.m-xl {
   margin: $spaceing * 4;
 }
