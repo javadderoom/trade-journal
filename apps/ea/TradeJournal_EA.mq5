@@ -9,7 +9,7 @@
 #property strict
 
 //--- Input parameters (configure in MT5 Properties → Inputs)
-input string   InpApiUrl       = "http://localhost:3000";  // API Base URL
+input string   InpApiUrl       = "http://127.0.0.1:3000";  // API Base URL
 input string   InpApiToken     = "";                       // API Auth Token (leave empty if no auth)
 input int      InpAccountId    = 1;                        // Account ID in معامله‌یار
 input int      InpSyncInterval = 60;                       // Sync interval in seconds (0 = manual only)

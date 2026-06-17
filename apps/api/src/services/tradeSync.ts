@@ -1,6 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
-import { TradeData, SyncResult } from '../types';
+import { SyncResult, TradeData } from '../types';
 
 const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
 const prisma = new PrismaClient({ adapter });
@@ -16,12 +16,30 @@ export async function syncTradesFromEA(
 ): Promise<SyncResult> {
   const result: SyncResult = { created: 0, updated: 0, skipped: 0, errors: [] };
 
-  // Verify account belongs to user
-  const account = await prisma.account.findFirst({
+  // Auto-create user if not exists (development mode)
+  let user = await prisma.user.findUnique({ where: { id: userId } });
+  if (!user) {
+    user = await prisma.user.create({
+      data: {
+        id: userId,
+        password_hash: 'dev-hash',
+        name: userId,
+      },
+    });
+  }
+
+  // Auto-create account if not exists (development mode)
+  let account = await prisma.account.findFirst({
     where: { id: accountId, user_id: userId },
   });
   if (!account) {
-    throw new Error(`Account ${accountId} not found for user ${userId}`);
+    account = await prisma.account.create({
+      data: {
+        id: accountId,
+        user_id: userId,
+        broker_name: 'MT5',
+      },
+    });
   }
 
   for (const trade of trades) {
@@ -77,4 +95,60 @@ export async function syncTradesFromEA(
   }
 
   return result;
+}
+
+export type TradeListRow = {
+  ticket: number | null;
+  symbol: string;
+  direction: 'BUY' | 'SELL';
+  openTime: string;
+  closeTime: string | null;
+  openPrice: number;
+  closePrice: number | null;
+  profitUsd: number;
+  commission: number;
+  swap: number;
+};
+
+export async function getTradesForAccount(params: {
+  userId: string;
+  accountId: string;
+  limit?: number;
+  offset?: number;
+}): Promise<TradeListRow[]> {
+  const { userId, accountId } = params;
+  const limit = Math.min(Math.max(params.limit ?? 100, 1), 500);
+  const offset = Math.max(params.offset ?? 0, 0);
+
+  const trades = await prisma.trade.findMany({
+    where: { user_id: userId, account_id: accountId },
+    orderBy: { open_time: 'desc' },
+    skip: offset,
+    take: limit,
+    select: {
+      ticket: true,
+      symbol: true,
+      direction: true,
+      open_time: true,
+      close_time: true,
+      open_price: true,
+      close_price: true,
+      profit_usd: true,
+      commission: true,
+      swap: true,
+    },
+  });
+
+  return trades.map(t => ({
+    ticket: t.ticket,
+    symbol: t.symbol,
+    direction: t.direction as 'BUY' | 'SELL',
+    openTime: t.open_time.toISOString(),
+    closeTime: t.close_time ? t.close_time.toISOString() : null,
+    openPrice: t.open_price,
+    closePrice: t.close_price,
+    profitUsd: t.profit_usd,
+    commission: t.commission,
+    swap: t.swap,
+  }));
 }
