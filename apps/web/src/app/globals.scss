@@ -1,0 +1,97 @@
+/* Global styles for Next.js App Router (SCSS) */
+@use './variables' as *;
+
+html,
+body {
+  padding: 0;
+  margin: 0;
+}
+
+body {
+  background: $background;
+  color: $text;
+}
+//typography:
+h1{
+  font-family: $font-primary;
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 48px;
+}
+h2{
+  font-family: $font-primary;
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 36px;
+}
+h3{
+  font-family: $font-primary;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 32px;
+}
+p.larg{
+  font-family: $font-primary;
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 28px;
+}
+p{
+  font-family: $font-primary;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 24px;
+}
+label{
+  font-family: $font-primary;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+}
+label.small{
+  font-family: $font-primary;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 16px;
+}
+//rounded
+.rounded_sm{
+  border-radius: $radius;
+} 
+.rounded{
+  border-radius: $radius * 2;
+}
+.rounded_md{
+  border-radius: $radius * 3;
+}
+.rounded_lg{
+  border-radius: $radius * 4;
+}
+.rounded_xl{
+  border-radius: $radius * 6;
+}
+.rounded_full{
+  border-radius: 9999px;
+}
+//spacing
+.m-auto{
+  margin: auto;
+}
+.m-xs{
+  margin: $spaceing / 2;
+}
+.m{
+  margin: 0;
+}
+.m-sm{
+  margin: $spaceing;
+}
+.m-md{
+  margin: $spaceing * 2;
+}
+.m-lg{
+  margin: $spaceing * 3;
+}
+.m-xl{
+  margin: $spaceing * 4;
+}
