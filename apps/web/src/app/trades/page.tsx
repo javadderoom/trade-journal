@@ -55,7 +55,7 @@ export default function TradesPage() {
   }, []);
 
   return (
-    <div style={{ padding: '16px' }}>
+    <div className="">
       <div style={{ border: '1px solid #e2e8f0', borderRadius: 8, overflow: 'hidden' }}>
         <div style={{ padding: 16 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12 }}>

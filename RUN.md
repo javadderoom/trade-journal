@@ -14,7 +14,7 @@ PostgreSQL runs on port **5433**.
 
 ## 2. Run Database Migrations
 ```bash
-npx prisma migrate dev --name init --schema apps/api/src/prisma/schema.prisma --config apps/api/src/prisma/prisma.config.ts
+npm run --workspace=api prisma:migrate
 ```
 
 ## 3. Generate Prisma Client
@@ -22,10 +22,7 @@ npx prisma migrate dev --name init --schema apps/api/src/prisma/schema.prisma --
 npx prisma generate --schema apps/api/src/prisma/schema.prisma --config apps/api/src/prisma/prisma.config.ts
 ```
 
-## 3. Generate Prisma Client
-```bash
-npx prisma generate --schema apps/api/src/prisma/schema.prisma --config apps/api/src/prisma/prisma.config.ts
-```
+
 
 ## 3. Start API Server (port 3000)
 ```bash

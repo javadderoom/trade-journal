@@ -1,23 +1,19 @@
 {
-  "dependencies": {
-    "@chakra-ui/react": "^3.36.0",
-    "@emotion/react": "^11.14.0",
-    "@emotion/styled": "^11.14.1",
-    "@prisma/adapter-pg": "^7.8.0",
-    "@prisma/client": "^7.8.0",
-    "@types/express": "^5.0.6",
-    "@types/node": "^25.9.3",
-    "@types/react": "^19.2.17",
-    "csv-parser": "^3.2.1",
-    "depd": "^2.0.0",
-    "express": "^5.2.1",
-    "next": "^16.2.9",
-    "node-html-parser": "^7.1.0",
-    "pg": "^8.21.0",
-    "prisma": "^7.8.0",
-    "react": "^19.2.7",
-    "react-dom": "^19.2.7",
-    "sass": "^1.101.0",
+  "name": "trade-journal",
+  "private": true,
+  "workspaces": ["apps/web", "apps/api"],
+  "prisma": {
+    "schema": "src/prisma/schema.prisma"
+  },
+  "scripts": {
+    "dev:web": "npm run dev --workspace=web",
+    "dev:api": "npm run dev --workspace=api",
+    "dev": "concurrently \"npm run dev:web\" \"npm run dev:api\""
+    
+  },
+  
+  "devDependencies": {
+    "concurrently": "^9.0.0",
     "typescript": "^6.0.3"
   }
 }
