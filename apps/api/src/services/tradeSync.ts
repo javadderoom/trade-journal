@@ -3,7 +3,7 @@ import { PrismaPg } from '@prisma/adapter-pg';
 import { SyncResult, TradeData } from '../types';
 
 const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
-const prisma = new PrismaClient({ adapter });
+export const prisma = new PrismaClient({ adapter });
 
 /**
  * Sync trades from MT5 EA into the database.
@@ -105,9 +105,18 @@ export type TradeListRow = {
   closeTime: string | null;
   openPrice: number;
   closePrice: number | null;
+  lotSize: number;
+  stopLoss: number | null;
+  takeProfit: number | null;
   profitUsd: number;
   commission: number;
   swap: number;
+  pips: number;
+  rMultiple: number;
+  tags: string[];
+  setupName: string | null;
+  emotion: string | null;
+  notes: string | null;
 };
 
 export async function getTradesForAccount(params: {
@@ -133,9 +142,22 @@ export async function getTradesForAccount(params: {
       close_time: true,
       open_price: true,
       close_price: true,
+      lot_size: true,
+      stop_loss: true,
+      take_profit: true,
       profit_usd: true,
       commission: true,
       swap: true,
+      pips: true,
+      r_multiple: true,
+      tags: true,
+      setup: {
+        select: {
+          name: true,
+        },
+      },
+      emotion: true,
+      notes: true,
     },
   });
 
@@ -147,8 +169,17 @@ export async function getTradesForAccount(params: {
     closeTime: t.close_time ? t.close_time.toISOString() : null,
     openPrice: t.open_price,
     closePrice: t.close_price,
+    lotSize: t.lot_size,
+    stopLoss: t.stop_loss,
+    takeProfit: t.take_profit,
     profitUsd: t.profit_usd,
     commission: t.commission,
     swap: t.swap,
+    pips: t.pips,
+    rMultiple: t.r_multiple,
+    tags: t.tags,
+    setupName: t.setup?.name ?? null,
+    emotion: t.emotion,
+    notes: t.notes,
   }));
 }

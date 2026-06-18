@@ -1,5 +1,5 @@
 import { Router, Request, Response } from 'express';
-import { getTradesForAccount, syncTradesFromEA } from '../services/tradeSync';
+import { getTradesForAccount, syncTradesFromEA, prisma } from '../services/tradeSync';
 
 const router = Router();
 
@@ -77,6 +77,117 @@ router.post('/sync', async (req: Request, res: Response) => {
     });
   } catch (err: any) {
     console.error('Trade sync error:', err);
+    res.status(500).json({ error: err.message || 'Internal server error' });
+  }
+});
+
+/**
+ * PUT /api/trades/:ticket
+ * Updates trade notes, emotion, setup, stop_loss, and take_profit.
+ */
+router.put('/:ticket', async (req: Request, res: Response) => {
+  try {
+    const ticket = Number.parseInt(req.params.ticket as string, 10);
+    if (Number.isNaN(ticket)) {
+      res.status(400).json({ error: 'Invalid ticket' });
+      return;
+    }
+
+    const { notes, emotion, setupName, stopLoss, takeProfit, tags } = req.body;
+
+    const existing = await prisma.trade.findFirst({
+      where: { ticket },
+    });
+
+    if (!existing) {
+      res.status(404).json({ error: 'Trade not found' });
+      return;
+    }
+
+    let setupId: string | null = null;
+    if (setupName) {
+      let setup = await prisma.setup.findFirst({
+        where: { name: setupName, user_id: existing.user_id },
+      });
+      if (!setup) {
+        setup = await prisma.setup.create({
+          data: {
+            name: setupName,
+            user_id: existing.user_id,
+          },
+        });
+      }
+      setupId = setup.id;
+    }
+
+    // Recalculate r_multiple when stop_loss is modified
+    let rMultipleUpdate: number | undefined = undefined;
+    if (stopLoss !== undefined) {
+      const stopLossVal = stopLoss === null ? null : parseFloat(stopLoss);
+      if (stopLossVal && stopLossVal > 0 && existing.open_price) {
+        const isBuy = existing.direction === 'BUY';
+        const risk = isBuy ? (existing.open_price - stopLossVal) : (stopLossVal - existing.open_price);
+        if (risk > 0) {
+          const exitPrice = existing.close_price ?? existing.open_price;
+          const reward = isBuy ? (exitPrice - existing.open_price) : (existing.open_price - exitPrice);
+          rMultipleUpdate = reward / risk;
+        } else {
+          rMultipleUpdate = 0;
+        }
+      } else {
+        // Fallback to legacy/mock-like R value if stop loss is removed
+        rMultipleUpdate = existing.profit_usd > 0 ? 1.5 : -1.0;
+      }
+    }
+
+    const updated = await prisma.trade.update({
+      where: { id: existing.id },
+      data: {
+        notes: notes !== undefined ? notes : undefined,
+        emotion: emotion !== undefined ? emotion : undefined,
+        setup_id: setupName !== undefined ? setupId : undefined,
+        stop_loss: stopLoss !== undefined ? (stopLoss === null ? null : parseFloat(stopLoss)) : undefined,
+        take_profit: takeProfit !== undefined ? (takeProfit === null ? null : parseFloat(takeProfit)) : undefined,
+        r_multiple: rMultipleUpdate !== undefined ? rMultipleUpdate : undefined,
+        tags: tags !== undefined ? tags : undefined,
+      },
+    });
+
+    res.status(200).json(updated);
+  } catch (err: any) {
+    console.error('Update trade error:', err);
+    res.status(500).json({ error: err.message || 'Internal server error' });
+  }
+});
+
+/**
+ * DELETE /api/trades/:ticket
+ * Deletes a trade by ticket.
+ */
+router.delete('/:ticket', async (req: Request, res: Response) => {
+  try {
+    const ticket = Number.parseInt(req.params.ticket as string, 10);
+    if (Number.isNaN(ticket)) {
+      res.status(400).json({ error: 'Invalid ticket' });
+      return;
+    }
+
+    const existing = await prisma.trade.findFirst({
+      where: { ticket },
+    });
+
+    if (!existing) {
+      res.status(404).json({ error: 'Trade not found' });
+      return;
+    }
+
+    await prisma.trade.delete({
+      where: { id: existing.id },
+    });
+
+    res.status(200).json({ success: true });
+  } catch (err: any) {
+    console.error('Delete trade error:', err);
     res.status(500).json({ error: err.message || 'Internal server error' });
   }
 });

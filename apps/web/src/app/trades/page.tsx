@@ -218,8 +218,19 @@ export default function TradesPage() {
             pips = isBuy ? (closePrice - openPrice) * multiplier : (openPrice - closePrice) * multiplier;
           }
 
-          // Calculate R multiple (default to 1.0 or mock if not present)
-          const rMultiple = item.rMultiple ?? (item.profitUsd > 0 ? 1.5 : -1.0);
+          // Calculate R multiple (default to 1.5/-1.0 if no SL, otherwise calculate from SL)
+          let rMultiple = item.rMultiple ?? 0;
+          const stopLossVal = item.stopLoss ?? 0;
+          if (stopLossVal > 0 && openPrice > 0) {
+            const risk = isBuy ? (openPrice - stopLossVal) : (stopLossVal - openPrice);
+            if (risk > 0) {
+              const exitPrice = closePrice ?? openPrice;
+              const reward = isBuy ? (exitPrice - openPrice) : (openPrice - exitPrice);
+              rMultiple = reward / risk;
+            }
+          } else if (rMultiple === 0 && item.profitUsd !== 0) {
+            rMultiple = item.profitUsd > 0 ? 1.5 : -1.0;
+          }
 
           return {
             id: item.ticket ? String(item.ticket) : `api-${idx}`,
@@ -275,7 +286,6 @@ export default function TradesPage() {
 
       if (!ticket) return true; // mock local only if no ticket
 
-      // Make update request if ticket exists
       const res = await fetch(`${baseUrl}/api/trades/${ticket}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
@@ -283,6 +293,9 @@ export default function TradesPage() {
           notes: updatedTrade.notes,
           emotion: updatedTrade.emotion,
           setupName: updatedTrade.setupName,
+          stopLoss: updatedTrade.stopLoss,
+          takeProfit: updatedTrade.takeProfit,
+          tags: updatedTrade.tags,
         }),
       });
 

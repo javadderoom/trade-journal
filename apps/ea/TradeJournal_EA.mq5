@@ -258,13 +258,9 @@ void FindOpenDealDetails(ulong positionId, double &openPrice, double &sl, double
          openPrice = HistoryDealGetDouble(ticket, DEAL_PRICE);
          openTime  = (datetime)HistoryDealGetInteger(ticket, DEAL_TIME);
          
-         // Get SL/TP from the position (not from the deal)
-         // SL/TP are set at position level, not deal level
-         if(PositionSelectByTicket(positionId))
-         {
-            sl = PositionGetDouble(POSITION_SL);
-            tp = PositionGetDouble(POSITION_TP);
-         }
+         // Get SL/TP from the deal history
+         sl = HistoryDealGetDouble(ticket, DEAL_SL);
+         tp = HistoryDealGetDouble(ticket, DEAL_TP);
          return;
       }
    }

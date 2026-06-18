@@ -36,6 +36,9 @@ interface TradesTableProps {
   onDeleteTrade?: (tradeId: string) => Promise<boolean>;
 }
 
+
+const DEFAULT_TAGS = ['آرام', 'با اطمینان', 'مضطرب', 'FOMO', 'انتقام'];
+
 export default function TradesTable({
   initialTrades,
   onRefresh,
@@ -76,6 +79,22 @@ export default function TradesTable({
       if (t.setupName) strategies.add(t.setupName);
     });
     return ['همه استراتژی‌ها', ...Array.from(strategies)];
+  }, [trades]);
+
+  const [allTags, setAllTags] = useState<string[]>(DEFAULT_TAGS);
+
+  // Seed allTags from trades once they load — only ever adds, never removes
+  useEffect(() => {
+    if (trades.length === 0) return;
+    setAllTags(prev => {
+      const set = new Set(prev);
+      trades.forEach(t => {
+        if (t.tags && Array.isArray(t.tags)) {
+          t.tags.forEach(tag => { if (tag) set.add(tag); });
+        }
+      });
+      return Array.from(set);
+    });
   }, [trades]);
 
   // Handle active trade details editing
@@ -223,7 +242,32 @@ export default function TradesTable({
   const updateActiveTradeField = (key: keyof Trade, value: any) => {
     if (!activeTradeId) return;
     setTrades(prev =>
-      prev.map(t => (t.id === activeTradeId ? { ...t, [key]: value } : t))
+      prev.map(t => {
+        if (t.id !== activeTradeId) return t;
+
+        const updated = { ...t, [key]: value };
+
+        // Recalculate rMultiple if stopLoss is updated
+        if (key === 'stopLoss') {
+          const isBuy = updated.direction === 'BUY';
+          const stopLossVal = value ?? 0;
+          if (stopLossVal > 0 && updated.openPrice > 0) {
+            const risk = isBuy ? (updated.openPrice - stopLossVal) : (stopLossVal - updated.openPrice);
+            if (risk > 0) {
+              const exitPrice = updated.closePrice ?? updated.openPrice;
+              const reward = isBuy ? (exitPrice - updated.openPrice) : (updated.openPrice - exitPrice);
+              updated.rMultiple = reward / risk;
+            } else {
+              updated.rMultiple = 0;
+            }
+          } else {
+            // Fallback to default mock-like R value if stop loss is removed/cleared
+            updated.rMultiple = updated.profitUsd > 0 ? 1.5 : -1.0;
+          }
+        }
+
+        return updated;
+      })
     );
   };
 
@@ -352,6 +396,7 @@ export default function TradesTable({
                   <th className="sortable-th">
                     تاریخ <span className="material-symbols-outlined sort-icon">arrow_downward</span>
                   </th>
+                  <th>روز</th>
                   <th>نماد</th>
                   <th>جهت</th>
                   <th>حجم</th>
@@ -366,7 +411,7 @@ export default function TradesTable({
                   const isBuy = trade.direction === 'BUY';
                   const isClosed = trade.closeTime !== null;
                   const isActive = trade.id === activeTradeId;
-                  
+
                   // P&L color logic
                   let profitClass = 'profit-zero';
                   if (trade.profitUsd > 0) profitClass = 'profit-positive';
@@ -388,6 +433,9 @@ export default function TradesTable({
                       </td>
                       <td className="col-time">
                         <span className="date-value">{formatDate(trade.openTime).date}</span>
+
+                      </td>
+                      <td>
                         <span className="day-badge">{formatDate(trade.openTime).day}</span>
                       </td>
                       <td className="col-symbol">{trade.symbol}</td>
@@ -401,9 +449,8 @@ export default function TradesTable({
                       </td>
                       <td className="col-number">{toPersianDigits(trade.lotSize)}</td>
                       <td
-                        className={`col-number ${
-                          trade.rMultiple > 0 ? 'text-primary' : trade.rMultiple < 0 ? 'text-error' : ''
-                        }`}
+                        className={`col-number ${trade.rMultiple > 0 ? 'text-primary' : trade.rMultiple < 0 ? 'text-error' : ''
+                          }`}
                       >
                         {trade.rMultiple > 0 ? '+' : ''}
                         {toPersianDigits(trade.rMultiple.toFixed(1))}R
@@ -420,9 +467,8 @@ export default function TradesTable({
                       </td>
                       <td style={{ textAlign: 'center' }}>
                         <span
-                          className={`material-symbols-outlined status-icon ${
-                            isClosed ? 'status-closed' : 'status-open'
-                          }`}
+                          className={`material-symbols-outlined status-icon ${isClosed ? 'status-closed' : 'status-open'
+                            }`}
                           title={isClosed ? 'بسته شده' : 'باز'}
                         >
                           {isClosed ? 'check_circle' : 'sync'}
@@ -481,9 +527,8 @@ export default function TradesTable({
           <div className="panel-header">
             <div className="header-info">
               <div
-                className={`icon-wrapper ${
-                  activeTrade.direction === 'SELL' ? 'sell-icon-wrapper' : ''
-                }`}
+                className={`icon-wrapper ${activeTrade.direction === 'SELL' ? 'sell-icon-wrapper' : ''
+                  }`}
               >
                 <span className="material-symbols-outlined dir-icon">
                   {activeTrade.direction === 'BUY' ? 'trending_up' : 'trending_down'}
@@ -505,9 +550,8 @@ export default function TradesTable({
           <div className="panel-body">
             {/* Financial Summary Box */}
             <div
-              className={`financial-box ${
-                activeTrade.profitUsd < 0 ? 'loss-box' : ''
-              }`}
+              className={`financial-box ${activeTrade.profitUsd < 0 ? 'loss-box' : ''
+                }`}
             >
               <div className="box-bar"></div>
               <div className="box-header">
@@ -553,13 +597,15 @@ export default function TradesTable({
                 </span>
 
                 <span className="grid-label">حد ضرر (SL):</span>
-                <span className="grid-value font-mono direction-ltr value-negative">
-                  {activeTrade.stopLoss ? toPersianDigits(activeTrade.stopLoss.toFixed(5).replace(/\.?0+$/, '')) : '-'}
+                <span className="grid-value">
+                  {activeTrade.stopLoss ?? ''}
+
                 </span>
 
                 <span className="grid-label">حد سود (TP):</span>
-                <span className="grid-value font-mono direction-ltr value-positive">
-                  {activeTrade.takeProfit ? toPersianDigits(activeTrade.takeProfit.toFixed(5).replace(/\.?0+$/, '')) : '-'}
+                <span className="grid-value">
+                  {activeTrade.takeProfit ?? ''}
+
                 </span>
 
                 {activeTrade.closeTime && (
@@ -594,39 +640,115 @@ export default function TradesTable({
             </div>
 
             <div className="form-group">
-              <label>برچسب‌های احساسی</label>
+              <label>برچسب‌های معامله</label>
               <div className="tags-container">
-                {activeTrade.emotion && (
-                  <span className="tag">
-                    <span className="material-symbols-outlined tag-icon">
-                      {activeTrade.emotion === 'CONFIDENT' ? 'verified' : 'self_improvement'}
+                {allTags.map(tag => {
+                  const isSelected = activeTrade.tags && activeTrade.tags.includes(tag);
+                  return (
+                    <span
+                      key={tag}
+                      className={`tag ${isSelected ? 'selected' : ''}`}
+                      onClick={() => {
+                        const currentTags = activeTrade.tags || [];
+                        const newTags = isSelected
+                          ? currentTags.filter(t => t !== tag)
+                          : [...currentTags, tag];
+                        updateActiveTradeField('tags', newTags);
+                      }}
+                    >
+                      {tag}
                     </span>
-                    {activeTrade.emotion === 'CONFIDENT' && 'با اطمینان'}
-                    {activeTrade.emotion === 'FOMO' && 'FOMO'}
-                    {activeTrade.emotion === 'NEUTRAL' && 'آرام/خنثی'}
-                    {activeTrade.emotion === 'ANXIOUS' && 'مضطرب'}
-                    {activeTrade.emotion === 'REVENGE' && 'انتقام'}
-                  </span>
-                )}
+                  );
+                })}
+              </div>
+              <div style={{ display: 'flex', gap: '8px', marginTop: '8px' }}>
+                <input
+                  type="text"
+                  placeholder="افزودن برچسب جدید..."
+                  id="new-tag-input"
+                  onKeyDown={e => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      const input = e.currentTarget;
+                      const val = input.value.trim();
+                      if (val) {
+                        const currentTags = activeTrade.tags || [];
+                        if (!currentTags.includes(val)) {
+                          updateActiveTradeField('tags', [...currentTags, val]);
+                        }
+                        setAllTags(prev => prev.includes(val) ? prev : [...prev, val]);
+                        input.value = '';
+                      }
+                    }
+                  }}
+                  style={{
+                    flex: 1,
+                    backgroundColor: '#1e212b',
+                    border: '1px solid #3d4150',
+                    borderRadius: '8px',
+                    padding: '8px 12px',
+                    fontSize: '14px',
+                    color: '#fff',
+                    outline: 'none'
+                  }}
+                />
                 <button
-                  className="add-tag-btn"
+                  type="button"
                   onClick={() => {
-                    const emotions: Array<Trade['emotion']> = [
-                      'CONFIDENT',
-                      'FOMO',
-                      'NEUTRAL',
-                      'ANXIOUS',
-                      'REVENGE',
-                    ];
-                    const currentIdx = activeTrade.emotion ? emotions.indexOf(activeTrade.emotion) : -1;
-                    const nextIdx = (currentIdx + 1) % (emotions.length + 1);
-                    const nextEmotion = nextIdx === emotions.length ? null : emotions[nextIdx];
-                    updateActiveTradeField('emotion', nextEmotion);
+                    const input = document.getElementById('new-tag-input') as HTMLInputElement;
+                    const val = input?.value.trim();
+                    if (val) {
+                      const currentTags = activeTrade.tags || [];
+                      if (!currentTags.includes(val)) {
+                        updateActiveTradeField('tags', [...currentTags, val]);
+                      }
+                      setAllTags(prev => prev.includes(val) ? prev : [...prev, val]);
+                      if (input) input.value = '';
+                    }
+                  }}
+                  className="add-tag-btn"
+                  style={{
+                    borderRadius: '8px',
+                    padding: '8px 16px',
+                    background: 'rgba(97, 249, 177, 0.15)',
+                    color: '#61f9b1',
+                    border: '1px solid rgba(97, 249, 177, 0.3)',
+                    cursor: 'pointer',
+                    fontSize: '14px',
+                    fontWeight: 500,
+                    transition: 'all 0.2s ease'
                   }}
                 >
-                  <span className="material-symbols-outlined btn-icon">add</span>
-                  {activeTrade.emotion ? 'تغییر احساس' : 'افزودن احساس'}
+                  افزودن
                 </button>
+              </div>
+            </div>
+
+            <div className="form-group">
+              <label>برچسب‌های احساسی</label>
+              <div className="tags-container">
+                {(
+                  [
+                    { value: 'CONFIDENT', label: 'با اطمینان' },
+                    { value: 'NEUTRAL',   label: 'آرام/خنثی' },
+                    { value: 'ANXIOUS',   label: 'مضطرب' },
+                    { value: 'FOMO',      label: 'FOMO' },
+                    { value: 'REVENGE',   label: 'انتقام' },
+                  ] as { value: Trade['emotion']; label: string }[]
+                ).map(({ value, label }) => {
+                  const isSelected = activeTrade.emotion === value;
+                  return (
+                    <span
+                      key={value!}
+                      className={`tag${isSelected ? ' selected' : ''}`}
+                      onClick={() =>
+                        updateActiveTradeField('emotion', isSelected ? null : value)
+                      }
+                    >
+                      {label}
+                    </span>
+                  );
+                })}
               </div>
             </div>
 

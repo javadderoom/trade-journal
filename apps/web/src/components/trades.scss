@@ -537,7 +537,7 @@
   flex-shrink: 0;
   background-color: $surface-container-high;
   border-right: 1px solid $outline-variant;
-  overflow-y: auto;
+  overflow: hidden;
   box-shadow: -10px 0 30px rgba(0, 0, 0, 0.3);
   display: flex;
   flex-direction: column;
@@ -628,6 +628,11 @@
     gap: 24px; // gap-lg
     flex: 1;
     min-height: 0;
+    overflow-y: auto;
+
+    & > * {
+      flex-shrink: 0;
+    }
 
     .financial-box {
       background-color: $surface-container;
@@ -736,7 +741,7 @@
 
       .details-grid {
         display: grid;
-        grid-template-cols: 1fr 1fr;
+        grid-template-columns: 1fr 1fr;
         row-gap: 8px;
         font-size: 16px;
         margin-top: 8px;
@@ -763,6 +768,43 @@
 
           &.value-negative {
             color: $error;
+          }
+        }
+
+        .grid-input {
+          background: rgba($surface-variant, 0.3);
+          border: 1px solid rgba($outline-variant, 0.4);
+          border-radius: 4px;
+          color: $on-surface;
+          font-family: $font-primary;
+          font-size: 14px;
+          padding: 2px 8px;
+          width: 110px;
+          text-align: left;
+          outline: none;
+          transition: all 0.2s ease;
+          direction: ltr;
+
+          &:focus {
+            border-color: $secondary;
+            background: $surface-container;
+            box-shadow: 0 0 0 1px $secondary;
+          }
+
+          &.sl-input {
+            color: $error;
+            &:focus {
+              border-color: $error;
+              box-shadow: 0 0 0 1px $error;
+            }
+          }
+
+          &.tp-input {
+            color: $primary;
+            &:focus {
+              border-color: $primary;
+              box-shadow: 0 0 0 1px $primary;
+            }
           }
         }
       }
@@ -816,6 +858,12 @@
 
           &:hover {
             background-color: $outline-variant;
+          }
+
+          &.selected {
+            background-color: rgba($primary, 0.15);
+            color: $primary;
+            border-color: $primary;
           }
 
           .tag-icon {
