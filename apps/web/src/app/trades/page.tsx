@@ -221,8 +221,6 @@ export default function TradesPage() {
               const reward = isBuy ? (exitPrice - openPrice) : (openPrice - exitPrice);
               rMultiple = reward / risk;
             }
-          } else if (rMultiple === 0 && item.profitUsd !== 0) {
-            rMultiple = item.profitUsd > 0 ? 1.5 : -1.0;
           }
 
           return {

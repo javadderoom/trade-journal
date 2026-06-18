@@ -3936,6 +3936,17 @@
       "target": "components_tradestable_trade"
     },
     {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/app/trades/page.tsx",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "trades_page",
+      "target": "components_tradestable_tradestable",
+      "confidence_score": 1.0
+    },
+    {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "apps/web/src/app/trades/page.tsx",
@@ -3981,9 +3992,9 @@
       "source_file": "apps/web/src/components/TradesTable.tsx",
       "source_location": "L67",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "components_tradestable",
-      "target": "components_tradestable_getemotionemoji",
-      "confidence_score": 1.0
+      "target": "components_tradestable_getemotionemoji"
     },
     {
       "relation": "contains",
@@ -3991,9 +4002,9 @@
       "source_file": "apps/web/src/components/TradesTable.tsx",
       "source_location": "L78",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "components_tradestable",
-      "target": "components_tradestable_getemotionlabel",
-      "confidence_score": 1.0
+      "target": "components_tradestable_getemotionlabel"
     },
     {
       "relation": "contains",
@@ -6096,5 +6107,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "e8fd3d384887c76bc44db49fb4dfc8d2951e3fee"
+  "built_at_commit": "3260737df5595952a745f38bed25da0a1efe3efb"
 }

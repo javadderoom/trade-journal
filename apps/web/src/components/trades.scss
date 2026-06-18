@@ -677,9 +677,12 @@
   box-shadow: -10px 0 30px rgba(0, 0, 0, 0.3);
   display: flex;
   flex-direction: column;
-  height: 100%;
-  position: relative;
-  z-index: 10;
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  z-index: 1000;
   animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 
   .panel-header {
@@ -935,6 +938,14 @@
           outline: none;
           transition: all 0.2s ease;
           direction: ltr;
+          appearance: textfield;
+          -moz-appearance: textfield;
+
+          &::-webkit-outer-spin-button,
+          &::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+          }
 
           &:focus {
             border-color: $secondary;
@@ -1172,5 +1183,60 @@ input[type="checkbox"] {
 
   to {
     transform: translateX(0);
+  }
+}
+
+.day-session-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: flex-start;
+}
+
+.session-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 500;
+  white-space: nowrap;
+  font-family: $font-primary;
+
+  &.session-asian {
+    background-color: rgba(#3b82f6, 0.12);
+    color: #60a5fa;
+    border: 1px solid rgba(#3b82f6, 0.2);
+  }
+
+  &.session-london {
+    background-color: rgba(#10b981, 0.12);
+    color: #34d399;
+    border: 1px solid rgba(#10b981, 0.2);
+  }
+
+  &.session-overlap {
+    background-color: rgba(#8b5cf6, 0.12);
+    color: #c084fc;
+    border: 1px solid rgba(#8b5cf6, 0.2);
+  }
+
+  &.session-ny {
+    background-color: rgba(#f59e0b, 0.12);
+    color: #fbbf24;
+    border: 1px solid rgba(#f59e0b, 0.2);
+  }
+
+  &.session-sydney {
+    background-color: rgba(#06b6d4, 0.12);
+    color: #22d3ee;
+    border: 1px solid rgba(#06b6d4, 0.2);
+  }
+
+  &.session-unknown {
+    background-color: rgba($outline, 0.12);
+    color: $on-surface-variant;
+    border: 1px solid rgba($outline, 0.2);
   }
 }

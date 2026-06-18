@@ -102,6 +102,7 @@ export default function TradesTable({
   const [isAddingTag, setIsAddingTag] = useState(false);
   const [isAddingEmotion, setIsAddingEmotion] = useState(false);
   const [allEmotions, setAllEmotions] = useState<{ value: string; label: string }[]>(DEFAULT_EMOTIONS);
+  const [selectedTimezone, setSelectedTimezone] = useState('Asia/Tehran');
 
   // USD → Toman exchange rate (pre-filled from live Navasan rate, user-editable)
   const [usdToToman, setUsdToToman] = useState<number>(initialUsdToToman);
@@ -284,27 +285,69 @@ export default function TradesTable({
     return formatPersianCurrency(val);
   };
 
-  const PERSIAN_DAYS = ['یکشنبه', 'دوشنبه', 'سه‌شنبه', 'چهارشنبه', 'پنجشنبه', 'جمعه', 'شنبه'];
-
-  // Returns { date: '۱۴۰۵/۰۳/۲۵ - ۱۳:۳۰', day: 'دوشنبه' }
-  const formatDate = (dateStr: string): { date: string; day: string } => {
+  // Returns { date: '۱۴۰۵/۰۳/۲۵ - ۱۳:۳۰', day: 'دوشنبه' } in selected timezone
+  const formatDate = (dateStr: string, timezone: string = selectedTimezone): { date: string; day: string } => {
     try {
       const d = new Date(dateStr);
       if (isNaN(d.getTime())) return { date: dateStr, day: '' };
 
-      const pad = (num: number) => String(num).padStart(2, '0');
-      const year = d.getFullYear();
-      const month = pad(d.getMonth() + 1);
-      const day = pad(d.getDate());
-      const hours = pad(d.getHours());
-      const minutes = pad(d.getMinutes());
+      // Format parts using Intl in the selected timezone
+      const formatter = new Intl.DateTimeFormat('fa-IR', {
+        timeZone: timezone,
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false
+      });
+
+      const formatted = formatter.format(d);
+      // Clean up separator formatted by Intl
+      const cleanedDate = formatted.replace('،', ' -').replace(',', ' -');
+
+      // Get day of week
+      const dayFormatter = new Intl.DateTimeFormat('fa-IR', {
+        timeZone: timezone,
+        weekday: 'long'
+      });
+      const dayLabel = dayFormatter.format(d);
 
       return {
-        date: toPersianDigits(`${year}/${month}/${day} - ${hours}:${minutes}`),
-        day: PERSIAN_DAYS[d.getDay()],
+        date: cleanedDate,
+        day: dayLabel,
       };
     } catch {
       return { date: toPersianDigits(dateStr), day: '' };
+    }
+  };
+
+  const getTradingSession = (dateStr: string): { name: string; label: string; emoji: string; className: string } => {
+    try {
+      const d = new Date(dateStr);
+      if (isNaN(d.getTime())) {
+        return { name: 'UNKNOWN', label: 'نامشخص', emoji: '❓', className: 'session-unknown' };
+      }
+      const hour = d.getUTCHours();
+
+      // Tokyo (Asia): 00:00 - 07:00 UTC
+      // London (Europe): 07:00 - 12:00 UTC
+      // London/NY Overlap: 12:00 - 16:00 UTC
+      // New York (US): 16:00 - 22:00 UTC
+      // Sydney: 22:00 - 24:00 UTC
+      if (hour >= 0 && hour < 7) {
+        return { name: 'ASIAN', label: 'توکیو', emoji: '🇯🇵', className: 'session-asian' };
+      } else if (hour >= 7 && hour < 12) {
+        return { name: 'LONDON', label: 'لندن', emoji: '🇬🇧', className: 'session-london' };
+      } else if (hour >= 12 && hour < 16) {
+        return { name: 'OVERLAP', label: 'لندن+نیویورک', emoji: '🤝', className: 'session-overlap' };
+      } else if (hour >= 16 && hour < 22) {
+        return { name: 'NEW_YORK', label: 'نیویورک', emoji: '🇺🇸', className: 'session-ny' };
+      } else {
+        return { name: 'SYDNEY', label: 'سیدنی', emoji: '🇦🇺', className: 'session-sydney' };
+      }
+    } catch {
+      return { name: 'UNKNOWN', label: 'نامشخص', emoji: '❓', className: 'session-unknown' };
     }
   };
 
@@ -331,8 +374,8 @@ export default function TradesTable({
               updated.rMultiple = 0;
             }
           } else {
-            // Fallback to default mock-like R value if stop loss is removed/cleared
-            updated.rMultiple = updated.profitUsd > 0 ? 1.5 : -1.0;
+            // Default R value to 0 if stop loss is removed/cleared
+            updated.rMultiple = 0;
           }
         }
 
@@ -388,6 +431,16 @@ export default function TradesTable({
               <option value="همه جهت‌ها">همه جهت‌ها</option>
               <option value="خرید (Buy)">خرید (Buy)</option>
               <option value="فروش (Sell)">فروش (Sell)</option>
+            </select>
+            <span className="material-symbols-outlined select-arrow">keyboard_arrow_down</span>
+          </div>
+
+          <div className="filter-select-wrapper" title="منطقه زمانی">
+            <select value={selectedTimezone} onChange={e => setSelectedTimezone(e.target.value)}>
+              <option value="Asia/Tehran">🇮🇷 تهران (GMT+۳:۳۰)</option>
+              <option value="UTC">🌐 UTC (GMT+۰)</option>
+              <option value="Europe/London">🇬🇧 لندن (GMT+۰ / تابستان +۱)</option>
+              <option value="America/New_York">🇺🇸 نیویورک (GMT−۵ / تابستان −۴)</option>
             </select>
             <span className="material-symbols-outlined select-arrow">keyboard_arrow_down</span>
           </div>
@@ -520,11 +573,20 @@ export default function TradesTable({
                         />
                       </td>
                       <td className="col-time">
-                        <span className="date-value">{formatDate(trade.openTime).date}</span>
-
+                        <span className="date-value">{formatDate(trade.openTime, selectedTimezone).date}</span>
                       </td>
                       <td>
-                        <span className="day-badge">{formatDate(trade.openTime).day}</span>
+                        <div className="day-session-wrapper">
+                          <span className="day-badge">{formatDate(trade.openTime, selectedTimezone).day}</span>
+                          {(() => {
+                            const sess = getTradingSession(trade.openTime);
+                            return (
+                              <span className={`session-badge ${sess.className}`} title={sess.label}>
+                                {sess.emoji} {sess.label}
+                              </span>
+                            );
+                          })()}
+                        </div>
                       </td>
                       <td className="col-symbol">
                         <div className="symbol-cell-content">
@@ -703,7 +765,19 @@ export default function TradesTable({
               <div className="details-grid">
                 <span className="grid-label">زمان ورود:</span>
                 <span className="grid-value direction-ltr">
-                  {formatDate(activeTrade.openTime).date}
+                  {formatDate(activeTrade.openTime, selectedTimezone).date}
+                </span>
+
+                <span className="grid-label">سشن ورود:</span>
+                <span className="grid-value">
+                  {(() => {
+                    const sess = getTradingSession(activeTrade.openTime);
+                    return (
+                      <span className={`session-badge ${sess.className}`}>
+                        {sess.emoji} {sess.label}
+                      </span>
+                    );
+                  })()}
                 </span>
 
                 <span className="grid-label">قیمت ورود:</span>
@@ -713,21 +787,39 @@ export default function TradesTable({
 
                 <span className="grid-label">حد ضرر (SL):</span>
                 <span className="grid-value">
-                  {activeTrade.stopLoss ?? ''}
-
+                  <input
+                    type="number"
+                    step="any"
+                    className="grid-input sl-input"
+                    placeholder="--"
+                    value={activeTrade.stopLoss !== null ? activeTrade.stopLoss : ''}
+                    onChange={e => {
+                      const val = e.target.value === '' ? null : parseFloat(e.target.value);
+                      updateActiveTradeField('stopLoss', val);
+                    }}
+                  />
                 </span>
 
                 <span className="grid-label">حد سود (TP):</span>
                 <span className="grid-value">
-                  {activeTrade.takeProfit ?? ''}
-
+                  <input
+                    type="number"
+                    step="any"
+                    className="grid-input tp-input"
+                    placeholder="--"
+                    value={activeTrade.takeProfit !== null ? activeTrade.takeProfit : ''}
+                    onChange={e => {
+                      const val = e.target.value === '' ? null : parseFloat(e.target.value);
+                      updateActiveTradeField('takeProfit', val);
+                    }}
+                  />
                 </span>
 
                 {activeTrade.closeTime && (
                   <>
                     <span className="grid-label">زمان خروج:</span>
                     <span className="grid-value direction-ltr">
-                      {formatDate(activeTrade.closeTime).date}
+                      {formatDate(activeTrade.closeTime, selectedTimezone).date}
                     </span>
 
                     <span className="grid-label">قیمت خروج:</span>

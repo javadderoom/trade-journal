@@ -20,8 +20,8 @@
     "semantic_hash": ""
   },
   "apps/api/src/routes/tradeSync.ts": {
-    "mtime": 1781810591.745679,
-    "ast_hash": "2e9a2b044897bd1df9feb0cbce0b0f9e",
+    "mtime": 1781818524.6499844,
+    "ast_hash": "9a8e9ae6283dc4e5bca3643979f375f6",
     "semantic_hash": ""
   },
   "apps/api/src/server.ts": {
@@ -65,13 +65,13 @@
     "semantic_hash": ""
   },
   "apps/web/src/app/trades/page.tsx": {
-    "mtime": 1781810628.3137567,
-    "ast_hash": "6d4ca2d7440ece7ea3d6d1242e9b09b2",
+    "mtime": 1781818505.4406152,
+    "ast_hash": "278d4fa8d0b504a8772991d854f4c925",
     "semantic_hash": ""
   },
   "apps/web/src/components/TradesTable.tsx": {
-    "mtime": 1781815040.236765,
-    "ast_hash": "e42a6d4a3f4bf7ac8563122f142024d5",
+    "mtime": 1781820598.9556446,
+    "ast_hash": "31e2304398adbe00e3727f146e0c13ed",
     "semantic_hash": ""
   },
   "apps/web/src/utils/farsi.ts": {

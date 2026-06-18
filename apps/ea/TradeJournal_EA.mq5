@@ -137,6 +137,11 @@ void SyncTrades()
 
       FindOpenDealDetails(positionId, openPrice, openCommission, sl, tp, openTime);
 
+      // Convert times from Broker Server timezone to UTC
+      int timezoneOffset = (int)(TimeCurrent() - TimeGMT());
+      datetime utcOpenTime = openTime - timezoneOffset;
+      datetime utcCloseTime = (datetime)dealTime - timezoneOffset;
+
       // Total commission = open deal commission + close deal commission
       double totalCommission = openCommission + commission;
       
@@ -178,8 +183,8 @@ void SyncTrades()
       jsonPayload += "\"ticket\":" + IntegerToString(ticket) + ",";
       jsonPayload += "\"symbol\":\"" + symbol + "\",";
       jsonPayload += "\"direction\":\"" + direction + "\",";
-      jsonPayload += "\"openTime\":\"" + FormatDateTime((datetime)openTime) + "\",";
-      jsonPayload += "\"closeTime\":\"" + FormatDateTime((datetime)dealTime) + "\",";
+      jsonPayload += "\"openTime\":\"" + FormatDateTime(utcOpenTime) + "\",";
+      jsonPayload += "\"closeTime\":\"" + FormatDateTime(utcCloseTime) + "\",";
       jsonPayload += "\"openPrice\":" + DoubleToString(openPrice, digits) + ",";
       jsonPayload += "\"closePrice\":" + DoubleToString(dealPrice, digits) + ",";
       jsonPayload += "\"lotSize\":" + DoubleToString(volume, 2) + ",";

@@ -121,8 +121,8 @@ router.put('/:ticket', async (req: Request, res: Response) => {
           rMultipleUpdate = 0;
         }
       } else {
-        // Fallback to legacy/mock-like R value if stop loss is removed
-        rMultipleUpdate = existing.profit_usd > 0 ? 1.5 : -1.0;
+        // Clear R value to 0 if stop loss is removed
+        rMultipleUpdate = 0;
       }
     }
 
