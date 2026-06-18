@@ -5,8 +5,6 @@
     "moduleResolution": "NodeNext",
     "strict": true,
     "esModuleInterop": true,
-    "skipLibCheck": true,
-    "types": ["node", "@prisma/client"]
-  },
-  "include": ["apps/api/src/**/*.ts"]
+    "skipLibCheck": true
+  }
 }
