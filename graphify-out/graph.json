@@ -514,6 +514,76 @@
       "norm_label": "multerfile"
     },
     {
+      "label": "tsconfig.json",
+      "file_type": "code",
+      "source_file": "apps/api/tsconfig.json",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "api_tsconfig",
+      "community": 21,
+      "norm_label": "tsconfig.json"
+    },
+    {
+      "label": "extends",
+      "file_type": "code",
+      "source_file": "apps/api/tsconfig.json",
+      "source_location": "L2",
+      "_origin": "ast",
+      "id": "api_tsconfig_extends",
+      "community": 21,
+      "norm_label": "extends"
+    },
+    {
+      "label": "compilerOptions",
+      "file_type": "code",
+      "source_file": "apps/api/tsconfig.json",
+      "source_location": "L3",
+      "_origin": "ast",
+      "id": "api_tsconfig_compileroptions",
+      "community": 21,
+      "norm_label": "compileroptions"
+    },
+    {
+      "label": "outDir",
+      "file_type": "code",
+      "source_file": "apps/api/tsconfig.json",
+      "source_location": "L4",
+      "_origin": "ast",
+      "id": "api_tsconfig_compileroptions_outdir",
+      "community": 21,
+      "norm_label": "outdir"
+    },
+    {
+      "label": "rootDir",
+      "file_type": "code",
+      "source_file": "apps/api/tsconfig.json",
+      "source_location": "L5",
+      "_origin": "ast",
+      "id": "api_tsconfig_compileroptions_rootdir",
+      "community": 21,
+      "norm_label": "rootdir"
+    },
+    {
+      "label": "types",
+      "file_type": "code",
+      "source_file": "apps/api/tsconfig.json",
+      "source_location": "L6",
+      "_origin": "ast",
+      "id": "api_tsconfig_compileroptions_types",
+      "community": 21,
+      "norm_label": "types"
+    },
+    {
+      "label": "include",
+      "file_type": "code",
+      "source_file": "apps/api/tsconfig.json",
+      "source_location": "L8",
+      "_origin": "ast",
+      "id": "api_tsconfig_include",
+      "community": 21,
+      "norm_label": "include"
+    },
+    {
       "label": "package.json",
       "file_type": "code",
       "source_file": "apps/web/package.json",
@@ -824,10 +894,30 @@
       "norm_label": "default_emotions"
     },
     {
-      "label": "TradesTable()",
+      "label": "getEmotionEmoji()",
       "file_type": "code",
       "source_file": "apps/web/src/components/TradesTable.tsx",
       "source_location": "L67",
+      "_origin": "ast",
+      "id": "components_tradestable_getemotionemoji",
+      "community": 7,
+      "norm_label": "getemotionemoji()"
+    },
+    {
+      "label": "getEmotionLabel()",
+      "file_type": "code",
+      "source_file": "apps/web/src/components/TradesTable.tsx",
+      "source_location": "L78",
+      "_origin": "ast",
+      "id": "components_tradestable_getemotionlabel",
+      "community": 7,
+      "norm_label": "getemotionlabel()"
+    },
+    {
+      "label": "TradesTable()",
+      "file_type": "code",
+      "source_file": "apps/web/src/components/TradesTable.tsx",
+      "source_location": "L84",
       "_origin": "ast",
       "id": "components_tradestable_tradestable",
       "community": 7,
@@ -1164,10 +1254,40 @@
       "norm_label": "dev"
     },
     {
+      "label": "build:web",
+      "file_type": "code",
+      "source_file": "package.json",
+      "source_location": "L12",
+      "_origin": "ast",
+      "id": "package_scripts_build_web",
+      "community": 8,
+      "norm_label": "build:web"
+    },
+    {
+      "label": "build:api",
+      "file_type": "code",
+      "source_file": "package.json",
+      "source_location": "L13",
+      "_origin": "ast",
+      "id": "package_scripts_build_api",
+      "community": 8,
+      "norm_label": "build:api"
+    },
+    {
+      "label": "build",
+      "file_type": "code",
+      "source_file": "package.json",
+      "source_location": "L14",
+      "_origin": "ast",
+      "id": "package_scripts_build",
+      "community": 8,
+      "norm_label": "build"
+    },
+    {
       "label": "devDependencies",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L15",
+      "source_location": "L17",
       "_origin": "ast",
       "id": "package_devdependencies",
       "community": 8,
@@ -1177,7 +1297,7 @@
       "label": "concurrently",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L16",
+      "source_location": "L18",
       "_origin": "ast",
       "id": "package_devdependencies_concurrently",
       "community": 8,
@@ -1187,7 +1307,7 @@
       "label": "typescript",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L17",
+      "source_location": "L19",
       "_origin": "ast",
       "id": "package_devdependencies_typescript",
       "community": 8,
@@ -1274,26 +1394,6 @@
       "norm_label": "skiplibcheck"
     },
     {
-      "label": "types",
-      "file_type": "code",
-      "source_file": "tsconfig.json",
-      "source_location": "L9",
-      "_origin": "ast",
-      "id": "tsconfig_compileroptions_types",
-      "community": 11,
-      "norm_label": "types"
-    },
-    {
-      "label": "include",
-      "file_type": "code",
-      "source_file": "tsconfig.json",
-      "source_location": "L11",
-      "_origin": "ast",
-      "id": "tsconfig_include",
-      "community": 11,
-      "norm_label": "include"
-    },
-    {
       "label": "graphify.md",
       "file_type": "document",
       "source_file": ".agents/rules/graphify.md",
@@ -1312,6 +1412,646 @@
       "id": "rules_graphify_graphify",
       "community": 17,
       "norm_label": "graphify"
+    },
+    {
+      "label": "SKILL.md",
+      "file_type": "document",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "emil_design_eng_skill",
+      "community": 19,
+      "norm_label": "skill.md"
+    },
+    {
+      "label": "Design Engineering",
+      "file_type": "document",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L6",
+      "_origin": "ast",
+      "id": "emil_design_eng_skill_design_engineering",
+      "community": 19,
+      "norm_label": "design engineering"
+    },
+    {
+      "label": "Initial Response",
+      "file_type": "document",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L8",
+      "_origin": "ast",
+      "id": "emil_design_eng_skill_initial_response",
+      "community": 19,
+      "norm_label": "initial response"
+    },
+    {
+      "label": "Core Philosophy",
+      "file_type": "document",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L18",
+      "_origin": "ast",
+      "id": "emil_design_eng_skill_core_philosophy",
+      "community": 19,
+      "norm_label": "core philosophy"
+    },
+    {
+      "label": "Taste is trained, not innate",
+      "file_type": "document",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L20",
+      "_origin": "ast",
+      "id": "emil_design_eng_skill_taste_is_trained_not_innate",
+      "community": 19,
+      "norm_label": "taste is trained, not innate"
+    },
+    {
+      "label": "Unseen details compound",
+      "file_type": "document",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L26",
+      "_origin": "ast",
+      "id": "emil_design_eng_skill_unseen_details_compound",
+      "community": 19,
+      "norm_label": "unseen details compound"
+    },
+    {
+      "label": "Beauty is leverage",
+      "file_type": "document",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L34",
+      "_origin": "ast",
+      "id": "emil_design_eng_skill_beauty_is_leverage",
+      "community": 19,
+      "norm_label": "beauty is leverage"
+    },
+    {
+      "label": "Review Format (Required)",
+      "file_type": "document",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L38",
+      "_origin": "ast",
+      "id": "emil_design_eng_skill_review_format_required",
+      "community": 19,
+      "norm_label": "review format (required)"
+    },
+    {
+      "label": "The Animation Decision Framework",
+      "file_type": "document",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L62",
+      "_origin": "ast",
+      "id": "emil_design_eng_skill_the_animation_decision_framework",
+      "community": 20,
+      "norm_label": "the animation decision framework"
+    },
+    {
+      "label": "1. Should this animate at all?",
+      "file_type": "document",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L66",
+      "_origin": "ast",
+      "id": "emil_design_eng_skill_1_should_this_animate_at_all",
+      "community": 20,
+      "norm_label": "1. should this animate at all?"
+    },
+    {
+      "label": "2. What is the purpose?",
+      "file_type": "document",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L81",
+      "_origin": "ast",
+      "id": "emil_design_eng_skill_2_what_is_the_purpose",
+      "community": 20,
+      "norm_label": "2. what is the purpose?"
+    },
+    {
+      "label": "3. What easing should it use?",
+      "file_type": "document",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L95",
+      "_origin": "ast",
+      "id": "emil_design_eng_skill_3_what_easing_should_it_use",
+      "community": 20,
+      "norm_label": "3. what easing should it use?"
+    },
+    {
+      "label": "4. How fast should it be?",
+      "file_type": "document",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L125",
+      "_origin": "ast",
+      "id": "emil_design_eng_skill_4_how_fast_should_it_be",
+      "community": 20,
+      "norm_label": "4. how fast should it be?"
+    },
+    {
+      "label": "Perceived performance",
+      "file_type": "document",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L137",
+      "_origin": "ast",
+      "id": "emil_design_eng_skill_perceived_performance",
+      "community": 20,
+      "norm_label": "perceived performance"
+    },
+    {
+      "label": "Spring Animations",
+      "file_type": "document",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L147",
+      "_origin": "ast",
+      "id": "emil_design_eng_skill_spring_animations",
+      "community": 19,
+      "norm_label": "spring animations"
+    },
+    {
+      "label": "When to use springs",
+      "file_type": "document",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L151",
+      "_origin": "ast",
+      "id": "emil_design_eng_skill_when_to_use_springs",
+      "community": 19,
+      "norm_label": "when to use springs"
+    },
+    {
+      "label": "Spring-based mouse interactions",
+      "file_type": "document",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L158",
+      "_origin": "ast",
+      "id": "emil_design_eng_skill_spring_based_mouse_interactions",
+      "community": 19,
+      "norm_label": "spring-based mouse interactions"
+    },
+    {
+      "label": "Spring configuration",
+      "file_type": "document",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L177",
+      "_origin": "ast",
+      "id": "emil_design_eng_skill_spring_configuration",
+      "community": 19,
+      "norm_label": "spring configuration"
+    },
+    {
+      "label": "Interruptibility advantage",
+      "file_type": "document",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L193",
+      "_origin": "ast",
+      "id": "emil_design_eng_skill_interruptibility_advantage",
+      "community": 19,
+      "norm_label": "interruptibility advantage"
+    },
+    {
+      "label": "Component Building Principles",
+      "file_type": "document",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L197",
+      "_origin": "ast",
+      "id": "emil_design_eng_skill_component_building_principles",
+      "community": 19,
+      "norm_label": "component building principles"
+    },
+    {
+      "label": "Buttons must feel responsive",
+      "file_type": "document",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L199",
+      "_origin": "ast",
+      "id": "emil_design_eng_skill_buttons_must_feel_responsive",
+      "community": 19,
+      "norm_label": "buttons must feel responsive"
+    },
+    {
+      "label": "Never animate from scale(0)",
+      "file_type": "document",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L215",
+      "_origin": "ast",
+      "id": "emil_design_eng_skill_never_animate_from_scale_0",
+      "community": 19,
+      "norm_label": "never animate from scale(0)"
+    },
+    {
+      "label": "Make popovers origin-aware",
+      "file_type": "document",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L234",
+      "_origin": "ast",
+      "id": "emil_design_eng_skill_make_popovers_origin_aware",
+      "community": 19,
+      "norm_label": "make popovers origin-aware"
+    },
+    {
+      "label": "Tooltips: skip delay on subsequent hovers",
+      "file_type": "document",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L252",
+      "_origin": "ast",
+      "id": "emil_design_eng_skill_tooltips_skip_delay_on_subsequent_hovers",
+      "community": 19,
+      "norm_label": "tooltips: skip delay on subsequent hovers"
+    },
+    {
+      "label": "Use CSS transitions over keyframes for interruptible UI",
+      "file_type": "document",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L274",
+      "_origin": "ast",
+      "id": "emil_design_eng_skill_use_css_transitions_over_keyframes_for_interruptible_ui",
+      "community": 19,
+      "norm_label": "use css transitions over keyframes for interruptible ui"
+    },
+    {
+      "label": "Use blur to mask imperfect transitions",
+      "file_type": "document",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L295",
+      "_origin": "ast",
+      "id": "emil_design_eng_skill_use_blur_to_mask_imperfect_transitions",
+      "community": 19,
+      "norm_label": "use blur to mask imperfect transitions"
+    },
+    {
+      "label": "Animate enter states with @starting-style",
+      "file_type": "document",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L324",
+      "_origin": "ast",
+      "id": "emil_design_eng_skill_animate_enter_states_with_starting_style",
+      "community": 19,
+      "norm_label": "animate enter states with @starting-style"
+    },
+    {
+      "label": "CSS Transform Mastery",
+      "file_type": "document",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L351",
+      "_origin": "ast",
+      "id": "emil_design_eng_skill_css_transform_mastery",
+      "community": 22,
+      "norm_label": "css transform mastery"
+    },
+    {
+      "label": "translateY with percentages",
+      "file_type": "document",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L353",
+      "_origin": "ast",
+      "id": "emil_design_eng_skill_translatey_with_percentages",
+      "community": 22,
+      "norm_label": "translatey with percentages"
+    },
+    {
+      "label": "scale() scales children too",
+      "file_type": "document",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L371",
+      "_origin": "ast",
+      "id": "emil_design_eng_skill_scale_scales_children_too",
+      "community": 22,
+      "norm_label": "scale() scales children too"
+    },
+    {
+      "label": "3D transforms for depth",
+      "file_type": "document",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L375",
+      "_origin": "ast",
+      "id": "emil_design_eng_skill_3d_transforms_for_depth",
+      "community": 22,
+      "norm_label": "3d transforms for depth"
+    },
+    {
+      "label": "transform-origin",
+      "file_type": "document",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L394",
+      "_origin": "ast",
+      "id": "emil_design_eng_skill_transform_origin",
+      "community": 22,
+      "norm_label": "transform-origin"
+    },
+    {
+      "label": "clip-path for Animation",
+      "file_type": "document",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L398",
+      "_origin": "ast",
+      "id": "emil_design_eng_skill_clip_path_for_animation",
+      "community": 23,
+      "norm_label": "clip-path for animation"
+    },
+    {
+      "label": "The inset shape",
+      "file_type": "document",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L402",
+      "_origin": "ast",
+      "id": "emil_design_eng_skill_the_inset_shape",
+      "community": 23,
+      "norm_label": "the inset shape"
+    },
+    {
+      "label": "Tabs with perfect color transitions",
+      "file_type": "document",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L428",
+      "_origin": "ast",
+      "id": "emil_design_eng_skill_tabs_with_perfect_color_transitions",
+      "community": 23,
+      "norm_label": "tabs with perfect color transitions"
+    },
+    {
+      "label": "Hold-to-delete pattern",
+      "file_type": "document",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L432",
+      "_origin": "ast",
+      "id": "emil_design_eng_skill_hold_to_delete_pattern",
+      "community": 23,
+      "norm_label": "hold-to-delete pattern"
+    },
+    {
+      "label": "Image reveals on scroll",
+      "file_type": "document",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L436",
+      "_origin": "ast",
+      "id": "emil_design_eng_skill_image_reveals_on_scroll",
+      "community": 23,
+      "norm_label": "image reveals on scroll"
+    },
+    {
+      "label": "Comparison sliders",
+      "file_type": "document",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L440",
+      "_origin": "ast",
+      "id": "emil_design_eng_skill_comparison_sliders",
+      "community": 23,
+      "norm_label": "comparison sliders"
+    },
+    {
+      "label": "Gesture and Drag Interactions",
+      "file_type": "document",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L444",
+      "_origin": "ast",
+      "id": "emil_design_eng_skill_gesture_and_drag_interactions",
+      "community": 25,
+      "norm_label": "gesture and drag interactions"
+    },
+    {
+      "label": "Momentum-based dismissal",
+      "file_type": "document",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L446",
+      "_origin": "ast",
+      "id": "emil_design_eng_skill_momentum_based_dismissal",
+      "community": 25,
+      "norm_label": "momentum-based dismissal"
+    },
+    {
+      "label": "Damping at boundaries",
+      "file_type": "document",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L459",
+      "_origin": "ast",
+      "id": "emil_design_eng_skill_damping_at_boundaries",
+      "community": 25,
+      "norm_label": "damping at boundaries"
+    },
+    {
+      "label": "Pointer capture for drag",
+      "file_type": "document",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L463",
+      "_origin": "ast",
+      "id": "emil_design_eng_skill_pointer_capture_for_drag",
+      "community": 25,
+      "norm_label": "pointer capture for drag"
+    },
+    {
+      "label": "Multi-touch protection",
+      "file_type": "document",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L467",
+      "_origin": "ast",
+      "id": "emil_design_eng_skill_multi_touch_protection",
+      "community": 25,
+      "norm_label": "multi-touch protection"
+    },
+    {
+      "label": "Friction instead of hard stops",
+      "file_type": "document",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L478",
+      "_origin": "ast",
+      "id": "emil_design_eng_skill_friction_instead_of_hard_stops",
+      "community": 25,
+      "norm_label": "friction instead of hard stops"
+    },
+    {
+      "label": "Performance Rules",
+      "file_type": "document",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L482",
+      "_origin": "ast",
+      "id": "emil_design_eng_skill_performance_rules",
+      "community": 24,
+      "norm_label": "performance rules"
+    },
+    {
+      "label": "Only animate transform and opacity",
+      "file_type": "document",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L484",
+      "_origin": "ast",
+      "id": "emil_design_eng_skill_only_animate_transform_and_opacity",
+      "community": 24,
+      "norm_label": "only animate transform and opacity"
+    },
+    {
+      "label": "CSS variables are inheritable",
+      "file_type": "document",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L488",
+      "_origin": "ast",
+      "id": "emil_design_eng_skill_css_variables_are_inheritable",
+      "community": 24,
+      "norm_label": "css variables are inheritable"
+    },
+    {
+      "label": "Framer Motion hardware acceleration caveat",
+      "file_type": "document",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L500",
+      "_origin": "ast",
+      "id": "emil_design_eng_skill_framer_motion_hardware_acceleration_caveat",
+      "community": 24,
+      "norm_label": "framer motion hardware acceleration caveat"
+    },
+    {
+      "label": "CSS animations beat JS under load",
+      "file_type": "document",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L514",
+      "_origin": "ast",
+      "id": "emil_design_eng_skill_css_animations_beat_js_under_load",
+      "community": 24,
+      "norm_label": "css animations beat js under load"
+    },
+    {
+      "label": "Use WAAPI for programmatic CSS animations",
+      "file_type": "document",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L518",
+      "_origin": "ast",
+      "id": "emil_design_eng_skill_use_waapi_for_programmatic_css_animations",
+      "community": 24,
+      "norm_label": "use waapi for programmatic css animations"
+    },
+    {
+      "label": "Accessibility",
+      "file_type": "document",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L530",
+      "_origin": "ast",
+      "id": "emil_design_eng_skill_accessibility",
+      "community": 19,
+      "norm_label": "accessibility"
+    },
+    {
+      "label": "prefers-reduced-motion",
+      "file_type": "document",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L532",
+      "_origin": "ast",
+      "id": "emil_design_eng_skill_prefers_reduced_motion",
+      "community": 19,
+      "norm_label": "prefers-reduced-motion"
+    },
+    {
+      "label": "Touch device hover states",
+      "file_type": "document",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L550",
+      "_origin": "ast",
+      "id": "emil_design_eng_skill_touch_device_hover_states",
+      "community": 19,
+      "norm_label": "touch device hover states"
+    },
+    {
+      "label": "The Sonner Principles (Building Loved Components)",
+      "file_type": "document",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L562",
+      "_origin": "ast",
+      "id": "emil_design_eng_skill_the_sonner_principles_building_loved_components",
+      "community": 19,
+      "norm_label": "the sonner principles (building loved components)"
+    },
+    {
+      "label": "Cohesion matters",
+      "file_type": "document",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L578",
+      "_origin": "ast",
+      "id": "emil_design_eng_skill_cohesion_matters",
+      "community": 19,
+      "norm_label": "cohesion matters"
+    },
+    {
+      "label": "The opacity + height combination",
+      "file_type": "document",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L584",
+      "_origin": "ast",
+      "id": "emil_design_eng_skill_the_opacity_height_combination",
+      "community": 19,
+      "norm_label": "the opacity + height combination"
+    },
+    {
+      "label": "Review your work the next day",
+      "file_type": "document",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L588",
+      "_origin": "ast",
+      "id": "emil_design_eng_skill_review_your_work_the_next_day",
+      "community": 19,
+      "norm_label": "review your work the next day"
+    },
+    {
+      "label": "Asymmetric enter/exit timing",
+      "file_type": "document",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L592",
+      "_origin": "ast",
+      "id": "emil_design_eng_skill_asymmetric_enter_exit_timing",
+      "community": 19,
+      "norm_label": "asymmetric enter/exit timing"
+    },
+    {
+      "label": "Stagger Animations",
+      "file_type": "document",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L608",
+      "_origin": "ast",
+      "id": "emil_design_eng_skill_stagger_animations",
+      "community": 19,
+      "norm_label": "stagger animations"
+    },
+    {
+      "label": "Debugging Animations",
+      "file_type": "document",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L642",
+      "_origin": "ast",
+      "id": "emil_design_eng_skill_debugging_animations",
+      "community": 19,
+      "norm_label": "debugging animations"
+    },
+    {
+      "label": "Slow motion testing",
+      "file_type": "document",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L644",
+      "_origin": "ast",
+      "id": "emil_design_eng_skill_slow_motion_testing",
+      "community": 19,
+      "norm_label": "slow motion testing"
+    },
+    {
+      "label": "Frame-by-frame inspection",
+      "file_type": "document",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L655",
+      "_origin": "ast",
+      "id": "emil_design_eng_skill_frame_by_frame_inspection",
+      "community": 19,
+      "norm_label": "frame-by-frame inspection"
+    },
+    {
+      "label": "Test on real devices",
+      "file_type": "document",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L659",
+      "_origin": "ast",
+      "id": "emil_design_eng_skill_test_on_real_devices",
+      "community": 19,
+      "norm_label": "test on real devices"
+    },
+    {
+      "label": "Review Checklist",
+      "file_type": "document",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L663",
+      "_origin": "ast",
+      "id": "emil_design_eng_skill_review_checklist",
+      "community": 19,
+      "norm_label": "review checklist"
     },
     {
       "label": "graphify.md",
@@ -2291,9 +3031,9 @@
       "source_file": "apps/api/package.json",
       "source_location": "L14",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "api_package",
-      "target": "api_package_dependencies",
-      "confidence_score": 1.0
+      "target": "api_package_dependencies"
     },
     {
       "relation": "contains",
@@ -2301,9 +3041,9 @@
       "source_file": "apps/api/package.json",
       "source_location": "L24",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "api_package",
-      "target": "api_package_devdependencies",
-      "confidence_score": 1.0
+      "target": "api_package_devdependencies"
     },
     {
       "relation": "contains",
@@ -2311,9 +3051,9 @@
       "source_file": "apps/api/package.json",
       "source_location": "L2",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "api_package",
-      "target": "api_package_name",
-      "confidence_score": 1.0
+      "target": "api_package_name"
     },
     {
       "relation": "contains",
@@ -2321,9 +3061,9 @@
       "source_file": "apps/api/package.json",
       "source_location": "L11",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "api_package",
-      "target": "api_package_prisma",
-      "confidence_score": 1.0
+      "target": "api_package_prisma"
     },
     {
       "relation": "contains",
@@ -2331,9 +3071,9 @@
       "source_file": "apps/api/package.json",
       "source_location": "L4",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "api_package",
-      "target": "api_package_private",
-      "confidence_score": 1.0
+      "target": "api_package_private"
     },
     {
       "relation": "contains",
@@ -2341,9 +3081,9 @@
       "source_file": "apps/api/package.json",
       "source_location": "L5",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "api_package",
-      "target": "api_package_scripts",
-      "confidence_score": 1.0
+      "target": "api_package_scripts"
     },
     {
       "relation": "contains",
@@ -2351,9 +3091,9 @@
       "source_file": "apps/api/package.json",
       "source_location": "L3",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "api_package",
-      "target": "api_package_version",
-      "confidence_score": 1.0
+      "target": "api_package_version"
     },
     {
       "relation": "contains",
@@ -2361,9 +3101,9 @@
       "source_file": "apps/api/package.json",
       "source_location": "L7",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "api_package_scripts",
-      "target": "api_package_scripts_build",
-      "confidence_score": 1.0
+      "target": "api_package_scripts_build"
     },
     {
       "relation": "contains",
@@ -2371,9 +3111,9 @@
       "source_file": "apps/api/package.json",
       "source_location": "L6",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "api_package_scripts",
-      "target": "api_package_scripts_dev",
-      "confidence_score": 1.0
+      "target": "api_package_scripts_dev"
     },
     {
       "relation": "contains",
@@ -2381,9 +3121,9 @@
       "source_file": "apps/api/package.json",
       "source_location": "L9",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "api_package_scripts",
-      "target": "api_package_scripts_prisma_migrate",
-      "confidence_score": 1.0
+      "target": "api_package_scripts_prisma_migrate"
     },
     {
       "relation": "contains",
@@ -2391,9 +3131,9 @@
       "source_file": "apps/api/package.json",
       "source_location": "L8",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "api_package_scripts",
-      "target": "api_package_scripts_start",
-      "confidence_score": 1.0
+      "target": "api_package_scripts_start"
     },
     {
       "relation": "contains",
@@ -2401,9 +3141,9 @@
       "source_file": "apps/api/package.json",
       "source_location": "L12",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "api_package_prisma",
-      "target": "api_package_prisma_schema",
-      "confidence_score": 1.0
+      "target": "api_package_prisma_schema"
     },
     {
       "relation": "contains",
@@ -2411,9 +3151,9 @@
       "source_file": "apps/api/package.json",
       "source_location": "L17",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "api_package_dependencies",
-      "target": "api_package_dependencies_csv_parser",
-      "confidence_score": 1.0
+      "target": "api_package_dependencies_csv_parser"
     },
     {
       "relation": "contains",
@@ -2421,9 +3161,9 @@
       "source_file": "apps/api/package.json",
       "source_location": "L18",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "api_package_dependencies",
-      "target": "api_package_dependencies_depd",
-      "confidence_score": 1.0
+      "target": "api_package_dependencies_depd"
     },
     {
       "relation": "contains",
@@ -2431,9 +3171,9 @@
       "source_file": "apps/api/package.json",
       "source_location": "L19",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "api_package_dependencies",
-      "target": "api_package_dependencies_express",
-      "confidence_score": 1.0
+      "target": "api_package_dependencies_express"
     },
     {
       "relation": "contains",
@@ -2441,9 +3181,9 @@
       "source_file": "apps/api/package.json",
       "source_location": "L20",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "api_package_dependencies",
-      "target": "api_package_dependencies_node_html_parser",
-      "confidence_score": 1.0
+      "target": "api_package_dependencies_node_html_parser"
     },
     {
       "relation": "contains",
@@ -2451,9 +3191,9 @@
       "source_file": "apps/api/package.json",
       "source_location": "L21",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "api_package_dependencies",
-      "target": "api_package_dependencies_pg",
-      "confidence_score": 1.0
+      "target": "api_package_dependencies_pg"
     },
     {
       "relation": "contains",
@@ -2461,9 +3201,9 @@
       "source_file": "apps/api/package.json",
       "source_location": "L22",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "api_package_dependencies",
-      "target": "api_package_dependencies_prisma",
-      "confidence_score": 1.0
+      "target": "api_package_dependencies_prisma"
     },
     {
       "relation": "contains",
@@ -2471,9 +3211,9 @@
       "source_file": "apps/api/package.json",
       "source_location": "L15",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "api_package_dependencies",
-      "target": "api_package_dependencies_prisma_adapter_pg",
-      "confidence_score": 1.0
+      "target": "api_package_dependencies_prisma_adapter_pg"
     },
     {
       "relation": "contains",
@@ -2481,9 +3221,9 @@
       "source_file": "apps/api/package.json",
       "source_location": "L16",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "api_package_dependencies",
-      "target": "api_package_dependencies_prisma_client",
-      "confidence_score": 1.0
+      "target": "api_package_dependencies_prisma_client"
     },
     {
       "relation": "contains",
@@ -2491,9 +3231,9 @@
       "source_file": "apps/api/package.json",
       "source_location": "L27",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "api_package_devdependencies",
-      "target": "api_package_devdependencies_ts_node",
-      "confidence_score": 1.0
+      "target": "api_package_devdependencies_ts_node"
     },
     {
       "relation": "contains",
@@ -2501,9 +3241,9 @@
       "source_file": "apps/api/package.json",
       "source_location": "L25",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "api_package_devdependencies",
-      "target": "api_package_devdependencies_types_express",
-      "confidence_score": 1.0
+      "target": "api_package_devdependencies_types_express"
     },
     {
       "relation": "contains",
@@ -2511,9 +3251,9 @@
       "source_file": "apps/api/package.json",
       "source_location": "L26",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "api_package_devdependencies",
-      "target": "api_package_devdependencies_types_node",
-      "confidence_score": 1.0
+      "target": "api_package_devdependencies_types_node"
     },
     {
       "relation": "contains",
@@ -2521,9 +3261,9 @@
       "source_file": "apps/api/src/prisma/prisma.config.ts",
       "source_location": "L6",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "prisma_prisma_config",
-      "target": "prisma_prisma_config_envpath",
-      "confidence_score": 1.0
+      "target": "prisma_prisma_config_envpath"
     },
     {
       "relation": "contains",
@@ -2531,9 +3271,9 @@
       "source_file": "apps/api/src/routes/tradeSync.ts",
       "source_location": "L4",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "routes_tradesync",
-      "target": "routes_tradesync_router",
-      "confidence_score": 1.0
+      "target": "routes_tradesync_router"
     },
     {
       "relation": "imports_from",
@@ -2542,9 +3282,9 @@
       "source_file": "apps/api/src/routes/tradeSync.ts",
       "source_location": "L2",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "routes_tradesync",
-      "target": "services_tradesync",
-      "confidence_score": 1.0
+      "target": "services_tradesync"
     },
     {
       "relation": "imports",
@@ -2553,9 +3293,9 @@
       "source_file": "apps/api/src/routes/tradeSync.ts",
       "source_location": "L2",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "routes_tradesync",
-      "target": "services_tradesync_gettradesforaccount",
-      "confidence_score": 1.0
+      "target": "services_tradesync_gettradesforaccount"
     },
     {
       "relation": "imports",
@@ -2564,9 +3304,9 @@
       "source_file": "apps/api/src/routes/tradeSync.ts",
       "source_location": "L2",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "routes_tradesync",
-      "target": "services_tradesync_prisma",
-      "confidence_score": 1.0
+      "target": "services_tradesync_prisma"
     },
     {
       "relation": "imports",
@@ -2575,9 +3315,9 @@
       "source_file": "apps/api/src/routes/tradeSync.ts",
       "source_location": "L2",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "routes_tradesync",
-      "target": "services_tradesync_synctradesfromea",
-      "confidence_score": 1.0
+      "target": "services_tradesync_synctradesfromea"
     },
     {
       "relation": "imports_from",
@@ -2586,9 +3326,9 @@
       "source_file": "apps/api/src/server.ts",
       "source_location": "L3",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_server",
-      "target": "routes_tradesync",
-      "confidence_score": 1.0
+      "target": "routes_tradesync"
     },
     {
       "relation": "imports",
@@ -2597,9 +3337,9 @@
       "source_file": "apps/api/src/server.ts",
       "source_location": "L3",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_server",
-      "target": "routes_tradesync_router",
-      "confidence_score": 1.0
+      "target": "routes_tradesync_router"
     },
     {
       "relation": "contains",
@@ -2607,9 +3347,9 @@
       "source_file": "apps/api/src/server.ts",
       "source_location": "L5",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_server",
-      "target": "src_server_app",
-      "confidence_score": 1.0
+      "target": "src_server_app"
     },
     {
       "relation": "contains",
@@ -2617,9 +3357,9 @@
       "source_file": "apps/api/src/services/mt4Parser.ts",
       "source_location": "L28",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "services_mt4parser",
-      "target": "services_mt4parser_detectformat",
-      "confidence_score": 1.0
+      "target": "services_mt4parser_detectformat"
     },
     {
       "relation": "contains",
@@ -2627,9 +3367,9 @@
       "source_file": "apps/api/src/services/mt4Parser.ts",
       "source_location": "L23",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "services_mt4parser",
-      "target": "services_mt4parser_parsedtrade",
-      "confidence_score": 1.0
+      "target": "services_mt4parser_parsedtrade"
     },
     {
       "relation": "contains",
@@ -2637,9 +3377,9 @@
       "source_file": "apps/api/src/services/mt4Parser.ts",
       "source_location": "L70",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "services_mt4parser",
-      "target": "services_mt4parser_parsemt4csv",
-      "confidence_score": 1.0
+      "target": "services_mt4parser_parsemt4csv"
     },
     {
       "relation": "contains",
@@ -2647,9 +3387,9 @@
       "source_file": "apps/api/src/services/mt4Parser.ts",
       "source_location": "L41",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "services_mt4parser",
-      "target": "services_mt4parser_parsemt4html",
-      "confidence_score": 1.0
+      "target": "services_mt4parser_parsemt4html"
     },
     {
       "relation": "contains",
@@ -2657,9 +3397,9 @@
       "source_file": "apps/api/src/services/mt4Parser.ts",
       "source_location": "L96",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "services_mt4parser",
-      "target": "services_mt4parser_parsemt5csv",
-      "confidence_score": 1.0
+      "target": "services_mt4parser_parsemt5csv"
     },
     {
       "relation": "contains",
@@ -2667,9 +3407,9 @@
       "source_file": "apps/api/src/services/mt4Parser.ts",
       "source_location": "L122",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "services_mt4parser",
-      "target": "services_mt4parser_parsetrades",
-      "confidence_score": 1.0
+      "target": "services_mt4parser_parsetrades"
     },
     {
       "relation": "contains",
@@ -2677,9 +3417,9 @@
       "source_file": "apps/api/src/services/mt4Parser.ts",
       "source_location": "L6",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "services_mt4parser",
-      "target": "services_mt4parser_rawtrade",
-      "confidence_score": 1.0
+      "target": "services_mt4parser_rawtrade"
     },
     {
       "relation": "imports_from",
@@ -2688,9 +3428,9 @@
       "source_file": "apps/api/src/services/mt4Parser.ts",
       "source_location": "L3",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "services_mt4parser",
-      "target": "types_index",
-      "confidence_score": 1.0
+      "target": "types_index"
     },
     {
       "relation": "imports",
@@ -2699,9 +3439,9 @@
       "source_file": "apps/api/src/services/mt4Parser.ts",
       "source_location": "L3",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "services_mt4parser",
-      "target": "types_trade_multerfile",
-      "confidence_score": 1.0
+      "target": "types_trade_multerfile"
     },
     {
       "relation": "imports",
@@ -2710,9 +3450,9 @@
       "source_file": "apps/api/src/services/mt4Parser.ts",
       "source_location": "L3",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "services_mt4parser",
-      "target": "types_trade_tradedata",
-      "confidence_score": 1.0
+      "target": "types_trade_tradedata"
     },
     {
       "relation": "inherits",
@@ -2721,9 +3461,9 @@
       "source_file": "apps/api/src/services/mt4Parser.ts",
       "source_location": "L23",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "services_mt4parser_parsedtrade",
-      "target": "types_trade_tradedata",
-      "confidence_score": 1.0
+      "target": "types_trade_tradedata"
     },
     {
       "relation": "calls",
@@ -2732,9 +3472,9 @@
       "source_file": "apps/api/src/services/mt4Parser.ts",
       "source_location": "L124",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "services_mt4parser_parsetrades",
-      "target": "services_mt4parser_detectformat",
-      "confidence_score": 1.0
+      "target": "services_mt4parser_detectformat"
     },
     {
       "relation": "calls",
@@ -2743,9 +3483,9 @@
       "source_file": "apps/api/src/services/mt4Parser.ts",
       "source_location": "L130",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "services_mt4parser_parsetrades",
-      "target": "services_mt4parser_parsemt4html",
-      "confidence_score": 1.0
+      "target": "services_mt4parser_parsemt4html"
     },
     {
       "relation": "calls",
@@ -2754,9 +3494,9 @@
       "source_file": "apps/api/src/services/mt4Parser.ts",
       "source_location": "L133",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "services_mt4parser_parsetrades",
-      "target": "services_mt4parser_parsemt4csv",
-      "confidence_score": 1.0
+      "target": "services_mt4parser_parsemt4csv"
     },
     {
       "relation": "calls",
@@ -2765,9 +3505,9 @@
       "source_file": "apps/api/src/services/mt4Parser.ts",
       "source_location": "L136",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "services_mt4parser_parsetrades",
-      "target": "services_mt4parser_parsemt5csv",
-      "confidence_score": 1.0
+      "target": "services_mt4parser_parsemt5csv"
     },
     {
       "relation": "contains",
@@ -2775,9 +3515,9 @@
       "source_file": "apps/api/src/services/tradeSync.ts",
       "source_location": "L5",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "services_tradesync",
-      "target": "services_tradesync_adapter",
-      "confidence_score": 1.0
+      "target": "services_tradesync_adapter"
     },
     {
       "relation": "contains",
@@ -2785,9 +3525,9 @@
       "source_file": "apps/api/src/services/tradeSync.ts",
       "source_location": "L121",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "services_tradesync",
-      "target": "services_tradesync_gettradesforaccount",
-      "confidence_score": 1.0
+      "target": "services_tradesync_gettradesforaccount"
     },
     {
       "relation": "contains",
@@ -2795,9 +3535,9 @@
       "source_file": "apps/api/src/services/tradeSync.ts",
       "source_location": "L6",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "services_tradesync",
-      "target": "services_tradesync_prisma",
-      "confidence_score": 1.0
+      "target": "services_tradesync_prisma"
     },
     {
       "relation": "contains",
@@ -2805,9 +3545,9 @@
       "source_file": "apps/api/src/services/tradeSync.ts",
       "source_location": "L12",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "services_tradesync",
-      "target": "services_tradesync_synctradesfromea",
-      "confidence_score": 1.0
+      "target": "services_tradesync_synctradesfromea"
     },
     {
       "relation": "contains",
@@ -2815,9 +3555,9 @@
       "source_file": "apps/api/src/services/tradeSync.ts",
       "source_location": "L100",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "services_tradesync",
-      "target": "services_tradesync_tradelistrow",
-      "confidence_score": 1.0
+      "target": "services_tradesync_tradelistrow"
     },
     {
       "relation": "imports_from",
@@ -2826,9 +3566,9 @@
       "source_file": "apps/api/src/services/tradeSync.ts",
       "source_location": "L3",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "services_tradesync",
-      "target": "types_index",
-      "confidence_score": 1.0
+      "target": "types_index"
     },
     {
       "relation": "imports",
@@ -2837,9 +3577,9 @@
       "source_file": "apps/api/src/services/tradeSync.ts",
       "source_location": "L3",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "services_tradesync",
-      "target": "types_trade_syncresult",
-      "confidence_score": 1.0
+      "target": "types_trade_syncresult"
     },
     {
       "relation": "imports",
@@ -2848,9 +3588,9 @@
       "source_file": "apps/api/src/services/tradeSync.ts",
       "source_location": "L3",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "services_tradesync",
-      "target": "types_trade_tradedata",
-      "confidence_score": 1.0
+      "target": "types_trade_tradedata"
     },
     {
       "relation": "re_exports",
@@ -2859,9 +3599,9 @@
       "source_file": "apps/api/src/types/index.ts",
       "source_location": "L1",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "types_index",
-      "target": "types_trade",
-      "confidence_score": 1.0
+      "target": "types_trade"
     },
     {
       "relation": "contains",
@@ -2869,9 +3609,9 @@
       "source_file": "apps/api/src/types/trade.ts",
       "source_location": "L6",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "types_trade",
-      "target": "types_trade_importsource",
-      "confidence_score": 1.0
+      "target": "types_trade_importsource"
     },
     {
       "relation": "contains",
@@ -2879,9 +3619,9 @@
       "source_file": "apps/api/src/types/trade.ts",
       "source_location": "L39",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "types_trade",
-      "target": "types_trade_multerfile",
-      "confidence_score": 1.0
+      "target": "types_trade_multerfile"
     },
     {
       "relation": "contains",
@@ -2889,9 +3629,9 @@
       "source_file": "apps/api/src/types/trade.ts",
       "source_location": "L31",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "types_trade",
-      "target": "types_trade_syncresult",
-      "confidence_score": 1.0
+      "target": "types_trade_syncresult"
     },
     {
       "relation": "contains",
@@ -2899,9 +3639,9 @@
       "source_file": "apps/api/src/types/trade.ts",
       "source_location": "L12",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "types_trade",
-      "target": "types_trade_tradedata",
-      "confidence_score": 1.0
+      "target": "types_trade_tradedata"
     },
     {
       "relation": "contains",
@@ -2909,9 +3649,69 @@
       "source_file": "apps/api/src/types/trade.ts",
       "source_location": "L9",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "types_trade",
-      "target": "types_trade_tradedirection",
-      "confidence_score": 1.0
+      "target": "types_trade_tradedirection"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/tsconfig.json",
+      "source_location": "L3",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "api_tsconfig",
+      "target": "api_tsconfig_compileroptions"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/tsconfig.json",
+      "source_location": "L2",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "api_tsconfig",
+      "target": "api_tsconfig_extends"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/tsconfig.json",
+      "source_location": "L8",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "api_tsconfig",
+      "target": "api_tsconfig_include"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/tsconfig.json",
+      "source_location": "L4",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "api_tsconfig_compileroptions",
+      "target": "api_tsconfig_compileroptions_outdir"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/tsconfig.json",
+      "source_location": "L5",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "api_tsconfig_compileroptions",
+      "target": "api_tsconfig_compileroptions_rootdir"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/tsconfig.json",
+      "source_location": "L6",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "api_tsconfig_compileroptions",
+      "target": "api_tsconfig_compileroptions_types"
     },
     {
       "relation": "contains",
@@ -2919,9 +3719,9 @@
       "source_file": "apps/web/package.json",
       "source_location": "L10",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "web_package",
-      "target": "web_package_dependencies",
-      "confidence_score": 1.0
+      "target": "web_package_dependencies"
     },
     {
       "relation": "contains",
@@ -2929,9 +3729,9 @@
       "source_file": "apps/web/package.json",
       "source_location": "L19",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "web_package",
-      "target": "web_package_devdependencies",
-      "confidence_score": 1.0
+      "target": "web_package_devdependencies"
     },
     {
       "relation": "contains",
@@ -2939,9 +3739,9 @@
       "source_file": "apps/web/package.json",
       "source_location": "L2",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "web_package",
-      "target": "web_package_name",
-      "confidence_score": 1.0
+      "target": "web_package_name"
     },
     {
       "relation": "contains",
@@ -2949,9 +3749,9 @@
       "source_file": "apps/web/package.json",
       "source_location": "L4",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "web_package",
-      "target": "web_package_private",
-      "confidence_score": 1.0
+      "target": "web_package_private"
     },
     {
       "relation": "contains",
@@ -2959,9 +3759,9 @@
       "source_file": "apps/web/package.json",
       "source_location": "L5",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "web_package",
-      "target": "web_package_scripts",
-      "confidence_score": 1.0
+      "target": "web_package_scripts"
     },
     {
       "relation": "contains",
@@ -2969,9 +3769,9 @@
       "source_file": "apps/web/package.json",
       "source_location": "L3",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "web_package",
-      "target": "web_package_version",
-      "confidence_score": 1.0
+      "target": "web_package_version"
     },
     {
       "relation": "contains",
@@ -2979,9 +3779,9 @@
       "source_file": "apps/web/package.json",
       "source_location": "L7",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "web_package_scripts",
-      "target": "web_package_scripts_build",
-      "confidence_score": 1.0
+      "target": "web_package_scripts_build"
     },
     {
       "relation": "contains",
@@ -2989,9 +3789,9 @@
       "source_file": "apps/web/package.json",
       "source_location": "L6",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "web_package_scripts",
-      "target": "web_package_scripts_dev",
-      "confidence_score": 1.0
+      "target": "web_package_scripts_dev"
     },
     {
       "relation": "contains",
@@ -2999,9 +3799,9 @@
       "source_file": "apps/web/package.json",
       "source_location": "L8",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "web_package_scripts",
-      "target": "web_package_scripts_start",
-      "confidence_score": 1.0
+      "target": "web_package_scripts_start"
     },
     {
       "relation": "contains",
@@ -3009,9 +3809,9 @@
       "source_file": "apps/web/package.json",
       "source_location": "L11",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "web_package_dependencies",
-      "target": "web_package_dependencies_chakra_ui_react",
-      "confidence_score": 1.0
+      "target": "web_package_dependencies_chakra_ui_react"
     },
     {
       "relation": "contains",
@@ -3019,9 +3819,9 @@
       "source_file": "apps/web/package.json",
       "source_location": "L12",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "web_package_dependencies",
-      "target": "web_package_dependencies_emotion_react",
-      "confidence_score": 1.0
+      "target": "web_package_dependencies_emotion_react"
     },
     {
       "relation": "contains",
@@ -3029,9 +3829,9 @@
       "source_file": "apps/web/package.json",
       "source_location": "L13",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "web_package_dependencies",
-      "target": "web_package_dependencies_emotion_styled",
-      "confidence_score": 1.0
+      "target": "web_package_dependencies_emotion_styled"
     },
     {
       "relation": "contains",
@@ -3039,9 +3839,9 @@
       "source_file": "apps/web/package.json",
       "source_location": "L14",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "web_package_dependencies",
-      "target": "web_package_dependencies_next",
-      "confidence_score": 1.0
+      "target": "web_package_dependencies_next"
     },
     {
       "relation": "contains",
@@ -3049,9 +3849,9 @@
       "source_file": "apps/web/package.json",
       "source_location": "L15",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "web_package_dependencies",
-      "target": "web_package_dependencies_react",
-      "confidence_score": 1.0
+      "target": "web_package_dependencies_react"
     },
     {
       "relation": "contains",
@@ -3059,9 +3859,9 @@
       "source_file": "apps/web/package.json",
       "source_location": "L16",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "web_package_dependencies",
-      "target": "web_package_dependencies_react_dom",
-      "confidence_score": 1.0
+      "target": "web_package_dependencies_react_dom"
     },
     {
       "relation": "contains",
@@ -3069,9 +3869,9 @@
       "source_file": "apps/web/package.json",
       "source_location": "L17",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "web_package_dependencies",
-      "target": "web_package_dependencies_sass",
-      "confidence_score": 1.0
+      "target": "web_package_dependencies_sass"
     },
     {
       "relation": "contains",
@@ -3079,9 +3879,9 @@
       "source_file": "apps/web/package.json",
       "source_location": "L20",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "web_package_devdependencies",
-      "target": "web_package_devdependencies_types_node",
-      "confidence_score": 1.0
+      "target": "web_package_devdependencies_types_node"
     },
     {
       "relation": "contains",
@@ -3089,9 +3889,9 @@
       "source_file": "apps/web/package.json",
       "source_location": "L21",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "web_package_devdependencies",
-      "target": "web_package_devdependencies_types_react",
-      "confidence_score": 1.0
+      "target": "web_package_devdependencies_types_react"
     },
     {
       "relation": "contains",
@@ -3099,9 +3899,9 @@
       "source_file": "apps/web/src/app/api/exchange-rate/route.ts",
       "source_location": "L20",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "exchange_rate_route",
-      "target": "exchange_rate_route_get",
-      "confidence_score": 1.0
+      "target": "exchange_rate_route_get"
     },
     {
       "relation": "contains",
@@ -3109,9 +3909,9 @@
       "source_file": "apps/web/src/app/layout.tsx",
       "source_location": "L3",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "app_layout",
-      "target": "app_layout_rootlayout",
-      "confidence_score": 1.0
+      "target": "app_layout_rootlayout"
     },
     {
       "relation": "imports_from",
@@ -3120,9 +3920,9 @@
       "source_file": "apps/web/src/app/trades/page.tsx",
       "source_location": "L4",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "trades_page",
-      "target": "components_tradestable",
-      "confidence_score": 1.0
+      "target": "components_tradestable"
     },
     {
       "relation": "imports",
@@ -3131,9 +3931,9 @@
       "source_file": "apps/web/src/app/trades/page.tsx",
       "source_location": "L4",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "trades_page",
-      "target": "components_tradestable_trade",
-      "confidence_score": 1.0
+      "target": "components_tradestable_trade"
     },
     {
       "relation": "contains",
@@ -3141,9 +3941,9 @@
       "source_file": "apps/web/src/app/trades/page.tsx",
       "source_location": "L7",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "trades_page",
-      "target": "trades_page_mock_trades",
-      "confidence_score": 1.0
+      "target": "trades_page_mock_trades"
     },
     {
       "relation": "contains",
@@ -3151,9 +3951,9 @@
       "source_file": "apps/web/src/app/trades/page.tsx",
       "source_location": "L178",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "trades_page",
-      "target": "trades_page_tradespage",
-      "confidence_score": 1.0
+      "target": "trades_page_tradespage"
     },
     {
       "relation": "contains",
@@ -3161,9 +3961,9 @@
       "source_file": "apps/web/src/components/TradesTable.tsx",
       "source_location": "L59",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "components_tradestable",
-      "target": "components_tradestable_default_emotions",
-      "confidence_score": 1.0
+      "target": "components_tradestable_default_emotions"
     },
     {
       "relation": "contains",
@@ -3171,19 +3971,9 @@
       "source_file": "apps/web/src/components/TradesTable.tsx",
       "source_location": "L41",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "components_tradestable",
-      "target": "components_tradestable_default_tags",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "apps/web/src/components/TradesTable.tsx",
-      "source_location": "L7",
-      "weight": 1.0,
-      "source": "components_tradestable",
-      "target": "components_tradestable_trade",
-      "confidence_score": 1.0
+      "target": "components_tradestable_default_tags"
     },
     {
       "relation": "contains",
@@ -3192,8 +3982,38 @@
       "source_location": "L67",
       "weight": 1.0,
       "source": "components_tradestable",
-      "target": "components_tradestable_tradestable",
+      "target": "components_tradestable_getemotionemoji",
       "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/components/TradesTable.tsx",
+      "source_location": "L78",
+      "weight": 1.0,
+      "source": "components_tradestable",
+      "target": "components_tradestable_getemotionlabel",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/components/TradesTable.tsx",
+      "source_location": "L7",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "components_tradestable",
+      "target": "components_tradestable_trade"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/components/TradesTable.tsx",
+      "source_location": "L67",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "components_tradestable",
+      "target": "components_tradestable_tradestable"
     },
     {
       "relation": "contains",
@@ -3201,9 +4021,9 @@
       "source_file": "apps/web/src/components/TradesTable.tsx",
       "source_location": "L30",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "components_tradestable",
-      "target": "components_tradestable_tradestableprops",
-      "confidence_score": 1.0
+      "target": "components_tradestable_tradestableprops"
     },
     {
       "relation": "imports_from",
@@ -3212,9 +4032,9 @@
       "source_file": "apps/web/src/components/TradesTable.tsx",
       "source_location": "L5",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "components_tradestable",
-      "target": "utils_farsi",
-      "confidence_score": 1.0
+      "target": "utils_farsi"
     },
     {
       "relation": "imports",
@@ -3223,9 +4043,9 @@
       "source_file": "apps/web/src/components/TradesTable.tsx",
       "source_location": "L5",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "components_tradestable",
-      "target": "utils_farsi_formatpersiancurrency",
-      "confidence_score": 1.0
+      "target": "utils_farsi_formatpersiancurrency"
     },
     {
       "relation": "imports",
@@ -3234,9 +4054,9 @@
       "source_file": "apps/web/src/components/TradesTable.tsx",
       "source_location": "L5",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "components_tradestable",
-      "target": "utils_farsi_formattoman",
-      "confidence_score": 1.0
+      "target": "utils_farsi_formattoman"
     },
     {
       "relation": "imports",
@@ -3245,9 +4065,9 @@
       "source_file": "apps/web/src/components/TradesTable.tsx",
       "source_location": "L5",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "components_tradestable",
-      "target": "utils_farsi_topersiandigits",
-      "confidence_score": 1.0
+      "target": "utils_farsi_topersiandigits"
     },
     {
       "relation": "calls",
@@ -3277,9 +4097,9 @@
       "source_file": "apps/web/src/utils/farsi.ts",
       "source_location": "L25",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "utils_farsi",
-      "target": "utils_farsi_formatpersiancurrency",
-      "confidence_score": 1.0
+      "target": "utils_farsi_formatpersiancurrency"
     },
     {
       "relation": "contains",
@@ -3287,9 +4107,9 @@
       "source_file": "apps/web/src/utils/farsi.ts",
       "source_location": "L14",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "utils_farsi",
-      "target": "utils_farsi_formatpersiannumber",
-      "confidence_score": 1.0
+      "target": "utils_farsi_formatpersiannumber"
     },
     {
       "relation": "contains",
@@ -3297,9 +4117,9 @@
       "source_file": "apps/web/src/utils/farsi.ts",
       "source_location": "L40",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "utils_farsi",
-      "target": "utils_farsi_formattoman",
-      "confidence_score": 1.0
+      "target": "utils_farsi_formattoman"
     },
     {
       "relation": "contains",
@@ -3307,9 +4127,9 @@
       "source_file": "apps/web/src/utils/farsi.ts",
       "source_location": "L4",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "utils_farsi",
-      "target": "utils_farsi_topersiandigits",
-      "confidence_score": 1.0
+      "target": "utils_farsi_topersiandigits"
     },
     {
       "relation": "calls",
@@ -3318,9 +4138,9 @@
       "source_file": "apps/web/src/utils/farsi.ts",
       "source_location": "L34",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "utils_farsi_formatpersiancurrency",
-      "target": "utils_farsi_topersiandigits",
-      "confidence_score": 1.0
+      "target": "utils_farsi_topersiandigits"
     },
     {
       "relation": "calls",
@@ -3329,9 +4149,9 @@
       "source_file": "apps/web/src/utils/farsi.ts",
       "source_location": "L19",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "utils_farsi_formatpersiannumber",
-      "target": "utils_farsi_topersiandigits",
-      "confidence_score": 1.0
+      "target": "utils_farsi_topersiandigits"
     },
     {
       "relation": "calls",
@@ -3340,9 +4160,9 @@
       "source_file": "apps/web/src/utils/farsi.ts",
       "source_location": "L47",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "utils_farsi_formattoman",
-      "target": "utils_farsi_formatpersiannumber",
-      "confidence_score": 1.0
+      "target": "utils_farsi_formatpersiannumber"
     },
     {
       "relation": "contains",
@@ -3350,9 +4170,9 @@
       "source_file": "apps/web/tsconfig.json",
       "source_location": "L2",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "web_tsconfig",
-      "target": "web_tsconfig_compileroptions",
-      "confidence_score": 1.0
+      "target": "web_tsconfig_compileroptions"
     },
     {
       "relation": "contains",
@@ -3360,9 +4180,9 @@
       "source_file": "apps/web/tsconfig.json",
       "source_location": "L34",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "web_tsconfig",
-      "target": "web_tsconfig_exclude",
-      "confidence_score": 1.0
+      "target": "web_tsconfig_exclude"
     },
     {
       "relation": "contains",
@@ -3370,9 +4190,9 @@
       "source_file": "apps/web/tsconfig.json",
       "source_location": "L26",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "web_tsconfig",
-      "target": "web_tsconfig_include",
-      "confidence_score": 1.0
+      "target": "web_tsconfig_include"
     },
     {
       "relation": "contains",
@@ -3380,9 +4200,9 @@
       "source_file": "apps/web/tsconfig.json",
       "source_location": "L9",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "web_tsconfig_compileroptions",
-      "target": "web_tsconfig_compileroptions_allowjs",
-      "confidence_score": 1.0
+      "target": "web_tsconfig_compileroptions_allowjs"
     },
     {
       "relation": "contains",
@@ -3390,9 +4210,9 @@
       "source_file": "apps/web/tsconfig.json",
       "source_location": "L15",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "web_tsconfig_compileroptions",
-      "target": "web_tsconfig_compileroptions_esmoduleinterop",
-      "confidence_score": 1.0
+      "target": "web_tsconfig_compileroptions_esmoduleinterop"
     },
     {
       "relation": "contains",
@@ -3400,9 +4220,9 @@
       "source_file": "apps/web/tsconfig.json",
       "source_location": "L13",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "web_tsconfig_compileroptions",
-      "target": "web_tsconfig_compileroptions_incremental",
-      "confidence_score": 1.0
+      "target": "web_tsconfig_compileroptions_incremental"
     },
     {
       "relation": "contains",
@@ -3410,9 +4230,9 @@
       "source_file": "apps/web/tsconfig.json",
       "source_location": "L18",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "web_tsconfig_compileroptions",
-      "target": "web_tsconfig_compileroptions_isolatedmodules",
-      "confidence_score": 1.0
+      "target": "web_tsconfig_compileroptions_isolatedmodules"
     },
     {
       "relation": "contains",
@@ -3420,9 +4240,9 @@
       "source_file": "apps/web/tsconfig.json",
       "source_location": "L19",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "web_tsconfig_compileroptions",
-      "target": "web_tsconfig_compileroptions_jsx",
-      "confidence_score": 1.0
+      "target": "web_tsconfig_compileroptions_jsx"
     },
     {
       "relation": "contains",
@@ -3430,9 +4250,9 @@
       "source_file": "apps/web/tsconfig.json",
       "source_location": "L4",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "web_tsconfig_compileroptions",
-      "target": "web_tsconfig_compileroptions_lib",
-      "confidence_score": 1.0
+      "target": "web_tsconfig_compileroptions_lib"
     },
     {
       "relation": "contains",
@@ -3440,9 +4260,9 @@
       "source_file": "apps/web/tsconfig.json",
       "source_location": "L14",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "web_tsconfig_compileroptions",
-      "target": "web_tsconfig_compileroptions_module",
-      "confidence_score": 1.0
+      "target": "web_tsconfig_compileroptions_module"
     },
     {
       "relation": "contains",
@@ -3450,9 +4270,9 @@
       "source_file": "apps/web/tsconfig.json",
       "source_location": "L16",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "web_tsconfig_compileroptions",
-      "target": "web_tsconfig_compileroptions_moduleresolution",
-      "confidence_score": 1.0
+      "target": "web_tsconfig_compileroptions_moduleresolution"
     },
     {
       "relation": "contains",
@@ -3460,9 +4280,9 @@
       "source_file": "apps/web/tsconfig.json",
       "source_location": "L12",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "web_tsconfig_compileroptions",
-      "target": "web_tsconfig_compileroptions_noemit",
-      "confidence_score": 1.0
+      "target": "web_tsconfig_compileroptions_noemit"
     },
     {
       "relation": "contains",
@@ -3470,9 +4290,9 @@
       "source_file": "apps/web/tsconfig.json",
       "source_location": "L20",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "web_tsconfig_compileroptions",
-      "target": "web_tsconfig_compileroptions_plugins",
-      "confidence_score": 1.0
+      "target": "web_tsconfig_compileroptions_plugins"
     },
     {
       "relation": "contains",
@@ -3480,9 +4300,9 @@
       "source_file": "apps/web/tsconfig.json",
       "source_location": "L17",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "web_tsconfig_compileroptions",
-      "target": "web_tsconfig_compileroptions_resolvejsonmodule",
-      "confidence_score": 1.0
+      "target": "web_tsconfig_compileroptions_resolvejsonmodule"
     },
     {
       "relation": "contains",
@@ -3490,9 +4310,9 @@
       "source_file": "apps/web/tsconfig.json",
       "source_location": "L10",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "web_tsconfig_compileroptions",
-      "target": "web_tsconfig_compileroptions_skiplibcheck",
-      "confidence_score": 1.0
+      "target": "web_tsconfig_compileroptions_skiplibcheck"
     },
     {
       "relation": "contains",
@@ -3500,9 +4320,9 @@
       "source_file": "apps/web/tsconfig.json",
       "source_location": "L11",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "web_tsconfig_compileroptions",
-      "target": "web_tsconfig_compileroptions_strict",
-      "confidence_score": 1.0
+      "target": "web_tsconfig_compileroptions_strict"
     },
     {
       "relation": "contains",
@@ -3510,9 +4330,9 @@
       "source_file": "apps/web/tsconfig.json",
       "source_location": "L3",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "web_tsconfig_compileroptions",
-      "target": "web_tsconfig_compileroptions_target",
-      "confidence_score": 1.0
+      "target": "web_tsconfig_compileroptions_target"
     },
     {
       "relation": "contains",
@@ -3520,9 +4340,9 @@
       "source_file": "package.json",
       "source_location": "L15",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "package",
-      "target": "package_devdependencies",
-      "confidence_score": 1.0
+      "target": "package_devdependencies"
     },
     {
       "relation": "contains",
@@ -3530,9 +4350,9 @@
       "source_file": "package.json",
       "source_location": "L2",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "package",
-      "target": "package_name",
-      "confidence_score": 1.0
+      "target": "package_name"
     },
     {
       "relation": "contains",
@@ -3540,9 +4360,9 @@
       "source_file": "package.json",
       "source_location": "L5",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "package",
-      "target": "package_prisma",
-      "confidence_score": 1.0
+      "target": "package_prisma"
     },
     {
       "relation": "contains",
@@ -3550,9 +4370,9 @@
       "source_file": "package.json",
       "source_location": "L3",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "package",
-      "target": "package_private",
-      "confidence_score": 1.0
+      "target": "package_private"
     },
     {
       "relation": "contains",
@@ -3560,9 +4380,9 @@
       "source_file": "package.json",
       "source_location": "L8",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "package",
-      "target": "package_scripts",
-      "confidence_score": 1.0
+      "target": "package_scripts"
     },
     {
       "relation": "contains",
@@ -3570,9 +4390,9 @@
       "source_file": "package.json",
       "source_location": "L4",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "package",
-      "target": "package_workspaces",
-      "confidence_score": 1.0
+      "target": "package_workspaces"
     },
     {
       "relation": "contains",
@@ -3580,9 +4400,39 @@
       "source_file": "package.json",
       "source_location": "L6",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "package_prisma",
-      "target": "package_prisma_schema",
-      "confidence_score": 1.0
+      "target": "package_prisma_schema"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "package.json",
+      "source_location": "L14",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "package_scripts",
+      "target": "package_scripts_build"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "package.json",
+      "source_location": "L13",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "package_scripts",
+      "target": "package_scripts_build_api"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "package.json",
+      "source_location": "L12",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "package_scripts",
+      "target": "package_scripts_build_web"
     },
     {
       "relation": "contains",
@@ -3590,9 +4440,9 @@
       "source_file": "package.json",
       "source_location": "L11",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "package_scripts",
-      "target": "package_scripts_dev",
-      "confidence_score": 1.0
+      "target": "package_scripts_dev"
     },
     {
       "relation": "contains",
@@ -3600,9 +4450,9 @@
       "source_file": "package.json",
       "source_location": "L10",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "package_scripts",
-      "target": "package_scripts_dev_api",
-      "confidence_score": 1.0
+      "target": "package_scripts_dev_api"
     },
     {
       "relation": "contains",
@@ -3610,9 +4460,9 @@
       "source_file": "package.json",
       "source_location": "L9",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "package_scripts",
-      "target": "package_scripts_dev_web",
-      "confidence_score": 1.0
+      "target": "package_scripts_dev_web"
     },
     {
       "relation": "contains",
@@ -3620,9 +4470,9 @@
       "source_file": "package.json",
       "source_location": "L16",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "package_devdependencies",
-      "target": "package_devdependencies_concurrently",
-      "confidence_score": 1.0
+      "target": "package_devdependencies_concurrently"
     },
     {
       "relation": "contains",
@@ -3630,9 +4480,9 @@
       "source_file": "package.json",
       "source_location": "L17",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "package_devdependencies",
-      "target": "package_devdependencies_typescript",
-      "confidence_score": 1.0
+      "target": "package_devdependencies_typescript"
     },
     {
       "relation": "contains",
@@ -3640,19 +4490,9 @@
       "source_file": "tsconfig.json",
       "source_location": "L2",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tsconfig",
-      "target": "tsconfig_compileroptions",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "tsconfig.json",
-      "source_location": "L11",
-      "weight": 1.0,
-      "source": "tsconfig",
-      "target": "tsconfig_include",
-      "confidence_score": 1.0
+      "target": "tsconfig_compileroptions"
     },
     {
       "relation": "contains",
@@ -3660,9 +4500,9 @@
       "source_file": "tsconfig.json",
       "source_location": "L7",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tsconfig_compileroptions",
-      "target": "tsconfig_compileroptions_esmoduleinterop",
-      "confidence_score": 1.0
+      "target": "tsconfig_compileroptions_esmoduleinterop"
     },
     {
       "relation": "contains",
@@ -3670,9 +4510,9 @@
       "source_file": "tsconfig.json",
       "source_location": "L4",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tsconfig_compileroptions",
-      "target": "tsconfig_compileroptions_module",
-      "confidence_score": 1.0
+      "target": "tsconfig_compileroptions_module"
     },
     {
       "relation": "contains",
@@ -3680,9 +4520,9 @@
       "source_file": "tsconfig.json",
       "source_location": "L5",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tsconfig_compileroptions",
-      "target": "tsconfig_compileroptions_moduleresolution",
-      "confidence_score": 1.0
+      "target": "tsconfig_compileroptions_moduleresolution"
     },
     {
       "relation": "contains",
@@ -3690,9 +4530,9 @@
       "source_file": "tsconfig.json",
       "source_location": "L8",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tsconfig_compileroptions",
-      "target": "tsconfig_compileroptions_skiplibcheck",
-      "confidence_score": 1.0
+      "target": "tsconfig_compileroptions_skiplibcheck"
     },
     {
       "relation": "contains",
@@ -3700,9 +4540,9 @@
       "source_file": "tsconfig.json",
       "source_location": "L6",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tsconfig_compileroptions",
-      "target": "tsconfig_compileroptions_strict",
-      "confidence_score": 1.0
+      "target": "tsconfig_compileroptions_strict"
     },
     {
       "relation": "contains",
@@ -3710,19 +4550,9 @@
       "source_file": "tsconfig.json",
       "source_location": "L3",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tsconfig_compileroptions",
-      "target": "tsconfig_compileroptions_target",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "tsconfig.json",
-      "source_location": "L9",
-      "weight": 1.0,
-      "source": "tsconfig_compileroptions",
-      "target": "tsconfig_compileroptions_types",
-      "confidence_score": 1.0
+      "target": "tsconfig_compileroptions_target"
     },
     {
       "relation": "contains",
@@ -3730,9 +4560,639 @@
       "source_file": ".agents/rules/graphify.md",
       "source_location": "L6",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "rules_graphify",
-      "target": "rules_graphify_graphify",
-      "confidence_score": 1.0
+      "target": "rules_graphify_graphify"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L6",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "emil_design_eng_skill",
+      "target": "emil_design_eng_skill_design_engineering"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L530",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "emil_design_eng_skill_design_engineering",
+      "target": "emil_design_eng_skill_accessibility"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L398",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "emil_design_eng_skill_design_engineering",
+      "target": "emil_design_eng_skill_clip_path_for_animation"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L197",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "emil_design_eng_skill_design_engineering",
+      "target": "emil_design_eng_skill_component_building_principles"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L18",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "emil_design_eng_skill_design_engineering",
+      "target": "emil_design_eng_skill_core_philosophy"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L351",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "emil_design_eng_skill_design_engineering",
+      "target": "emil_design_eng_skill_css_transform_mastery"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L642",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "emil_design_eng_skill_design_engineering",
+      "target": "emil_design_eng_skill_debugging_animations"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L444",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "emil_design_eng_skill_design_engineering",
+      "target": "emil_design_eng_skill_gesture_and_drag_interactions"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L8",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "emil_design_eng_skill_design_engineering",
+      "target": "emil_design_eng_skill_initial_response"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L482",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "emil_design_eng_skill_design_engineering",
+      "target": "emil_design_eng_skill_performance_rules"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L663",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "emil_design_eng_skill_design_engineering",
+      "target": "emil_design_eng_skill_review_checklist"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L38",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "emil_design_eng_skill_design_engineering",
+      "target": "emil_design_eng_skill_review_format_required"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L147",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "emil_design_eng_skill_design_engineering",
+      "target": "emil_design_eng_skill_spring_animations"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L608",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "emil_design_eng_skill_design_engineering",
+      "target": "emil_design_eng_skill_stagger_animations"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L62",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "emil_design_eng_skill_design_engineering",
+      "target": "emil_design_eng_skill_the_animation_decision_framework"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L562",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "emil_design_eng_skill_design_engineering",
+      "target": "emil_design_eng_skill_the_sonner_principles_building_loved_components"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L34",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "emil_design_eng_skill_core_philosophy",
+      "target": "emil_design_eng_skill_beauty_is_leverage"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L20",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "emil_design_eng_skill_core_philosophy",
+      "target": "emil_design_eng_skill_taste_is_trained_not_innate"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L26",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "emil_design_eng_skill_core_philosophy",
+      "target": "emil_design_eng_skill_unseen_details_compound"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L66",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "emil_design_eng_skill_the_animation_decision_framework",
+      "target": "emil_design_eng_skill_1_should_this_animate_at_all"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L81",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "emil_design_eng_skill_the_animation_decision_framework",
+      "target": "emil_design_eng_skill_2_what_is_the_purpose"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L95",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "emil_design_eng_skill_the_animation_decision_framework",
+      "target": "emil_design_eng_skill_3_what_easing_should_it_use"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L125",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "emil_design_eng_skill_the_animation_decision_framework",
+      "target": "emil_design_eng_skill_4_how_fast_should_it_be"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L137",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "emil_design_eng_skill_the_animation_decision_framework",
+      "target": "emil_design_eng_skill_perceived_performance"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L193",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "emil_design_eng_skill_spring_animations",
+      "target": "emil_design_eng_skill_interruptibility_advantage"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L158",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "emil_design_eng_skill_spring_animations",
+      "target": "emil_design_eng_skill_spring_based_mouse_interactions"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L177",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "emil_design_eng_skill_spring_animations",
+      "target": "emil_design_eng_skill_spring_configuration"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L151",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "emil_design_eng_skill_spring_animations",
+      "target": "emil_design_eng_skill_when_to_use_springs"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L324",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "emil_design_eng_skill_component_building_principles",
+      "target": "emil_design_eng_skill_animate_enter_states_with_starting_style"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L199",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "emil_design_eng_skill_component_building_principles",
+      "target": "emil_design_eng_skill_buttons_must_feel_responsive"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L234",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "emil_design_eng_skill_component_building_principles",
+      "target": "emil_design_eng_skill_make_popovers_origin_aware"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L215",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "emil_design_eng_skill_component_building_principles",
+      "target": "emil_design_eng_skill_never_animate_from_scale_0"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L252",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "emil_design_eng_skill_component_building_principles",
+      "target": "emil_design_eng_skill_tooltips_skip_delay_on_subsequent_hovers"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L295",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "emil_design_eng_skill_component_building_principles",
+      "target": "emil_design_eng_skill_use_blur_to_mask_imperfect_transitions"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L274",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "emil_design_eng_skill_component_building_principles",
+      "target": "emil_design_eng_skill_use_css_transitions_over_keyframes_for_interruptible_ui"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L375",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "emil_design_eng_skill_css_transform_mastery",
+      "target": "emil_design_eng_skill_3d_transforms_for_depth"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L371",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "emil_design_eng_skill_css_transform_mastery",
+      "target": "emil_design_eng_skill_scale_scales_children_too"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L394",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "emil_design_eng_skill_css_transform_mastery",
+      "target": "emil_design_eng_skill_transform_origin"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L353",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "emil_design_eng_skill_css_transform_mastery",
+      "target": "emil_design_eng_skill_translatey_with_percentages"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L440",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "emil_design_eng_skill_clip_path_for_animation",
+      "target": "emil_design_eng_skill_comparison_sliders"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L432",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "emil_design_eng_skill_clip_path_for_animation",
+      "target": "emil_design_eng_skill_hold_to_delete_pattern"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L436",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "emil_design_eng_skill_clip_path_for_animation",
+      "target": "emil_design_eng_skill_image_reveals_on_scroll"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L428",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "emil_design_eng_skill_clip_path_for_animation",
+      "target": "emil_design_eng_skill_tabs_with_perfect_color_transitions"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L402",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "emil_design_eng_skill_clip_path_for_animation",
+      "target": "emil_design_eng_skill_the_inset_shape"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L459",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "emil_design_eng_skill_gesture_and_drag_interactions",
+      "target": "emil_design_eng_skill_damping_at_boundaries"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L478",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "emil_design_eng_skill_gesture_and_drag_interactions",
+      "target": "emil_design_eng_skill_friction_instead_of_hard_stops"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L446",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "emil_design_eng_skill_gesture_and_drag_interactions",
+      "target": "emil_design_eng_skill_momentum_based_dismissal"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L467",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "emil_design_eng_skill_gesture_and_drag_interactions",
+      "target": "emil_design_eng_skill_multi_touch_protection"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L463",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "emil_design_eng_skill_gesture_and_drag_interactions",
+      "target": "emil_design_eng_skill_pointer_capture_for_drag"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L514",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "emil_design_eng_skill_performance_rules",
+      "target": "emil_design_eng_skill_css_animations_beat_js_under_load"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L488",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "emil_design_eng_skill_performance_rules",
+      "target": "emil_design_eng_skill_css_variables_are_inheritable"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L500",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "emil_design_eng_skill_performance_rules",
+      "target": "emil_design_eng_skill_framer_motion_hardware_acceleration_caveat"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L484",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "emil_design_eng_skill_performance_rules",
+      "target": "emil_design_eng_skill_only_animate_transform_and_opacity"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L518",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "emil_design_eng_skill_performance_rules",
+      "target": "emil_design_eng_skill_use_waapi_for_programmatic_css_animations"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L532",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "emil_design_eng_skill_accessibility",
+      "target": "emil_design_eng_skill_prefers_reduced_motion"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L550",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "emil_design_eng_skill_accessibility",
+      "target": "emil_design_eng_skill_touch_device_hover_states"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L592",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "emil_design_eng_skill_the_sonner_principles_building_loved_components",
+      "target": "emil_design_eng_skill_asymmetric_enter_exit_timing"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L578",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "emil_design_eng_skill_the_sonner_principles_building_loved_components",
+      "target": "emil_design_eng_skill_cohesion_matters"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L588",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "emil_design_eng_skill_the_sonner_principles_building_loved_components",
+      "target": "emil_design_eng_skill_review_your_work_the_next_day"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L584",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "emil_design_eng_skill_the_sonner_principles_building_loved_components",
+      "target": "emil_design_eng_skill_the_opacity_height_combination"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L655",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "emil_design_eng_skill_debugging_animations",
+      "target": "emil_design_eng_skill_frame_by_frame_inspection"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L644",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "emil_design_eng_skill_debugging_animations",
+      "target": "emil_design_eng_skill_slow_motion_testing"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".agents/skills/emil-design-eng/SKILL.md",
+      "source_location": "L659",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "emil_design_eng_skill_debugging_animations",
+      "target": "emil_design_eng_skill_test_on_real_devices"
     },
     {
       "relation": "contains",
@@ -3740,9 +5200,9 @@
       "source_file": ".agents/workflows/graphify.md",
       "source_location": "L6",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "workflows_graphify",
-      "target": "workflows_graphify_workflow_graphify",
-      "confidence_score": 1.0
+      "target": "workflows_graphify_workflow_graphify"
     },
     {
       "relation": "contains",
@@ -3750,9 +5210,9 @@
       "source_file": "RUN.md",
       "source_location": "L1",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "run",
-      "target": "run_\u0645\u0639\u0627\u0645\u0644\u0647_\u06cc\u0627\u0631_run_commands",
-      "confidence_score": 1.0
+      "target": "run_\u0645\u0639\u0627\u0645\u0644\u0647_\u06cc\u0627\u0631_run_commands"
     },
     {
       "relation": "contains",
@@ -3760,9 +5220,9 @@
       "source_file": "RUN.md",
       "source_location": "L8",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "run_\u0645\u0639\u0627\u0645\u0644\u0647_\u06cc\u0627\u0631_run_commands",
-      "target": "run_1_start_database",
-      "confidence_score": 1.0
+      "target": "run_1_start_database"
     },
     {
       "relation": "contains",
@@ -3770,9 +5230,9 @@
       "source_file": "RUN.md",
       "source_location": "L15",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "run_\u0645\u0639\u0627\u0645\u0644\u0647_\u06cc\u0627\u0631_run_commands",
-      "target": "run_2_run_database_migrations",
-      "confidence_score": 1.0
+      "target": "run_2_run_database_migrations"
     },
     {
       "relation": "contains",
@@ -3780,9 +5240,9 @@
       "source_file": "RUN.md",
       "source_location": "L20",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "run_\u0645\u0639\u0627\u0645\u0644\u0647_\u06cc\u0627\u0631_run_commands",
-      "target": "run_3_generate_prisma_client",
-      "confidence_score": 1.0
+      "target": "run_3_generate_prisma_client"
     },
     {
       "relation": "contains",
@@ -3790,9 +5250,9 @@
       "source_file": "RUN.md",
       "source_location": "L27",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "run_\u0645\u0639\u0627\u0645\u0644\u0647_\u06cc\u0627\u0631_run_commands",
-      "target": "run_3_start_api_server_port_3000",
-      "confidence_score": 1.0
+      "target": "run_3_start_api_server_port_3000"
     },
     {
       "relation": "contains",
@@ -3800,9 +5260,9 @@
       "source_file": "RUN.md",
       "source_location": "L32",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "run_\u0645\u0639\u0627\u0645\u0644\u0647_\u06cc\u0627\u0631_run_commands",
-      "target": "run_4_start_web_app_port_3001",
-      "confidence_score": 1.0
+      "target": "run_4_start_web_app_port_3001"
     },
     {
       "relation": "contains",
@@ -3810,9 +5270,9 @@
       "source_file": "RUN.md",
       "source_location": "L37",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "run_\u0645\u0639\u0627\u0645\u0644\u0647_\u06cc\u0627\u0631_run_commands",
-      "target": "run_5_install_mt5_expert_advisor",
-      "confidence_score": 1.0
+      "target": "run_5_install_mt5_expert_advisor"
     },
     {
       "relation": "contains",
@@ -3820,9 +5280,9 @@
       "source_file": "RUN.md",
       "source_location": "L56",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "run_\u0645\u0639\u0627\u0645\u0644\u0647_\u06cc\u0627\u0631_run_commands",
-      "target": "run_endpoints",
-      "confidence_score": 1.0
+      "target": "run_endpoints"
     },
     {
       "relation": "contains",
@@ -3830,9 +5290,9 @@
       "source_file": "RUN.md",
       "source_location": "L3",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "run_\u0645\u0639\u0627\u0645\u0644\u0647_\u06cc\u0627\u0631_run_commands",
-      "target": "run_prerequisites",
-      "confidence_score": 1.0
+      "target": "run_prerequisites"
     },
     {
       "relation": "contains",
@@ -3840,9 +5300,9 @@
       "source_file": "RUN.md",
       "source_location": "L43",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "run_\u0645\u0639\u0627\u0645\u0644\u0647_\u06cc\u0627\u0631_run_commands",
-      "target": "run_quick_start_all_at_once",
-      "confidence_score": 1.0
+      "target": "run_quick_start_all_at_once"
     },
     {
       "relation": "contains",
@@ -3850,9 +5310,9 @@
       "source_file": "apps/api/PROGRESS.md",
       "source_location": "L1",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "api_progress",
-      "target": "api_progress_api_progress_\u0645\u0639\u0627\u0645\u0644\u0647_\u06cc\u0627\u0631",
-      "confidence_score": 1.0
+      "target": "api_progress_api_progress_\u0645\u0639\u0627\u0645\u0644\u0647_\u06cc\u0627\u0631"
     },
     {
       "relation": "contains",
@@ -3860,9 +5320,9 @@
       "source_file": "apps/api/PROGRESS.md",
       "source_location": "L10",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "api_progress_api_progress_\u0645\u0639\u0627\u0645\u0644\u0647_\u06cc\u0627\u0631",
-      "target": "api_progress_done",
-      "confidence_score": 1.0
+      "target": "api_progress_done"
     },
     {
       "relation": "contains",
@@ -3870,9 +5330,9 @@
       "source_file": "apps/api/PROGRESS.md",
       "source_location": "L52",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "api_progress_api_progress_\u0645\u0639\u0627\u0645\u0644\u0647_\u06cc\u0627\u0631",
-      "target": "api_progress_not_done_next_steps",
-      "confidence_score": 1.0
+      "target": "api_progress_not_done_next_steps"
     },
     {
       "relation": "contains",
@@ -3880,9 +5340,9 @@
       "source_file": "apps/api/PROGRESS.md",
       "source_location": "L3",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "api_progress_api_progress_\u0645\u0639\u0627\u0645\u0644\u0647_\u06cc\u0627\u0631",
-      "target": "api_progress_tech_stack",
-      "confidence_score": 1.0
+      "target": "api_progress_tech_stack"
     },
     {
       "relation": "contains",
@@ -3890,9 +5350,9 @@
       "source_file": "apps/api/PROGRESS.md",
       "source_location": "L12",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "api_progress_done",
-      "target": "api_progress_database_schema_src_prisma_schema_prisma",
-      "confidence_score": 1.0
+      "target": "api_progress_database_schema_src_prisma_schema_prisma"
     },
     {
       "relation": "contains",
@@ -3900,9 +5360,9 @@
       "source_file": "apps/api/PROGRESS.md",
       "source_location": "L20",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "api_progress_done",
-      "target": "api_progress_express_server_src_server_ts",
-      "confidence_score": 1.0
+      "target": "api_progress_express_server_src_server_ts"
     },
     {
       "relation": "contains",
@@ -3910,9 +5370,9 @@
       "source_file": "apps/api/PROGRESS.md",
       "source_location": "L25",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "api_progress_done",
-      "target": "api_progress_mt4_mt5_parser_src_services_mt4parser_ts",
-      "confidence_score": 1.0
+      "target": "api_progress_mt4_mt5_parser_src_services_mt4parser_ts"
     },
     {
       "relation": "contains",
@@ -3920,9 +5380,9 @@
       "source_file": "apps/api/PROGRESS.md",
       "source_location": "L33",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "api_progress_done",
-      "target": "api_progress_trade_routes_src_routes_tradesync_ts_mounted_at_api_trades",
-      "confidence_score": 1.0
+      "target": "api_progress_trade_routes_src_routes_tradesync_ts_mounted_at_api_trades"
     },
     {
       "relation": "contains",
@@ -3930,9 +5390,9 @@
       "source_file": "apps/api/PROGRESS.md",
       "source_location": "L29",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "api_progress_done",
-      "target": "api_progress_trade_sync_service_src_services_tradesync_ts",
-      "confidence_score": 1.0
+      "target": "api_progress_trade_sync_service_src_services_tradesync_ts"
     },
     {
       "relation": "contains",
@@ -3940,9 +5400,9 @@
       "source_file": "apps/api/PROGRESS.md",
       "source_location": "L47",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "api_progress_done",
-      "target": "api_progress_typescript",
-      "confidence_score": 1.0
+      "target": "api_progress_typescript"
     },
     {
       "relation": "contains",
@@ -3950,9 +5410,9 @@
       "source_file": "apps/api/PROGRESS.md",
       "source_location": "L54",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "api_progress_not_done_next_steps",
-      "target": "api_progress_high_priority",
-      "confidence_score": 1.0
+      "target": "api_progress_high_priority"
     },
     {
       "relation": "contains",
@@ -3960,9 +5420,9 @@
       "source_file": "apps/api/PROGRESS.md",
       "source_location": "L66",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "api_progress_not_done_next_steps",
-      "target": "api_progress_low_priority",
-      "confidence_score": 1.0
+      "target": "api_progress_low_priority"
     },
     {
       "relation": "contains",
@@ -3970,9 +5430,9 @@
       "source_file": "apps/api/PROGRESS.md",
       "source_location": "L59",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "api_progress_not_done_next_steps",
-      "target": "api_progress_medium_priority",
-      "confidence_score": 1.0
+      "target": "api_progress_medium_priority"
     },
     {
       "relation": "contains",
@@ -3980,9 +5440,9 @@
       "source_file": "apps/ea/README.md",
       "source_location": "L1",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "ea_readme",
-      "target": "ea_readme_mt5_expert_advisor_trade_sync",
-      "confidence_score": 1.0
+      "target": "ea_readme_mt5_expert_advisor_trade_sync"
     },
     {
       "relation": "contains",
@@ -3990,9 +5450,9 @@
       "source_file": "apps/ea/README.md",
       "source_location": "L3",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "ea_readme_mt5_expert_advisor_trade_sync",
-      "target": "ea_readme_file",
-      "confidence_score": 1.0
+      "target": "ea_readme_file"
     },
     {
       "relation": "contains",
@@ -4000,9 +5460,9 @@
       "source_file": "apps/ea/README.md",
       "source_location": "L19",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "ea_readme_mt5_expert_advisor_trade_sync",
-      "target": "ea_readme_how_it_works",
-      "confidence_score": 1.0
+      "target": "ea_readme_how_it_works"
     },
     {
       "relation": "contains",
@@ -4010,9 +5470,9 @@
       "source_file": "apps/ea/README.md",
       "source_location": "L26",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "ea_readme_mt5_expert_advisor_trade_sync",
-      "target": "ea_readme_json_payload_format",
-      "confidence_score": 1.0
+      "target": "ea_readme_json_payload_format"
     },
     {
       "relation": "contains",
@@ -4020,9 +5480,9 @@
       "source_file": "apps/ea/README.md",
       "source_location": "L47",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "ea_readme_mt5_expert_advisor_trade_sync",
-      "target": "ea_readme_notes",
-      "confidence_score": 1.0
+      "target": "ea_readme_notes"
     },
     {
       "relation": "contains",
@@ -4030,9 +5490,9 @@
       "source_file": "apps/ea/README.md",
       "source_location": "L6",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "ea_readme_mt5_expert_advisor_trade_sync",
-      "target": "ea_readme_setup",
-      "confidence_score": 1.0
+      "target": "ea_readme_setup"
     },
     {
       "relation": "contains",
@@ -4040,9 +5500,9 @@
       "source_file": "apps/web/PROGRESS.md",
       "source_location": "L1",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "web_progress",
-      "target": "web_progress_web_progress_\u0645\u0639\u0627\u0645\u0644\u0647_\u06cc\u0627\u0631",
-      "confidence_score": 1.0
+      "target": "web_progress_web_progress_\u0645\u0639\u0627\u0645\u0644\u0647_\u06cc\u0627\u0631"
     },
     {
       "relation": "contains",
@@ -4050,9 +5510,9 @@
       "source_file": "apps/web/PROGRESS.md",
       "source_location": "L12",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "web_progress_web_progress_\u0645\u0639\u0627\u0645\u0644\u0647_\u06cc\u0627\u0631",
-      "target": "web_progress_done",
-      "confidence_score": 1.0
+      "target": "web_progress_done"
     },
     {
       "relation": "contains",
@@ -4060,9 +5520,9 @@
       "source_file": "apps/web/PROGRESS.md",
       "source_location": "L78",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "web_progress_web_progress_\u0645\u0639\u0627\u0645\u0644\u0647_\u06cc\u0627\u0631",
-      "target": "web_progress_not_done_next_steps",
-      "confidence_score": 1.0
+      "target": "web_progress_not_done_next_steps"
     },
     {
       "relation": "contains",
@@ -4070,9 +5530,9 @@
       "source_file": "apps/web/PROGRESS.md",
       "source_location": "L3",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "web_progress_web_progress_\u0645\u0639\u0627\u0645\u0644\u0647_\u06cc\u0627\u0631",
-      "target": "web_progress_tech_stack",
-      "confidence_score": 1.0
+      "target": "web_progress_tech_stack"
     },
     {
       "relation": "contains",
@@ -4080,9 +5540,9 @@
       "source_file": "apps/web/PROGRESS.md",
       "source_location": "L14",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "web_progress_done",
-      "target": "web_progress_app_layout_src_app_layout_tsx",
-      "confidence_score": 1.0
+      "target": "web_progress_app_layout_src_app_layout_tsx"
     },
     {
       "relation": "contains",
@@ -4090,9 +5550,9 @@
       "source_file": "apps/web/PROGRESS.md",
       "source_location": "L21",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "web_progress_done",
-      "target": "web_progress_design_system_src_app_variables_scss_src_app_globals_scss",
-      "confidence_score": 1.0
+      "target": "web_progress_design_system_src_app_variables_scss_src_app_globals_scss"
     },
     {
       "relation": "contains",
@@ -4100,9 +5560,9 @@
       "source_file": "apps/web/PROGRESS.md",
       "source_location": "L66",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "web_progress_done",
-      "target": "web_progress_stylesheet_src_components_trades_scss",
-      "confidence_score": 1.0
+      "target": "web_progress_stylesheet_src_components_trades_scss"
     },
     {
       "relation": "contains",
@@ -4110,9 +5570,9 @@
       "source_file": "apps/web/PROGRESS.md",
       "source_location": "L26",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "web_progress_done",
-      "target": "web_progress_trades_page_src_app_trades_page_tsx",
-      "confidence_score": 1.0
+      "target": "web_progress_trades_page_src_app_trades_page_tsx"
     },
     {
       "relation": "contains",
@@ -4120,9 +5580,9 @@
       "source_file": "apps/web/PROGRESS.md",
       "source_location": "L41",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "web_progress_done",
-      "target": "web_progress_tradestable_component_src_components_tradestable_tsx",
-      "confidence_score": 1.0
+      "target": "web_progress_tradestable_component_src_components_tradestable_tsx"
     },
     {
       "relation": "contains",
@@ -4130,9 +5590,9 @@
       "source_file": "apps/web/PROGRESS.md",
       "source_location": "L72",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "web_progress_done",
-      "target": "web_progress_utilities_src_utils_farsi_ts",
-      "confidence_score": 1.0
+      "target": "web_progress_utilities_src_utils_farsi_ts"
     },
     {
       "relation": "contains",
@@ -4140,9 +5600,9 @@
       "source_file": "apps/web/PROGRESS.md",
       "source_location": "L32",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "web_progress_trades_page_src_app_trades_page_tsx",
-      "target": "web_progress_api_integration_in_page_tsx",
-      "confidence_score": 1.0
+      "target": "web_progress_api_integration_in_page_tsx"
     },
     {
       "relation": "contains",
@@ -4150,9 +5610,9 @@
       "source_file": "apps/web/PROGRESS.md",
       "source_location": "L80",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "web_progress_not_done_next_steps",
-      "target": "web_progress_high_priority",
-      "confidence_score": 1.0
+      "target": "web_progress_high_priority"
     },
     {
       "relation": "contains",
@@ -4160,9 +5620,9 @@
       "source_file": "apps/web/PROGRESS.md",
       "source_location": "L94",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "web_progress_not_done_next_steps",
-      "target": "web_progress_low_priority",
-      "confidence_score": 1.0
+      "target": "web_progress_low_priority"
     },
     {
       "relation": "contains",
@@ -4170,9 +5630,9 @@
       "source_file": "apps/web/PROGRESS.md",
       "source_location": "L85",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "web_progress_not_done_next_steps",
-      "target": "web_progress_medium_priority",
-      "confidence_score": 1.0
+      "target": "web_progress_medium_priority"
     },
     {
       "relation": "contains",
@@ -4180,9 +5640,9 @@
       "source_file": "apps/web/ui_sample/DESIGN.md",
       "source_location": "L98",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "ui_sample_design",
-      "target": "ui_sample_design_brand_style",
-      "confidence_score": 1.0
+      "target": "ui_sample_design_brand_style"
     },
     {
       "relation": "contains",
@@ -4190,9 +5650,9 @@
       "source_file": "apps/web/ui_sample/DESIGN.md",
       "source_location": "L104",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "ui_sample_design",
-      "target": "ui_sample_design_colors",
-      "confidence_score": 1.0
+      "target": "ui_sample_design_colors"
     },
     {
       "relation": "contains",
@@ -4200,9 +5660,9 @@
       "source_file": "apps/web/ui_sample/DESIGN.md",
       "source_location": "L144",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "ui_sample_design",
-      "target": "ui_sample_design_components",
-      "confidence_score": 1.0
+      "target": "ui_sample_design_components"
     },
     {
       "relation": "contains",
@@ -4210,9 +5670,9 @@
       "source_file": "apps/web/ui_sample/DESIGN.md",
       "source_location": "L128",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "ui_sample_design",
-      "target": "ui_sample_design_elevation_depth",
-      "confidence_score": 1.0
+      "target": "ui_sample_design_elevation_depth"
     },
     {
       "relation": "contains",
@@ -4220,9 +5680,9 @@
       "source_file": "apps/web/ui_sample/DESIGN.md",
       "source_location": "L120",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "ui_sample_design",
-      "target": "ui_sample_design_layout_spacing",
-      "confidence_score": 1.0
+      "target": "ui_sample_design_layout_spacing"
     },
     {
       "relation": "contains",
@@ -4230,9 +5690,9 @@
       "source_file": "apps/web/ui_sample/DESIGN.md",
       "source_location": "L137",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "ui_sample_design",
-      "target": "ui_sample_design_shapes",
-      "confidence_score": 1.0
+      "target": "ui_sample_design_shapes"
     },
     {
       "relation": "contains",
@@ -4240,9 +5700,9 @@
       "source_file": "apps/web/ui_sample/DESIGN.md",
       "source_location": "L112",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "ui_sample_design",
-      "target": "ui_sample_design_typography",
-      "confidence_score": 1.0
+      "target": "ui_sample_design_typography"
     },
     {
       "relation": "contains",
@@ -4250,9 +5710,9 @@
       "source_file": "apps/web/ui_sample/DESIGN.md",
       "source_location": "L146",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "ui_sample_design_components",
-      "target": "ui_sample_design_buttons",
-      "confidence_score": 1.0
+      "target": "ui_sample_design_buttons"
     },
     {
       "relation": "contains",
@@ -4260,9 +5720,9 @@
       "source_file": "apps/web/ui_sample/DESIGN.md",
       "source_location": "L151",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "ui_sample_design_components",
-      "target": "ui_sample_design_cards_trade_logs",
-      "confidence_score": 1.0
+      "target": "ui_sample_design_cards_trade_logs"
     },
     {
       "relation": "contains",
@@ -4270,9 +5730,9 @@
       "source_file": "apps/web/ui_sample/DESIGN.md",
       "source_location": "L158",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "ui_sample_design_components",
-      "target": "ui_sample_design_chips_badges",
-      "confidence_score": 1.0
+      "target": "ui_sample_design_chips_badges"
     },
     {
       "relation": "contains",
@@ -4280,9 +5740,9 @@
       "source_file": "apps/web/ui_sample/DESIGN.md",
       "source_location": "L155",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "ui_sample_design_components",
-      "target": "ui_sample_design_input_fields",
-      "confidence_score": 1.0
+      "target": "ui_sample_design_input_fields"
     },
     {
       "relation": "contains",
@@ -4290,9 +5750,9 @@
       "source_file": "apps/web/ui_sample/DESIGN.md",
       "source_location": "L162",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "ui_sample_design_components",
-      "target": "ui_sample_design_progress_bars_pnl",
-      "confidence_score": 1.0
+      "target": "ui_sample_design_progress_bars_pnl"
     },
     {
       "relation": "contains",
@@ -4300,9 +5760,9 @@
       "source_file": "persian-trading-journal-architecture.md",
       "source_location": "L1",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "persian_trading_journal_architecture",
-      "target": "persian_trading_journal_architecture_\u0645\u0639\u0627\u0645\u0644\u0647_\u06cc\u0627\u0631_persian_trading_journal_platform",
-      "confidence_score": 1.0
+      "target": "persian_trading_journal_architecture_\u0645\u0639\u0627\u0645\u0644\u0647_\u06cc\u0627\u0631_persian_trading_journal_platform"
     },
     {
       "relation": "contains",
@@ -4310,9 +5770,9 @@
       "source_file": "persian-trading-journal-architecture.md",
       "source_location": "L410",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "persian_trading_journal_architecture_\u0645\u0639\u0627\u0645\u0644\u0647_\u06cc\u0627\u0631_persian_trading_journal_platform",
-      "target": "persian_trading_journal_architecture_10_key_risks_mitigations",
-      "confidence_score": 1.0
+      "target": "persian_trading_journal_architecture_10_key_risks_mitigations"
     },
     {
       "relation": "contains",
@@ -4320,9 +5780,9 @@
       "source_file": "persian-trading-journal-architecture.md",
       "source_location": "L422",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "persian_trading_journal_architecture_\u0645\u0639\u0627\u0645\u0644\u0647_\u06cc\u0627\u0631_persian_trading_journal_platform",
-      "target": "persian_trading_journal_architecture_11_suggested_next_steps",
-      "confidence_score": 1.0
+      "target": "persian_trading_journal_architecture_11_suggested_next_steps"
     },
     {
       "relation": "contains",
@@ -4330,9 +5790,9 @@
       "source_file": "persian-trading-journal-architecture.md",
       "source_location": "L6",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "persian_trading_journal_architecture_\u0645\u0639\u0627\u0645\u0644\u0647_\u06cc\u0627\u0631_persian_trading_journal_platform",
-      "target": "persian_trading_journal_architecture_1_project_overview",
-      "confidence_score": 1.0
+      "target": "persian_trading_journal_architecture_1_project_overview"
     },
     {
       "relation": "contains",
@@ -4340,9 +5800,9 @@
       "source_file": "persian-trading-journal-architecture.md",
       "source_location": "L22",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "persian_trading_journal_architecture_\u0645\u0639\u0627\u0645\u0644\u0647_\u06cc\u0627\u0631_persian_trading_journal_platform",
-      "target": "persian_trading_journal_architecture_2_system_architecture_overview",
-      "confidence_score": 1.0
+      "target": "persian_trading_journal_architecture_2_system_architecture_overview"
     },
     {
       "relation": "contains",
@@ -4350,9 +5810,9 @@
       "source_file": "persian-trading-journal-architecture.md",
       "source_location": "L50",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "persian_trading_journal_architecture_\u0645\u0639\u0627\u0645\u0644\u0647_\u06cc\u0627\u0631_persian_trading_journal_platform",
-      "target": "persian_trading_journal_architecture_3_tech_stack_full_detail",
-      "confidence_score": 1.0
+      "target": "persian_trading_journal_architecture_3_tech_stack_full_detail"
     },
     {
       "relation": "contains",
@@ -4360,9 +5820,9 @@
       "source_file": "persian-trading-journal-architecture.md",
       "source_location": "L151",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "persian_trading_journal_architecture_\u0645\u0639\u0627\u0645\u0644\u0647_\u06cc\u0627\u0631_persian_trading_journal_platform",
-      "target": "persian_trading_journal_architecture_4_monorepo_structure",
-      "confidence_score": 1.0
+      "target": "persian_trading_journal_architecture_4_monorepo_structure"
     },
     {
       "relation": "contains",
@@ -4370,9 +5830,9 @@
       "source_file": "persian-trading-journal-architecture.md",
       "source_location": "L209",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "persian_trading_journal_architecture_\u0645\u0639\u0627\u0645\u0644\u0647_\u06cc\u0627\u0631_persian_trading_journal_platform",
-      "target": "persian_trading_journal_architecture_5_feature_breakdown_v1",
-      "confidence_score": 1.0
+      "target": "persian_trading_journal_architecture_5_feature_breakdown_v1"
     },
     {
       "relation": "contains",
@@ -4380,9 +5840,9 @@
       "source_file": "persian-trading-journal-architecture.md",
       "source_location": "L287",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "persian_trading_journal_architecture_\u0645\u0639\u0627\u0645\u0644\u0647_\u06cc\u0627\u0631_persian_trading_journal_platform",
-      "target": "persian_trading_journal_architecture_6_mt4_mt5_parser_detail",
-      "confidence_score": 1.0
+      "target": "persian_trading_journal_architecture_6_mt4_mt5_parser_detail"
     },
     {
       "relation": "contains",
@@ -4390,9 +5850,9 @@
       "source_file": "persian-trading-journal-architecture.md",
       "source_location": "L321",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "persian_trading_journal_architecture_\u0645\u0639\u0627\u0645\u0644\u0647_\u06cc\u0627\u0631_persian_trading_journal_platform",
-      "target": "persian_trading_journal_architecture_7_rtl_persian_ui_guidelines",
-      "confidence_score": 1.0
+      "target": "persian_trading_journal_architecture_7_rtl_persian_ui_guidelines"
     },
     {
       "relation": "contains",
@@ -4400,9 +5860,9 @@
       "source_file": "persian-trading-journal-architecture.md",
       "source_location": "L333",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "persian_trading_journal_architecture_\u0645\u0639\u0627\u0645\u0644\u0647_\u06cc\u0627\u0631_persian_trading_journal_platform",
-      "target": "persian_trading_journal_architecture_8_api_design_key_endpoints",
-      "confidence_score": 1.0
+      "target": "persian_trading_journal_architecture_8_api_design_key_endpoints"
     },
     {
       "relation": "contains",
@@ -4410,9 +5870,9 @@
       "source_file": "persian-trading-journal-architecture.md",
       "source_location": "L379",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "persian_trading_journal_architecture_\u0645\u0639\u0627\u0645\u0644\u0647_\u06cc\u0627\u0631_persian_trading_journal_platform",
-      "target": "persian_trading_journal_architecture_9_development_phases",
-      "confidence_score": 1.0
+      "target": "persian_trading_journal_architecture_9_development_phases"
     },
     {
       "relation": "contains",
@@ -4420,9 +5880,9 @@
       "source_file": "persian-trading-journal-architecture.md",
       "source_location": "L2",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "persian_trading_journal_architecture_\u0645\u0639\u0627\u0645\u0644\u0647_\u06cc\u0627\u0631_persian_trading_journal_platform",
-      "target": "persian_trading_journal_architecture_full_architecture_document_v1",
-      "confidence_score": 1.0
+      "target": "persian_trading_journal_architecture_full_architecture_document_v1"
     },
     {
       "relation": "contains",
@@ -4430,9 +5890,9 @@
       "source_file": "persian-trading-journal-architecture.md",
       "source_location": "L52",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "persian_trading_journal_architecture_3_tech_stack_full_detail",
-      "target": "persian_trading_journal_architecture_3_1_frontend",
-      "confidence_score": 1.0
+      "target": "persian_trading_journal_architecture_3_1_frontend"
     },
     {
       "relation": "contains",
@@ -4440,9 +5900,9 @@
       "source_file": "persian-trading-journal-architecture.md",
       "source_location": "L68",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "persian_trading_journal_architecture_3_tech_stack_full_detail",
-      "target": "persian_trading_journal_architecture_3_2_backend",
-      "confidence_score": 1.0
+      "target": "persian_trading_journal_architecture_3_2_backend"
     },
     {
       "relation": "contains",
@@ -4450,9 +5910,9 @@
       "source_file": "persian-trading-journal-architecture.md",
       "source_location": "L82",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "persian_trading_journal_architecture_3_tech_stack_full_detail",
-      "target": "persian_trading_journal_architecture_3_3_database_postgresql_schema_core_tables",
-      "confidence_score": 1.0
+      "target": "persian_trading_journal_architecture_3_3_database_postgresql_schema_core_tables"
     },
     {
       "relation": "contains",
@@ -4460,9 +5920,9 @@
       "source_file": "persian-trading-journal-architecture.md",
       "source_location": "L129",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "persian_trading_journal_architecture_3_tech_stack_full_detail",
-      "target": "persian_trading_journal_architecture_3_4_infrastructure",
-      "confidence_score": 1.0
+      "target": "persian_trading_journal_architecture_3_4_infrastructure"
     },
     {
       "relation": "contains",
@@ -4470,9 +5930,9 @@
       "source_file": "persian-trading-journal-architecture.md",
       "source_location": "L141",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "persian_trading_journal_architecture_3_tech_stack_full_detail",
-      "target": "persian_trading_journal_architecture_3_5_payments",
-      "confidence_score": 1.0
+      "target": "persian_trading_journal_architecture_3_5_payments"
     },
     {
       "relation": "contains",
@@ -4480,9 +5940,9 @@
       "source_file": "persian-trading-journal-architecture.md",
       "source_location": "L211",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "persian_trading_journal_architecture_5_feature_breakdown_v1",
-      "target": "persian_trading_journal_architecture_5_1_authentication",
-      "confidence_score": 1.0
+      "target": "persian_trading_journal_architecture_5_1_authentication"
     },
     {
       "relation": "contains",
@@ -4490,9 +5950,9 @@
       "source_file": "persian-trading-journal-architecture.md",
       "source_location": "L217",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "persian_trading_journal_architecture_5_feature_breakdown_v1",
-      "target": "persian_trading_journal_architecture_5_2_manual_trade_entry",
-      "confidence_score": 1.0
+      "target": "persian_trading_journal_architecture_5_2_manual_trade_entry"
     },
     {
       "relation": "contains",
@@ -4500,9 +5960,9 @@
       "source_file": "persian-trading-journal-architecture.md",
       "source_location": "L230",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "persian_trading_journal_architecture_5_feature_breakdown_v1",
-      "target": "persian_trading_journal_architecture_5_3_mt4_mt5_import",
-      "confidence_score": 1.0
+      "target": "persian_trading_journal_architecture_5_3_mt4_mt5_import"
     },
     {
       "relation": "contains",
@@ -4510,9 +5970,9 @@
       "source_file": "persian-trading-journal-architecture.md",
       "source_location": "L238",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "persian_trading_journal_architecture_5_feature_breakdown_v1",
-      "target": "persian_trading_journal_architecture_5_4_analytics_dashboard",
-      "confidence_score": 1.0
+      "target": "persian_trading_journal_architecture_5_4_analytics_dashboard"
     },
     {
       "relation": "contains",
@@ -4520,9 +5980,9 @@
       "source_file": "persian-trading-journal-architecture.md",
       "source_location": "L258",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "persian_trading_journal_architecture_5_feature_breakdown_v1",
-      "target": "persian_trading_journal_architecture_5_5_trade_list_detail",
-      "confidence_score": 1.0
+      "target": "persian_trading_journal_architecture_5_5_trade_list_detail"
     },
     {
       "relation": "contains",
@@ -4530,9 +5990,9 @@
       "source_file": "persian-trading-journal-architecture.md",
       "source_location": "L264",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "persian_trading_journal_architecture_5_feature_breakdown_v1",
-      "target": "persian_trading_journal_architecture_5_6_daily_journal",
-      "confidence_score": 1.0
+      "target": "persian_trading_journal_architecture_5_6_daily_journal"
     },
     {
       "relation": "contains",
@@ -4540,9 +6000,9 @@
       "source_file": "persian-trading-journal-architecture.md",
       "source_location": "L270",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "persian_trading_journal_architecture_5_feature_breakdown_v1",
-      "target": "persian_trading_journal_architecture_5_7_setup_playbook",
-      "confidence_score": 1.0
+      "target": "persian_trading_journal_architecture_5_7_setup_playbook"
     },
     {
       "relation": "contains",
@@ -4550,9 +6010,9 @@
       "source_file": "persian-trading-journal-architecture.md",
       "source_location": "L275",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "persian_trading_journal_architecture_5_feature_breakdown_v1",
-      "target": "persian_trading_journal_architecture_5_8_payments_plans",
-      "confidence_score": 1.0
+      "target": "persian_trading_journal_architecture_5_8_payments_plans"
     },
     {
       "relation": "contains",
@@ -4560,9 +6020,9 @@
       "source_file": "persian-trading-journal-architecture.md",
       "source_location": "L291",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "persian_trading_journal_architecture_6_mt4_mt5_parser_detail",
-      "target": "persian_trading_journal_architecture_mt4_account_statement_htm",
-      "confidence_score": 1.0
+      "target": "persian_trading_journal_architecture_mt4_account_statement_htm"
     },
     {
       "relation": "contains",
@@ -4570,9 +6030,9 @@
       "source_file": "persian-trading-journal-architecture.md",
       "source_location": "L298",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "persian_trading_journal_architecture_6_mt4_mt5_parser_detail",
-      "target": "persian_trading_journal_architecture_mt4_csv_export",
-      "confidence_score": 1.0
+      "target": "persian_trading_journal_architecture_mt4_csv_export"
     },
     {
       "relation": "contains",
@@ -4580,9 +6040,9 @@
       "source_file": "persian-trading-journal-architecture.md",
       "source_location": "L304",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "persian_trading_journal_architecture_6_mt4_mt5_parser_detail",
-      "target": "persian_trading_journal_architecture_mt5_csv_export",
-      "confidence_score": 1.0
+      "target": "persian_trading_journal_architecture_mt5_csv_export"
     },
     {
       "relation": "contains",
@@ -4590,9 +6050,9 @@
       "source_file": "persian-trading-journal-architecture.md",
       "source_location": "L310",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "persian_trading_journal_architecture_6_mt4_mt5_parser_detail",
-      "target": "persian_trading_journal_architecture_parser_logic",
-      "confidence_score": 1.0
+      "target": "persian_trading_journal_architecture_parser_logic"
     },
     {
       "relation": "contains",
@@ -4600,9 +6060,9 @@
       "source_file": "persian-trading-journal-architecture.md",
       "source_location": "L381",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "persian_trading_journal_architecture_9_development_phases",
-      "target": "persian_trading_journal_architecture_phase_1_foundation_2_3_weeks",
-      "confidence_score": 1.0
+      "target": "persian_trading_journal_architecture_phase_1_foundation_2_3_weeks"
     },
     {
       "relation": "contains",
@@ -4610,9 +6070,9 @@
       "source_file": "persian-trading-journal-architecture.md",
       "source_location": "L388",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "persian_trading_journal_architecture_9_development_phases",
-      "target": "persian_trading_journal_architecture_phase_2_import_analytics_2_3_weeks",
-      "confidence_score": 1.0
+      "target": "persian_trading_journal_architecture_phase_2_import_analytics_2_3_weeks"
     },
     {
       "relation": "contains",
@@ -4620,9 +6080,9 @@
       "source_file": "persian-trading-journal-architecture.md",
       "source_location": "L394",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "persian_trading_journal_architecture_9_development_phases",
-      "target": "persian_trading_journal_architecture_phase_3_journal_setups_polish_1_2_weeks",
-      "confidence_score": 1.0
+      "target": "persian_trading_journal_architecture_phase_3_journal_setups_polish_1_2_weeks"
     },
     {
       "relation": "contains",
@@ -4630,11 +6090,11 @@
       "source_file": "persian-trading-journal-architecture.md",
       "source_location": "L400",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "persian_trading_journal_architecture_9_development_phases",
-      "target": "persian_trading_journal_architecture_phase_4_payments_launch_1_week",
-      "confidence_score": 1.0
+      "target": "persian_trading_journal_architecture_phase_4_payments_launch_1_week"
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "a2a1776e844ce2df435e88831ed67a25514808e8"
+  "built_at_commit": "e8fd3d384887c76bc44db49fb4dfc8d2951e3fee"
 }

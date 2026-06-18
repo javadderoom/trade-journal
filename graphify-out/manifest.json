@@ -70,8 +70,8 @@
     "semantic_hash": ""
   },
   "apps/web/src/components/TradesTable.tsx": {
-    "mtime": 1781811162.7235115,
-    "ast_hash": "60f404289cd640e72c0dac1642142f42",
+    "mtime": 1781815040.236765,
+    "ast_hash": "e42a6d4a3f4bf7ac8563122f142024d5",
     "semantic_hash": ""
   },
   "apps/web/src/utils/farsi.ts": {
@@ -85,13 +85,13 @@
     "semantic_hash": ""
   },
   "package.json": {
-    "mtime": 1781718156.59521,
-    "ast_hash": "9f559b5b141692e6b8a1005b57fe0bfd",
+    "mtime": 1781812943.4133694,
+    "ast_hash": "2f252e4ebc1df6f41f22f80389c2b802",
     "semantic_hash": ""
   },
   "tsconfig.json": {
-    "mtime": 1781647883.39972,
-    "ast_hash": "25e0666097055991b411f66cb3dba00c",
+    "mtime": 1781812904.812749,
+    "ast_hash": "ad0bcb4c2ae9c6c3bb238ba8cc6594ac",
     "semantic_hash": ""
   },
   ".agents/rules/graphify.md": {
@@ -142,6 +142,21 @@
   "persian-trading-journal-architecture.md": {
     "mtime": 1781551971.5195389,
     "ast_hash": "2f9fa1ac328a9fedfbf946ac50d4d818",
+    "semantic_hash": ""
+  },
+  "apps/api/tsconfig.json": {
+    "mtime": 1781812876.472947,
+    "ast_hash": "0e510e8a7f4c1e8322fa5aa0dc89a4e7",
+    "semantic_hash": ""
+  },
+  "skills-lock.json": {
+    "mtime": 1781812263.1254637,
+    "ast_hash": "bd3d398eabb722b91e4bb75a399e4af8",
+    "semantic_hash": ""
+  },
+  ".agents/skills/emil-design-eng/SKILL.md": {
+    "mtime": 1781812196.7882135,
+    "ast_hash": "fd025de68df6836a0c52564d7ac85e72",
     "semantic_hash": ""
   }
 }

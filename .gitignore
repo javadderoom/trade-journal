@@ -38,3 +38,7 @@ next-env.d.ts
 
 # API build output
 /apps/api/dist
+
+# Graphify cache
+/graphify-out/cache/
+

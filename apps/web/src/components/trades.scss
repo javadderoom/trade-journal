@@ -424,6 +424,87 @@
           &.col-symbol {
             font-weight: 600;
             letter-spacing: 0.02em;
+
+            .symbol-cell-content {
+              display: flex;
+              flex-direction: column;
+              gap: 4px;
+              align-items: flex-start;
+            }
+
+            .symbol-name {
+              font-size: 15px;
+              color: $on-surface;
+              font-weight: 700;
+            }
+
+            .symbol-metadata {
+              display: flex;
+              align-items: center;
+              gap: 4px;
+              flex-wrap: wrap;
+            }
+
+            .emotion-mini-badge {
+              font-size: 10px;
+              padding: 1px 5px;
+              border-radius: 4px;
+              font-weight: 500;
+              white-space: nowrap;
+              display: inline-flex;
+              align-items: center;
+              gap: 2px;
+              font-family: $font-primary;
+
+              &.emotion-confident {
+                background-color: rgba($primary, 0.12);
+                color: $primary;
+                border: 1px solid rgba($primary, 0.2);
+              }
+
+              &.emotion-neutral {
+                background-color: rgba($outline, 0.12);
+                color: $on-surface-variant;
+                border: 1px solid rgba($outline, 0.2);
+              }
+
+              &.emotion-anxious {
+                background-color: rgba($secondary, 0.12);
+                color: $secondary;
+                border: 1px solid rgba($secondary, 0.2);
+              }
+
+              &.emotion-fomo {
+                background-color: rgba(#8b5cf6, 0.12);
+                color: #c084fc;
+                border: 1px solid rgba(#8b5cf6, 0.2);
+              }
+
+              &.emotion-revenge {
+                background-color: rgba($error, 0.12);
+                color: $error;
+                border: 1px solid rgba($error, 0.2);
+              }
+            }
+
+            .tag-mini-pill {
+              font-size: 10px;
+              padding: 1px 5px;
+              border-radius: 4px;
+              background-color: rgba($surface-variant, 0.4);
+              border: 1px solid rgba($outline-variant, 0.3);
+              color: $on-surface-variant;
+              white-space: nowrap;
+              font-family: $font-primary;
+            }
+
+            .tag-mini-more {
+              font-size: 10px;
+              color: $on-surface-variant;
+              opacity: 0.8;
+              font-weight: 500;
+              font-family: $font-primary;
+            }
           }
 
           &.col-number {

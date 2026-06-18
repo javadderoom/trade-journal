@@ -64,6 +64,23 @@ const DEFAULT_EMOTIONS = [
   { value: 'REVENGE', label: 'انتقام' },
 ];
 
+const getEmotionEmoji = (emotion: string | null): string => {
+  switch (emotion) {
+    case 'CONFIDENT': return '😌';
+    case 'NEUTRAL': return '😐';
+    case 'ANXIOUS': return '😰';
+    case 'FOMO': return '🎯';
+    case 'REVENGE': return '😡';
+    default: return '💭';
+  }
+};
+
+const getEmotionLabel = (emotion: string | null, emotionsList: { value: string; label: string }[]): string => {
+  if (!emotion) return '';
+  const found = emotionsList.find(e => e.value === emotion);
+  return found ? found.label : emotion;
+};
+
 export default function TradesTable({
   initialTrades,
   initialUsdToToman = 90_000,
@@ -509,7 +526,30 @@ export default function TradesTable({
                       <td>
                         <span className="day-badge">{formatDate(trade.openTime).day}</span>
                       </td>
-                      <td className="col-symbol">{trade.symbol}</td>
+                      <td className="col-symbol">
+                        <div className="symbol-cell-content">
+                          <span className="symbol-name">{trade.symbol}</span>
+                          {(trade.emotion || (trade.tags && trade.tags.length > 0)) && (
+                            <div className="symbol-metadata">
+                              {trade.emotion && (
+                                <span className={`emotion-mini-badge emotion-${trade.emotion.toLowerCase()}`} title={`احساس: ${getEmotionLabel(trade.emotion, allEmotions)}`}>
+                                  {getEmotionEmoji(trade.emotion)} {getEmotionLabel(trade.emotion, allEmotions)}
+                                </span>
+                              )}
+                              {trade.tags && trade.tags.slice(0, 2).map(tag => (
+                                <span key={tag} className="tag-mini-pill">
+                                  {tag}
+                                </span>
+                              ))}
+                              {trade.tags && trade.tags.length > 2 && (
+                                <span className="tag-mini-more" title={trade.tags.slice(2).join('، ')}>
+                                  +{toPersianDigits(trade.tags.length - 2)}
+                                </span>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      </td>
                       <td>
                         <span className={`direction-badge ${isBuy ? 'buy' : 'sell'}`}>
                           <span className="material-symbols-outlined badge-icon">
