@@ -188,6 +188,41 @@
     display: flex;
     gap: 8px;
     margin-right: auto; // mr-auto
+    align-items: center;
+
+    .rate-input-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 8px;
+      background-color: $surface-container;
+      border-radius: 4px;
+      border: 1px solid $outline-variant;
+
+      .rate-label {
+        font-size: 12px;
+        color: $on-surface-variant;
+        white-space: nowrap;
+      }
+
+      .rate-input {
+        width: 80px;
+        background: transparent;
+        border: none;
+        color: $on-surface;
+        font-size: 13px;
+        outline: none;
+        text-align: center;
+        font-family: $font-primary;
+
+        // Hide browser spin arrows
+        &::-webkit-inner-spin-button,
+        &::-webkit-outer-spin-button {
+          -webkit-appearance: none;
+          margin: 0;
+        }
+      }
+    }
 
     .icon-btn {
       padding: 4px 8px;
@@ -262,6 +297,13 @@
       .value {
         color: $primary;
       }
+    }
+
+    .toman-value {
+      font-size: 11px;
+      color: $primary;
+      opacity: 0.7;
+      white-space: nowrap;
     }
 
     .card-icon {
@@ -395,6 +437,19 @@
             direction: ltr;
             text-align: left;
             font-weight: 700;
+
+            .profit-usd {
+              display: block;
+            }
+
+            .profit-toman {
+              display: block;
+              font-size: 11px;
+              font-weight: 400;
+              opacity: 0.65;
+              margin-top: 2px;
+              direction: rtl;
+            }
 
             &.profit-positive {
               color: $primary;
@@ -630,7 +685,7 @@
     min-height: 0;
     overflow-y: auto;
 
-    & > * {
+    &>* {
       flex-shrink: 0;
     }
 
@@ -691,9 +746,24 @@
         font-weight: 700;
         color: $primary;
         letter-spacing: -0.02em;
-        margin-bottom: 8px;
+        margin-bottom: 2px;
         direction: ltr;
         text-align: right;
+      }
+
+      .pnl-toman {
+        font-size: 14px;
+        color: $primary;
+        opacity: 0.7;
+        direction: rtl;
+        text-align: right;
+        margin-bottom: 8px;
+      }
+
+      &.loss-box {
+        .pnl-toman {
+          color: $error;
+        }
       }
 
       .metrics-grid {
@@ -793,6 +863,7 @@
 
           &.sl-input {
             color: $error;
+
             &:focus {
               border-color: $error;
               box-shadow: 0 0 0 1px $error;
@@ -801,6 +872,7 @@
 
           &.tp-input {
             color: $primary;
+
             &:focus {
               border-color: $primary;
               box-shadow: 0 0 0 1px $primary;

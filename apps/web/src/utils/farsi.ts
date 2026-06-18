@@ -25,11 +25,34 @@ export function formatPersianNumber(val: number, decimals: number = 2): string {
 export function formatPersianCurrency(val: number): string {
   const prefix = val > 0 ? '+' : val < 0 ? '-' : '';
   const absVal = Math.abs(val).toFixed(2);
-  
+
   // Format thousand separator
   const parts = absVal.split('.');
   parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
   const formattedAbs = parts.join('.');
-  
+
   return `${prefix}$${toPersianDigits(formattedAbs)}`;
+}
+/**
+ * Formats a USD profit/loss value as Iranian Tomans.
+ * Abbreviates large numbers: 1,000,000+ → X میلیون تومان, 1,000+ → X هزار تومان
+ */
+export function formatToman(usd: number, usdToToman: number): string {
+  const prefix = usd > 0 ? '+' : usd < 0 ? '-' : '';
+  const tomans = Math.abs(usd) * usdToToman;
+
+  let display: string;
+  let suffix: string;
+  if (tomans >= 1_000_000) {
+    display = formatPersianNumber(tomans / 1_000_000, 1);
+    suffix = ' میلیون';
+  } else if (tomans >= 1_000) {
+    display = formatPersianNumber(tomans / 1_000, 0);
+    suffix = ' هزار';
+  } else {
+    display = formatPersianNumber(tomans, 0);
+    suffix = '';
+  }
+
+  return `${display}${prefix}${suffix} ت`;
 }

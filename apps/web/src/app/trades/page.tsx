@@ -22,7 +22,7 @@ const MOCK_TRADES: Trade[] = [
     swap: -0.50,
     pips: 75.0,
     rMultiple: 1.5,
-    tags: ['آرام', 'با اطمینان'],
+    tags: ['پرایس اکشن', 'برگشت از حمایت'],
     setupName: 'پرایس اکشن',
     emotion: 'CONFIDENT',
     notes: 'در حمایت اصلی فریم زمانی ۴ ساعته الگو اینگالف صعودی تشکیل شد. ریسک به ریوارد مناسب بود. کمی زودتر از تارگت اصلی خارج شدم چون اخبار مهمی در راه بود.',
@@ -44,7 +44,7 @@ const MOCK_TRADES: Trade[] = [
     swap: 0.00,
     pips: -20.0,
     rMultiple: -1.0,
-    tags: ['مضطرب'],
+    tags: ['شکست ساختار', 'نقض قانون'],
     setupName: 'شکست ساختار',
     emotion: 'ANXIOUS',
     notes: 'قیمت از ناحیه مقاومتی عبور کرد و حد ضرر من فعال شد. عجله کردم و تاییدیه دوم را نگرفتم.',
@@ -66,7 +66,7 @@ const MOCK_TRADES: Trade[] = [
     swap: -0.10,
     pips: 60.0,
     rMultiple: 2.0,
-    tags: ['آرام'],
+    tags: ['روند گیری', 'مدیریت خوب'],
     setupName: 'روند گیری',
     emotion: 'NEUTRAL',
     notes: 'روند صعودی قوی در تایم ۳۰ دقیقه. معامله با موفقیت به حد سود رسید.',
@@ -88,7 +88,7 @@ const MOCK_TRADES: Trade[] = [
     swap: 0.00,
     pips: 150.0,
     rMultiple: 0.5,
-    tags: ['FOMO'],
+    tags: ['اسکالپ', 'خبری'],
     setupName: 'اسکالپ',
     emotion: 'FOMO',
     notes: 'معامله در حال حاضر باز است. حجم معامله کم است و مدیریت ریسک رعایت شده است.',
@@ -110,7 +110,7 @@ const MOCK_TRADES: Trade[] = [
     swap: -0.80,
     pips: 30.0,
     rMultiple: 1.2,
-    tags: ['با اطمینان'],
+    tags: ['پرایس اکشن', 'برگشت از حمایت', 'مدیریت خوب'],
     setupName: 'پرایس اکشن',
     emotion: 'CONFIDENT',
     notes: 'برگشت قیمت از کف کانال صعودی.',
@@ -132,7 +132,7 @@ const MOCK_TRADES: Trade[] = [
     swap: 0.00,
     pips: -40.0,
     rMultiple: -1.0,
-    tags: ['انتقام'],
+    tags: ['شکست ساختار', 'نقض قانون', 'حجم اضافه'],
     setupName: 'شکست ساختار',
     emotion: 'REVENGE',
     notes: 'معامله انتقامی بعد از ضرر روی EURUSD. متاسفانه باز هم با ضرر بسته شد. باید سیستم معاملاتی را رعایت کنم.',
@@ -154,7 +154,7 @@ const MOCK_TRADES: Trade[] = [
     swap: 0.00,
     pips: 100.0,
     rMultiple: 2.5,
-    tags: ['آرام'],
+    tags: ['روند گیری', 'شکست ساختار'],
     setupName: 'روند گیری',
     emotion: 'NEUTRAL',
     notes: 'شکست پرقدرت مقاومت و ریزش تا اولین حمایت روزانه.',
@@ -176,7 +176,7 @@ const MOCK_TRADES: Trade[] = [
     swap: 0.00,
     pips: -15.0,
     rMultiple: -1.0,
-    tags: ['مضطرب'],
+    tags: ['اسکالپ', 'خروج زود'],
     setupName: 'اسکالپ',
     emotion: 'ANXIOUS',
     notes: 'خروج زودهنگام به دلیل استرس شدید، در حالی که تحلیل کلی درست بود.',
@@ -187,6 +187,7 @@ export default function TradesPage() {
   const [trades, setTrades] = useState<Trade[]>(MOCK_TRADES);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [usdToToman, setUsdToToman] = useState<number>(90_000);
 
   const fetchTrades = async () => {
     try {
@@ -271,6 +272,15 @@ export default function TradesPage() {
 
   useEffect(() => {
     fetchTrades();
+    // Fetch live USD→Toman rate (cached 6h server-side, safe within 120/month quota)
+    fetch('/api/exchange-rate')
+      .then(r => r.json())
+      .then(data => {
+        if (data?.usdToToman && data.usdToToman > 0) {
+          setUsdToToman(data.usdToToman);
+        }
+      })
+      .catch(() => { /* keep default 90,000 */ });
   }, []);
 
   const handleUpdateTrade = async (updatedTrade: Trade): Promise<boolean> => {
@@ -343,6 +353,7 @@ export default function TradesPage() {
     <main style={{ minHeight: '100vh', backgroundColor: '#111319' }}>
       <TradesTable
         initialTrades={trades}
+        initialUsdToToman={usdToToman}
         onRefresh={fetchTrades}
         onImportMT4={handleImportMT4}
         onAddManualTrade={handleAddManualTrade}

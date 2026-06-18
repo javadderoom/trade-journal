@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import './trades.scss';
-import { toPersianDigits, formatPersianCurrency } from '../utils/farsi';
+import { toPersianDigits, formatPersianCurrency, formatToman } from '../utils/farsi';
 
 export interface Trade {
   id: string;
@@ -29,6 +29,7 @@ export interface Trade {
 
 interface TradesTableProps {
   initialTrades: Trade[];
+  initialUsdToToman?: number;
   onRefresh?: () => void;
   onImportMT4?: () => void;
   onAddManualTrade?: () => void;
@@ -37,10 +38,27 @@ interface TradesTableProps {
 }
 
 
-const DEFAULT_TAGS = ['آرام', 'با اطمینان', 'مضطرب', 'FOMO', 'انتقام'];
+const DEFAULT_TAGS = [
+  'پرایس اکشن',       // Price Action
+  'شکست ساختار',     // Structure Break
+  'برگشت از حمایت',  // Support Bounce
+  'برگشت از مقاومت', // Resistance Bounce
+  'روند گیری',        // Trend Following
+  'واگرایی',          // Divergence
+  'اسکالپ',           // Scalp
+  'سوئینگ',           // Swing
+  'خبری',             // News-based
+  'تله خرسی',         // Bear Trap
+  'تله گاوی',         // Bull Trap
+  'نقض قانون',        // Rule Break
+  'مدیریت خوب',      // Good Management
+  'خروج زود',         // Early Exit
+  'حجم اضافه',        // Oversize
+];
 
 export default function TradesTable({
   initialTrades,
+  initialUsdToToman = 90_000,
   onRefresh,
   onImportMT4,
   onAddManualTrade,
@@ -56,6 +74,14 @@ export default function TradesTable({
   const [selectedSymbol, setSelectedSymbol] = useState('همه نمادها');
   const [selectedDirection, setSelectedDirection] = useState('همه جهت‌ها');
   const [selectedStrategy, setSelectedStrategy] = useState('همه استراتژی‌ها');
+
+  // USD → Toman exchange rate (pre-filled from live Navasan rate, user-editable)
+  const [usdToToman, setUsdToToman] = useState<number>(initialUsdToToman);
+
+  // Sync when parent delivers the live rate after async fetch
+  useEffect(() => {
+    setUsdToToman(initialUsdToToman);
+  }, [initialUsdToToman]);
 
   // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
@@ -334,6 +360,21 @@ export default function TradesTable({
           </div>
 
           <div className="filter-actions">
+            <div className="rate-input-wrapper" title="نرخ دلار به تومان">
+              <span className="rate-label">$=</span>
+              <input
+                type="number"
+                className="rate-input"
+                value={usdToToman}
+                min={1}
+                step={1000}
+                onChange={e => {
+                  const v = parseInt(e.target.value, 10);
+                  if (!isNaN(v) && v > 0) setUsdToToman(v);
+                }}
+              />
+              <span className="rate-label">ت</span>
+            </div>
             <button
               className="icon-btn"
               title="پاک کردن فیلترها"
@@ -373,6 +414,9 @@ export default function TradesTable({
             <span className="label">مجموع سود:</span>
             <span className="value" dir="ltr">
               {formatCurrency(summary.totalProfit)}
+            </span>
+            <span className="toman-value">
+              {formatToman(summary.totalProfit, usdToToman)}
             </span>
           </div>
         </div>
@@ -456,7 +500,8 @@ export default function TradesTable({
                         {toPersianDigits(trade.rMultiple.toFixed(1))}R
                       </td>
                       <td className={`col-profit ${profitClass}`}>
-                        {formatCurrency(trade.profitUsd)}
+                        <span className="profit-usd">{formatCurrency(trade.profitUsd)}</span>
+                        <span className="profit-toman">{formatToman(trade.profitUsd, usdToToman)}</span>
                       </td>
                       <td style={{ textAlign: 'center' }}>
                         {trade.setupName ? (
@@ -562,6 +607,9 @@ export default function TradesTable({
               </div>
               <div className="pnl-value">
                 {formatCurrency(activeTrade.profitUsd)}
+              </div>
+              <div className="pnl-toman">
+                {formatToman(activeTrade.profitUsd, usdToToman)}
               </div>
               <div className="metrics-grid">
                 <div className="metric-item">

@@ -130,11 +130,15 @@ void SyncTrades()
       
       // Find the matching open deal for this position
       double openPrice = 0;
+      double openCommission = 0;
       double sl = 0;
       double tp = 0;
       datetime openTime = 0;
-      
-      FindOpenDealDetails(positionId, openPrice, sl, tp, openTime);
+
+      FindOpenDealDetails(positionId, openPrice, openCommission, sl, tp, openTime);
+
+      // Total commission = open deal commission + close deal commission
+      double totalCommission = openCommission + commission;
       
       // Direction: closing a BUY = SELL signal, closing a SELL = BUY signal
       // But for the trade journal, we record the ORIGINAL direction
@@ -161,11 +165,11 @@ void SyncTrades()
             pips = (openPrice - dealPrice) / pipSize;
       }
       
-      // Calculate R-multiple
+      // Calculate R-multiple using total commission
       double entryRisk = MathAbs(openPrice - sl);
       double rMultiple = 0;
       if(entryRisk > 0)
-         rMultiple = (profit + commission + swap) / entryRisk;
+         rMultiple = (profit + totalCommission + swap) / entryRisk;
       
       // Build JSON for this trade
       if(newTrades > 0) jsonPayload += ",";
@@ -182,7 +186,7 @@ void SyncTrades()
       jsonPayload += "\"stopLoss\":" + DoubleToString(sl, digits) + ",";
       jsonPayload += "\"takeProfit\":" + DoubleToString(tp, digits) + ",";
       jsonPayload += "\"profitUsd\":" + DoubleToString(profit, 2) + ",";
-      jsonPayload += "\"commission\":" + DoubleToString(commission, 2) + ",";
+      jsonPayload += "\"commission\":" + DoubleToString(totalCommission, 2) + ",";
       jsonPayload += "\"swap\":" + DoubleToString(swap, 2) + ",";
       jsonPayload += "\"pips\":" + DoubleToString(pips, 1) + ",";
       jsonPayload += "\"rMultiple\":" + DoubleToString(rMultiple, 2);
@@ -239,30 +243,55 @@ void SyncTrades()
 }
 
 //+------------------------------------------------------------------+
-//| Find open deal details for a position                              |
+//| Find open deal details for a position                             |
 //+------------------------------------------------------------------+
-void FindOpenDealDetails(ulong positionId, double &openPrice, double &sl, double &tp, datetime &openTime)
+//| NOTE: In MT5, DEAL_SL and DEAL_TP on deals are always 0.         |
+//| SL/TP are stored on Orders, not Deals.                            |
+//| We first find the open deal for open price/time, then scan        |
+//| HistoryOrders for that position to get the last known SL/TP.     |
+//+------------------------------------------------------------------+
+void FindOpenDealDetails(ulong positionId, double &openPrice, double &openCommission, double &sl, double &tp, datetime &openTime)
 {
    int totalDeals = HistoryDealsTotal();
-   
+
+   // Step 1: Find the opening deal — gives us openPrice and openTime
    for(int i = 0; i < totalDeals; i++)
    {
       ulong ticket = HistoryDealGetTicket(i);
       if(ticket == 0) continue;
-      
+
       long dealEntry = HistoryDealGetInteger(ticket, DEAL_ENTRY);
       long dealPosId = HistoryDealGetInteger(ticket, DEAL_POSITION_ID);
-      
+
       if(dealPosId == (long)positionId && dealEntry == DEAL_ENTRY_IN)
       {
-         openPrice = HistoryDealGetDouble(ticket, DEAL_PRICE);
-         openTime  = (datetime)HistoryDealGetInteger(ticket, DEAL_TIME);
-         
-         // Get SL/TP from the deal history
-         sl = HistoryDealGetDouble(ticket, DEAL_SL);
-         tp = HistoryDealGetDouble(ticket, DEAL_TP);
-         return;
+         openPrice      = HistoryDealGetDouble(ticket, DEAL_PRICE);
+         openTime       = (datetime)HistoryDealGetInteger(ticket, DEAL_TIME);
+         openCommission = HistoryDealGetDouble(ticket, DEAL_COMMISSION);
+         break;
       }
+   }
+
+   // Step 2: Scan HistoryOrders for this position to get SL/TP
+   // Orders carry the SL/TP that was set at the time of execution.
+   // We take the last order for the position (most recent modification).
+   sl = 0;
+   tp = 0;
+   int totalOrders = HistoryOrdersTotal();
+   for(int i = 0; i < totalOrders; i++)
+   {
+      ulong orderTicket = HistoryOrderGetTicket(i);
+      if(orderTicket == 0) continue;
+
+      long orderPosId = HistoryOrderGetInteger(orderTicket, ORDER_POSITION_ID);
+      if(orderPosId != (long)positionId) continue;
+
+      double orderSl = HistoryOrderGetDouble(orderTicket, ORDER_SL);
+      double orderTp = HistoryOrderGetDouble(orderTicket, ORDER_TP);
+
+      // Prefer non-zero values; last order wins (loop runs in chronological order)
+      if(orderSl > 0) sl = orderSl;
+      if(orderTp > 0) tp = orderTp;
    }
 }
 
