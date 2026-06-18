@@ -23,7 +23,7 @@ export interface Trade {
   rMultiple: number;
   tags: string[];
   setupName: string | null;
-  emotion: 'FOMO' | 'CONFIDENT' | 'NEUTRAL' | 'ANXIOUS' | 'REVENGE' | null;
+  emotion: string | null;
   notes: string | null;
 }
 
@@ -56,6 +56,14 @@ const DEFAULT_TAGS = [
   'حجم اضافه',        // Oversize
 ];
 
+const DEFAULT_EMOTIONS = [
+  { value: 'CONFIDENT', label: 'با اطمینان' },
+  { value: 'NEUTRAL', label: 'آرام/خنثی' },
+  { value: 'ANXIOUS', label: 'مضطرب' },
+  { value: 'FOMO', label: 'FOMO' },
+  { value: 'REVENGE', label: 'انتقام' },
+];
+
 export default function TradesTable({
   initialTrades,
   initialUsdToToman = 90_000,
@@ -74,6 +82,9 @@ export default function TradesTable({
   const [selectedSymbol, setSelectedSymbol] = useState('همه نمادها');
   const [selectedDirection, setSelectedDirection] = useState('همه جهت‌ها');
   const [selectedStrategy, setSelectedStrategy] = useState('همه استراتژی‌ها');
+  const [isAddingTag, setIsAddingTag] = useState(false);
+  const [isAddingEmotion, setIsAddingEmotion] = useState(false);
+  const [allEmotions, setAllEmotions] = useState<{ value: string; label: string }[]>(DEFAULT_EMOTIONS);
 
   // USD → Toman exchange rate (pre-filled from live Navasan rate, user-editable)
   const [usdToToman, setUsdToToman] = useState<number>(initialUsdToToman);
@@ -120,6 +131,22 @@ export default function TradesTable({
         }
       });
       return Array.from(set);
+    });
+  }, [trades]);
+
+  // Seed allEmotions from trades once they load — only ever adds, never removes
+  useEffect(() => {
+    if (trades.length === 0) return;
+    setAllEmotions(prev => {
+      const existingValues = new Set(prev.map(e => e.value));
+      const updated = [...prev];
+      trades.forEach(t => {
+        if (t.emotion && !existingValues.has(t.emotion)) {
+          existingValues.add(t.emotion);
+          updated.push({ value: t.emotion, label: t.emotion });
+        }
+      });
+      return updated;
     });
   }, [trades]);
 
@@ -444,7 +471,7 @@ export default function TradesTable({
                   <th>نماد</th>
                   <th>جهت</th>
                   <th>حجم</th>
-                  <th>R</th>
+                  <th>R:R</th>
                   <th style={{ textAlign: 'left' }}>سود/زیان</th>
                   <th style={{ textAlign: 'center' }}>استراتژی</th>
                   <th style={{ textAlign: 'center' }}>وضعیت</th>
@@ -690,113 +717,146 @@ export default function TradesTable({
             <div className="form-group">
               <label>برچسب‌های معامله</label>
               <div className="tags-container">
-                {allTags.map(tag => {
-                  const isSelected = activeTrade.tags && activeTrade.tags.includes(tag);
-                  return (
-                    <span
-                      key={tag}
-                      className={`tag ${isSelected ? 'selected' : ''}`}
-                      onClick={() => {
-                        const currentTags = activeTrade.tags || [];
-                        const newTags = isSelected
-                          ? currentTags.filter(t => t !== tag)
-                          : [...currentTags, tag];
-                        updateActiveTradeField('tags', newTags);
-                      }}
-                    >
-                      {tag}
-                    </span>
-                  );
-                })}
-              </div>
-              <div style={{ display: 'flex', gap: '8px', marginTop: '8px' }}>
-                <input
-                  type="text"
-                  placeholder="افزودن برچسب جدید..."
-                  id="new-tag-input"
-                  onKeyDown={e => {
-                    if (e.key === 'Enter') {
-                      e.preventDefault();
-                      const input = e.currentTarget;
-                      const val = input.value.trim();
-                      if (val) {
-                        const currentTags = activeTrade.tags || [];
-                        if (!currentTags.includes(val)) {
-                          updateActiveTradeField('tags', [...currentTags, val]);
+                {[...allTags]
+                  .sort((a, b) => {
+                    const aSelected = activeTrade.tags?.includes(a) ? 1 : 0;
+                    const bSelected = activeTrade.tags?.includes(b) ? 1 : 0;
+                    return bSelected - aSelected;
+                  })
+                  .map(tag => {
+                    const isSelected = activeTrade.tags && activeTrade.tags.includes(tag);
+                    return (
+                      <span
+                        key={tag}
+                        className={`tag ${isSelected ? 'selected' : ''}`}
+                        onClick={() => {
+                          const currentTags = activeTrade.tags || [];
+                          const newTags = isSelected
+                            ? currentTags.filter(t => t !== tag)
+                            : [...currentTags, tag];
+                          updateActiveTradeField('tags', newTags);
+                        }}
+                      >
+                        {tag}
+                      </span>
+                    );
+                  })}
+                {isAddingTag ? (
+                  <input
+                    type="text"
+                    autoFocus
+                    placeholder="برچسب..."
+                    onBlur={() => setIsAddingTag(false)}
+                    onKeyDown={e => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        const val = e.currentTarget.value.trim();
+                        if (val) {
+                          const currentTags = activeTrade.tags || [];
+                          if (!currentTags.includes(val)) {
+                            updateActiveTradeField('tags', [...currentTags, val]);
+                          }
+                          setAllTags(prev => prev.includes(val) ? prev : [...prev, val]);
                         }
-                        setAllTags(prev => prev.includes(val) ? prev : [...prev, val]);
-                        input.value = '';
+                        setIsAddingTag(false);
+                      } else if (e.key === 'Escape') {
+                        setIsAddingTag(false);
                       }
-                    }
-                  }}
-                  style={{
-                    flex: 1,
-                    backgroundColor: '#1e212b',
-                    border: '1px solid #3d4150',
-                    borderRadius: '8px',
-                    padding: '8px 12px',
-                    fontSize: '14px',
-                    color: '#fff',
-                    outline: 'none'
-                  }}
-                />
-                <button
-                  type="button"
-                  onClick={() => {
-                    const input = document.getElementById('new-tag-input') as HTMLInputElement;
-                    const val = input?.value.trim();
-                    if (val) {
-                      const currentTags = activeTrade.tags || [];
-                      if (!currentTags.includes(val)) {
-                        updateActiveTradeField('tags', [...currentTags, val]);
-                      }
-                      setAllTags(prev => prev.includes(val) ? prev : [...prev, val]);
-                      if (input) input.value = '';
-                    }
-                  }}
-                  className="add-tag-btn"
-                  style={{
-                    borderRadius: '8px',
-                    padding: '8px 16px',
-                    background: 'rgba(97, 249, 177, 0.15)',
-                    color: '#61f9b1',
-                    border: '1px solid rgba(97, 249, 177, 0.3)',
-                    cursor: 'pointer',
-                    fontSize: '14px',
-                    fontWeight: 500,
-                    transition: 'all 0.2s ease'
-                  }}
-                >
-                  افزودن
-                </button>
+                    }}
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      padding: '4px 12px',
+                      backgroundColor: 'rgba(97, 249, 177, 0.05)',
+                      color: '#fff',
+                      borderRadius: '9999px',
+                      fontSize: '12px',
+                      border: '1px dashed rgba(97, 249, 177, 0.5)',
+                      outline: 'none',
+                      width: '100px',
+                      fontFamily: 'Vazirmatn'
+                    }}
+                  />
+                ) : (
+                  <span
+                    className="add-tag-btn"
+                    onClick={() => setIsAddingTag(true)}
+                  >
+                    <span className="material-symbols-outlined btn-icon" style={{ fontSize: '14px' }}>add</span>
+                    افزودن برچسب
+                  </span>
+                )}
               </div>
             </div>
 
             <div className="form-group">
               <label>برچسب‌های احساسی</label>
               <div className="tags-container">
-                {(
-                  [
-                    { value: 'CONFIDENT', label: 'با اطمینان' },
-                    { value: 'NEUTRAL',   label: 'آرام/خنثی' },
-                    { value: 'ANXIOUS',   label: 'مضطرب' },
-                    { value: 'FOMO',      label: 'FOMO' },
-                    { value: 'REVENGE',   label: 'انتقام' },
-                  ] as { value: Trade['emotion']; label: string }[]
-                ).map(({ value, label }) => {
-                  const isSelected = activeTrade.emotion === value;
-                  return (
-                    <span
-                      key={value!}
-                      className={`tag${isSelected ? ' selected' : ''}`}
-                      onClick={() =>
-                        updateActiveTradeField('emotion', isSelected ? null : value)
+                {[...allEmotions]
+                  .sort((a, b) => {
+                    const aSelected = activeTrade.emotion === a.value ? 1 : 0;
+                    const bSelected = activeTrade.emotion === b.value ? 1 : 0;
+                    return bSelected - aSelected;
+                  })
+                  .map(({ value, label }) => {
+                    const isSelected = activeTrade.emotion === value;
+                    return (
+                      <span
+                        key={value}
+                        className={`tag${isSelected ? ' selected' : ''}`}
+                        onClick={() =>
+                          updateActiveTradeField('emotion', isSelected ? null : value)
+                        }
+                      >
+                        {label}
+                      </span>
+                    );
+                  })}
+                {isAddingEmotion ? (
+                  <input
+                    type="text"
+                    autoFocus
+                    placeholder="احساس..."
+                    onBlur={() => setIsAddingEmotion(false)}
+                    onKeyDown={e => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        const val = e.currentTarget.value.trim();
+                        if (val) {
+                          updateActiveTradeField('emotion', val);
+                          setAllEmotions(prev => {
+                            if (prev.some(e => e.value === val)) return prev;
+                            return [...prev, { value: val, label: val }];
+                          });
+                        }
+                        setIsAddingEmotion(false);
+                      } else if (e.key === 'Escape') {
+                        setIsAddingEmotion(false);
                       }
-                    >
-                      {label}
-                    </span>
-                  );
-                })}
+                    }}
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      padding: '4px 12px',
+                      backgroundColor: 'rgba(97, 249, 177, 0.05)',
+                      color: '#fff',
+                      borderRadius: '9999px',
+                      fontSize: '12px',
+                      border: '1px dashed rgba(97, 249, 177, 0.5)',
+                      outline: 'none',
+                      width: '100px',
+                      fontFamily: 'Vazirmatn'
+                    }}
+                  />
+                ) : (
+                  <span
+                    className="add-tag-btn"
+                    onClick={() => setIsAddingEmotion(true)}
+                  >
+                    <span className="material-symbols-outlined btn-icon" style={{ fontSize: '14px' }}>add</span>
+                    افزودن احساس
+                  </span>
+                )}
               </div>
             </div>
 
