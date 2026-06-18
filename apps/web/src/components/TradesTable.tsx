@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import './trades.scss';
 import { toPersianDigits, formatPersianCurrency, formatToman } from '../utils/farsi';
+import Select from './Select';
 
 export interface Trade {
   id: string;
@@ -415,35 +416,33 @@ export default function TradesTable({
             />
           </div>
 
-          <div className="filter-select-wrapper">
-            <select value={selectedSymbol} onChange={e => setSelectedSymbol(e.target.value)}>
-              {symbolOptions.map(opt => (
-                <option key={opt} value={opt}>
-                  {opt}
-                </option>
-              ))}
-            </select>
-            <span className="material-symbols-outlined select-arrow">keyboard_arrow_down</span>
-          </div>
+          <Select
+            value={selectedSymbol}
+            onChange={setSelectedSymbol}
+            options={symbolOptions.map(s => ({ value: s, label: s }))}
+          />
 
-          <div className="filter-select-wrapper">
-            <select value={selectedDirection} onChange={e => setSelectedDirection(e.target.value)}>
-              <option value="همه جهت‌ها">همه جهت‌ها</option>
-              <option value="خرید (Buy)">خرید (Buy)</option>
-              <option value="فروش (Sell)">فروش (Sell)</option>
-            </select>
-            <span className="material-symbols-outlined select-arrow">keyboard_arrow_down</span>
-          </div>
+          <Select
+            value={selectedDirection}
+            onChange={setSelectedDirection}
+            options={[
+              { value: 'همه جهت‌ها', label: 'همه جهت‌ها' },
+              { value: 'خرید (Buy)', label: '↑ خرید' },
+              { value: 'فروش (Sell)', label: '↓ فروش' },
+            ]}
+          />
 
-          <div className="filter-select-wrapper" title="منطقه زمانی">
-            <select value={selectedTimezone} onChange={e => setSelectedTimezone(e.target.value)}>
-              <option value="Asia/Tehran">🇮🇷 تهران (GMT+۳:۳۰)</option>
-              <option value="UTC">🌐 UTC (GMT+۰)</option>
-              <option value="Europe/London">🇬🇧 لندن (GMT+۰ / تابستان +۱)</option>
-              <option value="America/New_York">🇺🇸 نیویورک (GMT−۵ / تابستان −۴)</option>
-            </select>
-            <span className="material-symbols-outlined select-arrow">keyboard_arrow_down</span>
-          </div>
+          <Select
+            value={selectedTimezone}
+            onChange={setSelectedTimezone}
+            title="منطقه زمانی"
+            options={[
+              { value: 'Asia/Tehran',     label: '🇮🇷 تهران (GMT+۳:۳۰)' },
+              { value: 'UTC',             label: '🌐 UTC (GMT+۰)' },
+              { value: 'Europe/London',   label: '🇬🇧 لندن (GMT+۰ / تابستان +۱)' },
+              { value: 'America/New_York',label: '🇺🇸 نیویورک (GMT−۵ / تابستان −۴)' },
+            ]}
+          />
 
           {/* <div className="filter-select-wrapper">
             <select value={selectedStrategy} onChange={e => setSelectedStrategy(e.target.value)}>

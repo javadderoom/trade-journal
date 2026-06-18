@@ -1,0 +1,203 @@
+@use '../app/variables' as *;
+
+// ─── Container ─────────────────────────────────────────────────────────────
+
+.custom-select {
+  position: relative;
+  display: inline-flex;
+  flex-direction: column;
+  min-width: 140px;
+  cursor: pointer;
+  outline: none;
+  user-select: none;
+  font-family: $font-primary;
+  direction: rtl;
+
+  // Keyboard-focus ring (not shown on mouse click)
+  &:focus-visible .cs-trigger {
+    border-color: $secondary;
+    box-shadow: 0 0 0 2px rgba($secondary, 0.25);
+  }
+}
+
+// ─── Trigger button ────────────────────────────────────────────────────────
+
+.cs-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  height: 40px;
+  padding: 0 12px 0 8px;
+  background-color: $surface-container;
+  border: 1px solid $outline-variant;
+  border-radius: 6px;
+  color: $on-surface;
+  font-size: 14px;
+  font-family: inherit;
+  transition: border-color 0.18s ease, background-color 0.18s ease, box-shadow 0.18s ease;
+
+  .custom-select:hover & {
+    border-color: $outline;
+    background-color: $surface-container-high;
+  }
+
+  .custom-select.is-open & {
+    border-color: $secondary;
+    background-color: $surface-container-high;
+    box-shadow: 0 0 0 1px rgba($secondary, 0.2);
+  }
+}
+
+.cs-label-area {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  align-self: stretch; // fill the 40px trigger height so absolute label centers
+}
+
+// All option labels stacked invisibly — widest one sets the width.
+.cs-sizer {
+  display: flex;
+  flex-direction: column;
+  visibility: hidden;
+  pointer-events: none;
+  white-space: nowrap;
+  font-size: 14px;
+  font-family: $font-primary;
+  line-height: 0; // collapse vertical space; only width matters
+
+  span {
+    display: block;
+    line-height: 0;
+  }
+}
+
+// Visible selected label — floats over the sizer
+.cs-label {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 14px;
+}
+
+.cs-chevron {
+  font-size: 18px;
+  color: $on-surface-variant;
+  flex-shrink: 0;
+  transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), color 0.18s ease;
+  pointer-events: none;
+
+  &.rotated {
+    transform: rotate(180deg);
+    color: $secondary;
+  }
+}
+
+// ─── Dropdown panel ────────────────────────────────────────────────────────
+
+.cs-dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  left: 0;
+  min-width: 100%;
+  width: max-content;
+  max-height: 240px;
+  overflow-y: auto;
+  z-index: 9000;
+  list-style: none;
+  margin: 0;
+  padding: 4px;
+  background-color: $surface-container-highest;
+  border: 1px solid rgba($outline-variant, 0.8);
+  border-radius: 8px;
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.3),
+    0 10px 30px -5px rgba(0, 0, 0, 0.4),
+    0 0 0 1px rgba($outline-variant, 0.1);
+
+  // Closed state
+  opacity: 0;
+  transform: translateY(-6px) scale(0.98);
+  pointer-events: none;
+  transition:
+    opacity 0.18s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+
+  // Open state
+  &.cs-dropdown--visible {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    pointer-events: auto;
+  }
+
+  // Scrollbar
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: $outline-variant;
+    border-radius: 4px;
+    &:hover { background: $outline; }
+  }
+}
+
+// ─── Option items ──────────────────────────────────────────────────────────
+
+.cs-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 5px;
+  font-size: 14px;
+  color: $on-surface-variant;
+  cursor: pointer;
+  transition: background-color 0.12s ease, color 0.12s ease;
+  white-space: nowrap;
+
+  // Selected option gets a subtle accent tint even when not hovered
+  &.is-selected {
+    color: $primary;
+    background-color: rgba($primary, 0.07);
+  }
+
+  // Focused (keyboard) or hovered
+  &.is-focused,
+  &:hover {
+    background-color: rgba($surface-variant, 0.6);
+    color: $on-surface;
+  }
+
+  // Selected + focused = stronger highlight
+  &.is-selected.is-focused,
+  &.is-selected:hover {
+    background-color: rgba($primary, 0.14);
+    color: $primary;
+  }
+}
+
+// Checkmark for the currently selected item
+.cs-check {
+  font-size: 14px;
+  color: $primary;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+// When an option is NOT selected, reserve space so label text aligns
+.cs-option:not(.is-selected) .cs-option-label {
+  margin-right: 22px; // 14px icon + 8px gap
+}
+
+.cs-option-label {
+  flex: 1;
+}
