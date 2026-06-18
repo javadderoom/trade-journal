@@ -93,7 +93,7 @@ router.put('/:ticket', async (req: Request, res: Response) => {
       return;
     }
 
-    const { notes, emotion, setupName, stopLoss, takeProfit, tags } = req.body;
+    const { notes, emotion, stopLoss, takeProfit, tags } = req.body;
 
     const existing = await prisma.trade.findFirst({
       where: { ticket },
@@ -104,21 +104,7 @@ router.put('/:ticket', async (req: Request, res: Response) => {
       return;
     }
 
-    let setupId: string | null = null;
-    if (setupName) {
-      let setup = await prisma.setup.findFirst({
-        where: { name: setupName, user_id: existing.user_id },
-      });
-      if (!setup) {
-        setup = await prisma.setup.create({
-          data: {
-            name: setupName,
-            user_id: existing.user_id,
-          },
-        });
-      }
-      setupId = setup.id;
-    }
+    // Setup database lookup removed - strategy entity decommissioned
 
     // Recalculate r_multiple when stop_loss is modified
     let rMultipleUpdate: number | undefined = undefined;
@@ -145,7 +131,6 @@ router.put('/:ticket', async (req: Request, res: Response) => {
       data: {
         notes: notes !== undefined ? notes : undefined,
         emotion: emotion !== undefined ? emotion : undefined,
-        setup_id: setupName !== undefined ? setupId : undefined,
         stop_loss: stopLoss !== undefined ? (stopLoss === null ? null : parseFloat(stopLoss)) : undefined,
         take_profit: takeProfit !== undefined ? (takeProfit === null ? null : parseFloat(takeProfit)) : undefined,
         r_multiple: rMultipleUpdate !== undefined ? rMultipleUpdate : undefined,

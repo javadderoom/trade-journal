@@ -22,7 +22,7 @@ export interface Trade {
   pips: number;
   rMultiple: number;
   tags: string[];
-  setupName: string | null;
+
   emotion: string | null;
   notes: string | null;
 }
@@ -110,13 +110,13 @@ export default function TradesTable({
     return ['همه نمادها', ...Array.from(symbols)];
   }, [trades]);
 
-  const strategyOptions = useMemo(() => {
-    const strategies = new Set<string>();
-    trades.forEach(t => {
-      if (t.setupName) strategies.add(t.setupName);
-    });
-    return ['همه استراتژی‌ها', ...Array.from(strategies)];
-  }, [trades]);
+  // const strategyOptions = useMemo(() => {
+  //   const strategies = new Set<string>();
+  //   trades.forEach(t => {
+  //     if (t.setupName) strategies.add(t.setupName);
+  //   });
+  //   return ['همه استراتژی‌ها', ...Array.from(strategies)];
+  // }, [trades]);
 
   const [allTags, setAllTags] = useState<string[]>(DEFAULT_TAGS);
 
@@ -167,10 +167,10 @@ export default function TradesTable({
         const dir = selectedDirection === 'خرید (Buy)' ? 'BUY' : 'SELL';
         if (trade.direction !== dir) return false;
       }
-      // Strategy filter
-      if (selectedStrategy !== 'همه استراتژی‌ها' && trade.setupName !== selectedStrategy) {
-        return false;
-      }
+      // // Strategy filter
+      // if (selectedStrategy !== 'همه استراتژی‌ها' && trade.setupName !== selectedStrategy) {
+      //   return false;
+      // }
       // Date filter (simple substring match for now)
       if (dateRange && !trade.openTime.includes(dateRange)) {
         return false;
@@ -375,7 +375,7 @@ export default function TradesTable({
             <span className="material-symbols-outlined select-arrow">keyboard_arrow_down</span>
           </div>
 
-          <div className="filter-select-wrapper">
+          {/* <div className="filter-select-wrapper">
             <select value={selectedStrategy} onChange={e => setSelectedStrategy(e.target.value)}>
               {strategyOptions.map(opt => (
                 <option key={opt} value={opt}>
@@ -384,7 +384,7 @@ export default function TradesTable({
               ))}
             </select>
             <span className="material-symbols-outlined select-arrow">keyboard_arrow_down</span>
-          </div>
+          </div> */}
 
           <div className="filter-actions">
             <div className="rate-input-wrapper" title="نرخ دلار به تومان">
@@ -473,7 +473,7 @@ export default function TradesTable({
                   <th>حجم</th>
                   <th>R:R</th>
                   <th style={{ textAlign: 'left' }}>سود/زیان</th>
-                  <th style={{ textAlign: 'center' }}>استراتژی</th>
+                  {/* <th style={{ textAlign: 'center' }}>استراتژی</th> */}
                   <th style={{ textAlign: 'center' }}>وضعیت</th>
                 </tr>
               </thead>
@@ -530,13 +530,13 @@ export default function TradesTable({
                         <span className="profit-usd">{formatCurrency(trade.profitUsd)}</span>
                         <span className="profit-toman">{formatToman(trade.profitUsd, usdToToman)}</span>
                       </td>
-                      <td style={{ textAlign: 'center' }}>
+                      {/* <td style={{ textAlign: 'center' }}>
                         {trade.setupName ? (
                           <span className="strategy-badge">{trade.setupName}</span>
                         ) : (
                           '-'
                         )}
-                      </td>
+                      </td> */}
                       <td style={{ textAlign: 'center' }}>
                         <span
                           className={`material-symbols-outlined status-icon ${isClosed ? 'status-closed' : 'status-open'
@@ -700,7 +700,7 @@ export default function TradesTable({
             </div>
 
             {/* Strategy & Emotions */}
-            <div className="form-group">
+            {/* <div className="form-group">
               <label>استراتژی اعمال شده</label>
               <select
                 value={activeTrade.setupName || ''}
@@ -712,7 +712,7 @@ export default function TradesTable({
                 <option value="روند گیری">روند گیری</option>
                 <option value="اسکالپ">اسکالپ</option>
               </select>
-            </div>
+            </div> */}
 
             <div className="form-group">
               <label>برچسب‌های معامله</label>

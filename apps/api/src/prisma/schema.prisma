@@ -20,7 +20,6 @@ model User {
   created_at     DateTime       @default(now())
   accounts       Account[]
   journalEntries JournalEntry[]
-  setups         Setup[]
   subscriptions  Subscription[]
   trades         Trade[]
   importJobs     ImportJob[]
@@ -59,8 +58,6 @@ model Trade {
   pips          Float
   r_multiple    Float
   tags          String[]
-  setup_id      String?
-  setup         Setup?       @relation(fields: [setup_id], references: [id])
   emotion       Emotion?
   notes         String?
   ticket        Int?         // MT4/MT5 deal ticket for deduplication
@@ -68,17 +65,6 @@ model Trade {
   created_at    DateTime     @default(now())
 
   @@unique([account_id, ticket])
-}
-
-model Setup {
-  id          String    @id @default(uuid())
-  user_id     String
-  user        User      @relation(fields: [user_id], references: [id])
-  name        String
-  description String?
-  color       String?
-  created_at  DateTime  @default(now())
-  trades      Trade[]
 }
 
 model JournalEntry {

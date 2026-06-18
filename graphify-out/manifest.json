@@ -1,0 +1,147 @@
+{
+  "apps/api/package.json": {
+    "mtime": 1781718468.5966558,
+    "ast_hash": "c3655b3229998435c9fcc6dd871f15d5",
+    "semantic_hash": ""
+  },
+  "apps/api/src/prisma/migrations/20260616214548_init/migration.sql": {
+    "mtime": 1781646348.6024444,
+    "ast_hash": "59208a115ccd1052c72ec37b95773a20",
+    "semantic_hash": ""
+  },
+  "apps/api/src/prisma/migrations/20260618192211_remove_setup/migration.sql": {
+    "mtime": 1781810531.9640615,
+    "ast_hash": "fb38517f3cf8ddee5b94fd63298ce7c2",
+    "semantic_hash": ""
+  },
+  "apps/api/src/prisma/prisma.config.ts": {
+    "mtime": 1781718425.3328793,
+    "ast_hash": "940f487e0c481a72d17c60c826d8f34b",
+    "semantic_hash": ""
+  },
+  "apps/api/src/routes/tradeSync.ts": {
+    "mtime": 1781810591.745679,
+    "ast_hash": "2e9a2b044897bd1df9feb0cbce0b0f9e",
+    "semantic_hash": ""
+  },
+  "apps/api/src/server.ts": {
+    "mtime": 1781648021.2029645,
+    "ast_hash": "48a3d8a341fffc43a09f91676d859ade",
+    "semantic_hash": ""
+  },
+  "apps/api/src/services/mt4Parser.ts": {
+    "mtime": 1781645782.0350149,
+    "ast_hash": "a2f2168c9bc9c4729d74c425a53074b8",
+    "semantic_hash": ""
+  },
+  "apps/api/src/services/tradeSync.ts": {
+    "mtime": 1781810567.759558,
+    "ast_hash": "479b51f575adac3d84712cc4bb0ae592",
+    "semantic_hash": ""
+  },
+  "apps/api/src/types/index.ts": {
+    "mtime": 1781645772.759671,
+    "ast_hash": "6a67f2d2cec47591bb1da6d1e08be60a",
+    "semantic_hash": ""
+  },
+  "apps/api/src/types/trade.ts": {
+    "mtime": 1781645486.2850873,
+    "ast_hash": "c5cc5acf9b06f8564e99598f1c9fb526",
+    "semantic_hash": ""
+  },
+  "apps/web/package.json": {
+    "mtime": 1781717065.202782,
+    "ast_hash": "6d3085031e2652998acbb58804c279da",
+    "semantic_hash": ""
+  },
+  "apps/web/src/app/api/exchange-rate/route.ts": {
+    "mtime": 1781795270.135911,
+    "ast_hash": "fbb6fe2b61d733b6709a386ca4815bf6",
+    "semantic_hash": ""
+  },
+  "apps/web/src/app/layout.tsx": {
+    "mtime": 1781725963.523262,
+    "ast_hash": "71964398ce02a2e757a6c068970f4023",
+    "semantic_hash": ""
+  },
+  "apps/web/src/app/trades/page.tsx": {
+    "mtime": 1781810628.3137567,
+    "ast_hash": "6d4ca2d7440ece7ea3d6d1242e9b09b2",
+    "semantic_hash": ""
+  },
+  "apps/web/src/components/TradesTable.tsx": {
+    "mtime": 1781811162.7235115,
+    "ast_hash": "60f404289cd640e72c0dac1642142f42",
+    "semantic_hash": ""
+  },
+  "apps/web/src/utils/farsi.ts": {
+    "mtime": 1781795501.8009768,
+    "ast_hash": "15a4fd0003330104b38c6d0be6a0dfea",
+    "semantic_hash": ""
+  },
+  "apps/web/tsconfig.json": {
+    "mtime": 1781651726.4031067,
+    "ast_hash": "b6e2829edd812d05567ee9624205f6dc",
+    "semantic_hash": ""
+  },
+  "package.json": {
+    "mtime": 1781718156.59521,
+    "ast_hash": "9f559b5b141692e6b8a1005b57fe0bfd",
+    "semantic_hash": ""
+  },
+  "tsconfig.json": {
+    "mtime": 1781647883.39972,
+    "ast_hash": "25e0666097055991b411f66cb3dba00c",
+    "semantic_hash": ""
+  },
+  ".agents/rules/graphify.md": {
+    "mtime": 1781810783.4898727,
+    "ast_hash": "a0e4d192b9e2e17256124dbfc8e24e6a",
+    "semantic_hash": ""
+  },
+  ".agents/workflows/graphify.md": {
+    "mtime": 1781810783.4908724,
+    "ast_hash": "637776aa6f7496d069afe7520c845c8a",
+    "semantic_hash": ""
+  },
+  "RUN.md": {
+    "mtime": 1781718535.5368648,
+    "ast_hash": "30989dd8ae7d869aef19131c2c63ac65",
+    "semantic_hash": ""
+  },
+  "apps/api/PROGRESS.md": {
+    "mtime": 1781791910.2663622,
+    "ast_hash": "3b76281f99146d22950bcdb811408f8a",
+    "semantic_hash": ""
+  },
+  "apps/ea/README.md": {
+    "mtime": 1781645032.8092034,
+    "ast_hash": "ac5ff6927eeb4376dc5f367201af5c9b",
+    "semantic_hash": ""
+  },
+  "apps/web/PROGRESS.md": {
+    "mtime": 1781791956.7942722,
+    "ast_hash": "859bf1076d4967c8696ce73c58ac3ce5",
+    "semantic_hash": ""
+  },
+  "apps/web/ui_sample/DESIGN.md": {
+    "mtime": 1781686606.0,
+    "ast_hash": "318c68243f365a9305e067da2cb83b5d",
+    "semantic_hash": ""
+  },
+  "apps/web/ui_sample/code.html": {
+    "mtime": 1781686606.0,
+    "ast_hash": "820377d6a1d0def03d0549a860d362c9",
+    "semantic_hash": ""
+  },
+  "docker-compose.yml": {
+    "mtime": 1781646246.8518755,
+    "ast_hash": "23577ea486519847720ebb5521b15124",
+    "semantic_hash": ""
+  },
+  "persian-trading-journal-architecture.md": {
+    "mtime": 1781551971.5195389,
+    "ast_hash": "2f9fa1ac328a9fedfbf946ac50d4d818",
+    "semantic_hash": ""
+  }
+}

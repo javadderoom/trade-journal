@@ -114,7 +114,6 @@ export type TradeListRow = {
   pips: number;
   rMultiple: number;
   tags: string[];
-  setupName: string | null;
   emotion: string | null;
   notes: string | null;
 };
@@ -151,11 +150,6 @@ export async function getTradesForAccount(params: {
       pips: true,
       r_multiple: true,
       tags: true,
-      setup: {
-        select: {
-          name: true,
-        },
-      },
       emotion: true,
       notes: true,
     },
@@ -178,7 +172,6 @@ export async function getTradesForAccount(params: {
     pips: t.pips,
     rMultiple: t.r_multiple,
     tags: t.tags,
-    setupName: t.setup?.name ?? null,
     emotion: t.emotion,
     notes: t.notes,
   }));
