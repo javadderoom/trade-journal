@@ -334,6 +334,56 @@
       "norm_label": "upload"
     },
     {
+      "label": "scratch-check-sltp.ts",
+      "file_type": "code",
+      "source_file": "apps/api/src/scratch-check-sltp.ts",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "src_scratch_check_sltp",
+      "community": 25,
+      "norm_label": "scratch-check-sltp.ts"
+    },
+    {
+      "label": "pool",
+      "file_type": "code",
+      "source_file": "apps/api/src/scratch-check-sltp.ts",
+      "source_location": "L5",
+      "_origin": "ast",
+      "id": "src_scratch_check_sltp_pool",
+      "community": 25,
+      "norm_label": "pool"
+    },
+    {
+      "label": "adapter",
+      "file_type": "code",
+      "source_file": "apps/api/src/scratch-check-sltp.ts",
+      "source_location": "L6",
+      "_origin": "ast",
+      "id": "src_scratch_check_sltp_adapter",
+      "community": 25,
+      "norm_label": "adapter"
+    },
+    {
+      "label": "prisma",
+      "file_type": "code",
+      "source_file": "apps/api/src/scratch-check-sltp.ts",
+      "source_location": "L7",
+      "_origin": "ast",
+      "id": "src_scratch_check_sltp_prisma",
+      "community": 25,
+      "norm_label": "prisma"
+    },
+    {
+      "label": "main()",
+      "file_type": "code",
+      "source_file": "apps/api/src/scratch-check-sltp.ts",
+      "source_location": "L9",
+      "_origin": "ast",
+      "id": "src_scratch_check_sltp_main",
+      "community": 25,
+      "norm_label": "main()"
+    },
+    {
       "label": "server.ts",
       "file_type": "code",
       "source_file": "apps/api/src/server.ts",
@@ -1700,7 +1750,7 @@
       "source_location": "L147",
       "_origin": "ast",
       "id": "emil_design_eng_skill_spring_animations",
-      "community": 24,
+      "community": 19,
       "norm_label": "spring animations"
     },
     {
@@ -1710,7 +1760,7 @@
       "source_location": "L151",
       "_origin": "ast",
       "id": "emil_design_eng_skill_when_to_use_springs",
-      "community": 24,
+      "community": 19,
       "norm_label": "when to use springs"
     },
     {
@@ -1720,7 +1770,7 @@
       "source_location": "L158",
       "_origin": "ast",
       "id": "emil_design_eng_skill_spring_based_mouse_interactions",
-      "community": 24,
+      "community": 19,
       "norm_label": "spring-based mouse interactions"
     },
     {
@@ -1730,7 +1780,7 @@
       "source_location": "L177",
       "_origin": "ast",
       "id": "emil_design_eng_skill_spring_configuration",
-      "community": 24,
+      "community": 19,
       "norm_label": "spring configuration"
     },
     {
@@ -1740,7 +1790,7 @@
       "source_location": "L193",
       "_origin": "ast",
       "id": "emil_design_eng_skill_interruptibility_advantage",
-      "community": 24,
+      "community": 19,
       "norm_label": "interruptibility advantage"
     },
     {
@@ -1880,7 +1930,7 @@
       "source_location": "L398",
       "_origin": "ast",
       "id": "emil_design_eng_skill_clip_path_for_animation",
-      "community": 19,
+      "community": 24,
       "norm_label": "clip-path for animation"
     },
     {
@@ -1890,7 +1940,7 @@
       "source_location": "L402",
       "_origin": "ast",
       "id": "emil_design_eng_skill_the_inset_shape",
-      "community": 19,
+      "community": 24,
       "norm_label": "the inset shape"
     },
     {
@@ -1900,7 +1950,7 @@
       "source_location": "L428",
       "_origin": "ast",
       "id": "emil_design_eng_skill_tabs_with_perfect_color_transitions",
-      "community": 19,
+      "community": 24,
       "norm_label": "tabs with perfect color transitions"
     },
     {
@@ -1910,7 +1960,7 @@
       "source_location": "L432",
       "_origin": "ast",
       "id": "emil_design_eng_skill_hold_to_delete_pattern",
-      "community": 19,
+      "community": 24,
       "norm_label": "hold-to-delete pattern"
     },
     {
@@ -1920,7 +1970,7 @@
       "source_location": "L436",
       "_origin": "ast",
       "id": "emil_design_eng_skill_image_reveals_on_scroll",
-      "community": 19,
+      "community": 24,
       "norm_label": "image reveals on scroll"
     },
     {
@@ -1930,7 +1980,7 @@
       "source_location": "L440",
       "_origin": "ast",
       "id": "emil_design_eng_skill_comparison_sliders",
-      "community": 19,
+      "community": 24,
       "norm_label": "comparison sliders"
     },
     {
@@ -3550,6 +3600,46 @@
       "confidence_score": 1.0,
       "source": "src_server",
       "target": "routes_tradesync_router"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/src/scratch-check-sltp.ts",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "src_scratch_check_sltp",
+      "target": "src_scratch_check_sltp_adapter",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/src/scratch-check-sltp.ts",
+      "source_location": "L9",
+      "weight": 1.0,
+      "source": "src_scratch_check_sltp",
+      "target": "src_scratch_check_sltp_main",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/src/scratch-check-sltp.ts",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "src_scratch_check_sltp",
+      "target": "src_scratch_check_sltp_pool",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/src/scratch-check-sltp.ts",
+      "source_location": "L7",
+      "weight": 1.0,
+      "source": "src_scratch_check_sltp",
+      "target": "src_scratch_check_sltp_prisma",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -6451,5 +6541,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "eb3ee18ce8d09d843cf91b5d8906156907d04b40"
+  "built_at_commit": "466be9af1c1ddea4c37e2a362e57818fbd39ec68"
 }

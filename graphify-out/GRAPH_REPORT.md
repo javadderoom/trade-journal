@@ -1,16 +1,16 @@
 # Graph Report - trade-journal  (2026-06-20)
 
 ## Corpus Check
-- 35 files · ~162,362 words
+- 36 files · ~162,459 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 318 nodes · 323 edges · 25 communities (22 shown, 3 thin omitted)
+- 323 nodes · 327 edges · 26 communities (23 shown, 3 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `eb3ee18c`
+- Built from commit: `466be9af`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -38,6 +38,7 @@
 - [[_COMMUNITY_Community 22|Community 22]]
 - [[_COMMUNITY_Community 23|Community 23]]
 - [[_COMMUNITY_Community 24|Community 24]]
+- [[_COMMUNITY_Community 25|Community 25]]
 
 ## God Nodes (most connected - your core abstractions)
 1. `Design Engineering` - 16 edges
@@ -62,7 +63,7 @@
 ## Import Cycles
 - None detected.
 
-## Communities (25 total, 3 thin omitted)
+## Communities (26 total, 3 thin omitted)
 
 ### Community 0 - "Community 0"
 Cohesion: 0.08
@@ -122,7 +123,7 @@ Nodes (6): File, How it works, JSON payload format, MT5 Expert Advisor — Trade
 
 ### Community 19 - "Community 19"
 Cohesion: 0.05
-Nodes (39): 3D transforms for depth, Accessibility, Beauty is leverage, clip-path for Animation, Comparison sliders, Core Philosophy, CSS animations beat JS under load, CSS Transform Mastery (+31 more)
+Nodes (38): 3D transforms for depth, Accessibility, Beauty is leverage, Core Philosophy, CSS animations beat JS under load, CSS Transform Mastery, CSS variables are inheritable, Damping at boundaries (+30 more)
 
 ### Community 20 - "Community 20"
 Cohesion: 0.33
@@ -141,11 +142,15 @@ Cohesion: 0.40
 Nodes (5): Asymmetric enter/exit timing, Cohesion matters, Review your work the next day, The opacity + height combination, The Sonner Principles (Building Loved Components)
 
 ### Community 24 - "Community 24"
+Cohesion: 0.33
+Nodes (6): clip-path for Animation, Comparison sliders, Hold-to-delete pattern, Image reveals on scroll, Tabs with perfect color transitions, The inset shape
+
+### Community 25 - "Community 25"
 Cohesion: 0.40
-Nodes (5): Interruptibility advantage, Spring Animations, Spring-based mouse interactions, Spring configuration, When to use springs
+Nodes (3): adapter, pool, prisma
 
 ## Knowledge Gaps
-- **223 isolated node(s):** `name`, `version`, `private`, `dev`, `build` (+218 more)
+- **226 isolated node(s):** `name`, `version`, `private`, `dev`, `build` (+221 more)
   These have ≤1 connection - possible missing edges or undocumented components.
 - **3 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
@@ -153,13 +158,13 @@ Nodes (5): Interruptibility advantage, Spring Animations, Spring-based mouse int
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `Design Engineering` connect `Community 19` to `Community 24`, `Community 12`, `Community 20`, `Community 23`?**
-  _High betweenness centrality (0.036) - this node is a cross-community bridge._
+  _High betweenness centrality (0.035) - this node is a cross-community bridge._
 - **Why does `معامله‌یار — Persian Trading Journal Platform` connect `Community 0` to `Community 22`?**
-  _High betweenness centrality (0.010) - this node is a cross-community bridge._
+  _High betweenness centrality (0.009) - this node is a cross-community bridge._
 - **Why does `Component Building Principles` connect `Community 12` to `Community 19`?**
   _High betweenness centrality (0.008) - this node is a cross-community bridge._
 - **What connects `name`, `version`, `private` to the rest of the system?**
-  _223 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _226 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Community 0` be split into smaller, more focused modules?**
   _Cohesion score 0.07692307692307693 - nodes in this community are weakly interconnected._
 - **Should `Community 1` be split into smaller, more focused modules?**

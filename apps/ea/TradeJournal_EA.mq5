@@ -184,7 +184,7 @@ void SyncOpenPositions()
 //+------------------------------------------------------------------+
 void SyncTrades()
 {
-   // Select history
+   // Select history first
    datetime fromDate;
    if(g_lastTicket == 0)
       fromDate = TimeCurrent() - InpLookbackDays * 86400;
@@ -203,10 +203,10 @@ void SyncTrades()
       return;
    }
    
-   // Collect new closing deals
-   string jsonPayload = "[";
-   int newTrades = 0;
-   int maxTicket = g_lastTicket;
+   // 1. Collect all closing deal tickets to avoid cache collision when fetching details of open deals.
+   ulong closingTickets[];
+   int closingCount = 0;
+   ArrayResize(closingTickets, 0);
    
    for(int i = 0; i < totalDeals; i++)
    {
@@ -220,7 +220,25 @@ void SyncTrades()
       long dealEntry = HistoryDealGetInteger(ticket, DEAL_ENTRY);
       if(dealEntry != DEAL_ENTRY_OUT) continue;
       
-      // Get deal data
+      closingCount++;
+      ArrayResize(closingTickets, closingCount);
+      closingTickets[closingCount - 1] = ticket;
+   }
+   
+   if(closingCount == 0) return;
+   
+   // 2. Process collected closing deals
+   string jsonPayload = "[";
+   int newTrades = 0;
+   int maxTicket = g_lastTicket;
+   
+   for(int tIdx = 0; tIdx < closingCount; tIdx++)
+   {
+      ulong ticket = closingTickets[tIdx];
+      
+      // Select the specific closing deal by ticket to get initial properties
+      if(!HistoryDealSelect(ticket)) continue;
+      
       string symbol      = HistoryDealGetString(ticket, DEAL_SYMBOL);
       long   dealType    = HistoryDealGetInteger(ticket, DEAL_TYPE);
       double volume      = HistoryDealGetDouble(ticket, DEAL_VOLUME);
@@ -231,7 +249,8 @@ void SyncTrades()
       long   dealTime    = HistoryDealGetInteger(ticket, DEAL_TIME);
       long   positionId  = HistoryDealGetInteger(ticket, DEAL_POSITION_ID);
       
-      // Find the matching open deal for this position
+      // Find the matching open deal and SL/TP for this position.
+      // This will select HistorySelectByPosition internally, which is safe since we are loop-independent now.
       double openPrice = 0;
       double openCommission = 0;
       double sl = 0;
@@ -302,6 +321,7 @@ void SyncTrades()
       jsonPayload += "\"swap\":" + DoubleToString(swap, 2) + ",";
       jsonPayload += "\"pips\":" + DoubleToString(pips, 1) + ",";
       jsonPayload += "\"rMultiple\":" + DoubleToString(rMultiple, 2) + ",";
+      // GetChartDataJson will perform its own HistorySelectByPosition internally, which is safe.
       jsonPayload += "\"chartData\":" + GetChartDataJson(symbol, openTime, (datetime)dealTime, timezoneOffset);
       jsonPayload += "}";
       
@@ -377,6 +397,12 @@ bool SendToApi(string jsonPayload)
 //+------------------------------------------------------------------+
 void FindOpenDealDetails(ulong positionId, double &openPrice, double &openCommission, double &sl, double &tp, datetime &openTime)
 {
+   if(!HistorySelectByPosition(positionId))
+   {
+      Print("Failed to select position history in FindOpenDealDetails for position ", positionId);
+      return;
+   }
+
    int totalDeals = HistoryDealsTotal();
 
    // Step 1: Find the opening deal — gives us openPrice and openTime
