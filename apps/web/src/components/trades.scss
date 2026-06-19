@@ -1423,6 +1423,10 @@ input[type="checkbox"] {
     text-align: center;
     font-family: $font-primary;
 
+    p {
+      margin: 0;
+    }
+
     .upload-icon {
       font-size: 28px;
       color: $primary;

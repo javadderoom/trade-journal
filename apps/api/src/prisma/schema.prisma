@@ -58,7 +58,7 @@ model Trade {
   pips          Float
   r_multiple    Float
   tags          String[]
-  emotion       Emotion?
+  emotion       String?
   notes         String?
   ticket        Int?         // MT4/MT5 deal ticket for deduplication
   import_source ImportSource @default(MANUAL)
@@ -110,13 +110,6 @@ enum Direction {
   SELL
 }
 
-enum Emotion {
-  FOMO
-  CONFIDENT
-  NEUTRAL
-  ANXIOUS
-  REVENGE
-}
 
 enum Mood {
   HAPPY
