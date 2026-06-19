@@ -163,7 +163,8 @@ void SyncOpenPositions()
       jsonPayload += "\"commission\":" + DoubleToString(commission, 2) + ",";
       jsonPayload += "\"swap\":" + DoubleToString(swap, 2) + ",";
       jsonPayload += "\"pips\":" + DoubleToString(pips, 1) + ",";
-      jsonPayload += "\"rMultiple\":" + DoubleToString(rMultiple, 2);
+      jsonPayload += "\"rMultiple\":" + DoubleToString(rMultiple, 2) + ",";
+      jsonPayload += "\"chartData\":" + GetChartDataJson(symbol, (datetime)posTime, 0, timezoneOffset);
       jsonPayload += "}";
 
       count++;
@@ -300,7 +301,8 @@ void SyncTrades()
       jsonPayload += "\"commission\":" + DoubleToString(totalCommission, 2) + ",";
       jsonPayload += "\"swap\":" + DoubleToString(swap, 2) + ",";
       jsonPayload += "\"pips\":" + DoubleToString(pips, 1) + ",";
-      jsonPayload += "\"rMultiple\":" + DoubleToString(rMultiple, 2);
+      jsonPayload += "\"rMultiple\":" + DoubleToString(rMultiple, 2) + ",";
+      jsonPayload += "\"chartData\":" + GetChartDataJson(symbol, openTime, (datetime)dealTime, timezoneOffset);
       jsonPayload += "}";
       
       newTrades++;
@@ -429,5 +431,91 @@ string FormatDateTime(datetime dt)
    return StringFormat("%04d-%02d-%02dT%02d:%02d:%02dZ",
       mqlTime.year, mqlTime.mon, mqlTime.day,
       mqlTime.hour, mqlTime.min, mqlTime.sec);
+}
+
+//+------------------------------------------------------------------+
+//| Get historical candlestick data formatted as JSON array          |
+//+------------------------------------------------------------------+
+string GetChartDataJson(string symbol, datetime openTime, datetime closeTime, int timezoneOffset)
+{
+   if(openTime == 0) return "null";
+   
+   datetime curTime = TimeCurrent();
+   datetime end = (closeTime == 0) ? curTime : closeTime;
+   
+   // Determine appropriate timeframe based on trade duration
+   ENUM_TIMEFRAMES timeframe = PERIOD_M1;
+   long duration = (long)(end - openTime);
+   
+   if(duration > 15 * 24 * 3600) timeframe = PERIOD_D1;     // > 15 days
+   else if(duration > 4 * 24 * 3600) timeframe = PERIOD_H4;  // 4 - 15 days
+   else if(duration > 24 * 3600) timeframe = PERIOD_H1;      // 1 - 4 days
+   else if(duration > 8 * 3600) timeframe = PERIOD_M15;      // 8 - 24 hours
+   else if(duration > 1.5 * 3600) timeframe = PERIOD_M5;     // 1.5 - 8 hours
+   else timeframe = PERIOD_M1;                               // < 1.5 hours
+   
+   // Add padding of 15 bars before entry and 15 bars after exit for context
+   int periodSec = PeriodSeconds(timeframe);
+   datetime startSearch = openTime - 15 * periodSec;
+   datetime endSearch = end + 15 * periodSec;
+   if(endSearch > curTime) endSearch = curTime;
+   
+   MqlRates rates[];
+   int copied = CopyRates(symbol, timeframe, startSearch, endSearch, rates);
+   if(copied <= 0)
+   {
+      return "null";
+   }
+   
+   // Limit to max 120 bars to optimize data size (center the trade)
+   int startIdx = 0;
+   int endIdx = copied - 1;
+   if(copied > 120)
+   {
+      // Try to center the trade bars
+      // Find the index of the bar that contains openTime
+      int openIdx = 0;
+      for(int i = 0; i < copied; i++)
+      {
+         if(rates[i].time >= openTime)
+         {
+            openIdx = i;
+            break;
+         }
+      }
+      
+      startIdx = openIdx - 20; // 20 bars before entry
+      if(startIdx < 0) startIdx = 0;
+      endIdx = startIdx + 119;
+      if(endIdx >= copied)
+      {
+         endIdx = copied - 1;
+         startIdx = endIdx - 119;
+         if(startIdx < 0) startIdx = 0;
+      }
+   }
+   
+   int digits = (int)SymbolInfoInteger(symbol, SYMBOL_DIGITS);
+   
+   string json = "[";
+   int barCount = 0;
+   for(int i = startIdx; i <= endIdx; i++)
+   {
+      if(barCount > 0) json += ",";
+      
+      long utcBarTime = (long)rates[i].time - timezoneOffset;
+      
+      json += "{";
+      json += "\"time\":" + IntegerToString(utcBarTime) + ",";
+      json += "\"open\":" + DoubleToString(rates[i].open, digits) + ",";
+      json += "\"high\":" + DoubleToString(rates[i].high, digits) + ",";
+      json += "\"low\":" + DoubleToString(rates[i].low, digits) + ",";
+      json += "\"close\":" + DoubleToString(rates[i].close, digits);
+      json += "}";
+      barCount++;
+   }
+   json += "]";
+   
+   return json;
 }
 //+------------------------------------------------------------------+

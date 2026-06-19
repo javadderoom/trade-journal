@@ -4,6 +4,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import './trades.scss';
 import { toPersianDigits, formatPersianCurrency, formatToman } from '../utils/farsi';
 import Select from './Select';
+import TradeChart from './TradeChart';
 
 export interface Trade {
   id: string;
@@ -27,6 +28,7 @@ export interface Trade {
   emotion: string | null;
   notes: string | null;
   screenshots?: string[];
+  chartData?: any;
 }
 
 interface TradesTableProps {
@@ -393,24 +395,79 @@ export default function TradesTable({
       if (isNaN(d.getTime())) {
         return { name: 'UNKNOWN', label: 'نامشخص', emoji: '❓', className: 'session-unknown' };
       }
-      const hour = d.getUTCHours();
 
-      // Tokyo (Asia): 00:00 - 07:00 UTC
-      // London (Europe): 07:00 - 12:00 UTC
-      // London/NY Overlap: 12:00 - 16:00 UTC
-      // New York (US): 16:00 - 22:00 UTC
-      // Sydney: 22:00 - 24:00 UTC
-      if (hour >= 0 && hour < 7) {
-        return { name: 'ASIAN', label: 'توکیو', emoji: '🇯🇵', className: 'session-asian' };
-      } else if (hour >= 7 && hour < 12) {
-        return { name: 'LONDON', label: 'لندن', emoji: '🇬🇧', className: 'session-london' };
-      } else if (hour >= 12 && hour < 16) {
+      // 0. Check if the trade occurred on a weekend (Forex market closed)
+      // Forex market closes Friday 5:00 PM NY time and opens Sunday 5:00 PM NY time.
+      const getNYDateTime = (date: Date) => {
+        const formatter = new Intl.DateTimeFormat('en-US', {
+          timeZone: 'America/New_York',
+          weekday: 'short',
+          hour: 'numeric',
+          hour12: false,
+        });
+        const formatted = formatter.format(date);
+        const match = formatted.match(/^([A-Za-z]+),\s*(\d+)$/);
+        if (!match) return { weekday: '', hour: 0 };
+        return { weekday: match[1], hour: parseInt(match[2], 10) };
+      };
+
+      const nyInfo = getNYDateTime(d);
+      if (
+        (nyInfo.weekday === 'Fri' && nyInfo.hour >= 17) ||
+        nyInfo.weekday === 'Sat' ||
+        (nyInfo.weekday === 'Sun' && nyInfo.hour < 17)
+      ) {
+        return { name: 'WEEKEND', label: 'آخر هفته (بسته)', emoji: '💤', className: 'session-weekend' };
+      }
+
+      // Helper to fetch the local hour in a specific timezone
+      const getHourInTimezone = (tz: string): number => {
+        const formatter = new Intl.DateTimeFormat('en-US', {
+          timeZone: tz,
+          hour: '2-digit',
+          hour12: false,
+        });
+        return parseInt(formatter.format(d), 10);
+      };
+
+      const nyHour = getHourInTimezone('America/New_York');
+      const londonHour = getHourInTimezone('Europe/London');
+      const tokyoHour = getHourInTimezone('Asia/Tokyo');
+      const sydneyHour = getHourInTimezone('Australia/Sydney');
+
+      // Standard financial session hours (local time):
+      // Sydney: 7:00 AM - 4:00 PM (7 to 16)
+      // Tokyo: 9:00 AM - 6:00 PM (9 to 18)
+      // London: 8:00 AM - 5:00 PM (8 to 17)
+      // New York: 8:00 AM - 5:00 PM (8 to 17)
+
+      // 1. London + New York overlap (highest volume)
+      if (londonHour >= 8 && londonHour < 17 && nyHour >= 8 && nyHour < 17) {
         return { name: 'OVERLAP', label: 'لندن+نیویورک', emoji: '🤝', className: 'session-overlap' };
-      } else if (hour >= 16 && hour < 22) {
+      }
+      // 2. Primary London session
+      if (londonHour >= 8 && londonHour < 17) {
+        return { name: 'LONDON', label: 'لندن', emoji: '🇬🇧', className: 'session-london' };
+      }
+      // 3. Primary New York session
+      if (nyHour >= 8 && nyHour < 17) {
         return { name: 'NEW_YORK', label: 'نیویورک', emoji: '🇺🇸', className: 'session-ny' };
-      } else {
+      }
+      // 4. Primary Tokyo/Asian session
+      if (tokyoHour >= 9 && tokyoHour < 18) {
+        return { name: 'ASIAN', label: 'توکیو', emoji: '🇯🇵', className: 'session-asian' };
+      }
+      // 5. Primary Sydney session
+      if (sydneyHour >= 7 && sydneyHour < 16) {
         return { name: 'SYDNEY', label: 'سیدنی', emoji: '🇦🇺', className: 'session-sydney' };
       }
+
+      // 6. Transition periods (e.g. after NY close, Sydney morning is active)
+      if (sydneyHour >= 16 || sydneyHour < 7) {
+        return { name: 'SYDNEY', label: 'سیدنی', emoji: '🇦🇺', className: 'session-sydney' };
+      }
+
+      return { name: 'UNKNOWN', label: 'نامشخص', emoji: '❓', className: 'session-unknown' };
     } catch {
       return { name: 'UNKNOWN', label: 'نامشخص', emoji: '❓', className: 'session-unknown' };
     }
@@ -821,6 +878,23 @@ export default function TradesTable({
                 </div>
               </div>
             </div>
+
+            {/* Trade Candlestick Chart */}
+            {activeTrade.chartData && Array.isArray(activeTrade.chartData) && activeTrade.chartData.length > 0 && (
+              <div className="trade-chart-section">
+                <label className="section-label">نمودار قیمت معامله</label>
+                <TradeChart 
+                  candlesticks={activeTrade.chartData}
+                  direction={activeTrade.direction}
+                  openPrice={activeTrade.openPrice}
+                  closePrice={activeTrade.closePrice}
+                  openTime={activeTrade.openTime}
+                  closeTime={activeTrade.closeTime}
+                  stopLoss={activeTrade.stopLoss}
+                  takeProfit={activeTrade.takeProfit}
+                />
+              </div>
+            )}
 
             {/* Execution Details */}
             <div className="details-section">

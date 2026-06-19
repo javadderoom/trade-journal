@@ -248,6 +248,7 @@ export default function TradesPage() {
             emotion: item.emotion ?? null,
             notes: item.notes ?? null,
             screenshots: item.screenshots ?? [],
+            chartData: item.chartData ?? null,
           };
         });
         setTrades(mapped);

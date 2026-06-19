@@ -35,8 +35,8 @@
     "semantic_hash": ""
   },
   "apps/api/src/services/tradeSync.ts": {
-    "mtime": 1781897509.5040545,
-    "ast_hash": "428546f5c04ca6e7acae7143422c1987",
+    "mtime": 1781902746.8286142,
+    "ast_hash": "35db3d22737546cebffbcf633b1e09f0",
     "semantic_hash": ""
   },
   "apps/api/src/types/index.ts": {
@@ -45,13 +45,13 @@
     "semantic_hash": ""
   },
   "apps/api/src/types/trade.ts": {
-    "mtime": 1781645486.2850873,
-    "ast_hash": "c5cc5acf9b06f8564e99598f1c9fb526",
+    "mtime": 1781902701.4527037,
+    "ast_hash": "ef69e876bc584715d14debda0000a4ca",
     "semantic_hash": ""
   },
   "apps/web/package.json": {
-    "mtime": 1781717065.202782,
-    "ast_hash": "6d3085031e2652998acbb58804c279da",
+    "mtime": 1781902883.218412,
+    "ast_hash": "4bcc99ffba22b66fd51c5556e9b3e963",
     "semantic_hash": ""
   },
   "apps/web/src/app/api/exchange-rate/route.ts": {
@@ -65,13 +65,13 @@
     "semantic_hash": ""
   },
   "apps/web/src/app/trades/page.tsx": {
-    "mtime": 1781897530.3126917,
-    "ast_hash": "e820922a42f3049d7b604580aa4b6d64",
+    "mtime": 1781902974.1532311,
+    "ast_hash": "9e36631cc79521dcad1c7a5338bad773",
     "semantic_hash": ""
   },
   "apps/web/src/components/TradesTable.tsx": {
-    "mtime": 1781897553.5366113,
-    "ast_hash": "c783904497735261df9fe5f297d2d353",
+    "mtime": 1781904403.2169669,
+    "ast_hash": "2c659f2db26d33971c34626cdc6e43c2",
     "semantic_hash": ""
   },
   "apps/web/src/utils/farsi.ts": {
@@ -182,6 +182,26 @@
   "apps/api/src/prisma/migrations/20260619203800_convert_emotion_to_string/migration.sql": {
     "mtime": 1781901491.895784,
     "ast_hash": "18fac3d8340194da944fd59875541175",
+    "semantic_hash": ""
+  },
+  "apps/api/src/prisma/migrations/20260619205700_add_chart_data_to_trade/migration.sql": {
+    "mtime": 1781902652.9112525,
+    "ast_hash": "e2e5d248df0a516da9ced752f60ee3e7",
+    "semantic_hash": ""
+  },
+  "apps/web/src/components/TradeChart.tsx": {
+    "mtime": 1781902924.8628154,
+    "ast_hash": "f76eee5913d2c9039d952f0a463445b8",
+    "semantic_hash": ""
+  },
+  "apps/api/src/scratch-check.ts": {
+    "mtime": 1781904370.47308,
+    "ast_hash": "53f051dbec70e4dc98591e9e4140461e",
+    "semantic_hash": ""
+  },
+  "apps/api/src/scratch-test.ts": {
+    "mtime": 1781904388.5157683,
+    "ast_hash": "26933f8a64b410a541fbd503266eafef",
     "semantic_hash": ""
   }
 }

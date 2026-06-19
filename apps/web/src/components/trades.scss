@@ -1300,6 +1300,12 @@ input[type="checkbox"] {
     border: 1px solid rgba(#06b6d4, 0.2);
   }
 
+  &.session-weekend {
+    background-color: rgba(#6b7280, 0.12);
+    color: #9ca3af;
+    border: 1px solid rgba(#6b7280, 0.2);
+  }
+
   &.session-unknown {
     background-color: rgba($outline, 0.12);
     color: $on-surface-variant;
@@ -1514,4 +1520,19 @@ input[type="checkbox"] {
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
+}
+
+.trade-chart-section {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+
+  .section-label {
+    color: rgba($on-surface-variant, 0.8);
+    font-size: 13px;
+    font-weight: 500;
+    font-family: $font-primary;
+  }
 }

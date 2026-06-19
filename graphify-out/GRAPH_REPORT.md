@@ -1,16 +1,16 @@
-# Graph Report - trade-journal  (2026-06-19)
+# Graph Report - trade-journal  (2026-06-20)
 
 ## Corpus Check
-- 32 files · ~20,828 words
+- 37 files · ~162,770 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 313 nodes · 317 edges · 24 communities (21 shown, 3 thin omitted)
+- 328 nodes · 333 edges · 26 communities (22 shown, 4 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `409aa5c6`
+- Built from commit: `dbc21d3c`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -36,7 +36,9 @@
 - [[_COMMUNITY_Community 20|Community 20]]
 - [[_COMMUNITY_Community 21|Community 21]]
 - [[_COMMUNITY_Community 22|Community 22]]
+- [[_COMMUNITY_Community 23|Community 23]]
 - [[_COMMUNITY_Community 24|Community 24]]
+- [[_COMMUNITY_Community 25|Community 25]]
 
 ## God Nodes (most connected - your core abstractions)
 1. `Design Engineering` - 16 edges
@@ -61,7 +63,7 @@
 ## Import Cycles
 - None detected.
 
-## Communities (24 total, 3 thin omitted)
+## Communities (26 total, 4 thin omitted)
 
 ### Community 0 - "Community 0"
 Cohesion: 0.06
@@ -76,8 +78,8 @@ Cohesion: 0.08
 Nodes (25): dependencies, csv-parser, depd, express, multer, node-html-parser, pg, prisma (+17 more)
 
 ### Community 3 - "Community 3"
-Cohesion: 0.11
-Nodes (18): dependencies, @chakra-ui/react, @emotion/react, @emotion/styled, next, react, react-dom, sass (+10 more)
+Cohesion: 0.10
+Nodes (19): dependencies, @chakra-ui/react, @emotion/react, @emotion/styled, lightweight-charts, next, react, react-dom (+11 more)
 
 ### Community 4 - "Community 4"
 Cohesion: 0.11
@@ -92,8 +94,8 @@ Cohesion: 0.14
 Nodes (13): API Progress — معامله‌یار, Database Schema (`src/prisma/schema.prisma`), ✅ Done, Express Server (`src/server.ts`), High Priority, Low Priority, Medium Priority, MT4/MT5 Parser (`src/services/mt4Parser.ts`) (+5 more)
 
 ### Community 7 - "Community 7"
-Cohesion: 0.16
-Nodes (13): Select(), SelectOption, SelectProps, DEFAULT_EMOTIONS, DEFAULT_TAGS, Trade, TradesTable(), TradesTableProps (+5 more)
+Cohesion: 0.13
+Nodes (16): Select(), SelectOption, SelectProps, CandlestickData, TradeChart(), TradeChartProps, DEFAULT_EMOTIONS, DEFAULT_TAGS (+8 more)
 
 ### Community 8 - "Community 8"
 Cohesion: 0.12
@@ -121,7 +123,7 @@ Nodes (6): File, How it works, JSON payload format, MT5 Expert Advisor — Trade
 
 ### Community 19 - "Community 19"
 Cohesion: 0.05
-Nodes (38): Accessibility, Asymmetric enter/exit timing, Beauty is leverage, clip-path for Animation, Cohesion matters, Comparison sliders, Core Philosophy, Damping at boundaries (+30 more)
+Nodes (37): 3D transforms for depth, Accessibility, Asymmetric enter/exit timing, Beauty is leverage, Cohesion matters, Core Philosophy, CSS Transform Mastery, Damping at boundaries (+29 more)
 
 ### Community 20 - "Community 20"
 Cohesion: 0.33
@@ -132,27 +134,31 @@ Cohesion: 0.29
 Nodes (6): compilerOptions, outDir, rootDir, types, extends, include
 
 ### Community 22 - "Community 22"
-Cohesion: 0.40
-Nodes (5): 3D transforms for depth, CSS Transform Mastery, scale() scales children too, transform-origin, translateY with percentages
+Cohesion: 0.38
+Nodes (6): adapter, getHourInTimezone(), getTradingSession(), main(), pool, prisma
+
+### Community 23 - "Community 23"
+Cohesion: 0.33
+Nodes (6): clip-path for Animation, Comparison sliders, Hold-to-delete pattern, Image reveals on scroll, Tabs with perfect color transitions, The inset shape
 
 ### Community 24 - "Community 24"
 Cohesion: 0.33
 Nodes (6): CSS animations beat JS under load, CSS variables are inheritable, Framer Motion hardware acceleration caveat, Only animate transform and opacity, Performance Rules, Use WAAPI for programmatic CSS animations
 
 ## Knowledge Gaps
-- **220 isolated node(s):** `name`, `version`, `private`, `dev`, `build` (+215 more)
+- **227 isolated node(s):** `name`, `version`, `private`, `dev`, `build` (+222 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **3 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **4 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `Design Engineering` connect `Community 19` to `Community 24`, `Community 12`, `Community 20`, `Community 22`?**
-  _High betweenness centrality (0.038) - this node is a cross-community bridge._
+- **Why does `Design Engineering` connect `Community 19` to `Community 24`, `Community 12`, `Community 20`, `Community 23`?**
+  _High betweenness centrality (0.034) - this node is a cross-community bridge._
 - **Why does `Component Building Principles` connect `Community 12` to `Community 19`?**
-  _High betweenness centrality (0.009) - this node is a cross-community bridge._
+  _High betweenness centrality (0.008) - this node is a cross-community bridge._
 - **What connects `name`, `version`, `private` to the rest of the system?**
-  _220 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _227 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Community 0` be split into smaller, more focused modules?**
   _Cohesion score 0.05714285714285714 - nodes in this community are weakly interconnected._
 - **Should `Community 1` be split into smaller, more focused modules?**
@@ -160,4 +166,4 @@ _Questions this graph is uniquely positioned to answer:_
 - **Should `Community 2` be split into smaller, more focused modules?**
   _Cohesion score 0.07692307692307693 - nodes in this community are weakly interconnected._
 - **Should `Community 3` be split into smaller, more focused modules?**
-  _Cohesion score 0.10526315789473684 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.1 - nodes in this community are weakly interconnected._

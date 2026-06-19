@@ -25,6 +25,7 @@ export interface TradeData {
   swap: number;
   pips?: number;
   rMultiple: number;
+  chartData?: any;
 }
 
 /** Result from a sync/import operation */

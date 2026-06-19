@@ -85,6 +85,7 @@ export async function syncTradesFromEA(
             r_multiple: trade.rMultiple,
             ticket: trade.ticket,
             import_source: (trade.closeTime ? 'MT5_EA' : 'MT5_EA') as any,
+            chart_data: trade.chartData ? trade.chartData : undefined,
           },
         });
         result.created++;
@@ -101,6 +102,7 @@ export async function syncTradesFromEA(
             swap: trade.swap,
             pips: trade.pips ?? 0,
             r_multiple: trade.rMultiple,
+            chart_data: trade.chartData ? trade.chartData : undefined,
             // Fill close data only if the trade is now closed
             ...(trade.closeTime
               ? {
@@ -144,6 +146,7 @@ export type TradeListRow = {
   emotion: string | null;
   notes: string | null;
   screenshots: string[];
+  chartData?: any;
 };
 
 export async function getTradesForAccount(params: {
@@ -181,6 +184,7 @@ export async function getTradesForAccount(params: {
       emotion: true,
       notes: true,
       screenshots: true,
+      chart_data: true,
     },
   });
 
@@ -204,5 +208,6 @@ export async function getTradesForAccount(params: {
     emotion: t.emotion,
     notes: t.notes,
     screenshots: t.screenshots,
+    chartData: t.chart_data,
   }));
 }

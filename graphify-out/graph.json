@@ -334,6 +334,106 @@
       "norm_label": "upload"
     },
     {
+      "label": "scratch-check.ts",
+      "file_type": "code",
+      "source_file": "apps/api/src/scratch-check.ts",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "src_scratch_check",
+      "community": 22,
+      "norm_label": "scratch-check.ts"
+    },
+    {
+      "label": "pool",
+      "file_type": "code",
+      "source_file": "apps/api/src/scratch-check.ts",
+      "source_location": "L5",
+      "_origin": "ast",
+      "id": "src_scratch_check_pool",
+      "community": 22,
+      "norm_label": "pool"
+    },
+    {
+      "label": "adapter",
+      "file_type": "code",
+      "source_file": "apps/api/src/scratch-check.ts",
+      "source_location": "L6",
+      "_origin": "ast",
+      "id": "src_scratch_check_adapter",
+      "community": 22,
+      "norm_label": "adapter"
+    },
+    {
+      "label": "prisma",
+      "file_type": "code",
+      "source_file": "apps/api/src/scratch-check.ts",
+      "source_location": "L7",
+      "_origin": "ast",
+      "id": "src_scratch_check_prisma",
+      "community": 22,
+      "norm_label": "prisma"
+    },
+    {
+      "label": "getHourInTimezone()",
+      "file_type": "code",
+      "source_file": "apps/api/src/scratch-check.ts",
+      "source_location": "L10",
+      "_origin": "ast",
+      "id": "src_scratch_check_gethourintimezone",
+      "community": 22,
+      "norm_label": "gethourintimezone()"
+    },
+    {
+      "label": "getTradingSession()",
+      "file_type": "code",
+      "source_file": "apps/api/src/scratch-check.ts",
+      "source_location": "L19",
+      "_origin": "ast",
+      "id": "src_scratch_check_gettradingsession",
+      "community": 22,
+      "norm_label": "gettradingsession()"
+    },
+    {
+      "label": "main()",
+      "file_type": "code",
+      "source_file": "apps/api/src/scratch-check.ts",
+      "source_location": "L60",
+      "_origin": "ast",
+      "id": "src_scratch_check_main",
+      "community": 22,
+      "norm_label": "main()"
+    },
+    {
+      "label": "scratch-test.ts",
+      "file_type": "code",
+      "source_file": "apps/api/src/scratch-test.ts",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "src_scratch_test",
+      "community": 25,
+      "norm_label": "scratch-test.ts"
+    },
+    {
+      "label": "getNYDateTime()",
+      "file_type": "code",
+      "source_file": "apps/api/src/scratch-test.ts",
+      "source_location": "L2",
+      "_origin": "ast",
+      "id": "src_scratch_test_getnydatetime",
+      "community": 25,
+      "norm_label": "getnydatetime()"
+    },
+    {
+      "label": "dates",
+      "file_type": "code",
+      "source_file": "apps/api/src/scratch-test.ts",
+      "source_location": "L15",
+      "_origin": "ast",
+      "id": "src_scratch_test_dates",
+      "community": 25,
+      "norm_label": "dates"
+    },
+    {
       "label": "server.ts",
       "file_type": "code",
       "source_file": "apps/api/src/server.ts",
@@ -477,7 +577,7 @@
       "label": "TradeListRow",
       "file_type": "code",
       "source_file": "apps/api/src/services/tradeSync.ts",
-      "source_location": "L127",
+      "source_location": "L129",
       "_origin": "ast",
       "id": "services_tradesync_tradelistrow",
       "community": 1,
@@ -487,7 +587,7 @@
       "label": "getTradesForAccount()",
       "file_type": "code",
       "source_file": "apps/api/src/services/tradeSync.ts",
-      "source_location": "L149",
+      "source_location": "L152",
       "_origin": "ast",
       "id": "services_tradesync_gettradesforaccount",
       "community": 1,
@@ -547,7 +647,7 @@
       "label": "SyncResult",
       "file_type": "code",
       "source_file": "apps/api/src/types/trade.ts",
-      "source_location": "L31",
+      "source_location": "L32",
       "_origin": "ast",
       "id": "types_trade_syncresult",
       "community": 1,
@@ -557,7 +657,7 @@
       "label": "MulterFile",
       "file_type": "code",
       "source_file": "apps/api/src/types/trade.ts",
-      "source_location": "L39",
+      "source_location": "L40",
       "_origin": "ast",
       "id": "types_trade_multerfile",
       "community": 1,
@@ -794,10 +894,20 @@
       "norm_label": "sass"
     },
     {
+      "label": "lightweight-charts",
+      "file_type": "code",
+      "source_file": "apps/web/package.json",
+      "source_location": "L18",
+      "_origin": "ast",
+      "id": "web_package_dependencies_lightweight_charts",
+      "community": 3,
+      "norm_label": "lightweight-charts"
+    },
+    {
       "label": "devDependencies",
       "file_type": "code",
       "source_file": "apps/web/package.json",
-      "source_location": "L19",
+      "source_location": "L20",
       "_origin": "ast",
       "id": "web_package_devdependencies",
       "community": 3,
@@ -807,7 +917,7 @@
       "label": "@types/node",
       "file_type": "code",
       "source_file": "apps/web/package.json",
-      "source_location": "L20",
+      "source_location": "L21",
       "_origin": "ast",
       "id": "web_package_devdependencies_types_node",
       "community": 3,
@@ -817,7 +927,7 @@
       "label": "@types/react",
       "file_type": "code",
       "source_file": "apps/web/package.json",
-      "source_location": "L21",
+      "source_location": "L22",
       "_origin": "ast",
       "id": "web_package_devdependencies_types_react",
       "community": 3,
@@ -934,6 +1044,46 @@
       "norm_label": "select()"
     },
     {
+      "label": "TradeChart.tsx",
+      "file_type": "code",
+      "source_file": "apps/web/src/components/TradeChart.tsx",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "components_tradechart",
+      "community": 7,
+      "norm_label": "tradechart.tsx"
+    },
+    {
+      "label": "CandlestickData",
+      "file_type": "code",
+      "source_file": "apps/web/src/components/TradeChart.tsx",
+      "source_location": "L6",
+      "_origin": "ast",
+      "id": "components_tradechart_candlestickdata",
+      "community": 7,
+      "norm_label": "candlestickdata"
+    },
+    {
+      "label": "TradeChartProps",
+      "file_type": "code",
+      "source_file": "apps/web/src/components/TradeChart.tsx",
+      "source_location": "L14",
+      "_origin": "ast",
+      "id": "components_tradechart_tradechartprops",
+      "community": 7,
+      "norm_label": "tradechartprops"
+    },
+    {
+      "label": "TradeChart()",
+      "file_type": "code",
+      "source_file": "apps/web/src/components/TradeChart.tsx",
+      "source_location": "L25",
+      "_origin": "ast",
+      "id": "components_tradechart_tradechart",
+      "community": 7,
+      "norm_label": "tradechart()"
+    },
+    {
       "label": "TradesTable.tsx",
       "file_type": "code",
       "source_file": "apps/web/src/components/TradesTable.tsx",
@@ -947,7 +1097,7 @@
       "label": "Trade",
       "file_type": "code",
       "source_file": "apps/web/src/components/TradesTable.tsx",
-      "source_location": "L8",
+      "source_location": "L9",
       "_origin": "ast",
       "id": "components_tradestable_trade",
       "community": 7,
@@ -957,7 +1107,7 @@
       "label": "TradesTableProps",
       "file_type": "code",
       "source_file": "apps/web/src/components/TradesTable.tsx",
-      "source_location": "L32",
+      "source_location": "L34",
       "_origin": "ast",
       "id": "components_tradestable_tradestableprops",
       "community": 7,
@@ -967,7 +1117,7 @@
       "label": "DEFAULT_TAGS",
       "file_type": "code",
       "source_file": "apps/web/src/components/TradesTable.tsx",
-      "source_location": "L43",
+      "source_location": "L45",
       "_origin": "ast",
       "id": "components_tradestable_default_tags",
       "community": 7,
@@ -977,7 +1127,7 @@
       "label": "DEFAULT_EMOTIONS",
       "file_type": "code",
       "source_file": "apps/web/src/components/TradesTable.tsx",
-      "source_location": "L61",
+      "source_location": "L63",
       "_origin": "ast",
       "id": "components_tradestable_default_emotions",
       "community": 7,
@@ -987,7 +1137,7 @@
       "label": "getEmotionEmoji()",
       "file_type": "code",
       "source_file": "apps/web/src/components/TradesTable.tsx",
-      "source_location": "L69",
+      "source_location": "L71",
       "_origin": "ast",
       "id": "components_tradestable_getemotionemoji",
       "community": 7,
@@ -997,7 +1147,7 @@
       "label": "getEmotionLabel()",
       "file_type": "code",
       "source_file": "apps/web/src/components/TradesTable.tsx",
-      "source_location": "L80",
+      "source_location": "L82",
       "_origin": "ast",
       "id": "components_tradestable_getemotionlabel",
       "community": 7,
@@ -1007,7 +1157,7 @@
       "label": "TradesTable()",
       "file_type": "code",
       "source_file": "apps/web/src/components/TradesTable.tsx",
-      "source_location": "L86",
+      "source_location": "L88",
       "_origin": "ast",
       "id": "components_tradestable_tradestable",
       "community": 7,
@@ -1780,7 +1930,7 @@
       "source_location": "L351",
       "_origin": "ast",
       "id": "emil_design_eng_skill_css_transform_mastery",
-      "community": 22,
+      "community": 19,
       "norm_label": "css transform mastery"
     },
     {
@@ -1790,7 +1940,7 @@
       "source_location": "L353",
       "_origin": "ast",
       "id": "emil_design_eng_skill_translatey_with_percentages",
-      "community": 22,
+      "community": 19,
       "norm_label": "translatey with percentages"
     },
     {
@@ -1800,7 +1950,7 @@
       "source_location": "L371",
       "_origin": "ast",
       "id": "emil_design_eng_skill_scale_scales_children_too",
-      "community": 22,
+      "community": 19,
       "norm_label": "scale() scales children too"
     },
     {
@@ -1810,7 +1960,7 @@
       "source_location": "L375",
       "_origin": "ast",
       "id": "emil_design_eng_skill_3d_transforms_for_depth",
-      "community": 22,
+      "community": 19,
       "norm_label": "3d transforms for depth"
     },
     {
@@ -1820,7 +1970,7 @@
       "source_location": "L394",
       "_origin": "ast",
       "id": "emil_design_eng_skill_transform_origin",
-      "community": 22,
+      "community": 19,
       "norm_label": "transform-origin"
     },
     {
@@ -1830,7 +1980,7 @@
       "source_location": "L398",
       "_origin": "ast",
       "id": "emil_design_eng_skill_clip_path_for_animation",
-      "community": 19,
+      "community": 23,
       "norm_label": "clip-path for animation"
     },
     {
@@ -1840,7 +1990,7 @@
       "source_location": "L402",
       "_origin": "ast",
       "id": "emil_design_eng_skill_the_inset_shape",
-      "community": 19,
+      "community": 23,
       "norm_label": "the inset shape"
     },
     {
@@ -1850,7 +2000,7 @@
       "source_location": "L428",
       "_origin": "ast",
       "id": "emil_design_eng_skill_tabs_with_perfect_color_transitions",
-      "community": 19,
+      "community": 23,
       "norm_label": "tabs with perfect color transitions"
     },
     {
@@ -1860,7 +2010,7 @@
       "source_location": "L432",
       "_origin": "ast",
       "id": "emil_design_eng_skill_hold_to_delete_pattern",
-      "community": 19,
+      "community": 23,
       "norm_label": "hold-to-delete pattern"
     },
     {
@@ -1870,7 +2020,7 @@
       "source_location": "L436",
       "_origin": "ast",
       "id": "emil_design_eng_skill_image_reveals_on_scroll",
-      "community": 19,
+      "community": 23,
       "norm_label": "image reveals on scroll"
     },
     {
@@ -1880,7 +2030,7 @@
       "source_location": "L440",
       "_origin": "ast",
       "id": "emil_design_eng_skill_comparison_sliders",
-      "community": 19,
+      "community": 23,
       "norm_label": "comparison sliders"
     },
     {
@@ -3291,9 +3441,9 @@
       "source_file": "apps/api/package.json",
       "source_location": "L23",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "api_package_dependencies",
-      "target": "api_package_dependencies_multer",
-      "confidence_score": 1.0
+      "target": "api_package_dependencies_multer"
     },
     {
       "relation": "contains",
@@ -3371,9 +3521,9 @@
       "source_file": "apps/api/package.json",
       "source_location": "L27",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "api_package_devdependencies",
-      "target": "api_package_devdependencies_types_multer",
-      "confidence_score": 1.0
+      "target": "api_package_devdependencies_types_multer"
     },
     {
       "relation": "contains",
@@ -3411,9 +3561,9 @@
       "source_file": "apps/api/src/routes/tradeSync.ts",
       "source_location": "L191",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "routes_tradesync",
-      "target": "routes_tradesync_storage",
-      "confidence_score": 1.0
+      "target": "routes_tradesync_storage"
     },
     {
       "relation": "contains",
@@ -3421,9 +3571,9 @@
       "source_file": "apps/api/src/routes/tradeSync.ts",
       "source_location": "L202",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "routes_tradesync",
-      "target": "routes_tradesync_upload",
-      "confidence_score": 1.0
+      "target": "routes_tradesync_upload"
     },
     {
       "relation": "contains",
@@ -3431,9 +3581,9 @@
       "source_file": "apps/api/src/routes/tradeSync.ts",
       "source_location": "L186",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "routes_tradesync",
-      "target": "routes_tradesync_uploaddir",
-      "confidence_score": 1.0
+      "target": "routes_tradesync_uploaddir"
     },
     {
       "relation": "imports_from",
@@ -3500,6 +3650,108 @@
       "confidence_score": 1.0,
       "source": "src_server",
       "target": "routes_tradesync_router"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/src/scratch-check.ts",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "src_scratch_check",
+      "target": "src_scratch_check_adapter",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/src/scratch-check.ts",
+      "source_location": "L10",
+      "weight": 1.0,
+      "source": "src_scratch_check",
+      "target": "src_scratch_check_gethourintimezone",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/src/scratch-check.ts",
+      "source_location": "L19",
+      "weight": 1.0,
+      "source": "src_scratch_check",
+      "target": "src_scratch_check_gettradingsession",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/src/scratch-check.ts",
+      "source_location": "L60",
+      "weight": 1.0,
+      "source": "src_scratch_check",
+      "target": "src_scratch_check_main",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/src/scratch-check.ts",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "src_scratch_check",
+      "target": "src_scratch_check_pool",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/src/scratch-check.ts",
+      "source_location": "L7",
+      "weight": 1.0,
+      "source": "src_scratch_check",
+      "target": "src_scratch_check_prisma",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/src/scratch-check.ts",
+      "source_location": "L20",
+      "weight": 1.0,
+      "source": "src_scratch_check_gettradingsession",
+      "target": "src_scratch_check_gethourintimezone",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/src/scratch-check.ts",
+      "source_location": "L73",
+      "weight": 1.0,
+      "source": "src_scratch_check_main",
+      "target": "src_scratch_check_gettradingsession",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/src/scratch-test.ts",
+      "source_location": "L15",
+      "weight": 1.0,
+      "source": "src_scratch_test",
+      "target": "src_scratch_test_dates",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/src/scratch-test.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "src_scratch_test",
+      "target": "src_scratch_test_getnydatetime",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -3997,6 +4249,16 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "apps/web/package.json",
+      "source_location": "L18",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "web_package_dependencies",
+      "target": "web_package_dependencies_lightweight_charts"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/package.json",
       "source_location": "L14",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -4177,6 +4439,58 @@
       "confidence_score": 1.0,
       "source": "components_tradestable",
       "target": "components_select_select"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/components/TradeChart.tsx",
+      "source_location": "L6",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "components_tradechart",
+      "target": "components_tradechart_candlestickdata"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/components/TradeChart.tsx",
+      "source_location": "L25",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "components_tradechart",
+      "target": "components_tradechart_tradechart"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/components/TradeChart.tsx",
+      "source_location": "L14",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "components_tradechart",
+      "target": "components_tradechart_tradechartprops"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/components/TradesTable.tsx",
+      "source_location": "L7",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "components_tradestable",
+      "target": "components_tradechart"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/components/TradesTable.tsx",
+      "source_location": "L7",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "components_tradestable",
+      "target": "components_tradechart_tradechart"
     },
     {
       "relation": "contains",
@@ -6339,5 +6653,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "409aa5c65ee9234567d8edd6253d7cf058a7163f"
+  "built_at_commit": "dbc21d3c735d91907faec44d38fd0bd0e88aa225"
 }
