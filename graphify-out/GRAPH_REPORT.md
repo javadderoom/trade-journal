@@ -1,16 +1,16 @@
 # Graph Report - trade-journal  (2026-06-20)
 
 ## Corpus Check
-- 37 files · ~162,770 words
+- 35 files · ~162,362 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 328 nodes · 333 edges · 26 communities (22 shown, 4 thin omitted)
+- 318 nodes · 323 edges · 25 communities (22 shown, 3 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `dbc21d3c`
+- Built from commit: `eb3ee18c`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -38,7 +38,6 @@
 - [[_COMMUNITY_Community 22|Community 22]]
 - [[_COMMUNITY_Community 23|Community 23]]
 - [[_COMMUNITY_Community 24|Community 24]]
-- [[_COMMUNITY_Community 25|Community 25]]
 
 ## God Nodes (most connected - your core abstractions)
 1. `Design Engineering` - 16 edges
@@ -63,11 +62,11 @@
 ## Import Cycles
 - None detected.
 
-## Communities (26 total, 4 thin omitted)
+## Communities (25 total, 3 thin omitted)
 
 ### Community 0 - "Community 0"
-Cohesion: 0.06
-Nodes (34): 10. Key Risks & Mitigations, 11. Suggested Next Steps, 1. Project Overview, 2. System Architecture Overview, 3.1 Frontend, 3.2 Backend, 3.3 Database — PostgreSQL Schema (core tables), 3.4 Infrastructure (+26 more)
+Cohesion: 0.08
+Nodes (25): 10. Key Risks & Mitigations, 11. Suggested Next Steps, 1. Project Overview, 2. System Architecture Overview, 3.1 Frontend, 3.2 Backend, 3.3 Database — PostgreSQL Schema (core tables), 3.4 Infrastructure (+17 more)
 
 ### Community 1 - "Community 1"
 Cohesion: 0.11
@@ -123,7 +122,7 @@ Nodes (6): File, How it works, JSON payload format, MT5 Expert Advisor — Trade
 
 ### Community 19 - "Community 19"
 Cohesion: 0.05
-Nodes (37): 3D transforms for depth, Accessibility, Asymmetric enter/exit timing, Beauty is leverage, Cohesion matters, Core Philosophy, CSS Transform Mastery, Damping at boundaries (+29 more)
+Nodes (39): 3D transforms for depth, Accessibility, Beauty is leverage, clip-path for Animation, Comparison sliders, Core Philosophy, CSS animations beat JS under load, CSS Transform Mastery (+31 more)
 
 ### Community 20 - "Community 20"
 Cohesion: 0.33
@@ -134,36 +133,36 @@ Cohesion: 0.29
 Nodes (6): compilerOptions, outDir, rootDir, types, extends, include
 
 ### Community 22 - "Community 22"
-Cohesion: 0.38
-Nodes (6): adapter, getHourInTimezone(), getTradingSession(), main(), pool, prisma
+Cohesion: 0.22
+Nodes (9): 5.1 Authentication, 5.2 Manual Trade Entry, 5.3 MT4/MT5 Import, 5.4 Analytics Dashboard, 5.5 Trade List & Detail, 5.6 Daily Journal, 5.7 Setup / Playbook, 5.8 Payments & Plans (+1 more)
 
 ### Community 23 - "Community 23"
-Cohesion: 0.33
-Nodes (6): clip-path for Animation, Comparison sliders, Hold-to-delete pattern, Image reveals on scroll, Tabs with perfect color transitions, The inset shape
+Cohesion: 0.40
+Nodes (5): Asymmetric enter/exit timing, Cohesion matters, Review your work the next day, The opacity + height combination, The Sonner Principles (Building Loved Components)
 
 ### Community 24 - "Community 24"
-Cohesion: 0.33
-Nodes (6): CSS animations beat JS under load, CSS variables are inheritable, Framer Motion hardware acceleration caveat, Only animate transform and opacity, Performance Rules, Use WAAPI for programmatic CSS animations
+Cohesion: 0.40
+Nodes (5): Interruptibility advantage, Spring Animations, Spring-based mouse interactions, Spring configuration, When to use springs
 
 ## Knowledge Gaps
-- **227 isolated node(s):** `name`, `version`, `private`, `dev`, `build` (+222 more)
+- **223 isolated node(s):** `name`, `version`, `private`, `dev`, `build` (+218 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **4 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **3 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `Design Engineering` connect `Community 19` to `Community 24`, `Community 12`, `Community 20`, `Community 23`?**
-  _High betweenness centrality (0.034) - this node is a cross-community bridge._
+  _High betweenness centrality (0.036) - this node is a cross-community bridge._
+- **Why does `معامله‌یار — Persian Trading Journal Platform` connect `Community 0` to `Community 22`?**
+  _High betweenness centrality (0.010) - this node is a cross-community bridge._
 - **Why does `Component Building Principles` connect `Community 12` to `Community 19`?**
   _High betweenness centrality (0.008) - this node is a cross-community bridge._
 - **What connects `name`, `version`, `private` to the rest of the system?**
-  _227 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _223 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Community 0` be split into smaller, more focused modules?**
-  _Cohesion score 0.05714285714285714 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.07692307692307693 - nodes in this community are weakly interconnected._
 - **Should `Community 1` be split into smaller, more focused modules?**
   _Cohesion score 0.10582010582010581 - nodes in this community are weakly interconnected._
 - **Should `Community 2` be split into smaller, more focused modules?**
   _Cohesion score 0.07692307692307693 - nodes in this community are weakly interconnected._
-- **Should `Community 3` be split into smaller, more focused modules?**
-  _Cohesion score 0.1 - nodes in this community are weakly interconnected._

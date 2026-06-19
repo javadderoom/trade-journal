@@ -792,6 +792,66 @@
     }
   }
 
+  .panel-tabs {
+    display: flex;
+    border-bottom: 1px solid rgba($outline-variant, 0.5);
+    background-color: rgba($surface-container-high, 0.95);
+    backdrop-filter: blur(12px);
+    padding: 0 16px;
+    gap: 8px;
+    z-index: 10;
+
+    .tab-btn {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 12px 8px;
+      background: transparent;
+      border: none;
+      color: $on-surface-variant;
+      font-size: 14px;
+      font-weight: 500;
+      font-family: $font-primary;
+      cursor: pointer;
+      position: relative;
+      transition: all 0.2s ease;
+
+      &:hover {
+        color: $on-surface;
+      }
+
+      .tab-icon {
+        font-size: 18px;
+      }
+
+      &::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background-color: transparent;
+        transition: background-color 0.2s ease;
+      }
+
+      &.active {
+        color: $primary;
+        font-weight: 700;
+
+        &::after {
+          background-color: $primary;
+        }
+
+        .tab-icon {
+          color: $primary;
+        }
+      }
+    }
+  }
+
   .panel-body {
     padding: 24px; // p-lg
     display: flex;
