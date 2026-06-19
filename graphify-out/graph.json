@@ -204,10 +204,20 @@
       "norm_label": "prisma"
     },
     {
+      "label": "multer",
+      "file_type": "code",
+      "source_file": "apps/api/package.json",
+      "source_location": "L23",
+      "_origin": "ast",
+      "id": "api_package_dependencies_multer",
+      "community": 2,
+      "norm_label": "multer"
+    },
+    {
       "label": "devDependencies",
       "file_type": "code",
       "source_file": "apps/api/package.json",
-      "source_location": "L24",
+      "source_location": "L25",
       "_origin": "ast",
       "id": "api_package_devdependencies",
       "community": 2,
@@ -217,17 +227,27 @@
       "label": "@types/express",
       "file_type": "code",
       "source_file": "apps/api/package.json",
-      "source_location": "L25",
+      "source_location": "L26",
       "_origin": "ast",
       "id": "api_package_devdependencies_types_express",
       "community": 2,
       "norm_label": "@types/express"
     },
     {
+      "label": "@types/multer",
+      "file_type": "code",
+      "source_file": "apps/api/package.json",
+      "source_location": "L27",
+      "_origin": "ast",
+      "id": "api_package_devdependencies_types_multer",
+      "community": 2,
+      "norm_label": "@types/multer"
+    },
+    {
       "label": "@types/node",
       "file_type": "code",
       "source_file": "apps/api/package.json",
-      "source_location": "L26",
+      "source_location": "L28",
       "_origin": "ast",
       "id": "api_package_devdependencies_types_node",
       "community": 2,
@@ -237,7 +257,7 @@
       "label": "ts-node",
       "file_type": "code",
       "source_file": "apps/api/package.json",
-      "source_location": "L27",
+      "source_location": "L29",
       "_origin": "ast",
       "id": "api_package_devdependencies_ts_node",
       "community": 2,
@@ -277,11 +297,41 @@
       "label": "router",
       "file_type": "code",
       "source_file": "apps/api/src/routes/tradeSync.ts",
-      "source_location": "L4",
+      "source_location": "L8",
       "_origin": "ast",
       "id": "routes_tradesync_router",
       "community": 1,
       "norm_label": "router"
+    },
+    {
+      "label": "uploadDir",
+      "file_type": "code",
+      "source_file": "apps/api/src/routes/tradeSync.ts",
+      "source_location": "L186",
+      "_origin": "ast",
+      "id": "routes_tradesync_uploaddir",
+      "community": 1,
+      "norm_label": "uploaddir"
+    },
+    {
+      "label": "storage",
+      "file_type": "code",
+      "source_file": "apps/api/src/routes/tradeSync.ts",
+      "source_location": "L191",
+      "_origin": "ast",
+      "id": "routes_tradesync_storage",
+      "community": 1,
+      "norm_label": "storage"
+    },
+    {
+      "label": "upload",
+      "file_type": "code",
+      "source_file": "apps/api/src/routes/tradeSync.ts",
+      "source_location": "L202",
+      "_origin": "ast",
+      "id": "routes_tradesync_upload",
+      "community": 1,
+      "norm_label": "upload"
     },
     {
       "label": "server.ts",
@@ -297,7 +347,7 @@
       "label": "app",
       "file_type": "code",
       "source_file": "apps/api/src/server.ts",
-      "source_location": "L5",
+      "source_location": "L6",
       "_origin": "ast",
       "id": "src_server_app",
       "community": 1,
@@ -437,7 +487,7 @@
       "label": "getTradesForAccount()",
       "file_type": "code",
       "source_file": "apps/api/src/services/tradeSync.ts",
-      "source_location": "L148",
+      "source_location": "L149",
       "_origin": "ast",
       "id": "services_tradesync_gettradesforaccount",
       "community": 1,
@@ -907,7 +957,7 @@
       "label": "TradesTableProps",
       "file_type": "code",
       "source_file": "apps/web/src/components/TradesTable.tsx",
-      "source_location": "L31",
+      "source_location": "L32",
       "_origin": "ast",
       "id": "components_tradestable_tradestableprops",
       "community": 7,
@@ -917,7 +967,7 @@
       "label": "DEFAULT_TAGS",
       "file_type": "code",
       "source_file": "apps/web/src/components/TradesTable.tsx",
-      "source_location": "L42",
+      "source_location": "L43",
       "_origin": "ast",
       "id": "components_tradestable_default_tags",
       "community": 7,
@@ -927,7 +977,7 @@
       "label": "DEFAULT_EMOTIONS",
       "file_type": "code",
       "source_file": "apps/web/src/components/TradesTable.tsx",
-      "source_location": "L60",
+      "source_location": "L61",
       "_origin": "ast",
       "id": "components_tradestable_default_emotions",
       "community": 7,
@@ -937,7 +987,7 @@
       "label": "getEmotionEmoji()",
       "file_type": "code",
       "source_file": "apps/web/src/components/TradesTable.tsx",
-      "source_location": "L68",
+      "source_location": "L69",
       "_origin": "ast",
       "id": "components_tradestable_getemotionemoji",
       "community": 7,
@@ -947,7 +997,7 @@
       "label": "getEmotionLabel()",
       "file_type": "code",
       "source_file": "apps/web/src/components/TradesTable.tsx",
-      "source_location": "L79",
+      "source_location": "L80",
       "_origin": "ast",
       "id": "components_tradestable_getemotionlabel",
       "community": 7,
@@ -957,7 +1007,7 @@
       "label": "TradesTable()",
       "file_type": "code",
       "source_file": "apps/web/src/components/TradesTable.tsx",
-      "source_location": "L85",
+      "source_location": "L86",
       "_origin": "ast",
       "id": "components_tradestable_tradestable",
       "community": 7,
@@ -1650,7 +1700,7 @@
       "source_location": "L197",
       "_origin": "ast",
       "id": "emil_design_eng_skill_component_building_principles",
-      "community": 19,
+      "community": 12,
       "norm_label": "component building principles"
     },
     {
@@ -1660,7 +1710,7 @@
       "source_location": "L199",
       "_origin": "ast",
       "id": "emil_design_eng_skill_buttons_must_feel_responsive",
-      "community": 19,
+      "community": 12,
       "norm_label": "buttons must feel responsive"
     },
     {
@@ -1670,7 +1720,7 @@
       "source_location": "L215",
       "_origin": "ast",
       "id": "emil_design_eng_skill_never_animate_from_scale_0",
-      "community": 19,
+      "community": 12,
       "norm_label": "never animate from scale(0)"
     },
     {
@@ -1680,7 +1730,7 @@
       "source_location": "L234",
       "_origin": "ast",
       "id": "emil_design_eng_skill_make_popovers_origin_aware",
-      "community": 19,
+      "community": 12,
       "norm_label": "make popovers origin-aware"
     },
     {
@@ -1690,7 +1740,7 @@
       "source_location": "L252",
       "_origin": "ast",
       "id": "emil_design_eng_skill_tooltips_skip_delay_on_subsequent_hovers",
-      "community": 19,
+      "community": 12,
       "norm_label": "tooltips: skip delay on subsequent hovers"
     },
     {
@@ -1700,7 +1750,7 @@
       "source_location": "L274",
       "_origin": "ast",
       "id": "emil_design_eng_skill_use_css_transitions_over_keyframes_for_interruptible_ui",
-      "community": 19,
+      "community": 12,
       "norm_label": "use css transitions over keyframes for interruptible ui"
     },
     {
@@ -1710,7 +1760,7 @@
       "source_location": "L295",
       "_origin": "ast",
       "id": "emil_design_eng_skill_use_blur_to_mask_imperfect_transitions",
-      "community": 19,
+      "community": 12,
       "norm_label": "use blur to mask imperfect transitions"
     },
     {
@@ -1720,7 +1770,7 @@
       "source_location": "L324",
       "_origin": "ast",
       "id": "emil_design_eng_skill_animate_enter_states_with_starting_style",
-      "community": 19,
+      "community": 12,
       "norm_label": "animate enter states with @starting-style"
     },
     {
@@ -1730,7 +1780,7 @@
       "source_location": "L351",
       "_origin": "ast",
       "id": "emil_design_eng_skill_css_transform_mastery",
-      "community": 19,
+      "community": 22,
       "norm_label": "css transform mastery"
     },
     {
@@ -1740,7 +1790,7 @@
       "source_location": "L353",
       "_origin": "ast",
       "id": "emil_design_eng_skill_translatey_with_percentages",
-      "community": 19,
+      "community": 22,
       "norm_label": "translatey with percentages"
     },
     {
@@ -1750,7 +1800,7 @@
       "source_location": "L371",
       "_origin": "ast",
       "id": "emil_design_eng_skill_scale_scales_children_too",
-      "community": 19,
+      "community": 22,
       "norm_label": "scale() scales children too"
     },
     {
@@ -1760,7 +1810,7 @@
       "source_location": "L375",
       "_origin": "ast",
       "id": "emil_design_eng_skill_3d_transforms_for_depth",
-      "community": 19,
+      "community": 22,
       "norm_label": "3d transforms for depth"
     },
     {
@@ -1770,7 +1820,7 @@
       "source_location": "L394",
       "_origin": "ast",
       "id": "emil_design_eng_skill_transform_origin",
-      "community": 19,
+      "community": 22,
       "norm_label": "transform-origin"
     },
     {
@@ -1780,7 +1830,7 @@
       "source_location": "L398",
       "_origin": "ast",
       "id": "emil_design_eng_skill_clip_path_for_animation",
-      "community": 23,
+      "community": 19,
       "norm_label": "clip-path for animation"
     },
     {
@@ -1790,7 +1840,7 @@
       "source_location": "L402",
       "_origin": "ast",
       "id": "emil_design_eng_skill_the_inset_shape",
-      "community": 23,
+      "community": 19,
       "norm_label": "the inset shape"
     },
     {
@@ -1800,7 +1850,7 @@
       "source_location": "L428",
       "_origin": "ast",
       "id": "emil_design_eng_skill_tabs_with_perfect_color_transitions",
-      "community": 23,
+      "community": 19,
       "norm_label": "tabs with perfect color transitions"
     },
     {
@@ -1810,7 +1860,7 @@
       "source_location": "L432",
       "_origin": "ast",
       "id": "emil_design_eng_skill_hold_to_delete_pattern",
-      "community": 23,
+      "community": 19,
       "norm_label": "hold-to-delete pattern"
     },
     {
@@ -1820,7 +1870,7 @@
       "source_location": "L436",
       "_origin": "ast",
       "id": "emil_design_eng_skill_image_reveals_on_scroll",
-      "community": 23,
+      "community": 19,
       "norm_label": "image reveals on scroll"
     },
     {
@@ -1830,7 +1880,7 @@
       "source_location": "L440",
       "_origin": "ast",
       "id": "emil_design_eng_skill_comparison_sliders",
-      "community": 23,
+      "community": 19,
       "norm_label": "comparison sliders"
     },
     {
@@ -1840,7 +1890,7 @@
       "source_location": "L444",
       "_origin": "ast",
       "id": "emil_design_eng_skill_gesture_and_drag_interactions",
-      "community": 25,
+      "community": 19,
       "norm_label": "gesture and drag interactions"
     },
     {
@@ -1850,7 +1900,7 @@
       "source_location": "L446",
       "_origin": "ast",
       "id": "emil_design_eng_skill_momentum_based_dismissal",
-      "community": 25,
+      "community": 19,
       "norm_label": "momentum-based dismissal"
     },
     {
@@ -1860,7 +1910,7 @@
       "source_location": "L459",
       "_origin": "ast",
       "id": "emil_design_eng_skill_damping_at_boundaries",
-      "community": 25,
+      "community": 19,
       "norm_label": "damping at boundaries"
     },
     {
@@ -1870,7 +1920,7 @@
       "source_location": "L463",
       "_origin": "ast",
       "id": "emil_design_eng_skill_pointer_capture_for_drag",
-      "community": 25,
+      "community": 19,
       "norm_label": "pointer capture for drag"
     },
     {
@@ -1880,7 +1930,7 @@
       "source_location": "L467",
       "_origin": "ast",
       "id": "emil_design_eng_skill_multi_touch_protection",
-      "community": 25,
+      "community": 19,
       "norm_label": "multi-touch protection"
     },
     {
@@ -1890,7 +1940,7 @@
       "source_location": "L478",
       "_origin": "ast",
       "id": "emil_design_eng_skill_friction_instead_of_hard_stops",
-      "community": 25,
+      "community": 19,
       "norm_label": "friction instead of hard stops"
     },
     {
@@ -2860,7 +2910,7 @@
       "source_location": "L209",
       "_origin": "ast",
       "id": "persian_trading_journal_architecture_5_feature_breakdown_v1",
-      "community": 12,
+      "community": 0,
       "norm_label": "5. feature breakdown \u2014 v1"
     },
     {
@@ -2870,7 +2920,7 @@
       "source_location": "L211",
       "_origin": "ast",
       "id": "persian_trading_journal_architecture_5_1_authentication",
-      "community": 12,
+      "community": 0,
       "norm_label": "5.1 authentication"
     },
     {
@@ -2880,7 +2930,7 @@
       "source_location": "L217",
       "_origin": "ast",
       "id": "persian_trading_journal_architecture_5_2_manual_trade_entry",
-      "community": 12,
+      "community": 0,
       "norm_label": "5.2 manual trade entry"
     },
     {
@@ -2890,7 +2940,7 @@
       "source_location": "L230",
       "_origin": "ast",
       "id": "persian_trading_journal_architecture_5_3_mt4_mt5_import",
-      "community": 12,
+      "community": 0,
       "norm_label": "5.3 mt4/mt5 import"
     },
     {
@@ -2900,7 +2950,7 @@
       "source_location": "L238",
       "_origin": "ast",
       "id": "persian_trading_journal_architecture_5_4_analytics_dashboard",
-      "community": 12,
+      "community": 0,
       "norm_label": "5.4 analytics dashboard"
     },
     {
@@ -2910,7 +2960,7 @@
       "source_location": "L258",
       "_origin": "ast",
       "id": "persian_trading_journal_architecture_5_5_trade_list_detail",
-      "community": 12,
+      "community": 0,
       "norm_label": "5.5 trade list & detail"
     },
     {
@@ -2920,7 +2970,7 @@
       "source_location": "L264",
       "_origin": "ast",
       "id": "persian_trading_journal_architecture_5_6_daily_journal",
-      "community": 12,
+      "community": 0,
       "norm_label": "5.6 daily journal"
     },
     {
@@ -2930,7 +2980,7 @@
       "source_location": "L270",
       "_origin": "ast",
       "id": "persian_trading_journal_architecture_5_7_setup_playbook",
-      "community": 12,
+      "community": 0,
       "norm_label": "5.7 setup / playbook"
     },
     {
@@ -2940,7 +2990,7 @@
       "source_location": "L275",
       "_origin": "ast",
       "id": "persian_trading_journal_architecture_5_8_payments_plans",
-      "community": 12,
+      "community": 0,
       "norm_label": "5.8 payments & plans"
     },
     {
@@ -3239,6 +3289,16 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "apps/api/package.json",
+      "source_location": "L23",
+      "weight": 1.0,
+      "source": "api_package_dependencies",
+      "target": "api_package_dependencies_multer",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
       "source_location": "L20",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -3309,6 +3369,16 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "apps/api/package.json",
+      "source_location": "L27",
+      "weight": 1.0,
+      "source": "api_package_devdependencies",
+      "target": "api_package_devdependencies_types_multer",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/package.json",
       "source_location": "L26",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -3334,6 +3404,36 @@
       "confidence_score": 1.0,
       "source": "routes_tradesync",
       "target": "routes_tradesync_router"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/src/routes/tradeSync.ts",
+      "source_location": "L191",
+      "weight": 1.0,
+      "source": "routes_tradesync",
+      "target": "routes_tradesync_storage",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/src/routes/tradeSync.ts",
+      "source_location": "L202",
+      "weight": 1.0,
+      "source": "routes_tradesync",
+      "target": "routes_tradesync_upload",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/src/routes/tradeSync.ts",
+      "source_location": "L186",
+      "weight": 1.0,
+      "source": "routes_tradesync",
+      "target": "routes_tradesync_uploaddir",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports_from",
@@ -4032,9 +4132,9 @@
       "source_file": "apps/web/src/components/Select.tsx",
       "source_location": "L20",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "components_select",
-      "target": "components_select_select",
-      "confidence_score": 1.0
+      "target": "components_select_select"
     },
     {
       "relation": "contains",
@@ -4042,9 +4142,9 @@
       "source_file": "apps/web/src/components/Select.tsx",
       "source_location": "L6",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "components_select",
-      "target": "components_select_selectoption",
-      "confidence_score": 1.0
+      "target": "components_select_selectoption"
     },
     {
       "relation": "contains",
@@ -4052,9 +4152,9 @@
       "source_file": "apps/web/src/components/Select.tsx",
       "source_location": "L11",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "components_select",
-      "target": "components_select_selectprops",
-      "confidence_score": 1.0
+      "target": "components_select_selectprops"
     },
     {
       "relation": "imports_from",
@@ -4063,9 +4163,9 @@
       "source_file": "apps/web/src/components/TradesTable.tsx",
       "source_location": "L6",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "components_tradestable",
-      "target": "components_select",
-      "confidence_score": 1.0
+      "target": "components_select"
     },
     {
       "relation": "imports",
@@ -4074,9 +4174,9 @@
       "source_file": "apps/web/src/components/TradesTable.tsx",
       "source_location": "L6",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "components_tradestable",
-      "target": "components_select_select",
-      "confidence_score": 1.0
+      "target": "components_select_select"
     },
     {
       "relation": "contains",
@@ -5683,9 +5783,9 @@
       "source_file": "apps/web/PROGRESS.md",
       "source_location": "L43",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "web_progress_done",
-      "target": "web_progress_exchange_rate_api_route_src_app_api_exchange_rate_route_ts",
-      "confidence_score": 1.0
+      "target": "web_progress_exchange_rate_api_route_src_app_api_exchange_rate_route_ts"
     },
     {
       "relation": "contains",
@@ -5693,9 +5793,9 @@
       "source_file": "apps/web/PROGRESS.md",
       "source_location": "L75",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "web_progress_done",
-      "target": "web_progress_select_component_src_components_select_tsx_select_scss",
-      "confidence_score": 1.0
+      "target": "web_progress_select_component_src_components_select_tsx_select_scss"
     },
     {
       "relation": "contains",
@@ -6239,5 +6339,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "f9b0bd3d1fbbf0681ed2bab79107481d48dad9e7"
+  "built_at_commit": "409aa5c65ee9234567d8edd6253d7cf058a7163f"
 }

@@ -143,6 +143,7 @@ export type TradeListRow = {
   tags: string[];
   emotion: string | null;
   notes: string | null;
+  screenshots: string[];
 };
 
 export async function getTradesForAccount(params: {
@@ -179,6 +180,7 @@ export async function getTradesForAccount(params: {
       tags: true,
       emotion: true,
       notes: true,
+      screenshots: true,
     },
   });
 
@@ -201,5 +203,6 @@ export async function getTradesForAccount(params: {
     tags: t.tags,
     emotion: t.emotion,
     notes: t.notes,
+    screenshots: t.screenshots,
   }));
 }

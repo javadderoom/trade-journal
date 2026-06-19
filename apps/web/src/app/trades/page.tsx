@@ -247,6 +247,7 @@ export default function TradesPage() {
             tags: item.tags ?? [],
             emotion: item.emotion ?? null,
             notes: item.notes ?? null,
+            screenshots: item.screenshots ?? [],
           };
         });
         setTrades(mapped);

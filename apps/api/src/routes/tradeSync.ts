@@ -1,5 +1,9 @@
 import { Router, Request, Response } from 'express';
 import { getTradesForAccount, syncTradesFromEA, prisma } from '../services/tradeSync';
+import multer from 'multer';
+import path from 'node:path';
+import fs from 'node:fs';
+import crypto from 'node:crypto';
 
 const router = Router();
 
@@ -173,6 +177,142 @@ router.delete('/:ticket', async (req: Request, res: Response) => {
     res.status(200).json({ success: true });
   } catch (err: any) {
     console.error('Delete trade error:', err);
+    res.status(500).json({ error: err.message || 'Internal server error' });
+  }
+});
+
+
+// Ensure uploads/screenshots folder exists dynamically
+const uploadDir = path.join(__dirname, '../../uploads/screenshots');
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
+
+const storage = multer.diskStorage({
+  destination: (_req, _file, cb) => {
+    cb(null, uploadDir);
+  },
+  filename: (_req, file, cb) => {
+    const ext = path.extname(file.originalname);
+    const filename = `${crypto.randomUUID()}${ext}`;
+    cb(null, filename);
+  },
+});
+
+const upload = multer({
+  storage,
+  limits: { fileSize: 10 * 1024 * 1024 }, // limit 10MB
+  fileFilter: (_req, file, cb) => {
+    const allowedTypes = /jpeg|jpg|png|gif|webp/;
+    const mimetype = allowedTypes.test(file.mimetype);
+    const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
+    if (mimetype && extname) {
+      return cb(null, true);
+    }
+    cb(new Error('Only images (jpg, jpeg, png, gif, webp) are allowed'));
+  },
+});
+
+/**
+ * POST /api/trades/:ticket/screenshots
+ * Uploads a screenshot for a trade and appends its URL to the screenshots list.
+ */
+router.post('/:ticket/screenshots', upload.single('screenshot'), async (req: Request, res: Response) => {
+  try {
+    const ticket = Number.parseInt(req.params.ticket as string, 10);
+    if (Number.isNaN(ticket)) {
+      res.status(400).json({ error: 'Invalid ticket' });
+      return;
+    }
+
+    if (!req.file) {
+      res.status(400).json({ error: 'No file uploaded' });
+      return;
+    }
+
+    const trade = await prisma.trade.findFirst({
+      where: { ticket },
+    });
+
+    if (!trade) {
+      // Remove uploaded file if trade is not found
+      if (fs.existsSync(req.file.path)) {
+        fs.unlinkSync(req.file.path);
+      }
+      res.status(404).json({ error: 'Trade not found' });
+      return;
+    }
+
+    const relativeUrl = `/uploads/screenshots/${req.file.filename}`;
+    const updatedScreenshots = [...trade.screenshots, relativeUrl];
+
+    await prisma.trade.update({
+      where: { id: trade.id },
+      data: {
+        screenshots: updatedScreenshots,
+      },
+    });
+
+    res.status(200).json({ screenshots: updatedScreenshots });
+  } catch (err: any) {
+    console.error('Screenshot upload error:', err);
+    res.status(500).json({ error: err.message || 'Internal server error' });
+  }
+});
+
+/**
+ * DELETE /api/trades/:ticket/screenshots
+ * Deletes a screenshot for a trade from disk and DB.
+ */
+router.delete('/:ticket/screenshots', async (req: Request, res: Response) => {
+  try {
+    const ticket = Number.parseInt(req.params.ticket as string, 10);
+    if (Number.isNaN(ticket)) {
+      res.status(400).json({ error: 'Invalid ticket' });
+      return;
+    }
+
+    const { url } = req.body;
+    if (!url) {
+      res.status(400).json({ error: 'Screenshot URL is required' });
+      return;
+    }
+
+    const trade = await prisma.trade.findFirst({
+      where: { ticket },
+    });
+
+    if (!trade) {
+      res.status(404).json({ error: 'Trade not found' });
+      return;
+    }
+
+    // Filter out the URL from the screenshots list
+    const updatedScreenshots = trade.screenshots.filter(s => s !== url);
+
+    // Delete the file from the filesystem if it belongs to this trade's uploads
+    if (url.startsWith('/uploads/screenshots/')) {
+      const filename = url.replace('/uploads/screenshots/', '');
+      const filepath = path.join(__dirname, '../../uploads/screenshots', filename);
+      if (fs.existsSync(filepath)) {
+        try {
+          fs.unlinkSync(filepath);
+        } catch (e) {
+          console.error(`Failed to delete file from disk: ${filepath}`, e);
+        }
+      }
+    }
+
+    await prisma.trade.update({
+      where: { id: trade.id },
+      data: {
+        screenshots: updatedScreenshots,
+      },
+    });
+
+    res.status(200).json({ screenshots: updatedScreenshots });
+  } catch (err: any) {
+    console.error('Screenshot deletion error:', err);
     res.status(500).json({ error: err.message || 'Internal server error' });
   }
 });

@@ -1,5 +1,6 @@
 import 'dotenv/config';
 import express from 'express';
+import path from 'node:path';
 import tradeSyncRouter from './routes/tradeSync';
 
 const app = express();
@@ -7,6 +8,7 @@ const PORT = process.env.PORT || 3000;
 
 // Middleware
 app.use(express.json({ limit: '10mb' }));
+app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
 // CORS — allow MT5 EA and web app
 app.use((_req, res, next) => {

@@ -26,6 +26,7 @@ export interface Trade {
 
   emotion: string | null;
   notes: string | null;
+  screenshots?: string[];
 }
 
 interface TradesTableProps {
@@ -94,6 +95,8 @@ export default function TradesTable({
   const [trades, setTrades] = useState<Trade[]>([]);
   const [selectedTrades, setSelectedTrades] = useState<Set<string>>(new Set());
   const [activeTradeId, setActiveTradeId] = useState<string | null>(null);
+  const [lightboxUrl, setLightboxUrl] = useState<string | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
 
   // Filter states
   const [dateRange, setDateRange] = useState('');
@@ -278,6 +281,67 @@ export default function TradesTable({
         return next;
       });
       setActiveTradeId(null);
+    }
+  };
+
+  // Handle uploading a screenshot
+  const handleScreenshotUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !activeTrade || !activeTrade.ticket) return;
+
+    try {
+      setIsUploading(true);
+      const formData = new FormData();
+      formData.append('screenshot', file);
+
+      const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://127.0.0.1:3000';
+      const res = await fetch(`${baseUrl}/api/trades/${activeTrade.ticket}/screenshots`, {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!res.ok) {
+        throw new Error('Upload failed');
+      }
+
+      const data = await res.json();
+      if (data?.screenshots) {
+        updateActiveTradeField('screenshots', data.screenshots);
+      }
+    } catch (err) {
+      console.error('Failed to upload screenshot:', err);
+      alert('خطا در بارگذاری تصویر. لطفا دوباره تلاش کنید.');
+    } finally {
+      setIsUploading(false);
+      e.target.value = ''; // Reset input
+    }
+  };
+
+  // Handle deleting a screenshot
+  const handleDeleteScreenshot = async (url: string) => {
+    if (!activeTrade || !activeTrade.ticket) return;
+    const confirmDelete = window.confirm('آیا از حذف این تصویر اطمینان دارید؟');
+    if (!confirmDelete) return;
+
+    try {
+      const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://127.0.0.1:3000';
+      const res = await fetch(`${baseUrl}/api/trades/${activeTrade.ticket}/screenshots`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url }),
+      });
+
+      if (!res.ok) {
+        throw new Error('Deletion failed');
+      }
+
+      const data = await res.json();
+      if (data?.screenshots) {
+        updateActiveTradeField('screenshots', data.screenshots);
+      }
+    } catch (err) {
+      console.error('Failed to delete screenshot:', err);
+      alert('خطا در حذف تصویر. لطفا دوباره تلاش کنید.');
     }
   };
 
@@ -1000,6 +1064,50 @@ export default function TradesTable({
                 onChange={e => updateActiveTradeField('notes', e.target.value)}
               />
             </div>
+
+            {/* Screenshots Group */}
+            <div className="form-group screenshots-group">
+              <label>تصاویر معامله (سند تصویری)</label>
+              
+              {!activeTrade.ticket ? (
+                <p className="no-ticket-warning">برای معاملات آزمایشی امکان ثبت تصویر وجود ندارد.</p>
+              ) : (
+                <div className="screenshots-grid">
+                  {activeTrade.screenshots && activeTrade.screenshots.map((url, idx) => {
+                    const fullUrl = url.startsWith('http') ? url : `${process.env.NEXT_PUBLIC_API_BASE_URL || 'http://127.0.0.1:3000'}${url}`;
+                    return (
+                      <div key={idx} className="screenshot-card">
+                        <img src={fullUrl} alt={`screenshot-${idx}`} onClick={() => setLightboxUrl(fullUrl)} />
+                        <button type="button" className="btn-delete-screenshot" onClick={(e) => { e.stopPropagation(); handleDeleteScreenshot(url); }} title="حذف تصویر">
+                          <span className="material-symbols-outlined">delete</span>
+                        </button>
+                      </div>
+                    );
+                  })}
+
+                  {/* Styled Upload Dropzone Card */}
+                  <label className="upload-dropzone">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleScreenshotUpload}
+                      style={{ display: 'none' }}
+                    />
+                    {isUploading ? (
+                      <div className="upload-loader">
+                        <span className="material-symbols-outlined spinner-icon">sync</span>
+                        <p>بارگذاری...</p>
+                      </div>
+                    ) : (
+                      <div className="upload-prompt">
+                        <span className="material-symbols-outlined upload-icon">add_photo_alternate</span>
+                        <p>افزودن تصویر</p>
+                      </div>
+                    )}
+                  </label>
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Panel Footer Actions */}
@@ -1012,6 +1120,18 @@ export default function TradesTable({
             </button>
           </div>
         </aside>
+      )}
+
+      {/* Lightbox Modal Overlay */}
+      {lightboxUrl && (
+        <div className="lightbox-overlay" onClick={() => setLightboxUrl(null)}>
+          <div className="lightbox-content" onClick={(e) => e.stopPropagation()}>
+            <img src={lightboxUrl} alt="Screenshot Full View" />
+            <button className="lightbox-close-btn" onClick={() => setLightboxUrl(null)}>
+              <span className="material-symbols-outlined">close</span>
+            </button>
+          </div>
+        </div>
       )}
     </div>
   );
