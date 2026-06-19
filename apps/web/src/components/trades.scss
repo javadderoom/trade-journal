@@ -405,7 +405,21 @@
         }
 
         &.open-row {
-          background-color: rgba($surface-variant, 0.1);
+          background-color: rgba($secondary, 0.04);
+          animation: row-pulse 3s ease-in-out infinite;
+
+          // Pulsing right-border indicator (RTL start side)
+          td:first-child::after {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background-color: $secondary;
+            box-shadow: 0 0 8px rgba($secondary, 0.5);
+            animation: border-glow 2s ease-in-out infinite;
+          }
         }
 
         td {
@@ -545,7 +559,24 @@
             }
 
             &.profit-open {
-              color: $secondary;
+              color: #f59e0b;
+
+              .profit-usd {
+                position: relative;
+
+                &::after {
+                  content: ' ●';
+                  font-size: 6px;
+                  vertical-align: middle;
+                  color: #f59e0b;
+                  animation: pulse 1.5s ease-in-out infinite;
+                }
+              }
+
+              .profit-toman {
+                color: #fbbf24;
+                opacity: 0.7;
+              }
             }
           }
         }
@@ -613,7 +644,8 @@
 
   &.status-open {
     color: $secondary;
-    animation: pulse 2s infinite;
+    animation: pulse-glow 2s ease-in-out infinite;
+    filter: drop-shadow(0 0 4px rgba($secondary, 0.5));
   }
 }
 
@@ -1165,14 +1197,48 @@ input[type="checkbox"] {
 
 // Animations
 @keyframes pulse {
-
   0%,
   100% {
     opacity: 1;
   }
 
   50% {
-    opacity: .5;
+    opacity: 0.5;
+  }
+}
+
+@keyframes pulse-glow {
+  0%,
+  100% {
+    opacity: 1;
+    filter: drop-shadow(0 0 4px rgba($secondary, 0.5));
+  }
+
+  50% {
+    opacity: 0.7;
+    filter: drop-shadow(0 0 8px rgba($secondary, 0.8));
+  }
+}
+
+@keyframes row-pulse {
+  0%,
+  100% {
+    background-color: rgba($secondary, 0.04);
+  }
+
+  50% {
+    background-color: rgba($secondary, 0.07);
+  }
+}
+
+@keyframes border-glow {
+  0%,
+  100% {
+    box-shadow: 0 0 4px rgba($secondary, 0.3);
+  }
+
+  50% {
+    box-shadow: 0 0 10px rgba($secondary, 0.7);
   }
 }
 

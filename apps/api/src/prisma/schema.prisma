@@ -62,6 +62,7 @@ model Trade {
   notes         String?
   ticket        Int?         // MT4/MT5 deal ticket for deduplication
   import_source ImportSource @default(MANUAL)
+  screenshots   String[]     @default([])
   created_at    DateTime     @default(now())
 
   @@unique([account_id, ticket])

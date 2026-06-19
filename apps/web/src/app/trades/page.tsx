@@ -181,13 +181,17 @@ export default function TradesPage() {
   const [error, setError] = useState<string | null>(null);
   const [usdToToman, setUsdToToman] = useState<number>(90_000);
 
-  const fetchTrades = async () => {
+  const fetchTrades = async (isManualRefresh = false) => {
     try {
-      setLoading(true);
+      if (!isManualRefresh) {
+        setLoading(true);
+      }
       setError(null);
 
       const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://127.0.0.1:3000';
-      const res = await fetch(`${baseUrl}/api/trades?limit=200&offset=0`);
+      const res = await fetch(`${baseUrl}/api/trades?limit=200&offset=0&t=${Date.now()}`, {
+        cache: 'no-store',
+      });
       
       if (!res.ok) {
         throw new Error(`Failed to load: ${res.status}`);
@@ -342,7 +346,7 @@ export default function TradesPage() {
       <TradesTable
         initialTrades={trades}
         initialUsdToToman={usdToToman}
-        onRefresh={fetchTrades}
+        onRefresh={() => fetchTrades(true)}
         onImportMT4={handleImportMT4}
         onAddManualTrade={handleAddManualTrade}
         onUpdateTrade={handleUpdateTrade}

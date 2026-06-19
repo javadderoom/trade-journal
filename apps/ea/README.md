@@ -17,11 +17,12 @@
    - **Lookback Days** — how far back to sync on first run
 
 ## How it works
-- On init + every N seconds (or manual button), scans MT5 deal history
-- Finds closing deals (`DEAL_ENTRY_OUT`), links to open deals for SL/TP/open price
-- Calculates pips and R-multiple
+- On init + every N seconds (or manual button):
+  1. **Syncs open positions** — reads all live positions via `PositionsTotal()`, captures SL/TP directly from `POSITION_SL`/`POSITION_TP` (reliable source). Sends with `closeTime: null`.
+  2. **Syncs closed trades** — scans MT5 deal history for closing deals (`DEAL_ENTRY_OUT`), links to open deals for open price/time, calculates final pips and R-multiple.
 - Sends JSON via `WebRequest POST` to `/api/trades/sync`
-- Tracks last synced ticket in global variable to avoid re-sending
+- Backend upserts: creates new, updates open, skips already-closed
+- Tracks last synced deal ticket in global variable to avoid re-sending closed trades
 
 ## JSON payload format
 ```json
@@ -45,6 +46,10 @@
 ```
 
 ## Notes
-- Only closed trades are synced (not open positions)
-- SL/TP come from the position level, not the deal
+- Both open positions and closed trades are synced
+- Open trades have `closeTime: null` and `closePrice: null`
+- SL/TP for open trades come directly from `POSITION_SL` / `POSITION_TP` (always accurate)
+- SL/TP for closed trades are recovered from `HistoryOrders` (may be 0 if broker doesn't store them, but the open sync should have already captured them)
+- Closed trades use `DEAL_POSITION_ID` as the ticket to match previously synced open positions
 - Works with netting accounts (most common for forex)
+- Commission on open positions may only report entry-side commission on some brokers

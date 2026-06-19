@@ -1,11 +1,11 @@
 //+------------------------------------------------------------------+
 //|                                    TradeJournal_EA.mq5           |
 //|            معامله‌یار — Trade History Sync Expert Advisor          |
-//|                     Sends closed trades to API via HTTP           |
+//|              Sends open + closed trades to API via HTTP           |
 //+------------------------------------------------------------------+
 #property copyright "Mo'amele-yar"
 #property link      ""
-#property version   "1.00"
+#property version   "1.10"
 #property strict
 
 //--- Input parameters (configure in MT5 Properties → Inputs)
@@ -39,7 +39,8 @@ int OnInit()
    if(InpSyncInterval > 0)
       EventSetTimer(InpSyncInterval);
    
-   // Do initial sync
+   // Do initial sync: open positions first, then closed trades
+   SyncOpenPositions();
    SyncTrades();
    
    Print("TradeJournal EA initialized. Last ticket: ", g_lastTicket);
@@ -59,6 +60,7 @@ void OnDeinit(const int reason)
 //+------------------------------------------------------------------+
 void OnTimer()
 {
+   SyncOpenPositions();
    SyncTrades();
 }
 
@@ -70,13 +72,114 @@ void OnChartEvent(const int id, const long &lparam, const double &dparam, const 
    if(id == CHARTEVENT_OBJECT_CLICK && sparam == "btnSyncNow")
    {
       Print("Manual sync triggered...");
+      SyncOpenPositions();
       SyncTrades();
       ObjectSetInteger(0, "btnSyncNow", OBJPROP_STATE, false);
    }
 }
 
 //+------------------------------------------------------------------+
-//| Main sync function                                                |
+//| Sync open (active) positions — reliable SL/TP source              |
+//+------------------------------------------------------------------+
+void SyncOpenPositions()
+{
+   int totalPositions = PositionsTotal();
+   if(totalPositions == 0) return;
+
+   string jsonPayload = "[";
+   int count = 0;
+
+   // Timezone offset: broker server time → UTC
+   int timezoneOffset = (int)(TimeCurrent() - TimeGMT());
+
+   for(int i = 0; i < totalPositions; i++)
+   {
+      ulong posTicket = PositionGetTicket(i);
+      if(posTicket == 0) continue;
+
+      // Read position data
+      string symbol     = PositionGetString(POSITION_SYMBOL);
+      long   posType    = PositionGetInteger(POSITION_TYPE);
+      double volume     = PositionGetDouble(POSITION_VOLUME);
+      double openPrice  = PositionGetDouble(POSITION_PRICE_OPEN);
+      double sl         = PositionGetDouble(POSITION_SL);
+      double tp         = PositionGetDouble(POSITION_TP);
+      double profit     = PositionGetDouble(POSITION_PROFIT);
+      double swap       = PositionGetDouble(POSITION_SWAP);
+      double commission = 0.0;
+      long   posTime    = PositionGetInteger(POSITION_TIME);
+      double curPrice   = PositionGetDouble(POSITION_PRICE_CURRENT);
+
+      // Direction from position type
+      string direction;
+      if(posType == POSITION_TYPE_BUY)
+         direction = "BUY";
+      else if(posType == POSITION_TYPE_SELL)
+         direction = "SELL";
+      else
+         continue;
+
+      // Convert open time to UTC
+      datetime utcOpenTime = (datetime)posTime - timezoneOffset;
+
+      // Symbol digits for price formatting
+      int digits = (int)SymbolInfoInteger(symbol, SYMBOL_DIGITS);
+
+      // Calculate live pips
+      double pipSize = MathPow(10, -digits);
+      if(digits == 3 || digits == 5)
+         pipSize *= 10;
+
+      double pips = 0;
+      if(openPrice > 0 && curPrice > 0)
+      {
+         if(direction == "BUY")
+            pips = (curPrice - openPrice) / pipSize;
+         else
+            pips = (openPrice - curPrice) / pipSize;
+      }
+
+      // Calculate live R-multiple
+      double entryRisk = MathAbs(openPrice - sl);
+      double rMultiple = 0;
+      if(entryRisk > 0)
+         rMultiple = (profit + commission + swap) / entryRisk;
+
+      // Build JSON — closeTime and closePrice are null (open trade marker)
+      if(count > 0) jsonPayload += ",";
+
+      jsonPayload += "{";
+      jsonPayload += "\"ticket\":" + IntegerToString(posTicket) + ",";
+      jsonPayload += "\"symbol\":\"" + symbol + "\",";
+      jsonPayload += "\"direction\":\"" + direction + "\",";
+      jsonPayload += "\"openTime\":\"" + FormatDateTime(utcOpenTime) + "\",";
+      jsonPayload += "\"closeTime\":null,";
+      jsonPayload += "\"openPrice\":" + DoubleToString(openPrice, digits) + ",";
+      jsonPayload += "\"closePrice\":null,";
+      jsonPayload += "\"lotSize\":" + DoubleToString(volume, 2) + ",";
+      jsonPayload += "\"stopLoss\":" + DoubleToString(sl, digits) + ",";
+      jsonPayload += "\"takeProfit\":" + DoubleToString(tp, digits) + ",";
+      jsonPayload += "\"profitUsd\":" + DoubleToString(profit, 2) + ",";
+      jsonPayload += "\"commission\":" + DoubleToString(commission, 2) + ",";
+      jsonPayload += "\"swap\":" + DoubleToString(swap, 2) + ",";
+      jsonPayload += "\"pips\":" + DoubleToString(pips, 1) + ",";
+      jsonPayload += "\"rMultiple\":" + DoubleToString(rMultiple, 2);
+      jsonPayload += "}";
+
+      count++;
+   }
+
+   jsonPayload += "]";
+
+   if(count == 0) return;
+
+   // Send to API (same endpoint — backend handles upsert)
+   if(SendToApi(jsonPayload))
+      Print("Synced ", count, " open position(s).");
+}
+
+//+------------------------------------------------------------------+
+//| Sync closed trades from deal history                               |
 //+------------------------------------------------------------------+
 void SyncTrades()
 {
@@ -96,7 +199,6 @@ void SyncTrades()
    int totalDeals = HistoryDealsTotal();
    if(totalDeals == 0)
    {
-      Print("No deals found in history");
       return;
    }
    
@@ -175,12 +277,16 @@ void SyncTrades()
       double rMultiple = 0;
       if(entryRisk > 0)
          rMultiple = (profit + totalCommission + swap) / entryRisk;
+
+      // Use the position ID as the ticket for closed trades so it matches
+      // the open position ticket that was previously synced
+      ulong syncTicket = (ulong)positionId;
       
       // Build JSON for this trade
       if(newTrades > 0) jsonPayload += ",";
       
       jsonPayload += "{";
-      jsonPayload += "\"ticket\":" + IntegerToString(ticket) + ",";
+      jsonPayload += "\"ticket\":" + IntegerToString(syncTicket) + ",";
       jsonPayload += "\"symbol\":\"" + symbol + "\",";
       jsonPayload += "\"direction\":\"" + direction + "\",";
       jsonPayload += "\"openTime\":\"" + FormatDateTime(utcOpenTime) + "\",";
@@ -211,21 +317,7 @@ void SyncTrades()
    }
    
    // Send to API
-   string url = InpApiUrl + "/api/trades/sync";
-   string headers = "Content-Type: application/json\r\n";
-   if(StringLen(g_authHeader) > 0)
-      headers += g_authHeader + "\r\n";
-   
-   uchar postData[];
-   StringToCharArray(jsonPayload, postData, 0, WHOLE_ARRAY, CP_UTF8);
-   ArrayResize(postData, ArraySize(postData) - 1); // Remove null terminator
-   
-   uchar result[];
-   string resultHeaders;
-   
-   int response = WebRequest("POST", url, headers, 5000, postData, result, resultHeaders);
-   
-   if(response == 200 || response == 201)
+   if(SendToApi(jsonPayload))
    {
       // Update last synced ticket
       g_lastTicket = maxTicket;
@@ -233,18 +325,44 @@ void SyncTrades()
       string gvName = "TradeJournal_LastTicket_" + IntegerToString(InpAccountId);
       GlobalVariableSet(gvName, g_lastTicket);
       
-      Print("Synced ", newTrades, " trades. Last ticket: ", g_lastTicket);
+      Print("Synced ", newTrades, " closed trade(s). Last ticket: ", g_lastTicket);
+   }
+}
+
+//+------------------------------------------------------------------+
+//| Send JSON payload to the sync API endpoint                         |
+//+------------------------------------------------------------------+
+bool SendToApi(string jsonPayload)
+{
+   string url = InpApiUrl + "/api/trades/sync";
+   string headers = "Content-Type: application/json\r\n";
+   if(StringLen(g_authHeader) > 0)
+      headers += g_authHeader + "\r\n";
+
+   uchar postData[];
+   StringToCharArray(jsonPayload, postData, 0, WHOLE_ARRAY, CP_UTF8);
+   ArrayResize(postData, ArraySize(postData) - 1); // Remove null terminator
+
+   uchar result[];
+   string resultHeaders;
+
+   int response = WebRequest("POST", url, headers, 5000, postData, result, resultHeaders);
+
+   if(response == 200 || response == 201)
+   {
+      return true;
    }
    else if(response == -1)
    {
-      Print("WebRequest failed. Error: ", GetLastError(), 
+      Print("WebRequest failed. Error: ", GetLastError(),
             ". Make sure API URL is added to Tools → Options → Expert Advisors → Allowed URLs");
    }
    else
    {
       string responseBody = CharArrayToString(result, 0, WHOLE_ARRAY, CP_UTF8);
-      Print("API returned ", response, ": ", responseBody);
+      Print("Failed to send data: ", response, " — ", responseBody);
    }
+   return false;
 }
 
 //+------------------------------------------------------------------+

@@ -7,7 +7,11 @@ export const prisma = new PrismaClient({ adapter });
 
 /**
  * Sync trades from MT5 EA into the database.
- * Deduplicates by (account_id + ticket).
+ * 3-way upsert by (account_id + ticket):
+ *   - Not found → CREATE
+ *   - Exists + open (close_time IS NULL) + incoming open → UPDATE (refresh SL/TP/profit)
+ *   - Exists + open (close_time IS NULL) + incoming closed → UPDATE (finalize with close data)
+ *   - Exists + closed (close_time IS NOT NULL) → SKIP (already final)
  */
 export async function syncTradesFromEA(
   userId: string,
@@ -50,7 +54,6 @@ export async function syncTradesFromEA(
         continue;
       }
 
-      // Upsert: insert if new, skip if already exists (same account + ticket)
       const existing = await prisma.trade.findUnique({
         where: {
           account_id_ticket: {
@@ -60,35 +63,58 @@ export async function syncTradesFromEA(
         },
       });
 
-      if (existing) {
+      if (!existing) {
+        // ── CREATE: new trade ──
+        await prisma.trade.create({
+          data: {
+            account_id: accountId,
+            user_id: userId,
+            symbol: trade.symbol,
+            direction: trade.direction as any,
+            open_time: new Date(trade.openTime),
+            close_time: trade.closeTime ? new Date(trade.closeTime) : null,
+            open_price: trade.openPrice,
+            close_price: trade.closePrice ?? null,
+            lot_size: trade.lotSize,
+            stop_loss: trade.stopLoss ?? null,
+            take_profit: trade.takeProfit ?? null,
+            profit_usd: trade.profitUsd,
+            commission: trade.commission,
+            swap: trade.swap,
+            pips: trade.pips ?? 0,
+            r_multiple: trade.rMultiple,
+            ticket: trade.ticket,
+            import_source: (trade.closeTime ? 'MT5_EA' : 'MT5_EA') as any,
+          },
+        });
+        result.created++;
+      } else if (existing.close_time === null) {
+        // ── UPDATE: trade is currently open in DB ──
+        // Either refreshing live data (still open) or finalizing (now closed)
+        await prisma.trade.update({
+          where: { id: existing.id },
+          data: {
+            stop_loss: trade.stopLoss ?? null,
+            take_profit: trade.takeProfit ?? null,
+            profit_usd: trade.profitUsd,
+            commission: trade.commission,
+            swap: trade.swap,
+            pips: trade.pips ?? 0,
+            r_multiple: trade.rMultiple,
+            // Fill close data only if the trade is now closed
+            ...(trade.closeTime
+              ? {
+                  close_time: new Date(trade.closeTime),
+                  close_price: trade.closePrice ?? null,
+                }
+              : {}),
+          },
+        });
+        result.updated++;
+      } else {
+        // ── SKIP: trade already closed in DB — final record ──
         result.skipped++;
-        continue;
       }
-
-      await prisma.trade.create({
-        data: {
-          account_id: accountId,
-          user_id: userId,
-          symbol: trade.symbol,
-          direction: trade.direction as any,
-          open_time: new Date(trade.openTime),
-          close_time: trade.closeTime ? new Date(trade.closeTime) : null,
-          open_price: trade.openPrice,
-          close_price: trade.closePrice ?? null,
-          lot_size: trade.lotSize,
-          stop_loss: trade.stopLoss ?? null,
-          take_profit: trade.takeProfit ?? null,
-          profit_usd: trade.profitUsd,
-          commission: trade.commission,
-          swap: trade.swap,
-          pips: trade.pips ?? 0,
-          r_multiple: trade.rMultiple,
-          ticket: trade.ticket,
-          import_source: 'MT5_EA' as any,
-        },
-      });
-
-      result.created++;
     } catch (err: any) {
       result.errors.push(`Ticket ${trade.ticket}: ${err.message}`);
     }
@@ -96,6 +122,7 @@ export async function syncTradesFromEA(
 
   return result;
 }
+
 
 export type TradeListRow = {
   ticket: number | null;

@@ -1,16 +1,16 @@
 # Graph Report - trade-journal  (2026-06-19)
 
 ## Corpus Check
-- 30 files · ~18,825 words
+- 31 files · ~19,979 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 302 nodes · 305 edges · 26 communities (23 shown, 3 thin omitted)
+- 308 nodes · 312 edges · 25 communities (22 shown, 3 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `3260737d`
+- Built from commit: `f9b0bd3d`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -35,7 +35,6 @@
 - [[_COMMUNITY_Community 19|Community 19]]
 - [[_COMMUNITY_Community 20|Community 20]]
 - [[_COMMUNITY_Community 21|Community 21]]
-- [[_COMMUNITY_Community 22|Community 22]]
 - [[_COMMUNITY_Community 23|Community 23]]
 - [[_COMMUNITY_Community 24|Community 24]]
 - [[_COMMUNITY_Community 25|Community 25]]
@@ -45,11 +44,11 @@
 2. `compilerOptions` - 15 edges
 3. `معامله‌یار — Persian Trading Journal Platform` - 13 edges
 4. `معامله‌یار — Run Commands` - 10 edges
-5. `5. Feature Breakdown — V1` - 9 edges
-6. `Component Building Principles` - 8 edges
-7. `scripts` - 7 edges
-8. `compilerOptions` - 7 edges
-9. `✅ Done` - 7 edges
+5. `✅ Done` - 9 edges
+6. `5. Feature Breakdown — V1` - 9 edges
+7. `Component Building Principles` - 8 edges
+8. `scripts` - 7 edges
+9. `compilerOptions` - 7 edges
 10. `✅ Done` - 7 edges
 
 ## Surprising Connections (you probably didn't know these)
@@ -63,7 +62,7 @@
 ## Import Cycles
 - None detected.
 
-## Communities (26 total, 3 thin omitted)
+## Communities (25 total, 3 thin omitted)
 
 ### Community 0 - "Community 0"
 Cohesion: 0.08
@@ -86,16 +85,16 @@ Cohesion: 0.11
 Nodes (17): compilerOptions, allowJs, esModuleInterop, incremental, isolatedModules, jsx, lib, module (+9 more)
 
 ### Community 5 - "Community 5"
-Cohesion: 0.13
-Nodes (14): API Integration in `page.tsx`, App Layout (`src/app/layout.tsx`), Design System (`src/app/variables.scss`, `src/app/globals.scss`), ✅ Done, High Priority, Low Priority, Medium Priority, ❌ Not Done (Next Steps) (+6 more)
+Cohesion: 0.12
+Nodes (16): API Integration in `page.tsx`, App Layout (`src/app/layout.tsx`), Design System (`src/app/variables.scss`, `src/app/globals.scss`), ✅ Done, Exchange Rate API Route (`src/app/api/exchange-rate/route.ts`), High Priority, Low Priority, Medium Priority (+8 more)
 
 ### Community 6 - "Community 6"
 Cohesion: 0.14
 Nodes (13): API Progress — معامله‌یار, Database Schema (`src/prisma/schema.prisma`), ✅ Done, Express Server (`src/server.ts`), High Priority, Low Priority, Medium Priority, MT4/MT5 Parser (`src/services/mt4Parser.ts`) (+5 more)
 
 ### Community 7 - "Community 7"
-Cohesion: 0.21
-Nodes (10): DEFAULT_EMOTIONS, DEFAULT_TAGS, Trade, TradesTable(), TradesTableProps, MOCK_TRADES, formatPersianCurrency(), formatPersianNumber() (+2 more)
+Cohesion: 0.16
+Nodes (13): Select(), SelectOption, SelectProps, DEFAULT_EMOTIONS, DEFAULT_TAGS, Trade, TradesTable(), TradesTableProps (+5 more)
 
 ### Community 8 - "Community 8"
 Cohesion: 0.12
@@ -122,8 +121,8 @@ Cohesion: 0.29
 Nodes (6): File, How it works, JSON payload format, MT5 Expert Advisor — Trade Sync, Notes, Setup
 
 ### Community 19 - "Community 19"
-Cohesion: 0.06
-Nodes (34): Accessibility, Animate enter states with @starting-style, Asymmetric enter/exit timing, Beauty is leverage, Buttons must feel responsive, Cohesion matters, Component Building Principles, Core Philosophy (+26 more)
+Cohesion: 0.05
+Nodes (39): 3D transforms for depth, Accessibility, Animate enter states with @starting-style, Asymmetric enter/exit timing, Beauty is leverage, Buttons must feel responsive, Cohesion matters, Component Building Principles (+31 more)
 
 ### Community 20 - "Community 20"
 Cohesion: 0.33
@@ -132,10 +131,6 @@ Nodes (6): 1. Should this animate at all?, 2. What is the purpose?, 3. What easi
 ### Community 21 - "Community 21"
 Cohesion: 0.29
 Nodes (6): compilerOptions, outDir, rootDir, types, extends, include
-
-### Community 22 - "Community 22"
-Cohesion: 0.40
-Nodes (5): 3D transforms for depth, CSS Transform Mastery, scale() scales children too, transform-origin, translateY with percentages
 
 ### Community 23 - "Community 23"
 Cohesion: 0.33
@@ -150,19 +145,19 @@ Cohesion: 0.33
 Nodes (6): Damping at boundaries, Friction instead of hard stops, Gesture and Drag Interactions, Momentum-based dismissal, Multi-touch protection, Pointer capture for drag
 
 ## Knowledge Gaps
-- **211 isolated node(s):** `name`, `version`, `private`, `dev`, `build` (+206 more)
+- **215 isolated node(s):** `name`, `version`, `private`, `dev`, `build` (+210 more)
   These have ≤1 connection - possible missing edges or undocumented components.
 - **3 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `Design Engineering` connect `Community 19` to `Community 20`, `Community 22`, `Community 23`, `Community 24`, `Community 25`?**
-  _High betweenness centrality (0.040) - this node is a cross-community bridge._
+- **Why does `Design Engineering` connect `Community 19` to `Community 24`, `Community 25`, `Community 20`, `Community 23`?**
+  _High betweenness centrality (0.039) - this node is a cross-community bridge._
 - **Why does `معامله‌یار — Persian Trading Journal Platform` connect `Community 0` to `Community 12`?**
-  _High betweenness centrality (0.011) - this node is a cross-community bridge._
+  _High betweenness centrality (0.010) - this node is a cross-community bridge._
 - **What connects `name`, `version`, `private` to the rest of the system?**
-  _211 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _215 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Community 0` be split into smaller, more focused modules?**
   _Cohesion score 0.07692307692307693 - nodes in this community are weakly interconnected._
 - **Should `Community 1` be split into smaller, more focused modules?**
