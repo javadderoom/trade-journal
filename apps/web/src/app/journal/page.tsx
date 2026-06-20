@@ -20,9 +20,14 @@ const EMOTION_MAP: { [key: string]: { label: string; emoji: string } } = {
 
 // Weekday index mapping to Persian names
 const WEEKDAY_NAMES = ['یکشنبه', 'دوشنبه', 'سه‌شنبه', 'چهارشنبه', 'پنج‌شنبه', 'جمعه', 'شنبه'];
+const JALALI_MONTH_NAMES = [
+  'فروردین', 'اردیبهشت', 'خرداد', 'تیر', 'مرداد', 'شهریور',
+  'مهر', 'آبان', 'آذر', 'دی', 'بهمن', 'اسفند'
+];
+const WEEKDAY_NAMES_CALENDAR = ['شنبه', 'یکشنبه', 'دوشنبه', 'سه‌شنبه', 'چهارشنبه', 'پنج‌شنبه', 'جمعه'];
 
 export default function JournalPage() {
-  const [activeTab, setActiveTab] = useState<'overview' | 'patterns'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'patterns' | 'charts'>('overview');
 
   const {
     accounts,
@@ -341,6 +346,368 @@ export default function JournalPage() {
     };
   }, [trades]);
 
+  // ─── TIER 3 CHARTS & RISK CALCULATIONS ───────────────────────────────────
+
+  const sortedClosedTrades = useMemo(() => {
+    return [...trades]
+      .filter((t) => t.closeTime !== null && t.closePrice !== null)
+      .sort((a, b) => new Date(a.closeTime!).getTime() - new Date(b.closeTime!).getTime());
+  }, [trades]);
+
+  const equityPoints = useMemo(() => {
+    const points = [{ index: 0, date: 'شروع', pnl: 0, cumulative: 0 }];
+    let sum = 0;
+    sortedClosedTrades.forEach((t, idx) => {
+      const net = t.profitUsd + (t.commission ?? 0) + (t.swap ?? 0);
+      sum += net;
+      let displayDate = '';
+      try {
+        displayDate = new Intl.DateTimeFormat('fa-IR', { month: 'numeric', day: 'numeric' }).format(new Date(t.closeTime!));
+      } catch {
+        displayDate = String(idx + 1);
+      }
+      points.push({
+        index: idx + 1,
+        date: displayDate,
+        pnl: net,
+        cumulative: sum
+      });
+    });
+    return points;
+  }, [sortedClosedTrades]);
+
+  const equityChartData = useMemo(() => {
+    if (equityPoints.length === 0) return null;
+
+    const width = 600;
+    const height = 260;
+    const paddingLeft = 70;
+    const paddingRight = 20;
+    const paddingTop = 30;
+    const paddingBottom = 30;
+
+    const graphWidth = width - paddingLeft - paddingRight;
+    const graphHeight = height - paddingTop - paddingBottom;
+
+    const values = equityPoints.map((p) => p.cumulative);
+    const minVal = Math.min(...values);
+    const maxVal = Math.max(...values);
+
+    const range = maxVal - minVal;
+    const pad = range === 0 ? 100 : range * 0.15;
+    const minY = minVal - pad;
+    const maxY = maxVal + pad;
+
+    const pointsCount = equityPoints.length;
+
+    const svgPoints = equityPoints.map((p, i) => {
+      const x = paddingLeft + (i / (pointsCount - 1 || 1)) * graphWidth;
+      const y = paddingTop + graphHeight - ((p.cumulative - minY) / (maxY - minY || 1)) * graphHeight;
+      return { x, y, val: p.cumulative, label: p.date, index: p.index };
+    });
+
+    const linePath = svgPoints.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x.toFixed(1)} ${p.y.toFixed(1)}`).join(' ');
+    const areaPath = svgPoints.length > 0
+      ? `${linePath} L ${svgPoints[svgPoints.length - 1].x.toFixed(1)} ${(paddingTop + graphHeight).toFixed(1)} L ${svgPoints[0].x.toFixed(1)} ${(paddingTop + graphHeight).toFixed(1)} Z`
+      : '';
+
+    const ticksCount = 4;
+    const yTicks = Array.from({ length: ticksCount + 1 }, (_, i) => {
+      const val = minY + (i / ticksCount) * (maxY - minY);
+      const y = paddingTop + graphHeight - (i / ticksCount) * graphHeight;
+      return { val, y };
+    });
+
+    const xTicksIndices: number[] = [];
+    if (pointsCount > 0) {
+      const step = Math.max(1, Math.floor(pointsCount / 5));
+      for (let i = 0; i < pointsCount; i += step) {
+        xTicksIndices.push(i);
+      }
+      if (xTicksIndices[xTicksIndices.length - 1] !== pointsCount - 1) {
+        xTicksIndices.push(pointsCount - 1);
+      }
+    }
+    const xTicks = xTicksIndices.map(idx => svgPoints[idx]);
+
+    let zeroY = null;
+    if (minY < 0 && maxY > 0) {
+      zeroY = paddingTop + graphHeight - ((0 - minY) / (maxY - minY)) * graphHeight;
+    }
+
+    return {
+      svgPoints,
+      linePath,
+      areaPath,
+      yTicks,
+      xTicks,
+      zeroY,
+      minY,
+      maxY
+    };
+  }, [equityPoints]);
+
+  const dailyPnlData = useMemo(() => {
+    const dailyMap: { [key: string]: number } = {};
+
+    sortedClosedTrades.forEach((t) => {
+      const net = t.profitUsd + (t.commission ?? 0) + (t.swap ?? 0);
+      let dateStr = '';
+      try {
+        const formatter = new Intl.DateTimeFormat('en-US', {
+          timeZone: 'Asia/Tehran',
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit',
+        });
+        const parts = formatter.format(new Date(t.closeTime!)).split('/');
+        dateStr = `${parts[2]}-${parts[0]}-${parts[1]}`;
+      } catch {
+        dateStr = t.closeTime!.substring(0, 10);
+      }
+      dailyMap[dateStr] = (dailyMap[dateStr] || 0) + net;
+    });
+
+    const list = Object.keys(dailyMap).map((date) => {
+      let datePersian = date;
+      try {
+        const gDate = new Date(date);
+        datePersian = new Intl.DateTimeFormat('fa-IR', { month: 'numeric', day: 'numeric' }).format(gDate);
+      } catch {}
+
+      return {
+        date,
+        datePersian,
+        pnl: dailyMap[date]
+      };
+    }).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+
+    const last15 = list.slice(-15);
+
+    if (last15.length === 0) return null;
+
+    const width = 600;
+    const height = 220;
+    const paddingLeft = 70;
+    const paddingRight = 20;
+    const paddingTop = 20;
+    const paddingBottom = 30;
+
+    const graphWidth = width - paddingLeft - paddingRight;
+    const graphHeight = height - paddingTop - paddingBottom;
+
+    const maxAbsVal = Math.max(...last15.map((d) => Math.abs(d.pnl)), 50);
+    const zeroY = paddingTop + graphHeight / 2;
+
+    const barCount = last15.length;
+    const spacing = graphWidth / barCount;
+    const barWidth = Math.max(spacing * 0.5, 8);
+
+    const bars = last15.map((d, i) => {
+      const x = paddingLeft + i * spacing + (spacing - barWidth) / 2;
+      const barHeight = (Math.abs(d.pnl) / maxAbsVal) * (graphHeight / 2);
+      const y = d.pnl >= 0 ? zeroY - barHeight : zeroY;
+      return {
+        x,
+        y,
+        width: barWidth,
+        height: barHeight,
+        pnl: d.pnl,
+        date: d.date,
+        datePersian: d.datePersian,
+      };
+    });
+
+    const yTicks = [
+      { val: maxAbsVal, y: zeroY - graphHeight / 2 },
+      { val: 0, y: zeroY },
+      { val: -maxAbsVal, y: zeroY + graphHeight / 2 }
+    ];
+
+    return {
+      bars,
+      zeroY,
+      yTicks,
+      width,
+      height,
+      paddingLeft,
+      paddingRight,
+      paddingTop,
+      paddingBottom,
+      graphWidth,
+      graphHeight
+    };
+  }, [sortedClosedTrades]);
+
+  const jalaliCalendarData = useMemo(() => {
+    const today = new Date();
+
+    const getJalaliDate = (date: Date) => {
+      try {
+        const formatted = new Intl.DateTimeFormat('en-US-u-ca-persian-nu-latn', {
+          year: 'numeric',
+          month: 'numeric',
+          day: 'numeric',
+          timeZone: 'Asia/Tehran'
+        }).format(date);
+        const clean = formatted.replace(' AP', '');
+        const [mStr, dStr, yStr] = clean.split('/');
+        return {
+          year: parseInt(yStr, 10),
+          month: parseInt(mStr, 10),
+          day: parseInt(dStr, 10)
+        };
+      } catch {
+        return { year: today.getFullYear(), month: today.getMonth() + 1, day: today.getDate() };
+      }
+    };
+
+    const todayJalali = getJalaliDate(today);
+
+    const current = new Date(today);
+    let jDate = getJalaliDate(current);
+    while (jDate.day > 1) {
+      current.setDate(current.getDate() - 1);
+      jDate = getJalaliDate(current);
+    }
+
+    const targetMonth = jDate.month;
+    const targetYear = jDate.year;
+    const days: { date: Date; jDay: number; dayOfWeek: number; dateStr: string }[] = [];
+
+    while (jDate.month === targetMonth) {
+      const yearStr = current.getFullYear();
+      const monthStr = String(current.getMonth() + 1).padStart(2, '0');
+      const dayStr = String(current.getDate()).padStart(2, '0');
+      const dateStr = `${yearStr}-${monthStr}-${dayStr}`;
+
+      days.push({
+        date: new Date(current),
+        jDay: jDate.day,
+        dayOfWeek: (current.getDay() + 1) % 7,
+        dateStr
+      });
+      current.setDate(current.getDate() + 1);
+      jDate = getJalaliDate(current);
+    }
+
+    const monthPnlMap: { [dateStr: string]: { netPnl: number; count: number; winners: number; losers: number } } = {};
+
+    sortedClosedTrades.forEach((t) => {
+      let dateStr = '';
+      try {
+        const formatter = new Intl.DateTimeFormat('en-US', {
+          timeZone: 'Asia/Tehran',
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit',
+        });
+        const parts = formatter.format(new Date(t.closeTime!)).split('/');
+        dateStr = `${parts[2]}-${parts[0]}-${parts[1]}`;
+      } catch {
+        dateStr = t.closeTime!.substring(0, 10);
+      }
+
+      const net = t.profitUsd + (t.commission ?? 0) + (t.swap ?? 0);
+
+      if (!monthPnlMap[dateStr]) {
+        monthPnlMap[dateStr] = { netPnl: 0, count: 0, winners: 0, losers: 0 };
+      }
+      monthPnlMap[dateStr].netPnl += net;
+      monthPnlMap[dateStr].count += 1;
+      if (net > 0) monthPnlMap[dateStr].winners += 1;
+      else if (net < 0) monthPnlMap[dateStr].losers += 1;
+    });
+
+    const daysWithStats = days.map((d) => {
+      const statsVal = monthPnlMap[d.dateStr] || { netPnl: 0, count: 0, winners: 0, losers: 0 };
+      return {
+        ...d,
+        ...statsVal
+      };
+    });
+
+    const monthPnls = daysWithStats.map((d) => Math.abs(d.netPnl)).filter((v) => v > 0);
+    const maxMonthAbsVal = monthPnls.length > 0 ? Math.max(...monthPnls) : 100;
+
+    return {
+      year: targetYear,
+      month: targetMonth,
+      monthName: JALALI_MONTH_NAMES[targetMonth - 1] || 'نامشخص',
+      days: daysWithStats,
+      maxMonthAbsVal
+    };
+  }, [sortedClosedTrades]);
+
+  const rDistribution = useMemo(() => {
+    const bins = [
+      { key: 'loss', label: 'ضرر (R < 0)', count: 0, className: 'bin-loss' },
+      { key: 'small-win', label: 'برد کوچک (0 ≤ R < 1)', count: 0, className: 'bin-small-win' },
+      { key: 'med-win', label: 'برد متوسط (1 ≤ R < 2)', count: 0, className: 'bin-med-win' },
+      { key: 'target-win', label: 'برد هدف (2 ≤ R < 3)', count: 0, className: 'bin-target-win' },
+      { key: 'big-win', label: 'برد بزرگ (R ≥ 3)', count: 0, className: 'bin-big-win' },
+    ];
+
+    sortedClosedTrades.forEach((t) => {
+      const r = t.rMultiple ?? 0;
+      if (r < 0) {
+        bins[0].count += 1;
+      } else if (r >= 0 && r < 1) {
+        bins[1].count += 1;
+      } else if (r >= 1 && r < 2) {
+        bins[2].count += 1;
+      } else if (r >= 2 && r < 3) {
+        bins[3].count += 1;
+      } else {
+        bins[4].count += 1;
+      }
+    });
+
+    const total = sortedClosedTrades.length || 1;
+    const maxCount = Math.max(...bins.map((b) => b.count), 1);
+
+    return bins.map((b) => ({
+      ...b,
+      percentage: (b.count / total) * 100,
+      relativeWidth: (b.count / maxCount) * 100
+    }));
+  }, [sortedClosedTrades]);
+
+  const comparisons = useMemo(() => {
+    const closedWinners = sortedClosedTrades.filter((t) => {
+      const net = t.profitUsd + (t.commission ?? 0) + (t.swap ?? 0);
+      return net > 0;
+    });
+    const closedLosers = sortedClosedTrades.filter((t) => {
+      const net = t.profitUsd + (t.commission ?? 0) + (t.swap ?? 0);
+      return net < 0;
+    });
+
+    const totalWinnerPnl = closedWinners.reduce((sum, t) => sum + (t.profitUsd + (t.commission ?? 0) + (t.swap ?? 0)), 0);
+    const totalLoserPnl = Math.abs(closedLosers.reduce((sum, t) => sum + (t.profitUsd + (t.commission ?? 0) + (t.swap ?? 0)), 0));
+
+    const avgWinnerUsd = closedWinners.length > 0 ? totalWinnerPnl / closedWinners.length : 0;
+    const avgLoserUsd = closedLosers.length > 0 ? totalLoserPnl / closedLosers.length : 0;
+
+    const totalWinnerPips = closedWinners.reduce((sum, t) => sum + (t.pips ?? 0), 0);
+    const totalLoserPips = Math.abs(closedLosers.reduce((sum, t) => sum + (t.pips ?? 0), 0));
+
+    const avgWinnerPips = closedWinners.length > 0 ? totalWinnerPips / closedWinners.length : 0;
+    const avgLoserPips = closedLosers.length > 0 ? totalLoserPips / closedLosers.length : 0;
+
+    const winLossRatio = avgLoserUsd > 0 ? avgWinnerUsd / avgLoserUsd : 0;
+
+    return {
+      avgWinnerUsd,
+      avgLoserUsd,
+      avgWinnerPips,
+      avgLoserPips,
+      winLossRatio,
+      winnersCount: closedWinners.length,
+      losersCount: closedLosers.length
+    };
+  }, [sortedClosedTrades]);
+
   // Account selector dropdown list options
   const accountOptions = useMemo(() => {
     const list = accounts.map((acc) => ({
@@ -390,6 +757,12 @@ export default function JournalPage() {
           onClick={() => setActiveTab('patterns')}
         >
           شناسایی الگوها (Patterns)
+        </button>
+        <button
+          className={`journal-tab-btn ${activeTab === 'charts' ? 'active' : ''}`}
+          onClick={() => setActiveTab('charts')}
+        >
+          نمودارها و ریسک (Charts & Risk)
         </button>
       </div>
 
@@ -569,7 +942,7 @@ export default function JournalPage() {
             </div>
           </div>
         </div>
-      ) : (
+      ) : activeTab === 'patterns' ? (
         /* Patterns (Tier 2) Panels */
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
           {/* Row A: Heatmap Hour Grid */}
@@ -750,6 +1123,366 @@ export default function JournalPage() {
               </div>
             </div>
           </div>
+        </div>
+      ) : (
+        /* Charts & Risk (Tier 3) Panels */
+        <div className="charts-tab-container">
+          
+          {/* 1. Equity Curve Card */}
+          <div className="journal-card journal-card--full-width">
+            <div className="card-header">
+              <span className="card-title">نمودار رشد سرمایه (Cumulative Equity Curve)</span>
+              <span className="material-symbols-outlined card-icon">show_chart</span>
+            </div>
+            
+            <div className="chart-wrapper">
+              {equityChartData ? (
+                <svg viewBox="0 0 600 260" width="100%" height="100%" className="svg-chart">
+                  <defs>
+                    <linearGradient id="equity-gradient" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#61f9b1" stopOpacity="0.3"/>
+                      <stop offset="100%" stopColor="#61f9b1" stopOpacity="0.0"/>
+                    </linearGradient>
+                  </defs>
+                  
+                  {/* Grid Lines */}
+                  {equityChartData.yTicks.map((tick, i) => (
+                    <line 
+                      key={i} 
+                      x1="70" 
+                      y1={tick.y} 
+                      x2="580" 
+                      y2={tick.y} 
+                      className="grid-line" 
+                    />
+                  ))}
+                  
+                  {/* Y Axis Labels */}
+                  {equityChartData.yTicks.map((tick, i) => (
+                    <text 
+                      key={i} 
+                      x="60" 
+                      y={tick.y + 4} 
+                      className="axis-label axis-label-y"
+                    >
+                      {tick.val >= 0 ? '+' : ''}${toPersianDigits(Math.round(tick.val).toString())}
+                    </text>
+                  ))}
+                  
+                  {/* Zero Baseline */}
+                  {equityChartData.zeroY !== null && (
+                    <line 
+                      x1="70" 
+                      y1={equityChartData.zeroY} 
+                      x2="580" 
+                      y2={equityChartData.zeroY} 
+                      className="zero-baseline" 
+                    />
+                  )}
+                  
+                  {/* Area fill under curve */}
+                  {equityChartData.areaPath && (
+                    <path d={equityChartData.areaPath} className="chart-area" />
+                  )}
+                  
+                  {/* Line curve */}
+                  {equityChartData.linePath && (
+                    <path d={equityChartData.linePath} className="chart-line" />
+                  )}
+                  
+                  {/* Dots on points (if <= 50 points to avoid clutter) */}
+                  {equityChartData.svgPoints.length <= 50 && equityChartData.svgPoints.map((pt, i) => (
+                    <circle 
+                      key={i} 
+                      cx={pt.x} 
+                      cy={pt.y} 
+                      r="4" 
+                      className="chart-dot"
+                    >
+                      <title>{`معامله ${toPersianDigits(pt.index)}: ${pt.val >= 0 ? '+' : ''}${toPersianDigits(pt.val.toFixed(2))}$ (${pt.label})`}</title>
+                    </circle>
+                  ))}
+                  
+                  {/* X Axis Labels */}
+                  {equityChartData.xTicks.map((tick, i) => (
+                    <g key={i}>
+                      <line 
+                        x1={tick.x} 
+                        y1="230" 
+                        x2={tick.x} 
+                        y2="234" 
+                        className="axis-line" 
+                      />
+                      <text 
+                        x={tick.x} 
+                        y="246" 
+                        className="axis-label"
+                      >
+                        {toPersianDigits(tick.label)}
+                      </text>
+                    </g>
+                  ))}
+                  
+                  {/* Bottom axis line */}
+                  <line x1="70" y1="230" x2="580" y2="230" className="axis-line" />
+                </svg>
+              ) : (
+                <div style={{ color: '#bbcabe', fontSize: '13px' }}>اطلاعات کافی برای ترسیم وجود ندارد.</div>
+              )}
+            </div>
+          </div>
+
+          <div className="patterns-split-row">
+            {/* 2. Daily P&L Bar Chart */}
+            <div className="journal-card">
+              <div className="card-header">
+                <span className="card-title">سود و زیان روزانه (۱۵ روز معاملاتی اخیر)</span>
+                <span className="material-symbols-outlined card-icon">bar_chart</span>
+              </div>
+              <div className="chart-wrapper">
+                {dailyPnlData ? (
+                  <svg viewBox="0 0 600 220" width="100%" height="100%" className="svg-chart">
+                    {/* Grid Lines */}
+                    {dailyPnlData.yTicks.map((tick, i) => (
+                      <line 
+                        key={i} 
+                        x1="70" 
+                        y1={tick.y} 
+                        x2="580" 
+                        y2={tick.y} 
+                        className="grid-line" 
+                      />
+                    ))}
+                    
+                    {/* Y Axis Labels */}
+                    {dailyPnlData.yTicks.map((tick, i) => (
+                      <text 
+                        key={i} 
+                        x="60" 
+                        y={tick.y + 4} 
+                        className="axis-label axis-label-y"
+                      >
+                        {tick.val >= 0 ? '+' : ''}${toPersianDigits(Math.round(tick.val).toString())}
+                      </text>
+                    ))}
+
+                    {/* Zero baseline */}
+                    <line 
+                      x1="70" 
+                      y1={dailyPnlData.zeroY} 
+                      x2="580" 
+                      y2={dailyPnlData.zeroY} 
+                      className="axis-line" 
+                      style={{ strokeWidth: 1.5 }}
+                    />
+                    
+                    {/* Bars */}
+                    {dailyPnlData.bars.map((bar, i) => (
+                      <rect 
+                        key={i}
+                        x={bar.x}
+                        y={bar.y}
+                        width={bar.width}
+                        height={bar.height}
+                        rx="2"
+                        className={`chart-bar ${bar.pnl >= 0 ? 'bar-profit' : 'bar-loss'}`}
+                      >
+                        <title>{`تاریخ: ${toPersianDigits(bar.date)} | سود/زیان: ${bar.pnl >= 0 ? '+' : ''}${toPersianDigits(bar.pnl.toFixed(2))}$`}</title>
+                      </rect>
+                    ))}
+
+                    {/* X Axis Labels */}
+                    {dailyPnlData.bars.map((bar, i) => (
+                      (dailyPnlData.bars.length <= 8 || i % 2 === 0) && (
+                        <text 
+                          key={i} 
+                          x={bar.x + bar.width / 2} 
+                          y="210" 
+                          className="axis-label"
+                          style={{ fontSize: '9px' }}
+                        >
+                          {toPersianDigits(bar.datePersian)}
+                        </text>
+                      )
+                    ))}
+                  </svg>
+                ) : (
+                  <div style={{ color: '#bbcabe', fontSize: '13px' }}>اطلاعات کافی برای ترسیم وجود ندارد.</div>
+                )}
+              </div>
+            </div>
+
+            {/* 3. Monthly Calendar Heatmap */}
+            <div className="journal-card calendar-heatmap-container">
+              <div className="calendar-header-row">
+                <span className="calendar-title-month">
+                  تقویم معاملاتی ماه {jalaliCalendarData.monthName} ({toPersianDigits(jalaliCalendarData.year)})
+                </span>
+                <div className="calendar-legend">
+                  <span>راهنما:</span>
+                  <div className="legend-box empty" title="بدون معامله" />
+                  <div className="legend-box loss-light" title="زیان کم" />
+                  <div className="legend-box loss-dark" title="زیان زیاد" />
+                  <div className="legend-box profit-light" title="سود کم" />
+                  <div className="legend-box profit-dark" title="سود زیاد" />
+                </div>
+              </div>
+
+              <div className="calendar-grid-wrapper">
+                <div className="calendar-weekdays-grid">
+                  {WEEKDAY_NAMES_CALENDAR.map((day) => (
+                    <div key={day}>{day}</div>
+                  ))}
+                </div>
+                
+                <div className="calendar-days-grid">
+                  {/* Empty cells before start of month */}
+                  {Array.from({ length: jalaliCalendarData.days[0].dayOfWeek }).map((_, idx) => (
+                    <div key={`empty-${idx}`} className="calendar-day-cell calendar-cell-placeholder" />
+                  ))}
+
+                  {/* Day cells */}
+                  {jalaliCalendarData.days.map((day) => {
+                    const cellClass = day.count === 0 
+                      ? 'calendar-cell-empty'
+                      : day.netPnl > 0 
+                        ? `calendar-cell-profit-${Math.min(Math.ceil((day.netPnl / jalaliCalendarData.maxMonthAbsVal) * 4), 4)}`
+                        : `calendar-cell-loss-${Math.min(Math.ceil((Math.abs(day.netPnl) / jalaliCalendarData.maxMonthAbsVal) * 4), 4)}`;
+
+                    const tooltipText = day.count > 0 
+                      ? `تاریخ: ${toPersianDigits(day.dateStr)}
+تعداد معاملات: ${toPersianDigits(day.count)}
+سود ناخالص: ${toPersianDigits(day.winners.toString())} معامله برد
+زیان ناخالص: ${toPersianDigits(day.losers.toString())} معامله باخت
+سود و زیان خالص: ${day.netPnl >= 0 ? '+' : ''}$${toPersianDigits(day.netPnl.toFixed(2))}`
+                      : `تاریخ: ${toPersianDigits(day.dateStr)}\nبدون معامله ثبت شده`;
+
+                    return (
+                      <div 
+                        key={day.jDay} 
+                        className={`calendar-day-cell ${cellClass}`}
+                        title={tooltipText}
+                      >
+                        <span className="cell-day-num">{toPersianDigits(day.jDay)}</span>
+                        {day.count > 0 && (
+                          <span className="cell-pnl-val">
+                            {day.netPnl >= 0 ? '+' : ''}${toPersianDigits(Math.round(day.netPnl).toString())}
+                          </span>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="patterns-split-row">
+            {/* 4. R-Multiple Distribution Histogram */}
+            <div className="journal-card">
+              <div className="card-header">
+                <span className="card-title">توزیع ریوارد کسب‌شده (R-Multiple Distribution)</span>
+                <span className="material-symbols-outlined card-icon">query_stats</span>
+              </div>
+              <div className="histogram-container">
+                {rDistribution.map((bin) => (
+                  <div key={bin.key} className="histogram-row">
+                    <div className="row-meta">
+                      <span className="bin-label">{bin.label}</span>
+                      <span className="bin-stats">
+                        {toPersianDigits(bin.count)} معامله
+                        <span className="percent">({toPersianDigits(Math.round(bin.percentage))}٪)</span>
+                      </span>
+                    </div>
+                    <div className="row-track">
+                      <div 
+                        className={`row-fill ${bin.className}`} 
+                        style={{ width: `${bin.relativeWidth}%` }} 
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* 5. Avg Winner vs Avg Loser Comparisons */}
+            <div className="journal-card">
+              <div className="card-header">
+                <span className="card-title">مقایسه معاملات برنده و بازنده (Risk Metrics)</span>
+                <span className="material-symbols-outlined card-icon">balance</span>
+              </div>
+              <div className="comparisons-container">
+                
+                {/* Dollar Winner vs Loser */}
+                <div className="comparison-block">
+                  <div className="comparison-title">میانگین سود در برابر میانگین زیان (دلار)</div>
+                  <div className="comparison-values-row">
+                    <div className="comp-item winner">
+                      <span className="lbl">میانگین برد</span>
+                      <span className="val">+${toPersianDigits(comparisons.avgWinnerUsd.toFixed(2))}</span>
+                    </div>
+                    <div className="comp-item loser">
+                      <span className="lbl">میانگین باخت</span>
+                      <span className="val">-${toPersianDigits(comparisons.avgLoserUsd.toFixed(2))}</span>
+                    </div>
+                  </div>
+                  <div className="comparison-visual-track">
+                    <div 
+                      className="bar-winner-fill" 
+                      style={{ 
+                        width: `${(comparisons.avgWinnerUsd / ((comparisons.avgWinnerUsd + comparisons.avgLoserUsd) || 1)) * 100}%` 
+                      }} 
+                    />
+                    <div 
+                      className="bar-loser-fill" 
+                      style={{ 
+                        width: `${(comparisons.avgLoserUsd / ((comparisons.avgWinnerUsd + comparisons.avgLoserUsd) || 1)) * 100}%` 
+                      }} 
+                    />
+                  </div>
+                </div>
+
+                {/* Pips Winner vs Loser */}
+                <div className="comparison-block">
+                  <div className="comparison-title">میانگین سود در برابر میانگین زیان (پیپ)</div>
+                  <div className="comparison-values-row">
+                    <div className="comp-item winner">
+                      <span className="lbl">میانگین برد پیپ</span>
+                      <span className="val">+{toPersianDigits(comparisons.avgWinnerPips.toFixed(1))} pip</span>
+                    </div>
+                    <div className="comp-item loser">
+                      <span className="lbl">میانگین باخت پیپ</span>
+                      <span className="val">-{toPersianDigits(comparisons.avgLoserPips.toFixed(1))} pip</span>
+                    </div>
+                  </div>
+                  <div className="comparison-visual-track">
+                    <div 
+                      className="bar-winner-fill" 
+                      style={{ 
+                        width: `${(comparisons.avgWinnerPips / ((comparisons.avgWinnerPips + comparisons.avgLoserPips) || 1)) * 100}%` 
+                      }} 
+                    />
+                    <div 
+                      className="bar-loser-fill" 
+                      style={{ 
+                        width: `${(comparisons.avgLoserPips / ((comparisons.avgWinnerPips + comparisons.avgLoserPips) || 1)) * 100}%` 
+                      }} 
+                    />
+                  </div>
+                </div>
+
+                {/* Risk reward ratio */}
+                <div className="ratio-card-footer">
+                  <span className="footer-label">نسبت ریسک به ریوارد واقعی (W/L Ratio)</span>
+                  <span className="footer-value">
+                    {toPersianDigits(comparisons.winLossRatio.toFixed(2))}
+                  </span>
+                </div>
+
+              </div>
+            </div>
+          </div>
+
         </div>
       )}
     </div>

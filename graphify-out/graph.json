@@ -924,10 +924,30 @@
       "norm_label": "weekday_names"
     },
     {
+      "label": "JALALI_MONTH_NAMES",
+      "file_type": "code",
+      "source_file": "apps/web/src/app/journal/page.tsx",
+      "source_location": "L23",
+      "_origin": "ast",
+      "id": "journal_page_jalali_month_names",
+      "community": 7,
+      "norm_label": "jalali_month_names"
+    },
+    {
+      "label": "WEEKDAY_NAMES_CALENDAR",
+      "file_type": "code",
+      "source_file": "apps/web/src/app/journal/page.tsx",
+      "source_location": "L27",
+      "_origin": "ast",
+      "id": "journal_page_weekday_names_calendar",
+      "community": 7,
+      "norm_label": "weekday_names_calendar"
+    },
+    {
       "label": "JournalPage()",
       "file_type": "code",
       "source_file": "apps/web/src/app/journal/page.tsx",
-      "source_location": "L24",
+      "source_location": "L29",
       "_origin": "ast",
       "id": "journal_page_journalpage",
       "community": 7,
@@ -4719,8 +4739,18 @@
       "source_file": "apps/web/src/app/journal/page.tsx",
       "source_location": "L12",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "journal_page",
-      "target": "journal_page_emotion_map",
+      "target": "journal_page_emotion_map"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/app/journal/page.tsx",
+      "source_location": "L23",
+      "weight": 1.0,
+      "source": "journal_page",
+      "target": "journal_page_jalali_month_names",
       "confidence_score": 1.0
     },
     {
@@ -4739,8 +4769,18 @@
       "source_file": "apps/web/src/app/journal/page.tsx",
       "source_location": "L22",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "journal_page",
-      "target": "journal_page_weekday_names",
+      "target": "journal_page_weekday_names"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/app/journal/page.tsx",
+      "source_location": "L27",
+      "weight": 1.0,
+      "source": "journal_page",
+      "target": "journal_page_weekday_names_calendar",
       "confidence_score": 1.0
     },
     {
@@ -4860,9 +4900,9 @@
       "source_file": "apps/web/src/app/journal/page.tsx",
       "source_location": "L8",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "journal_page",
-      "target": "utils_tradehelpers",
-      "confidence_score": 1.0
+      "target": "utils_tradehelpers"
     },
     {
       "relation": "imports",
@@ -4871,9 +4911,9 @@
       "source_file": "apps/web/src/app/journal/page.tsx",
       "source_location": "L8",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "journal_page",
-      "target": "utils_tradehelpers_getemotionemoji",
-      "confidence_score": 1.0
+      "target": "utils_tradehelpers_getemotionemoji"
     },
     {
       "relation": "imports",
@@ -4882,9 +4922,9 @@
       "source_file": "apps/web/src/app/journal/page.tsx",
       "source_location": "L8",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "journal_page",
-      "target": "utils_tradehelpers_getmainpair",
-      "confidence_score": 1.0
+      "target": "utils_tradehelpers_getmainpair"
     },
     {
       "relation": "imports",
@@ -4893,9 +4933,9 @@
       "source_file": "apps/web/src/app/journal/page.tsx",
       "source_location": "L8",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "journal_page",
-      "target": "utils_tradehelpers_gettradingsession",
-      "confidence_score": 1.0
+      "target": "utils_tradehelpers_gettradingsession"
     },
     {
       "relation": "calls",
@@ -8413,5 +8453,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "b6a96dc188fbe4a8854e96ec00ce4f7668f7d39b"
+  "built_at_commit": "9c64a57598134c6275fca74293f53300bad5b84f"
 }
