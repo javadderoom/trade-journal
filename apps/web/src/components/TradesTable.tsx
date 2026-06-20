@@ -5,6 +5,7 @@ import './trades.scss';
 import { toPersianDigits, formatPersianCurrency, formatToman } from '../utils/farsi';
 import Select from './Select';
 import TradeChart from './TradeChart';
+import ConfirmModal from './ConfirmModal';
 
 export interface Trade {
   id: string;
@@ -104,6 +105,41 @@ export default function TradesTable({
   const [activeTradeId, setActiveTradeId] = useState<string | null>(null);
   const [lightboxUrl, setLightboxUrl] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
+
+  // Dialog state for custom alerts & confirmations
+  const [dialogConfig, setDialogConfig] = useState<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    type: 'info' | 'confirm' | 'error' | 'success';
+    confirmLabel?: string;
+    cancelLabel?: string;
+    onConfirm?: () => void;
+  }>({
+    isOpen: false,
+    title: '',
+    message: '',
+    type: 'info',
+  });
+
+  const showAlertDialog = (
+    title: string,
+    message: string,
+    type: 'info' | 'confirm' | 'error' | 'success' = 'info',
+    onConfirm?: () => void,
+    confirmLabel?: string,
+    cancelLabel?: string
+  ) => {
+    setDialogConfig({
+      isOpen: true,
+      title,
+      message,
+      type,
+      confirmLabel,
+      cancelLabel,
+      onConfirm,
+    });
+  };
 
   // Sync prop-level activeTradeId if provided by parent
   useEffect(() => {
@@ -290,58 +326,72 @@ export default function TradesTable({
     if (onUpdateTrade) {
       const success = await onUpdateTrade(activeTrade);
       if (success) {
-        alert('تغییرات با موفقیت ذخیره شد.');
+        showAlertDialog('ذخیره موفقیت‌آمیز', 'تغییرات با موفقیت ذخیره شد.', 'success');
       }
     } else {
       // Local updates if no callback
-      alert('تغییرات به صورت محلی ذخیره شد.');
+      showAlertDialog('ذخیره محلی', 'تغییرات به صورت محلی ذخیره شد.', 'info');
     }
   };
 
   // Handle deleting a trade
   const handleDeleteClick = async () => {
     if (!activeTradeId) return;
-    const confirmDelete = window.confirm('آیا از حذف این معامله اطمینان دارید؟');
-    if (!confirmDelete) return;
 
-    let success = true;
-    if (onDeleteTrade) {
-      success = await onDeleteTrade(activeTradeId);
-    }
+    showAlertDialog(
+      'تایید حذف معامله',
+      'آیا از حذف این معامله اطمینان دارید؟ این عمل غیرقابل بازگشت است.',
+      'confirm',
+      async () => {
+        let success = true;
+        if (onDeleteTrade) {
+          success = await onDeleteTrade(activeTradeId);
+        }
 
-    if (success) {
-      setTrades(prev => prev.filter(t => t.id !== activeTradeId));
-      setSelectedTrades(prev => {
-        const next = new Set(prev);
-        next.delete(activeTradeId);
-        return next;
-      });
-      setActiveTradeId(null);
-    }
+        if (success) {
+          setTrades(prev => prev.filter(t => t.id !== activeTradeId));
+          setSelectedTrades(prev => {
+            const next = new Set(prev);
+            next.delete(activeTradeId);
+            return next;
+          });
+          setActiveTradeId(null);
+        }
+      },
+      'حذف معامله',
+      'انصراف'
+    );
   };
 
   // Handle deleting multiple selected trades
   const handleDeleteSelected = async () => {
     if (selectedTrades.size === 0) return;
-    const confirmDelete = window.confirm(`آیا از حذف ${toPersianDigits(selectedTrades.size)} معامله انتخاب شده اطمینان دارید؟`);
-    if (!confirmDelete) return;
 
-    let success = true;
-    const idsArray = Array.from(selectedTrades);
-    if (onDeleteMultipleTrades) {
-      success = await onDeleteMultipleTrades(idsArray);
-    } else if (onDeleteTrade) {
-      const results = await Promise.all(idsArray.map(id => onDeleteTrade(id)));
-      success = results.every(res => res === true);
-    }
+    showAlertDialog(
+      'تایید حذف گروهی',
+      `آیا از حذف ${toPersianDigits(selectedTrades.size)} معامله انتخاب شده اطمینان دارید؟ این عمل غیرقابل بازگشت است.`,
+      'confirm',
+      async () => {
+        let success = true;
+        const idsArray = Array.from(selectedTrades);
+        if (onDeleteMultipleTrades) {
+          success = await onDeleteMultipleTrades(idsArray);
+        } else if (onDeleteTrade) {
+          const results = await Promise.all(idsArray.map(id => onDeleteTrade(id)));
+          success = results.every(res => res === true);
+        }
 
-    if (success) {
-      setTrades(prev => prev.filter(t => !selectedTrades.has(t.id)));
-      setSelectedTrades(new Set());
-      if (activeTradeId && selectedTrades.has(activeTradeId)) {
-        setActiveTradeId(null);
-      }
-    }
+        if (success) {
+          setTrades(prev => prev.filter(t => !selectedTrades.has(t.id)));
+          setSelectedTrades(new Set());
+          if (activeTradeId && selectedTrades.has(activeTradeId)) {
+            setActiveTradeId(null);
+          }
+        }
+      },
+      'حذف گروهی',
+      'انصراف'
+    );
   };
 
   // Handle uploading a screenshot
@@ -370,7 +420,7 @@ export default function TradesTable({
       }
     } catch (err) {
       console.error('Failed to upload screenshot:', err);
-      alert('خطا در بارگذاری تصویر. لطفا دوباره تلاش کنید.');
+      showAlertDialog('خطا در بارگذاری', 'خطا در بارگذاری تصویر. لطفا دوباره تلاش کنید.', 'error');
     } finally {
       setIsUploading(false);
       e.target.value = ''; // Reset input
@@ -380,29 +430,36 @@ export default function TradesTable({
   // Handle deleting a screenshot
   const handleDeleteScreenshot = async (url: string) => {
     if (!activeTrade) return;
-    const confirmDelete = window.confirm('آیا از حذف این تصویر اطمینان دارید؟');
-    if (!confirmDelete) return;
 
-    try {
-      const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://127.0.0.1:3000';
-      const res = await fetch(`${baseUrl}/api/trades/${activeTrade.id}/screenshots`, {
-        method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url }),
-      });
+    showAlertDialog(
+      'تایید حذف تصویر',
+      'آیا از حذف این تصویر اطمینان دارید؟',
+      'confirm',
+      async () => {
+        try {
+          const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://127.0.0.1:3000';
+          const res = await fetch(`${baseUrl}/api/trades/${activeTrade.id}/screenshots`, {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ url }),
+          });
 
-      if (!res.ok) {
-        throw new Error('Deletion failed');
-      }
+          if (!res.ok) {
+            throw new Error('Deletion failed');
+          }
 
-      const data = await res.json();
-      if (data?.screenshots) {
-        updateActiveTradeField('screenshots', data.screenshots);
-      }
-    } catch (err) {
-      console.error('Failed to delete screenshot:', err);
-      alert('خطا در حذف تصویر. لطفا دوباره تلاش کنید.');
-    }
+          const data = await res.json();
+          if (data?.screenshots) {
+            updateActiveTradeField('screenshots', data.screenshots);
+          }
+        } catch (err) {
+          console.error('Failed to delete screenshot:', err);
+          showAlertDialog('خطا در حذف', 'خطا در حذف تصویر. لطفا دوباره تلاش کنید.', 'error');
+        }
+      },
+      'حذف تصویر',
+      'انصراف'
+    );
   };
 
   // Format Helper for Currency & P&L
@@ -1374,6 +1431,18 @@ export default function TradesTable({
           </div>
         </div>
       )}
+
+      {/* 8. Reusable Dialog Modal */}
+      <ConfirmModal
+        isOpen={dialogConfig.isOpen}
+        title={dialogConfig.title}
+        message={dialogConfig.message}
+        type={dialogConfig.type}
+        confirmLabel={dialogConfig.confirmLabel}
+        cancelLabel={dialogConfig.cancelLabel}
+        onConfirm={dialogConfig.onConfirm}
+        onClose={() => setDialogConfig(prev => ({ ...prev, isOpen: false }))}
+      />
 
       {/* Lightbox Modal Overlay */}
       {lightboxUrl && (

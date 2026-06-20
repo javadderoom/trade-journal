@@ -917,7 +917,7 @@
       "label": "MOCK_TRADES",
       "file_type": "code",
       "source_file": "apps/web/src/app/trades/page.tsx",
-      "source_location": "L9",
+      "source_location": "L10",
       "_origin": "ast",
       "id": "trades_page_mock_trades",
       "community": 7,
@@ -927,11 +927,41 @@
       "label": "TradesPage()",
       "file_type": "code",
       "source_file": "apps/web/src/app/trades/page.tsx",
-      "source_location": "L180",
+      "source_location": "L181",
       "_origin": "ast",
       "id": "trades_page_tradespage",
       "community": 7,
       "norm_label": "tradespage()"
+    },
+    {
+      "label": "ConfirmModal.tsx",
+      "file_type": "code",
+      "source_file": "apps/web/src/components/ConfirmModal.tsx",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "components_confirmmodal",
+      "community": 7,
+      "norm_label": "confirmmodal.tsx"
+    },
+    {
+      "label": "ConfirmModalProps",
+      "file_type": "code",
+      "source_file": "apps/web/src/components/ConfirmModal.tsx",
+      "source_location": "L6",
+      "_origin": "ast",
+      "id": "components_confirmmodal_confirmmodalprops",
+      "community": 7,
+      "norm_label": "confirmmodalprops"
+    },
+    {
+      "label": "ConfirmModal()",
+      "file_type": "code",
+      "source_file": "apps/web/src/components/ConfirmModal.tsx",
+      "source_location": "L18",
+      "_origin": "ast",
+      "id": "components_confirmmodal_confirmmodal",
+      "community": 7,
+      "norm_label": "confirmmodal()"
     },
     {
       "label": "ImportMT4Modal.tsx",
@@ -1087,7 +1117,7 @@
       "label": "Trade",
       "file_type": "code",
       "source_file": "apps/web/src/components/TradesTable.tsx",
-      "source_location": "L9",
+      "source_location": "L10",
       "_origin": "ast",
       "id": "components_tradestable_trade",
       "community": 7,
@@ -1097,7 +1127,7 @@
       "label": "TradesTableProps",
       "file_type": "code",
       "source_file": "apps/web/src/components/TradesTable.tsx",
-      "source_location": "L34",
+      "source_location": "L35",
       "_origin": "ast",
       "id": "components_tradestable_tradestableprops",
       "community": 7,
@@ -1107,7 +1137,7 @@
       "label": "DEFAULT_TAGS",
       "file_type": "code",
       "source_file": "apps/web/src/components/TradesTable.tsx",
-      "source_location": "L47",
+      "source_location": "L48",
       "_origin": "ast",
       "id": "components_tradestable_default_tags",
       "community": 7,
@@ -1117,7 +1147,7 @@
       "label": "DEFAULT_EMOTIONS",
       "file_type": "code",
       "source_file": "apps/web/src/components/TradesTable.tsx",
-      "source_location": "L66",
+      "source_location": "L67",
       "_origin": "ast",
       "id": "components_tradestable_default_emotions",
       "community": 7,
@@ -1127,7 +1157,7 @@
       "label": "getEmotionEmoji()",
       "file_type": "code",
       "source_file": "apps/web/src/components/TradesTable.tsx",
-      "source_location": "L74",
+      "source_location": "L75",
       "_origin": "ast",
       "id": "components_tradestable_getemotionemoji",
       "community": 7,
@@ -1137,7 +1167,7 @@
       "label": "getEmotionLabel()",
       "file_type": "code",
       "source_file": "apps/web/src/components/TradesTable.tsx",
-      "source_location": "L85",
+      "source_location": "L86",
       "_origin": "ast",
       "id": "components_tradestable_getemotionlabel",
       "community": 7,
@@ -1147,7 +1177,7 @@
       "label": "TradesTable()",
       "file_type": "code",
       "source_file": "apps/web/src/components/TradesTable.tsx",
-      "source_location": "L91",
+      "source_location": "L92",
       "_origin": "ast",
       "id": "components_tradestable_tradestable",
       "community": 7,
@@ -1730,7 +1760,7 @@
       "source_location": "L62",
       "_origin": "ast",
       "id": "emil_design_eng_skill_the_animation_decision_framework",
-      "community": 19,
+      "community": 24,
       "norm_label": "the animation decision framework"
     },
     {
@@ -1740,7 +1770,7 @@
       "source_location": "L66",
       "_origin": "ast",
       "id": "emil_design_eng_skill_1_should_this_animate_at_all",
-      "community": 19,
+      "community": 24,
       "norm_label": "1. should this animate at all?"
     },
     {
@@ -1750,7 +1780,7 @@
       "source_location": "L81",
       "_origin": "ast",
       "id": "emil_design_eng_skill_2_what_is_the_purpose",
-      "community": 19,
+      "community": 24,
       "norm_label": "2. what is the purpose?"
     },
     {
@@ -1760,7 +1790,7 @@
       "source_location": "L95",
       "_origin": "ast",
       "id": "emil_design_eng_skill_3_what_easing_should_it_use",
-      "community": 19,
+      "community": 24,
       "norm_label": "3. what easing should it use?"
     },
     {
@@ -1770,7 +1800,7 @@
       "source_location": "L125",
       "_origin": "ast",
       "id": "emil_design_eng_skill_4_how_fast_should_it_be",
-      "community": 19,
+      "community": 24,
       "norm_label": "4. how fast should it be?"
     },
     {
@@ -1780,7 +1810,7 @@
       "source_location": "L137",
       "_origin": "ast",
       "id": "emil_design_eng_skill_perceived_performance",
-      "community": 19,
+      "community": 24,
       "norm_label": "perceived performance"
     },
     {
@@ -1790,7 +1820,7 @@
       "source_location": "L147",
       "_origin": "ast",
       "id": "emil_design_eng_skill_spring_animations",
-      "community": 24,
+      "community": 19,
       "norm_label": "spring animations"
     },
     {
@@ -1800,7 +1830,7 @@
       "source_location": "L151",
       "_origin": "ast",
       "id": "emil_design_eng_skill_when_to_use_springs",
-      "community": 24,
+      "community": 19,
       "norm_label": "when to use springs"
     },
     {
@@ -1810,7 +1840,7 @@
       "source_location": "L158",
       "_origin": "ast",
       "id": "emil_design_eng_skill_spring_based_mouse_interactions",
-      "community": 24,
+      "community": 19,
       "norm_label": "spring-based mouse interactions"
     },
     {
@@ -1820,7 +1850,7 @@
       "source_location": "L177",
       "_origin": "ast",
       "id": "emil_design_eng_skill_spring_configuration",
-      "community": 24,
+      "community": 19,
       "norm_label": "spring configuration"
     },
     {
@@ -1830,7 +1860,7 @@
       "source_location": "L193",
       "_origin": "ast",
       "id": "emil_design_eng_skill_interruptibility_advantage",
-      "community": 24,
+      "community": 19,
       "norm_label": "interruptibility advantage"
     },
     {
@@ -1840,7 +1870,7 @@
       "source_location": "L197",
       "_origin": "ast",
       "id": "emil_design_eng_skill_component_building_principles",
-      "community": 19,
+      "community": 23,
       "norm_label": "component building principles"
     },
     {
@@ -1850,7 +1880,7 @@
       "source_location": "L199",
       "_origin": "ast",
       "id": "emil_design_eng_skill_buttons_must_feel_responsive",
-      "community": 19,
+      "community": 23,
       "norm_label": "buttons must feel responsive"
     },
     {
@@ -1860,7 +1890,7 @@
       "source_location": "L215",
       "_origin": "ast",
       "id": "emil_design_eng_skill_never_animate_from_scale_0",
-      "community": 19,
+      "community": 23,
       "norm_label": "never animate from scale(0)"
     },
     {
@@ -1870,7 +1900,7 @@
       "source_location": "L234",
       "_origin": "ast",
       "id": "emil_design_eng_skill_make_popovers_origin_aware",
-      "community": 19,
+      "community": 23,
       "norm_label": "make popovers origin-aware"
     },
     {
@@ -1880,7 +1910,7 @@
       "source_location": "L252",
       "_origin": "ast",
       "id": "emil_design_eng_skill_tooltips_skip_delay_on_subsequent_hovers",
-      "community": 19,
+      "community": 23,
       "norm_label": "tooltips: skip delay on subsequent hovers"
     },
     {
@@ -1890,7 +1920,7 @@
       "source_location": "L274",
       "_origin": "ast",
       "id": "emil_design_eng_skill_use_css_transitions_over_keyframes_for_interruptible_ui",
-      "community": 19,
+      "community": 23,
       "norm_label": "use css transitions over keyframes for interruptible ui"
     },
     {
@@ -1900,7 +1930,7 @@
       "source_location": "L295",
       "_origin": "ast",
       "id": "emil_design_eng_skill_use_blur_to_mask_imperfect_transitions",
-      "community": 19,
+      "community": 23,
       "norm_label": "use blur to mask imperfect transitions"
     },
     {
@@ -1910,7 +1940,7 @@
       "source_location": "L324",
       "_origin": "ast",
       "id": "emil_design_eng_skill_animate_enter_states_with_starting_style",
-      "community": 19,
+      "community": 23,
       "norm_label": "animate enter states with @starting-style"
     },
     {
@@ -2180,7 +2210,7 @@
       "source_location": "L562",
       "_origin": "ast",
       "id": "emil_design_eng_skill_the_sonner_principles_building_loved_components",
-      "community": 23,
+      "community": 19,
       "norm_label": "the sonner principles (building loved components)"
     },
     {
@@ -2190,7 +2220,7 @@
       "source_location": "L578",
       "_origin": "ast",
       "id": "emil_design_eng_skill_cohesion_matters",
-      "community": 23,
+      "community": 19,
       "norm_label": "cohesion matters"
     },
     {
@@ -2200,7 +2230,7 @@
       "source_location": "L584",
       "_origin": "ast",
       "id": "emil_design_eng_skill_the_opacity_height_combination",
-      "community": 23,
+      "community": 19,
       "norm_label": "the opacity + height combination"
     },
     {
@@ -2210,7 +2240,7 @@
       "source_location": "L588",
       "_origin": "ast",
       "id": "emil_design_eng_skill_review_your_work_the_next_day",
-      "community": 23,
+      "community": 19,
       "norm_label": "review your work the next day"
     },
     {
@@ -2220,7 +2250,7 @@
       "source_location": "L592",
       "_origin": "ast",
       "id": "emil_design_eng_skill_asymmetric_enter_exit_timing",
-      "community": 23,
+      "community": 19,
       "norm_label": "asymmetric enter/exit timing"
     },
     {
@@ -4258,6 +4288,28 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "apps/web/src/app/trades/page.tsx",
+      "source_location": "L7",
+      "weight": 1.0,
+      "source": "trades_page",
+      "target": "components_confirmmodal",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/app/trades/page.tsx",
+      "source_location": "L7",
+      "weight": 1.0,
+      "source": "trades_page",
+      "target": "components_confirmmodal_confirmmodal",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/app/trades/page.tsx",
       "source_location": "L6",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -4349,6 +4401,48 @@
       "confidence_score": 1.0,
       "source": "trades_page",
       "target": "trades_page_tradespage"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/components/ConfirmModal.tsx",
+      "source_location": "L18",
+      "weight": 1.0,
+      "source": "components_confirmmodal",
+      "target": "components_confirmmodal_confirmmodal",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/components/ConfirmModal.tsx",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "components_confirmmodal",
+      "target": "components_confirmmodal_confirmmodalprops",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/components/TradesTable.tsx",
+      "source_location": "L8",
+      "weight": 1.0,
+      "source": "components_tradestable",
+      "target": "components_confirmmodal",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/components/TradesTable.tsx",
+      "source_location": "L8",
+      "weight": 1.0,
+      "source": "components_tradestable",
+      "target": "components_confirmmodal_confirmmodal",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -6655,5 +6749,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "9d1e339bcf205a48a84db27149ef961d617fc901"
+  "built_at_commit": "54910abb4cdf9f9d0d71f8f398c1b89074e6816b"
 }

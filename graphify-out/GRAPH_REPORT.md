@@ -1,16 +1,16 @@
 # Graph Report - trade-journal  (2026-06-20)
 
 ## Corpus Check
-- 37 files · ~238,707 words
+- 38 files · ~239,386 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 327 nodes · 334 edges · 25 communities (22 shown, 3 thin omitted)
+- 330 nodes · 340 edges · 25 communities (22 shown, 3 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `9d1e339b`
+- Built from commit: `54910abb`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -93,8 +93,8 @@ Cohesion: 0.14
 Nodes (13): API Progress — معامله‌یار, Database Schema (`src/prisma/schema.prisma`), ✅ Done, Express Server (`src/server.ts`), High Priority, Low Priority, Medium Priority, MT4/MT5 Parser (`src/services/mt4Parser.ts`) (+5 more)
 
 ### Community 7 - "Community 7"
-Cohesion: 0.10
-Nodes (20): ImportMT4Modal(), ImportMT4ModalProps, ManualTradeModal(), ManualTradeModalProps, Select(), SelectOption, SelectProps, CandlestickData (+12 more)
+Cohesion: 0.09
+Nodes (22): ConfirmModal(), ConfirmModalProps, ImportMT4Modal(), ImportMT4ModalProps, ManualTradeModal(), ManualTradeModalProps, Select(), SelectOption (+14 more)
 
 ### Community 8 - "Community 8"
 Cohesion: 0.12
@@ -122,7 +122,7 @@ Nodes (6): File, How it works, JSON payload format, MT5 Expert Advisor — Trade
 
 ### Community 19 - "Community 19"
 Cohesion: 0.05
-Nodes (41): 1. Should this animate at all?, 2. What is the purpose?, 3. What easing should it use?, 3D transforms for depth, 4. How fast should it be?, Accessibility, Animate enter states with @starting-style, Beauty is leverage (+33 more)
+Nodes (37): 3D transforms for depth, Accessibility, Asymmetric enter/exit timing, Beauty is leverage, Cohesion matters, Core Philosophy, CSS Transform Mastery, Damping at boundaries (+29 more)
 
 ### Community 20 - "Community 20"
 Cohesion: 0.33
@@ -137,15 +137,15 @@ Cohesion: 0.22
 Nodes (9): 5.1 Authentication, 5.2 Manual Trade Entry, 5.3 MT4/MT5 Import, 5.4 Analytics Dashboard, 5.5 Trade List & Detail, 5.6 Daily Journal, 5.7 Setup / Playbook, 5.8 Payments & Plans (+1 more)
 
 ### Community 23 - "Community 23"
-Cohesion: 0.40
-Nodes (5): Asymmetric enter/exit timing, Cohesion matters, Review your work the next day, The opacity + height combination, The Sonner Principles (Building Loved Components)
+Cohesion: 0.25
+Nodes (8): Animate enter states with @starting-style, Buttons must feel responsive, Component Building Principles, Make popovers origin-aware, Never animate from scale(0), Tooltips: skip delay on subsequent hovers, Use blur to mask imperfect transitions, Use CSS transitions over keyframes for interruptible UI
 
 ### Community 24 - "Community 24"
-Cohesion: 0.40
-Nodes (5): Interruptibility advantage, Spring Animations, Spring-based mouse interactions, Spring configuration, When to use springs
+Cohesion: 0.33
+Nodes (6): 1. Should this animate at all?, 2. What is the purpose?, 3. What easing should it use?, 4. How fast should it be?, Perceived performance, The Animation Decision Framework
 
 ## Knowledge Gaps
-- **226 isolated node(s):** `name`, `version`, `private`, `dev`, `build` (+221 more)
+- **227 isolated node(s):** `name`, `version`, `private`, `dev`, `build` (+222 more)
   These have ≤1 connection - possible missing edges or undocumented components.
 - **3 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
@@ -156,13 +156,13 @@ _Questions this graph is uniquely positioned to answer:_
   _High betweenness centrality (0.034) - this node is a cross-community bridge._
 - **Why does `معامله‌یار — Persian Trading Journal Platform` connect `Community 0` to `Community 22`?**
   _High betweenness centrality (0.009) - this node is a cross-community bridge._
+- **Why does `Component Building Principles` connect `Community 23` to `Community 19`?**
+  _High betweenness centrality (0.008) - this node is a cross-community bridge._
 - **What connects `name`, `version`, `private` to the rest of the system?**
-  _226 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _227 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Community 0` be split into smaller, more focused modules?**
   _Cohesion score 0.07692307692307693 - nodes in this community are weakly interconnected._
 - **Should `Community 1` be split into smaller, more focused modules?**
   _Cohesion score 0.09247311827956989 - nodes in this community are weakly interconnected._
 - **Should `Community 2` be split into smaller, more focused modules?**
   _Cohesion score 0.07692307692307693 - nodes in this community are weakly interconnected._
-- **Should `Community 3` be split into smaller, more focused modules?**
-  _Cohesion score 0.1 - nodes in this community are weakly interconnected._

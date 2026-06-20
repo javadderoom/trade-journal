@@ -65,13 +65,13 @@
     "semantic_hash": ""
   },
   "apps/web/src/app/trades/page.tsx": {
-    "mtime": 1781960126.3497427,
-    "ast_hash": "a818f12d6502d12c1671c4b3f52fdee3",
+    "mtime": 1781962940.4387245,
+    "ast_hash": "506ed4c21279f358b29f40228dbbe35b",
     "semantic_hash": ""
   },
   "apps/web/src/components/TradesTable.tsx": {
-    "mtime": 1781961602.278417,
-    "ast_hash": "cc00de8aaf013f8692e4998bc47f3f63",
+    "mtime": 1781962931.6351614,
+    "ast_hash": "efc638f4ecf1ef8103615453e102ccb9",
     "semantic_hash": ""
   },
   "apps/web/src/utils/farsi.ts": {
@@ -227,6 +227,11 @@
   "apps/ea/ReportHistory-3107530.html": {
     "mtime": 1770281732.5373292,
     "ast_hash": "a256b3a13afe3a3214cc8c5c4d9e4438",
+    "semantic_hash": ""
+  },
+  "apps/web/src/components/ConfirmModal.tsx": {
+    "mtime": 1781962875.9577525,
+    "ast_hash": "53f007985f4391f61219e97c980c399b",
     "semantic_hash": ""
   }
 }

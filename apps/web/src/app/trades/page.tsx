@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import TradesTable, { Trade } from '../../components/TradesTable';
 import ManualTradeModal from '../../components/ManualTradeModal';
 import ImportMT4Modal from '../../components/ImportMT4Modal';
+import ConfirmModal from '../../components/ConfirmModal';
 
 // Premium high-fidelity mock trades matching code.html
 const MOCK_TRADES: Trade[] = [
@@ -186,6 +187,20 @@ export default function TradesPage() {
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [autoOpenTradeId, setAutoOpenTradeId] = useState<string | null>(null);
 
+  // Dialog State for custom alerts
+  const [dialogConfig, setDialogConfig] = useState<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    type: 'info' | 'confirm' | 'error' | 'success';
+    confirmLabel?: string;
+  }>({
+    isOpen: false,
+    title: '',
+    message: '',
+    type: 'info',
+  });
+
   const fetchTrades = async (isManualRefresh = false) => {
     try {
       if (!isManualRefresh) {
@@ -354,7 +369,13 @@ export default function TradesPage() {
   };
 
   const handleImportSuccess = async (result: any) => {
-    alert(`واردات فایل با موفقیت انجام شد:\nتعداد معامله یافت شده: ${result.found}\nتعداد وارد شده: ${result.imported}\nتعداد تکراری (نادیده گرفته شده): ${result.skipped}`);
+    setDialogConfig({
+      isOpen: true,
+      title: 'واردات موفقیت‌آمیز',
+      message: `واردات فایل با موفقیت انجام شد:\nتعداد معامله یافت شده: ${result.found}\nتعداد وارد شده: ${result.imported}\nتعداد تکراری (نادیده گرفته شده): ${result.skipped}`,
+      type: 'success',
+      confirmLabel: 'باشه',
+    });
     await fetchTrades(true);
   };
 
@@ -405,6 +426,14 @@ export default function TradesPage() {
         isOpen={isImportModalOpen}
         onClose={() => setIsImportModalOpen(false)}
         onSuccess={handleImportSuccess}
+      />
+      <ConfirmModal
+        isOpen={dialogConfig.isOpen}
+        title={dialogConfig.title}
+        message={dialogConfig.message}
+        type={dialogConfig.type}
+        confirmLabel={dialogConfig.confirmLabel}
+        onClose={() => setDialogConfig(prev => ({ ...prev, isOpen: false }))}
       />
     </main>
   );
