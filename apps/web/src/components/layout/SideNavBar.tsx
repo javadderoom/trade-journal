@@ -10,7 +10,7 @@ export default function SideNavBar() {
   const navItems = [
     { href: '/dashboard', label: 'داشبورد', icon: 'dashboard' },
     { href: '/trades', label: 'معاملات', icon: 'analytics', fillIcon: true },
-    { href: '/import', label: 'وارد کردن داده', icon: 'file_upload' },
+
     { href: '/journal', label: 'ژورنال', icon: 'menu_book' },
     { href: '/strategies', label: 'استراتژی‌ها', icon: 'query_stats' },
     { href: '/settings', label: 'تنظیمات', icon: 'settings' },
@@ -42,7 +42,7 @@ export default function SideNavBar() {
               >
                 <span
                   className="material-symbols-outlined icon"
-                  style={item.fillIcon && isActive ? { fontVariationSettings: "'FILL' 1" } : undefined}
+                  style={isActive ? { fontVariationSettings: "'FILL' 1" } : undefined}
                 >
                   {item.icon}
                 </span>
@@ -54,6 +54,8 @@ export default function SideNavBar() {
 
         {/* CTA Upgrade */}
         <div className="sidenav-cta-box">
+          <span className="cta-title">حساب حرفه‌ای</span>
+          <span className="cta-desc">دسترسی به تمامی ابزارها و گزارش‌های پیشرفته معاملات</span>
           <button className="upgrade-btn">ارتقاء حساب</button>
         </div>
 

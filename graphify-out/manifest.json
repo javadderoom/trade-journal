@@ -230,13 +230,13 @@
     "semantic_hash": ""
   },
   "apps/web/src/components/layout/BottomNavBar.tsx": {
-    "mtime": 1781980806.4069605,
-    "ast_hash": "8fdbe577398a50fe95a333abf9487547",
+    "mtime": 1781982379.9146292,
+    "ast_hash": "dbc0ae8a1e82ccefde42456f5fd06a25",
     "semantic_hash": ""
   },
   "apps/web/src/components/layout/SideNavBar.tsx": {
-    "mtime": 1781980612.9249518,
-    "ast_hash": "e2ae9df751a65cf643039a1f3164a20a",
+    "mtime": 1781982926.0156832,
+    "ast_hash": "8e41df2e0a9d77a2ccd8d7fcbd2c9751",
     "semantic_hash": ""
   },
   "apps/web/src/components/modals/ImportMT4Modal.tsx": {
