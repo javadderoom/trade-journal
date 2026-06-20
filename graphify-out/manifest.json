@@ -20,8 +20,8 @@
     "semantic_hash": ""
   },
   "apps/api/src/routes/tradeSync.ts": {
-    "mtime": 1781897519.1791532,
-    "ast_hash": "b2ec9f09e098bb3f86b8fcd5b4b4b831",
+    "mtime": 1781960105.6210365,
+    "ast_hash": "8f49cdc6cfea4fadb0c5cb62f38e5bf1",
     "semantic_hash": ""
   },
   "apps/api/src/server.ts": {
@@ -35,8 +35,8 @@
     "semantic_hash": ""
   },
   "apps/api/src/services/tradeSync.ts": {
-    "mtime": 1781902746.8286142,
-    "ast_hash": "35db3d22737546cebffbcf633b1e09f0",
+    "mtime": 1781909611.5659063,
+    "ast_hash": "26f0d5cf65e86be967d2d436246a4285",
     "semantic_hash": ""
   },
   "apps/api/src/types/index.ts": {
@@ -65,13 +65,13 @@
     "semantic_hash": ""
   },
   "apps/web/src/app/trades/page.tsx": {
-    "mtime": 1781902974.1532311,
-    "ast_hash": "9e36631cc79521dcad1c7a5338bad773",
+    "mtime": 1781960126.3497427,
+    "ast_hash": "a818f12d6502d12c1671c4b3f52fdee3",
     "semantic_hash": ""
   },
   "apps/web/src/components/TradesTable.tsx": {
-    "mtime": 1781905274.1665993,
-    "ast_hash": "e740dd5a254ce9b73a775a8cdeb7ad98",
+    "mtime": 1781961602.278417,
+    "ast_hash": "cc00de8aaf013f8692e4998bc47f3f63",
     "semantic_hash": ""
   },
   "apps/web/src/utils/farsi.ts": {
@@ -194,9 +194,39 @@
     "ast_hash": "f76eee5913d2c9039d952f0a463445b8",
     "semantic_hash": ""
   },
-  "apps/api/src/scratch-check-sltp.ts": {
-    "mtime": 1781905661.298661,
-    "ast_hash": "0ed63690674ddf4d0c45d159e028a85a",
+  "apps/web/src/components/ManualTradeModal.tsx": {
+    "mtime": 1781907626.7424192,
+    "ast_hash": "0e59e47614a4e82a89e8a5fb1dadbaee",
+    "semantic_hash": ""
+  },
+  "apps/api/uploads/screenshots/f1aaa574-0dba-4adc-9f02-6f9503a98fab.png": {
+    "mtime": 1781909560.6847885,
+    "ast_hash": "67643944353d8ee6bb5a991cc1913ea8",
+    "semantic_hash": ""
+  },
+  "apps/api/uploads/screenshots/f35a1712-31ed-4c8c-b250-f13befa8bf80.png": {
+    "mtime": 1781909544.9783819,
+    "ast_hash": "daf424bdc9c8d7b7cf5c52f16a2b24dd",
+    "semantic_hash": ""
+  },
+  "apps/web/src/components/ImportMT4Modal.tsx": {
+    "mtime": 1781958325.7674556,
+    "ast_hash": "ab550e38907011fa8056c5136a57e98a",
+    "semantic_hash": ""
+  },
+  "apps/web/public/MT4_Sample_Statement.html": {
+    "mtime": 1781957893.217191,
+    "ast_hash": "8987f5a43d9f917095aa616c4b4a12cb",
+    "semantic_hash": ""
+  },
+  "apps/api/uploads/screenshots/eea1ca3d-bcdb-49a6-8bf2-ab41d0e22b6e.png": {
+    "mtime": 1781909707.6962128,
+    "ast_hash": "67643944353d8ee6bb5a991cc1913ea8",
+    "semantic_hash": ""
+  },
+  "apps/ea/ReportHistory-3107530.html": {
+    "mtime": 1770281732.5373292,
+    "ast_hash": "a256b3a13afe3a3214cc8c5c4d9e4438",
     "semantic_hash": ""
   }
 }

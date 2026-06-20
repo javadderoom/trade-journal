@@ -1,16 +1,16 @@
 # Graph Report - trade-journal  (2026-06-20)
 
 ## Corpus Check
-- 36 files · ~162,459 words
+- 37 files · ~238,707 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 323 nodes · 327 edges · 26 communities (23 shown, 3 thin omitted)
+- 327 nodes · 334 edges · 25 communities (22 shown, 3 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `466be9af`
+- Built from commit: `9d1e339b`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -38,7 +38,6 @@
 - [[_COMMUNITY_Community 22|Community 22]]
 - [[_COMMUNITY_Community 23|Community 23]]
 - [[_COMMUNITY_Community 24|Community 24]]
-- [[_COMMUNITY_Community 25|Community 25]]
 
 ## God Nodes (most connected - your core abstractions)
 1. `Design Engineering` - 16 edges
@@ -63,15 +62,15 @@
 ## Import Cycles
 - None detected.
 
-## Communities (26 total, 3 thin omitted)
+## Communities (25 total, 3 thin omitted)
 
 ### Community 0 - "Community 0"
 Cohesion: 0.08
 Nodes (25): 10. Key Risks & Mitigations, 11. Suggested Next Steps, 1. Project Overview, 2. System Architecture Overview, 3.1 Frontend, 3.2 Backend, 3.3 Database — PostgreSQL Schema (core tables), 3.4 Infrastructure (+17 more)
 
 ### Community 1 - "Community 1"
-Cohesion: 0.11
-Nodes (22): router, storage, upload, uploadDir, detectFormat(), ParsedTrade, parseMT4CSV(), parseMT4HTML() (+14 more)
+Cohesion: 0.09
+Nodes (23): router, storage, upload, uploadDir, uploadMemory, detectFormat(), ParsedTrade, parseMT4CSV() (+15 more)
 
 ### Community 2 - "Community 2"
 Cohesion: 0.08
@@ -94,8 +93,8 @@ Cohesion: 0.14
 Nodes (13): API Progress — معامله‌یار, Database Schema (`src/prisma/schema.prisma`), ✅ Done, Express Server (`src/server.ts`), High Priority, Low Priority, Medium Priority, MT4/MT5 Parser (`src/services/mt4Parser.ts`) (+5 more)
 
 ### Community 7 - "Community 7"
-Cohesion: 0.13
-Nodes (16): Select(), SelectOption, SelectProps, CandlestickData, TradeChart(), TradeChartProps, DEFAULT_EMOTIONS, DEFAULT_TAGS (+8 more)
+Cohesion: 0.10
+Nodes (20): ImportMT4Modal(), ImportMT4ModalProps, ManualTradeModal(), ManualTradeModalProps, Select(), SelectOption, SelectProps, CandlestickData (+12 more)
 
 ### Community 8 - "Community 8"
 Cohesion: 0.12
@@ -114,8 +113,8 @@ Cohesion: 0.25
 Nodes (7): compilerOptions, esModuleInterop, module, moduleResolution, skipLibCheck, strict, target
 
 ### Community 12 - "Community 12"
-Cohesion: 0.25
-Nodes (8): Animate enter states with @starting-style, Buttons must feel responsive, Component Building Principles, Make popovers origin-aware, Never animate from scale(0), Tooltips: skip delay on subsequent hovers, Use blur to mask imperfect transitions, Use CSS transitions over keyframes for interruptible UI
+Cohesion: 0.33
+Nodes (6): clip-path for Animation, Comparison sliders, Hold-to-delete pattern, Image reveals on scroll, Tabs with perfect color transitions, The inset shape
 
 ### Community 13 - "Community 13"
 Cohesion: 0.29
@@ -123,11 +122,11 @@ Nodes (6): File, How it works, JSON payload format, MT5 Expert Advisor — Trade
 
 ### Community 19 - "Community 19"
 Cohesion: 0.05
-Nodes (38): 3D transforms for depth, Accessibility, Beauty is leverage, Core Philosophy, CSS animations beat JS under load, CSS Transform Mastery, CSS variables are inheritable, Damping at boundaries (+30 more)
+Nodes (41): 1. Should this animate at all?, 2. What is the purpose?, 3. What easing should it use?, 3D transforms for depth, 4. How fast should it be?, Accessibility, Animate enter states with @starting-style, Beauty is leverage (+33 more)
 
 ### Community 20 - "Community 20"
 Cohesion: 0.33
-Nodes (6): 1. Should this animate at all?, 2. What is the purpose?, 3. What easing should it use?, 4. How fast should it be?, Perceived performance, The Animation Decision Framework
+Nodes (6): CSS animations beat JS under load, CSS variables are inheritable, Framer Motion hardware acceleration caveat, Only animate transform and opacity, Performance Rules, Use WAAPI for programmatic CSS animations
 
 ### Community 21 - "Community 21"
 Cohesion: 0.29
@@ -142,12 +141,8 @@ Cohesion: 0.40
 Nodes (5): Asymmetric enter/exit timing, Cohesion matters, Review your work the next day, The opacity + height combination, The Sonner Principles (Building Loved Components)
 
 ### Community 24 - "Community 24"
-Cohesion: 0.33
-Nodes (6): clip-path for Animation, Comparison sliders, Hold-to-delete pattern, Image reveals on scroll, Tabs with perfect color transitions, The inset shape
-
-### Community 25 - "Community 25"
 Cohesion: 0.40
-Nodes (3): adapter, pool, prisma
+Nodes (5): Interruptibility advantage, Spring Animations, Spring-based mouse interactions, Spring configuration, When to use springs
 
 ## Knowledge Gaps
 - **226 isolated node(s):** `name`, `version`, `private`, `dev`, `build` (+221 more)
@@ -158,16 +153,16 @@ Nodes (3): adapter, pool, prisma
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `Design Engineering` connect `Community 19` to `Community 24`, `Community 12`, `Community 20`, `Community 23`?**
-  _High betweenness centrality (0.035) - this node is a cross-community bridge._
+  _High betweenness centrality (0.034) - this node is a cross-community bridge._
 - **Why does `معامله‌یار — Persian Trading Journal Platform` connect `Community 0` to `Community 22`?**
   _High betweenness centrality (0.009) - this node is a cross-community bridge._
-- **Why does `Component Building Principles` connect `Community 12` to `Community 19`?**
-  _High betweenness centrality (0.008) - this node is a cross-community bridge._
 - **What connects `name`, `version`, `private` to the rest of the system?**
   _226 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Community 0` be split into smaller, more focused modules?**
   _Cohesion score 0.07692307692307693 - nodes in this community are weakly interconnected._
 - **Should `Community 1` be split into smaller, more focused modules?**
-  _Cohesion score 0.10582010582010581 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.09247311827956989 - nodes in this community are weakly interconnected._
 - **Should `Community 2` be split into smaller, more focused modules?**
   _Cohesion score 0.07692307692307693 - nodes in this community are weakly interconnected._
+- **Should `Community 3` be split into smaller, more focused modules?**
+  _Cohesion score 0.1 - nodes in this community are weakly interconnected._

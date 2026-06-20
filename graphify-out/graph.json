@@ -297,7 +297,7 @@
       "label": "router",
       "file_type": "code",
       "source_file": "apps/api/src/routes/tradeSync.ts",
-      "source_location": "L8",
+      "source_location": "L9",
       "_origin": "ast",
       "id": "routes_tradesync_router",
       "community": 1,
@@ -307,7 +307,7 @@
       "label": "uploadDir",
       "file_type": "code",
       "source_file": "apps/api/src/routes/tradeSync.ts",
-      "source_location": "L186",
+      "source_location": "L320",
       "_origin": "ast",
       "id": "routes_tradesync_uploaddir",
       "community": 1,
@@ -317,7 +317,7 @@
       "label": "storage",
       "file_type": "code",
       "source_file": "apps/api/src/routes/tradeSync.ts",
-      "source_location": "L191",
+      "source_location": "L325",
       "_origin": "ast",
       "id": "routes_tradesync_storage",
       "community": 1,
@@ -327,61 +327,41 @@
       "label": "upload",
       "file_type": "code",
       "source_file": "apps/api/src/routes/tradeSync.ts",
-      "source_location": "L202",
+      "source_location": "L336",
       "_origin": "ast",
       "id": "routes_tradesync_upload",
       "community": 1,
       "norm_label": "upload"
     },
     {
-      "label": "scratch-check-sltp.ts",
+      "label": "uploadMemory",
       "file_type": "code",
-      "source_file": "apps/api/src/scratch-check-sltp.ts",
-      "source_location": "L1",
+      "source_file": "apps/api/src/routes/tradeSync.ts",
+      "source_location": "L445",
       "_origin": "ast",
-      "id": "src_scratch_check_sltp",
-      "community": 25,
-      "norm_label": "scratch-check-sltp.ts"
+      "id": "routes_tradesync_uploadmemory",
+      "community": 1,
+      "norm_label": "uploadmemory"
     },
     {
-      "label": "pool",
+      "label": "parseMT4Date()",
       "file_type": "code",
-      "source_file": "apps/api/src/scratch-check-sltp.ts",
-      "source_location": "L5",
+      "source_file": "apps/api/src/routes/tradeSync.ts",
+      "source_location": "L447",
       "_origin": "ast",
-      "id": "src_scratch_check_sltp_pool",
-      "community": 25,
-      "norm_label": "pool"
+      "id": "routes_tradesync_parsemt4date",
+      "community": 1,
+      "norm_label": "parsemt4date()"
     },
     {
-      "label": "adapter",
+      "label": "findHeaderMapping()",
       "file_type": "code",
-      "source_file": "apps/api/src/scratch-check-sltp.ts",
-      "source_location": "L6",
+      "source_file": "apps/api/src/routes/tradeSync.ts",
+      "source_location": "L475",
       "_origin": "ast",
-      "id": "src_scratch_check_sltp_adapter",
-      "community": 25,
-      "norm_label": "adapter"
-    },
-    {
-      "label": "prisma",
-      "file_type": "code",
-      "source_file": "apps/api/src/scratch-check-sltp.ts",
-      "source_location": "L7",
-      "_origin": "ast",
-      "id": "src_scratch_check_sltp_prisma",
-      "community": 25,
-      "norm_label": "prisma"
-    },
-    {
-      "label": "main()",
-      "file_type": "code",
-      "source_file": "apps/api/src/scratch-check-sltp.ts",
-      "source_location": "L9",
-      "_origin": "ast",
-      "id": "src_scratch_check_sltp_main",
-      "community": 25,
-      "norm_label": "main()"
+      "id": "routes_tradesync_findheadermapping",
+      "community": 1,
+      "norm_label": "findheadermapping()"
     },
     {
       "label": "server.ts",
@@ -537,7 +517,7 @@
       "label": "getTradesForAccount()",
       "file_type": "code",
       "source_file": "apps/api/src/services/tradeSync.ts",
-      "source_location": "L152",
+      "source_location": "L153",
       "_origin": "ast",
       "id": "services_tradesync_gettradesforaccount",
       "community": 1,
@@ -937,7 +917,7 @@
       "label": "MOCK_TRADES",
       "file_type": "code",
       "source_file": "apps/web/src/app/trades/page.tsx",
-      "source_location": "L7",
+      "source_location": "L9",
       "_origin": "ast",
       "id": "trades_page_mock_trades",
       "community": 7,
@@ -947,11 +927,71 @@
       "label": "TradesPage()",
       "file_type": "code",
       "source_file": "apps/web/src/app/trades/page.tsx",
-      "source_location": "L178",
+      "source_location": "L180",
       "_origin": "ast",
       "id": "trades_page_tradespage",
       "community": 7,
       "norm_label": "tradespage()"
+    },
+    {
+      "label": "ImportMT4Modal.tsx",
+      "file_type": "code",
+      "source_file": "apps/web/src/components/ImportMT4Modal.tsx",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "components_importmt4modal",
+      "community": 7,
+      "norm_label": "importmt4modal.tsx"
+    },
+    {
+      "label": "ImportMT4ModalProps",
+      "file_type": "code",
+      "source_file": "apps/web/src/components/ImportMT4Modal.tsx",
+      "source_location": "L5",
+      "_origin": "ast",
+      "id": "components_importmt4modal_importmt4modalprops",
+      "community": 7,
+      "norm_label": "importmt4modalprops"
+    },
+    {
+      "label": "ImportMT4Modal()",
+      "file_type": "code",
+      "source_file": "apps/web/src/components/ImportMT4Modal.tsx",
+      "source_location": "L11",
+      "_origin": "ast",
+      "id": "components_importmt4modal_importmt4modal",
+      "community": 7,
+      "norm_label": "importmt4modal()"
+    },
+    {
+      "label": "ManualTradeModal.tsx",
+      "file_type": "code",
+      "source_file": "apps/web/src/components/ManualTradeModal.tsx",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "components_manualtrademodal",
+      "community": 7,
+      "norm_label": "manualtrademodal.tsx"
+    },
+    {
+      "label": "ManualTradeModalProps",
+      "file_type": "code",
+      "source_file": "apps/web/src/components/ManualTradeModal.tsx",
+      "source_location": "L5",
+      "_origin": "ast",
+      "id": "components_manualtrademodal_manualtrademodalprops",
+      "community": 7,
+      "norm_label": "manualtrademodalprops"
+    },
+    {
+      "label": "ManualTradeModal()",
+      "file_type": "code",
+      "source_file": "apps/web/src/components/ManualTradeModal.tsx",
+      "source_location": "L11",
+      "_origin": "ast",
+      "id": "components_manualtrademodal_manualtrademodal",
+      "community": 7,
+      "norm_label": "manualtrademodal()"
     },
     {
       "label": "Select.tsx",
@@ -1067,7 +1107,7 @@
       "label": "DEFAULT_TAGS",
       "file_type": "code",
       "source_file": "apps/web/src/components/TradesTable.tsx",
-      "source_location": "L45",
+      "source_location": "L47",
       "_origin": "ast",
       "id": "components_tradestable_default_tags",
       "community": 7,
@@ -1077,7 +1117,7 @@
       "label": "DEFAULT_EMOTIONS",
       "file_type": "code",
       "source_file": "apps/web/src/components/TradesTable.tsx",
-      "source_location": "L63",
+      "source_location": "L66",
       "_origin": "ast",
       "id": "components_tradestable_default_emotions",
       "community": 7,
@@ -1087,7 +1127,7 @@
       "label": "getEmotionEmoji()",
       "file_type": "code",
       "source_file": "apps/web/src/components/TradesTable.tsx",
-      "source_location": "L71",
+      "source_location": "L74",
       "_origin": "ast",
       "id": "components_tradestable_getemotionemoji",
       "community": 7,
@@ -1097,7 +1137,7 @@
       "label": "getEmotionLabel()",
       "file_type": "code",
       "source_file": "apps/web/src/components/TradesTable.tsx",
-      "source_location": "L82",
+      "source_location": "L85",
       "_origin": "ast",
       "id": "components_tradestable_getemotionlabel",
       "community": 7,
@@ -1107,7 +1147,7 @@
       "label": "TradesTable()",
       "file_type": "code",
       "source_file": "apps/web/src/components/TradesTable.tsx",
-      "source_location": "L88",
+      "source_location": "L91",
       "_origin": "ast",
       "id": "components_tradestable_tradestable",
       "community": 7,
@@ -1690,7 +1730,7 @@
       "source_location": "L62",
       "_origin": "ast",
       "id": "emil_design_eng_skill_the_animation_decision_framework",
-      "community": 20,
+      "community": 19,
       "norm_label": "the animation decision framework"
     },
     {
@@ -1700,7 +1740,7 @@
       "source_location": "L66",
       "_origin": "ast",
       "id": "emil_design_eng_skill_1_should_this_animate_at_all",
-      "community": 20,
+      "community": 19,
       "norm_label": "1. should this animate at all?"
     },
     {
@@ -1710,7 +1750,7 @@
       "source_location": "L81",
       "_origin": "ast",
       "id": "emil_design_eng_skill_2_what_is_the_purpose",
-      "community": 20,
+      "community": 19,
       "norm_label": "2. what is the purpose?"
     },
     {
@@ -1720,7 +1760,7 @@
       "source_location": "L95",
       "_origin": "ast",
       "id": "emil_design_eng_skill_3_what_easing_should_it_use",
-      "community": 20,
+      "community": 19,
       "norm_label": "3. what easing should it use?"
     },
     {
@@ -1730,7 +1770,7 @@
       "source_location": "L125",
       "_origin": "ast",
       "id": "emil_design_eng_skill_4_how_fast_should_it_be",
-      "community": 20,
+      "community": 19,
       "norm_label": "4. how fast should it be?"
     },
     {
@@ -1740,7 +1780,7 @@
       "source_location": "L137",
       "_origin": "ast",
       "id": "emil_design_eng_skill_perceived_performance",
-      "community": 20,
+      "community": 19,
       "norm_label": "perceived performance"
     },
     {
@@ -1750,7 +1790,7 @@
       "source_location": "L147",
       "_origin": "ast",
       "id": "emil_design_eng_skill_spring_animations",
-      "community": 19,
+      "community": 24,
       "norm_label": "spring animations"
     },
     {
@@ -1760,7 +1800,7 @@
       "source_location": "L151",
       "_origin": "ast",
       "id": "emil_design_eng_skill_when_to_use_springs",
-      "community": 19,
+      "community": 24,
       "norm_label": "when to use springs"
     },
     {
@@ -1770,7 +1810,7 @@
       "source_location": "L158",
       "_origin": "ast",
       "id": "emil_design_eng_skill_spring_based_mouse_interactions",
-      "community": 19,
+      "community": 24,
       "norm_label": "spring-based mouse interactions"
     },
     {
@@ -1780,7 +1820,7 @@
       "source_location": "L177",
       "_origin": "ast",
       "id": "emil_design_eng_skill_spring_configuration",
-      "community": 19,
+      "community": 24,
       "norm_label": "spring configuration"
     },
     {
@@ -1790,7 +1830,7 @@
       "source_location": "L193",
       "_origin": "ast",
       "id": "emil_design_eng_skill_interruptibility_advantage",
-      "community": 19,
+      "community": 24,
       "norm_label": "interruptibility advantage"
     },
     {
@@ -1800,7 +1840,7 @@
       "source_location": "L197",
       "_origin": "ast",
       "id": "emil_design_eng_skill_component_building_principles",
-      "community": 12,
+      "community": 19,
       "norm_label": "component building principles"
     },
     {
@@ -1810,7 +1850,7 @@
       "source_location": "L199",
       "_origin": "ast",
       "id": "emil_design_eng_skill_buttons_must_feel_responsive",
-      "community": 12,
+      "community": 19,
       "norm_label": "buttons must feel responsive"
     },
     {
@@ -1820,7 +1860,7 @@
       "source_location": "L215",
       "_origin": "ast",
       "id": "emil_design_eng_skill_never_animate_from_scale_0",
-      "community": 12,
+      "community": 19,
       "norm_label": "never animate from scale(0)"
     },
     {
@@ -1830,7 +1870,7 @@
       "source_location": "L234",
       "_origin": "ast",
       "id": "emil_design_eng_skill_make_popovers_origin_aware",
-      "community": 12,
+      "community": 19,
       "norm_label": "make popovers origin-aware"
     },
     {
@@ -1840,7 +1880,7 @@
       "source_location": "L252",
       "_origin": "ast",
       "id": "emil_design_eng_skill_tooltips_skip_delay_on_subsequent_hovers",
-      "community": 12,
+      "community": 19,
       "norm_label": "tooltips: skip delay on subsequent hovers"
     },
     {
@@ -1850,7 +1890,7 @@
       "source_location": "L274",
       "_origin": "ast",
       "id": "emil_design_eng_skill_use_css_transitions_over_keyframes_for_interruptible_ui",
-      "community": 12,
+      "community": 19,
       "norm_label": "use css transitions over keyframes for interruptible ui"
     },
     {
@@ -1860,7 +1900,7 @@
       "source_location": "L295",
       "_origin": "ast",
       "id": "emil_design_eng_skill_use_blur_to_mask_imperfect_transitions",
-      "community": 12,
+      "community": 19,
       "norm_label": "use blur to mask imperfect transitions"
     },
     {
@@ -1870,7 +1910,7 @@
       "source_location": "L324",
       "_origin": "ast",
       "id": "emil_design_eng_skill_animate_enter_states_with_starting_style",
-      "community": 12,
+      "community": 19,
       "norm_label": "animate enter states with @starting-style"
     },
     {
@@ -1930,7 +1970,7 @@
       "source_location": "L398",
       "_origin": "ast",
       "id": "emil_design_eng_skill_clip_path_for_animation",
-      "community": 24,
+      "community": 12,
       "norm_label": "clip-path for animation"
     },
     {
@@ -1940,7 +1980,7 @@
       "source_location": "L402",
       "_origin": "ast",
       "id": "emil_design_eng_skill_the_inset_shape",
-      "community": 24,
+      "community": 12,
       "norm_label": "the inset shape"
     },
     {
@@ -1950,7 +1990,7 @@
       "source_location": "L428",
       "_origin": "ast",
       "id": "emil_design_eng_skill_tabs_with_perfect_color_transitions",
-      "community": 24,
+      "community": 12,
       "norm_label": "tabs with perfect color transitions"
     },
     {
@@ -1960,7 +2000,7 @@
       "source_location": "L432",
       "_origin": "ast",
       "id": "emil_design_eng_skill_hold_to_delete_pattern",
-      "community": 24,
+      "community": 12,
       "norm_label": "hold-to-delete pattern"
     },
     {
@@ -1970,7 +2010,7 @@
       "source_location": "L436",
       "_origin": "ast",
       "id": "emil_design_eng_skill_image_reveals_on_scroll",
-      "community": 24,
+      "community": 12,
       "norm_label": "image reveals on scroll"
     },
     {
@@ -1980,7 +2020,7 @@
       "source_location": "L440",
       "_origin": "ast",
       "id": "emil_design_eng_skill_comparison_sliders",
-      "community": 24,
+      "community": 12,
       "norm_label": "comparison sliders"
     },
     {
@@ -2050,7 +2090,7 @@
       "source_location": "L482",
       "_origin": "ast",
       "id": "emil_design_eng_skill_performance_rules",
-      "community": 19,
+      "community": 20,
       "norm_label": "performance rules"
     },
     {
@@ -2060,7 +2100,7 @@
       "source_location": "L484",
       "_origin": "ast",
       "id": "emil_design_eng_skill_only_animate_transform_and_opacity",
-      "community": 19,
+      "community": 20,
       "norm_label": "only animate transform and opacity"
     },
     {
@@ -2070,7 +2110,7 @@
       "source_location": "L488",
       "_origin": "ast",
       "id": "emil_design_eng_skill_css_variables_are_inheritable",
-      "community": 19,
+      "community": 20,
       "norm_label": "css variables are inheritable"
     },
     {
@@ -2080,7 +2120,7 @@
       "source_location": "L500",
       "_origin": "ast",
       "id": "emil_design_eng_skill_framer_motion_hardware_acceleration_caveat",
-      "community": 19,
+      "community": 20,
       "norm_label": "framer motion hardware acceleration caveat"
     },
     {
@@ -2090,7 +2130,7 @@
       "source_location": "L514",
       "_origin": "ast",
       "id": "emil_design_eng_skill_css_animations_beat_js_under_load",
-      "community": 19,
+      "community": 20,
       "norm_label": "css animations beat js under load"
     },
     {
@@ -2100,7 +2140,7 @@
       "source_location": "L518",
       "_origin": "ast",
       "id": "emil_design_eng_skill_use_waapi_for_programmatic_css_animations",
-      "community": 19,
+      "community": 20,
       "norm_label": "use waapi for programmatic css animations"
     },
     {
@@ -3499,6 +3539,26 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "apps/api/src/routes/tradeSync.ts",
+      "source_location": "L447",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "routes_tradesync",
+      "target": "routes_tradesync_findheadermapping"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/src/routes/tradeSync.ts",
+      "source_location": "L419",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "routes_tradesync",
+      "target": "routes_tradesync_parsemt4date"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/src/routes/tradeSync.ts",
       "source_location": "L4",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -3534,6 +3594,16 @@
       "confidence_score": 1.0,
       "source": "routes_tradesync",
       "target": "routes_tradesync_uploaddir"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/src/routes/tradeSync.ts",
+      "source_location": "L417",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "routes_tradesync",
+      "target": "routes_tradesync_uploadmemory"
     },
     {
       "relation": "imports_from",
@@ -3600,46 +3670,6 @@
       "confidence_score": 1.0,
       "source": "src_server",
       "target": "routes_tradesync_router"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "apps/api/src/scratch-check-sltp.ts",
-      "source_location": "L6",
-      "weight": 1.0,
-      "source": "src_scratch_check_sltp",
-      "target": "src_scratch_check_sltp_adapter",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "apps/api/src/scratch-check-sltp.ts",
-      "source_location": "L9",
-      "weight": 1.0,
-      "source": "src_scratch_check_sltp",
-      "target": "src_scratch_check_sltp_main",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "apps/api/src/scratch-check-sltp.ts",
-      "source_location": "L5",
-      "weight": 1.0,
-      "source": "src_scratch_check_sltp",
-      "target": "src_scratch_check_sltp_pool",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "apps/api/src/scratch-check-sltp.ts",
-      "source_location": "L7",
-      "weight": 1.0,
-      "source": "src_scratch_check_sltp",
-      "target": "src_scratch_check_sltp_prisma",
-      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -4228,6 +4258,50 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "apps/web/src/app/trades/page.tsx",
+      "source_location": "L6",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "trades_page",
+      "target": "components_importmt4modal"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/app/trades/page.tsx",
+      "source_location": "L6",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "trades_page",
+      "target": "components_importmt4modal_importmt4modal"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/app/trades/page.tsx",
+      "source_location": "L5",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "trades_page",
+      "target": "components_manualtrademodal"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/app/trades/page.tsx",
+      "source_location": "L5",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "trades_page",
+      "target": "components_manualtrademodal_manualtrademodal"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/app/trades/page.tsx",
       "source_location": "L4",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -4275,6 +4349,46 @@
       "confidence_score": 1.0,
       "source": "trades_page",
       "target": "trades_page_tradespage"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/components/ImportMT4Modal.tsx",
+      "source_location": "L11",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "components_importmt4modal",
+      "target": "components_importmt4modal_importmt4modal"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/components/ImportMT4Modal.tsx",
+      "source_location": "L5",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "components_importmt4modal",
+      "target": "components_importmt4modal_importmt4modalprops"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/components/ManualTradeModal.tsx",
+      "source_location": "L11",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "components_manualtrademodal",
+      "target": "components_manualtrademodal_manualtrademodal"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/components/ManualTradeModal.tsx",
+      "source_location": "L5",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "components_manualtrademodal",
+      "target": "components_manualtrademodal_manualtrademodalprops"
     },
     {
       "relation": "contains",
@@ -6541,5 +6655,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "466be9af1c1ddea4c37e2a362e57818fbd39ec68"
+  "built_at_commit": "9d1e339bcf205a48a84db27149ef961d617fc901"
 }

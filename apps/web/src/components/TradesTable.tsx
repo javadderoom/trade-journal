@@ -39,6 +39,8 @@ interface TradesTableProps {
   onAddManualTrade?: () => void;
   onUpdateTrade?: (updatedTrade: Trade) => Promise<boolean>;
   onDeleteTrade?: (tradeId: string) => Promise<boolean>;
+  onDeleteMultipleTrades?: (tradeIds: string[]) => Promise<boolean>;
+  initialActiveTradeId?: string | null;
 }
 
 
@@ -58,6 +60,7 @@ const DEFAULT_TAGS = [
   'مدیریت خوب',      // Good Management
   'خروج زود',         // Early Exit
   'حجم اضافه',        // Oversize
+  'فرصت از دست رفته', // Missed Opportunity (exclude from stats)
 ];
 
 const DEFAULT_EMOTIONS = [
@@ -93,6 +96,8 @@ export default function TradesTable({
   onAddManualTrade,
   onUpdateTrade,
   onDeleteTrade,
+  onDeleteMultipleTrades,
+  initialActiveTradeId,
 }: TradesTableProps) {
   const [trades, setTrades] = useState<Trade[]>([]);
   const [selectedTrades, setSelectedTrades] = useState<Set<string>>(new Set());
@@ -100,11 +105,20 @@ export default function TradesTable({
   const [lightboxUrl, setLightboxUrl] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
 
+  // Sync prop-level activeTradeId if provided by parent
+  useEffect(() => {
+    if (initialActiveTradeId !== undefined) {
+      setActiveTradeId(initialActiveTradeId);
+    }
+  }, [initialActiveTradeId]);
+
   // Filter states
-  const [dateRange, setDateRange] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
   const [selectedSymbol, setSelectedSymbol] = useState('همه نمادها');
   const [selectedDirection, setSelectedDirection] = useState('همه جهت‌ها');
   const [selectedStrategy, setSelectedStrategy] = useState('همه استراتژی‌ها');
+  const [selectedStatus, setSelectedStatus] = useState<'ALL' | 'OPEN' | 'CLOSED' | 'MISSED'>('ALL');
+  const [isAdvancedFiltersOpen, setIsAdvancedFiltersOpen] = useState(false);
   const [isAddingTag, setIsAddingTag] = useState(false);
   const [isAddingEmotion, setIsAddingEmotion] = useState(false);
   const [allEmotions, setAllEmotions] = useState<{ value: string; label: string }[]>(DEFAULT_EMOTIONS);
@@ -198,24 +212,37 @@ export default function TradesTable({
         const dir = selectedDirection === 'خرید (Buy)' ? 'BUY' : 'SELL';
         if (trade.direction !== dir) return false;
       }
-      // // Strategy filter
-      // if (selectedStrategy !== 'همه استراتژی‌ها' && trade.setupName !== selectedStrategy) {
-      //   return false;
-      // }
-      // Date filter (simple substring match for now)
-      if (dateRange && !trade.openTime.includes(dateRange)) {
-        return false;
+      // Search filter (searches symbol, ticket, notes, and date)
+      if (searchQuery) {
+        const query = searchQuery.toLowerCase().trim();
+        const symbolMatch = trade.symbol.toLowerCase().includes(query);
+        const ticketMatch = trade.ticket ? String(trade.ticket).includes(query) : false;
+        const notesMatch = trade.notes ? trade.notes.toLowerCase().includes(query) : false;
+        const dateMatch = trade.openTime.includes(query);
+        if (!symbolMatch && !ticketMatch && !notesMatch && !dateMatch) {
+          return false;
+        }
+      }
+      // Status filter
+      if (selectedStatus === 'OPEN' && trade.closeTime !== null) return false;
+      if (selectedStatus === 'CLOSED' && trade.closeTime === null) return false;
+      if (selectedStatus === 'MISSED') {
+        const isMissed = trade.tags?.includes('فرصت از دست رفته') || trade.tags?.includes('Missed');
+        if (!isMissed) return false;
       }
       return true;
     });
-  }, [trades, selectedSymbol, selectedDirection, selectedStrategy, dateRange]);
+  }, [trades, selectedSymbol, selectedDirection, selectedStrategy, searchQuery, selectedStatus]);
 
   // Summary Metrics
   const summary = useMemo(() => {
-    const count = filteredTrades.length;
-    const wins = filteredTrades.filter(t => t.profitUsd > 0).length;
+    const activeTrades = filteredTrades.filter(
+      t => !t.tags?.includes('فرصت از دست رفته') && !t.tags?.includes('Missed')
+    );
+    const count = activeTrades.length;
+    const wins = activeTrades.filter(t => t.profitUsd > 0).length;
     const winRate = count > 0 ? Math.round((wins / count) * 100) : 0;
-    const totalProfit = filteredTrades.reduce((sum, t) => sum + t.profitUsd, 0);
+    const totalProfit = activeTrades.reduce((sum, t) => sum + t.profitUsd, 0);
     return { count, winRate, totalProfit };
   }, [filteredTrades]);
 
@@ -293,10 +320,34 @@ export default function TradesTable({
     }
   };
 
+  // Handle deleting multiple selected trades
+  const handleDeleteSelected = async () => {
+    if (selectedTrades.size === 0) return;
+    const confirmDelete = window.confirm(`آیا از حذف ${toPersianDigits(selectedTrades.size)} معامله انتخاب شده اطمینان دارید؟`);
+    if (!confirmDelete) return;
+
+    let success = true;
+    const idsArray = Array.from(selectedTrades);
+    if (onDeleteMultipleTrades) {
+      success = await onDeleteMultipleTrades(idsArray);
+    } else if (onDeleteTrade) {
+      const results = await Promise.all(idsArray.map(id => onDeleteTrade(id)));
+      success = results.every(res => res === true);
+    }
+
+    if (success) {
+      setTrades(prev => prev.filter(t => !selectedTrades.has(t.id)));
+      setSelectedTrades(new Set());
+      if (activeTradeId && selectedTrades.has(activeTradeId)) {
+        setActiveTradeId(null);
+      }
+    }
+  };
+
   // Handle uploading a screenshot
   const handleScreenshotUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (!file || !activeTrade || !activeTrade.ticket) return;
+    if (!file || !activeTrade) return;
 
     try {
       setIsUploading(true);
@@ -304,7 +355,7 @@ export default function TradesTable({
       formData.append('screenshot', file);
 
       const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://127.0.0.1:3000';
-      const res = await fetch(`${baseUrl}/api/trades/${activeTrade.ticket}/screenshots`, {
+      const res = await fetch(`${baseUrl}/api/trades/${activeTrade.id}/screenshots`, {
         method: 'POST',
         body: formData,
       });
@@ -328,13 +379,13 @@ export default function TradesTable({
 
   // Handle deleting a screenshot
   const handleDeleteScreenshot = async (url: string) => {
-    if (!activeTrade || !activeTrade.ticket) return;
+    if (!activeTrade) return;
     const confirmDelete = window.confirm('آیا از حذف این تصویر اطمینان دارید؟');
     if (!confirmDelete) return;
 
     try {
       const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://127.0.0.1:3000';
-      const res = await fetch(`${baseUrl}/api/trades/${activeTrade.ticket}/screenshots`, {
+      const res = await fetch(`${baseUrl}/api/trades/${activeTrade.id}/screenshots`, {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ url }),
@@ -532,90 +583,169 @@ export default function TradesTable({
           </div>
         </header>
 
-        {/* 2. Filter Bar */}
-        <div className="filters-bar">
-          <div className="filter-input-wrapper">
-            <span className="material-symbols-outlined filter-icon">calendar_today</span>
-            <input
-              type="text"
-              placeholder="جستجو تاریخ..."
-              value={dateRange}
-              onChange={e => setDateRange(e.target.value)}
-            />
-          </div>
-
-          <Select
-            value={selectedSymbol}
-            onChange={setSelectedSymbol}
-            options={symbolOptions.map(s => ({ value: s, label: s }))}
-          />
-
-          <Select
-            value={selectedDirection}
-            onChange={setSelectedDirection}
-            options={[
-              { value: 'همه جهت‌ها', label: 'همه جهت‌ها' },
-              { value: 'خرید (Buy)', label: '↑ خرید' },
-              { value: 'فروش (Sell)', label: '↓ فروش' },
-            ]}
-          />
-
-          <Select
-            value={selectedTimezone}
-            onChange={setSelectedTimezone}
-            title="منطقه زمانی"
-            options={[
-              { value: 'Asia/Tehran',     label: '🇮🇷 تهران (GMT+۳:۳۰)' },
-              { value: 'UTC',             label: '🌐 UTC (GMT+۰)' },
-              { value: 'Europe/London',   label: '🇬🇧 لندن (GMT+۰ / تابستان +۱)' },
-              { value: 'America/New_York',label: '🇺🇸 نیویورک (GMT−۵ / تابستان −۴)' },
-            ]}
-          />
-
-          {/* <div className="filter-select-wrapper">
-            <select value={selectedStrategy} onChange={e => setSelectedStrategy(e.target.value)}>
-              {strategyOptions.map(opt => (
-                <option key={opt} value={opt}>
-                  {opt}
-                </option>
-              ))}
-            </select>
-            <span className="material-symbols-outlined select-arrow">keyboard_arrow_down</span>
-          </div> */}
-
-          <div className="filter-actions">
-            <div className="rate-input-wrapper" title="نرخ دلار به تومان">
-              <span className="rate-label">$=</span>
+        {/* 2. Filter Bar Overhaul */}
+        <div className="filters-bar-container">
+          <div className="filters-main-row">
+            {/* Search Input */}
+            <div className="filter-input-wrapper search-wrapper">
+              <span className="material-symbols-outlined filter-icon">search</span>
               <input
-                type="number"
-                className="rate-input"
-                value={usdToToman}
-                min={1}
-                step={1000}
-                onChange={e => {
-                  const v = parseInt(e.target.value, 10);
-                  if (!isNaN(v) && v > 0) setUsdToToman(v);
-                }}
+                type="text"
+                placeholder="جستجو نماد، تیکت، یادداشت..."
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
               />
-              <span className="rate-label">ت</span>
             </div>
-            <button
-              className="icon-btn"
-              title="پاک کردن فیلترها"
-              onClick={() => {
-                setDateRange('');
-                setSelectedSymbol('همه نمادها');
-                setSelectedDirection('همه جهت‌ها');
-                setSelectedStrategy('همه استراتژی‌ها');
-              }}
-            >
-              <span className="material-symbols-outlined">filter_list</span>
-            </button>
-            <button className="icon-btn" title="بروزرسانی" onClick={onRefresh}>
-              <span className="material-symbols-outlined">refresh</span>
-            </button>
+
+            {/* Quick Status Segmented Selector */}
+            <div className="segmented-status-selector">
+              <button
+                type="button"
+                className={selectedStatus === 'ALL' ? 'active' : ''}
+                onClick={() => {
+                  setSelectedStatus('ALL');
+                  setCurrentPage(1);
+                }}
+              >
+                همه
+              </button>
+              <button
+                type="button"
+                className={selectedStatus === 'OPEN' ? 'active' : ''}
+                onClick={() => {
+                  setSelectedStatus('OPEN');
+                  setCurrentPage(1);
+                }}
+              >
+                باز
+              </button>
+              <button
+                type="button"
+                className={selectedStatus === 'CLOSED' ? 'active' : ''}
+                onClick={() => {
+                  setSelectedStatus('CLOSED');
+                  setCurrentPage(1);
+                }}
+              >
+                بسته
+              </button>
+              <button
+                type="button"
+                className={selectedStatus === 'MISSED' ? 'active' : ''}
+                onClick={() => {
+                  setSelectedStatus('MISSED');
+                  setCurrentPage(1);
+                }}
+              >
+                فرصت سوخته
+              </button>
+            </div>
+
+            {/* Actions: Toggle Advanced & Refresh */}
+            <div className="filters-action-group">
+              <button
+                type="button"
+                className={`btn-toggle-advanced ${isAdvancedFiltersOpen ? 'active' : ''}`}
+                onClick={() => setIsAdvancedFiltersOpen(!isAdvancedFiltersOpen)}
+                title="فیلترهای پیشرفته"
+              >
+                <span className="material-symbols-outlined">tune</span>
+                <span>فیلترهای پیشرفته</span>
+              </button>
+              
+              <button className="icon-btn refresh-btn" title="بروزرسانی" onClick={onRefresh}>
+                <span className="material-symbols-outlined">refresh</span>
+              </button>
+            </div>
           </div>
+
+          {/* Collapsible Advanced Filters Drawer */}
+          {isAdvancedFiltersOpen && (
+            <div className="filters-advanced-panel animate-slide-down">
+              <div className="advanced-fields-grid">
+                <div className="advanced-field">
+                  <label>نماد معاملاتی</label>
+                  <Select
+                    value={selectedSymbol}
+                    onChange={(val) => {
+                      setSelectedSymbol(val);
+                      setCurrentPage(1);
+                    }}
+                    options={symbolOptions.map(s => ({ value: s, label: s }))}
+                  />
+                </div>
+
+                <div className="advanced-field">
+                  <label>جهت معامله</label>
+                  <Select
+                    value={selectedDirection}
+                    onChange={(val) => {
+                      setSelectedDirection(val);
+                      setCurrentPage(1);
+                    }}
+                    options={[
+                      { value: 'همه جهت‌ها', label: 'همه جهت‌ها' },
+                      { value: 'خرید (Buy)', label: '↑ خرید' },
+                      { value: 'فروش (Sell)', label: '↓ فروش' },
+                    ]}
+                  />
+                </div>
+
+                <div className="advanced-field">
+                  <label>منطقه زمانی</label>
+                  <Select
+                    value={selectedTimezone}
+                    onChange={setSelectedTimezone}
+                    options={[
+                      { value: 'Asia/Tehran',     label: '🇮🇷 تهران (GMT+۳:۳۰)' },
+                      { value: 'UTC',             label: '🌐 UTC (GMT+۰)' },
+                      { value: 'Europe/London',   label: '🇬🇧 لندن (GMT+۰ / تابستان +۱)' },
+                      { value: 'America/New_York',label: '🇺🇸 نیویورک (GMT−۵ / تابستان −۴)' },
+                    ]}
+                  />
+                </div>
+
+                <div className="advanced-field">
+                  <label>نرخ دلار به تومان</label>
+                  <div className="rate-input-wrapper">
+                    <span className="rate-label">$=</span>
+                    <input
+                      type="number"
+                      className="rate-input"
+                      value={usdToToman}
+                      min={1}
+                      step={1000}
+                      onChange={e => {
+                        const v = parseInt(e.target.value, 10);
+                        if (!isNaN(v) && v > 0) setUsdToToman(v);
+                      }}
+                    />
+                    <span className="rate-label">ت</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="advanced-panel-footer">
+                <button
+                  className="btn btn-secondary btn-clear"
+                  onClick={() => {
+                    setSearchQuery('');
+                    setSelectedSymbol('همه نمادها');
+                    setSelectedDirection('همه جهت‌ها');
+                    setSelectedStatus('ALL');
+                    setCurrentPage(1);
+                  }}
+                >
+                  <span className="material-symbols-outlined">filter_alt_off</span>
+                  پاک کردن فیلترها
+                </button>
+              </div>
+            </div>
+          )}
         </div>
+
+
+
 
         {/* 3. Summary Bar */}
         <div className="summary-bar">
@@ -681,10 +811,12 @@ export default function TradesTable({
                   const isActive = trade.id === activeTradeId;
 
                   // P&L color logic
+                  const isMissed = trade.tags?.includes('فرصت از دست رفته') || trade.tags?.includes('Missed');
                   let profitClass = 'profit-zero';
                   if (trade.profitUsd > 0) profitClass = 'profit-positive';
                   else if (trade.profitUsd < 0) profitClass = 'profit-negative';
                   if (!isClosed) profitClass = 'profit-open';
+                  if (isMissed) profitClass = 'profit-missed';
 
                   return (
                     <tr
@@ -767,13 +899,23 @@ export default function TradesTable({
                         )}
                       </td> */}
                       <td style={{ textAlign: 'center' }}>
-                        <span
-                          className={`material-symbols-outlined status-icon ${isClosed ? 'status-closed' : 'status-open'
-                            }`}
-                          title={isClosed ? 'بسته شده' : 'باز'}
-                        >
-                          {isClosed ? 'check_circle' : 'sync'}
-                        </span>
+                        {isMissed ? (
+                          <span
+                            className="material-symbols-outlined status-icon status-missed"
+                            title="فرصت از دست رفته"
+                            style={{ color: '#9ca3af' }}
+                          >
+                            block
+                          </span>
+                        ) : (
+                          <span
+                            className={`material-symbols-outlined status-icon ${isClosed ? 'status-closed' : 'status-open'
+                              }`}
+                            title={isClosed ? 'بسته شده' : 'باز'}
+                          >
+                            {isClosed ? 'check_circle' : 'sync'}
+                          </span>
+                        )}
                       </td>
                     </tr>
                   );
@@ -1158,44 +1300,40 @@ export default function TradesTable({
                 <div className="form-group screenshots-group">
                   <label>تصاویر معامله (سند تصویری)</label>
                   
-                  {!activeTrade.ticket ? (
-                    <p className="no-ticket-warning">برای معاملات آزمایشی امکان ثبت تصویر وجود ندارد.</p>
-                  ) : (
-                    <div className="screenshots-grid">
-                      {activeTrade.screenshots && activeTrade.screenshots.map((url, idx) => {
-                        const fullUrl = url.startsWith('http') ? url : `${process.env.NEXT_PUBLIC_API_BASE_URL || 'http://127.0.0.1:3000'}${url}`;
-                        return (
-                          <div key={idx} className="screenshot-card">
-                            <img src={fullUrl} alt={`screenshot-${idx}`} onClick={() => setLightboxUrl(fullUrl)} />
-                            <button type="button" className="btn-delete-screenshot" onClick={(e) => { e.stopPropagation(); handleDeleteScreenshot(url); }} title="حذف تصویر">
-                              <span className="material-symbols-outlined">delete</span>
-                            </button>
-                          </div>
-                        );
-                      })}
+                  <div className="screenshots-grid">
+                    {activeTrade.screenshots && activeTrade.screenshots.map((url, idx) => {
+                      const fullUrl = url.startsWith('http') ? url : `${process.env.NEXT_PUBLIC_API_BASE_URL || 'http://127.0.0.1:3000'}${url}`;
+                      return (
+                        <div key={idx} className="screenshot-card">
+                          <img src={fullUrl} alt={`screenshot-${idx}`} onClick={() => setLightboxUrl(fullUrl)} />
+                          <button type="button" className="btn-delete-screenshot" onClick={(e) => { e.stopPropagation(); handleDeleteScreenshot(url); }} title="حذف تصویر">
+                            <span className="material-symbols-outlined">delete</span>
+                          </button>
+                        </div>
+                      );
+                    })}
 
-                      {/* Styled Upload Dropzone Card */}
-                      <label className="upload-dropzone">
-                        <input
-                          type="file"
-                          accept="image/*"
-                          onChange={handleScreenshotUpload}
-                          style={{ display: 'none' }}
-                        />
-                        {isUploading ? (
-                          <div className="upload-loader">
-                            <span className="material-symbols-outlined spinner-icon">sync</span>
-                            <p>بارگذاری...</p>
-                          </div>
-                        ) : (
-                          <div className="upload-prompt">
-                            <span className="material-symbols-outlined upload-icon">add_photo_alternate</span>
-                            <p>افزودن تصویر</p>
-                          </div>
-                        )}
-                      </label>
-                    </div>
-                  )}
+                    {/* Styled Upload Dropzone Card */}
+                    <label className="upload-dropzone">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleScreenshotUpload}
+                        style={{ display: 'none' }}
+                      />
+                      {isUploading ? (
+                        <div className="upload-loader">
+                          <span className="material-symbols-outlined spinner-icon">sync</span>
+                          <p>بارگذاری...</p>
+                        </div>
+                      ) : (
+                        <div className="upload-prompt">
+                          <span className="material-symbols-outlined upload-icon">add_photo_alternate</span>
+                          <p>افزودن تصویر</p>
+                        </div>
+                      )}
+                    </label>
+                  </div>
                 </div>
               </>
             )}
@@ -1211,6 +1349,30 @@ export default function TradesTable({
             </button>
           </div>
         </aside>
+      )}
+
+      {/* 7. Floating Contextual Bulk Action Bar */}
+      {selectedTrades.size > 0 && (
+        <div className="floating-bulk-actions-bar animate-slide-up">
+          <div className="selection-count">
+            <span className="count-badge">{toPersianDigits(selectedTrades.size)}</span>
+            <span>معامله انتخاب شده است</span>
+          </div>
+          
+          <div className="divider-vertical"></div>
+          
+          <div className="action-buttons">
+            <button className="btn btn-danger" onClick={handleDeleteSelected}>
+              <span className="material-symbols-outlined">delete</span>
+              حذف گروهی
+            </button>
+            
+            <button className="btn-cancel-selection" onClick={() => setSelectedTrades(new Set())}>
+              <span className="material-symbols-outlined">close</span>
+              لغو انتخاب
+            </button>
+          </div>
+        </div>
       )}
 
       {/* Lightbox Modal Overlay */}

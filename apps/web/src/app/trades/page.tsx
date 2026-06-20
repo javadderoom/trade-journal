@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import TradesTable, { Trade } from '../../components/TradesTable';
+import ManualTradeModal from '../../components/ManualTradeModal';
+import ImportMT4Modal from '../../components/ImportMT4Modal';
 
 // Premium high-fidelity mock trades matching code.html
 const MOCK_TRADES: Trade[] = [
@@ -180,6 +182,9 @@ export default function TradesPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [usdToToman, setUsdToToman] = useState<number>(90_000);
+  const [isManualModalOpen, setIsManualModalOpen] = useState(false);
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false);
+  const [autoOpenTradeId, setAutoOpenTradeId] = useState<string | null>(null);
 
   const fetchTrades = async (isManualRefresh = false) => {
     try {
@@ -228,7 +233,7 @@ export default function TradesPage() {
           }
 
           return {
-            id: item.ticket ? String(item.ticket) : `api-${idx}`,
+            id: item.id,
             ticket: item.ticket ?? null,
             symbol: item.symbol,
             direction: item.direction,
@@ -286,12 +291,11 @@ export default function TradesPage() {
 
     // Call update API
     try {
+      const tradeId = updatedTrade.id;
+      if (tradeId.startsWith('mock-')) return true; // mock local only if no persistent DB trade
+
       const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://127.0.0.1:3000';
-      const ticket = updatedTrade.ticket;
-
-      if (!ticket) return true; // mock local only if no ticket
-
-      const res = await fetch(`${baseUrl}/api/trades/${ticket}`, {
+      const res = await fetch(`${baseUrl}/api/trades/${tradeId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -312,11 +316,10 @@ export default function TradesPage() {
 
   const handleDeleteTrade = async (tradeId: string): Promise<boolean> => {
     try {
-      const target = trades.find(t => t.id === tradeId);
-      if (!target || !target.ticket) return true; // local mock only
+      if (tradeId.startsWith('mock-')) return true; // local mock only
 
       const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://127.0.0.1:3000';
-      const res = await fetch(`${baseUrl}/api/trades/${target.ticket}`, {
+      const res = await fetch(`${baseUrl}/api/trades/${tradeId}`, {
         method: 'DELETE',
       });
 
@@ -327,12 +330,49 @@ export default function TradesPage() {
     }
   };
 
+  const handleDeleteMultipleTrades = async (tradeIds: string[]): Promise<boolean> => {
+    try {
+      const realIds = tradeIds.filter(id => !id.startsWith('mock-'));
+      if (realIds.length === 0) return true; // local mock only
+
+      const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://127.0.0.1:3000';
+      const res = await fetch(`${baseUrl}/api/trades/bulk-delete`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ids: realIds }),
+      });
+
+      return res.ok;
+    } catch (err) {
+      console.error('Failed to delete multiple trades on backend:', err);
+      return true; // Return true so UI local changes persist
+    }
+  };
+
   const handleImportMT4 = () => {
-    alert('امکان واردات فایل در فازهای بعدی فعال خواهد شد.');
+    setIsImportModalOpen(true);
+  };
+
+  const handleImportSuccess = async (result: any) => {
+    alert(`واردات فایل با موفقیت انجام شد:\nتعداد معامله یافت شده: ${result.found}\nتعداد وارد شده: ${result.imported}\nتعداد تکراری (نادیده گرفته شده): ${result.skipped}`);
+    await fetchTrades(true);
   };
 
   const handleAddManualTrade = () => {
-    alert('ثبت معامله دستی در فازهای بعدی فعال خواهد شد.');
+    setIsManualModalOpen(true);
+  };
+
+  const handleManualTradeSuccess = async (newTrade: any) => {
+    // 1. Re-fetch trades from database
+    await fetchTrades(true);
+    // 2. Set newly created trade to open in sidebar automatically
+    if (newTrade && newTrade.id) {
+      setAutoOpenTradeId(newTrade.id);
+      // Clear it after a short timeout so that subsequent row clicks work normally
+      setTimeout(() => {
+        setAutoOpenTradeId(null);
+      }, 500);
+    }
   };
 
   if (loading) {
@@ -353,6 +393,18 @@ export default function TradesPage() {
         onAddManualTrade={handleAddManualTrade}
         onUpdateTrade={handleUpdateTrade}
         onDeleteTrade={handleDeleteTrade}
+        onDeleteMultipleTrades={handleDeleteMultipleTrades}
+        initialActiveTradeId={autoOpenTradeId}
+      />
+      <ManualTradeModal
+        isOpen={isManualModalOpen}
+        onClose={() => setIsManualModalOpen(false)}
+        onSuccess={handleManualTradeSuccess}
+      />
+      <ImportMT4Modal
+        isOpen={isImportModalOpen}
+        onClose={() => setIsImportModalOpen(false)}
+        onSuccess={handleImportSuccess}
       />
     </main>
   );

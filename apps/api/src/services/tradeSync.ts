@@ -127,6 +127,7 @@ export async function syncTradesFromEA(
 
 
 export type TradeListRow = {
+  id: string;
   ticket: number | null;
   symbol: string;
   direction: 'BUY' | 'SELL';
@@ -165,6 +166,7 @@ export async function getTradesForAccount(params: {
     skip: offset,
     take: limit,
     select: {
+      id: true,
       ticket: true,
       symbol: true,
       direction: true,
@@ -189,6 +191,7 @@ export async function getTradesForAccount(params: {
   });
 
   return trades.map(t => ({
+    id: t.id,
     ticket: t.ticket,
     symbol: t.symbol,
     direction: t.direction as 'BUY' | 'SELL',

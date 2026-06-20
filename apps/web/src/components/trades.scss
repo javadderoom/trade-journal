@@ -97,125 +97,219 @@
       filter: brightness(1.1);
     }
   }
+
+  &.btn-danger {
+    background-color: $error-container;
+    color: $on-error-container;
+    font-weight: 700;
+    box-shadow: 0 4px 20px rgba($error, 0.15);
+
+    &:hover {
+      filter: brightness(1.2);
+    }
+  }
 }
 
-// 2. Filter Bar
-.filters-bar {
+// 2. Filter Bar Overhaul
+.filters-bar-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 24px;
+  width: 100%;
+}
+
+.filters-main-row {
   display: flex;
   align-items: center;
-  gap: 16px; // gap-md
-  margin-bottom: 24px; // mb-lg
-  padding: 8px; // p-sm
-  background-color: $surface-container-low;
-  border: 1px solid rgba($outline-variant, 0.5);
-  border-radius: 8px; // rounded-lg
+  gap: 16px;
   width: 100%;
   flex-wrap: wrap;
+}
 
-  .filter-input-wrapper {
-    display: flex;
-    align-items: center;
-    gap: 4px; // gap-xs
-    padding: 4px 16px; // py-xs px-md
-    background-color: $surface-container;
-    border-radius: 4px;
-    border: 1px solid $outline-variant;
-    transition: border-color 0.2s ease;
+.filter-input-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background-color: $surface-container-low;
+  border: 1px solid $outline-variant;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  flex: 1;
+  min-width: 260px;
 
-    &:focus-within {
-      border-color: $secondary;
-    }
-
-    .filter-icon {
-      color: $on-surface-variant;
-      font-size: 18px;
-    }
-
-    input {
-      background: transparent;
-      border: none;
-      color: $on-surface;
-      font-size: 16px;
-      line-height: 24px;
-      outline: none;
-      width: 192px; // w-48
-      height: 32px; // h-8
-
-      &::placeholder {
-        color: rgba($on-surface-variant, 0.5);
-      }
-    }
+  &:focus-within {
+    border-color: $primary;
+    box-shadow: 0 0 0 1px $primary;
   }
 
-  .filter-select-wrapper {
-    position: relative;
-    display: flex;
-    align-items: center;
-
-    select {
-      appearance: none;
-      background-color: $surface-container;
-      border-radius: 4px;
-      border: 1px solid $outline-variant;
-      padding: 4px 16px;
-      padding-right: 32px;
-      font-size: 16px;
-      line-height: 24px;
-      color: $on-surface;
-      height: 40px;
-      transition: all 0.2s ease;
-      cursor: pointer;
-      outline: none;
-
-      &:focus {
-        border-color: $secondary;
-        box-shadow: 0 0 0 1px $secondary;
-      }
-    }
-
-    .select-arrow {
-      position: absolute;
-      right: 8px;
-      top: 50%;
-      transform: translateY(-50%);
-      color: $on-surface-variant;
-      pointer-events: none;
-      font-size: 18px;
-    }
+  .filter-icon {
+    color: $on-surface-variant;
+    font-size: 20px;
   }
 
-  .filter-actions {
-    display: flex;
+  input {
+    background: transparent;
+    border: none;
+    color: $on-surface;
+    font-size: 14px;
+    outline: none;
+    width: 100%;
+
+    &::placeholder {
+      color: rgba($on-surface-variant, 0.4);
+    }
+  }
+}
+
+.segmented-status-selector {
+  display: flex;
+  background-color: $surface-container-low;
+  border: 1px solid $outline-variant;
+  border-radius: 8px;
+  padding: 4px;
+  gap: 4px;
+
+  button {
+    background: transparent;
+    border: none;
+    color: $on-surface-variant;
+    padding: 6px 16px;
+    font-size: 13px;
+    font-weight: 500;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: $font-primary;
+
+    &:hover {
+      color: $on-surface;
+      background-color: rgba($surface-variant, 0.3);
+    }
+
+    &.active {
+      color: $on-primary-container;
+      background-color: $primary-container;
+      font-weight: 700;
+    }
+  }
+}
+
+.filters-action-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-right: auto; // Push to left in RTL
+
+  .btn-toggle-advanced {
+    display: inline-flex;
+    align-items: center;
     gap: 8px;
-    margin-right: auto; // mr-auto
-    align-items: center;
+    padding: 8px 16px;
+    border: 1px solid $outline-variant;
+    border-radius: 8px;
+    color: $on-surface-variant;
+    background-color: transparent;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: $font-primary;
 
+    &:hover {
+      color: $on-surface;
+      background-color: rgba($surface-variant, 0.3);
+      border-color: $outline;
+    }
+
+    &.active {
+      color: $primary;
+      border-color: $primary;
+      background-color: rgba($primary, 0.05);
+    }
+
+    span {
+      display: inline-block;
+    }
+  }
+
+  .icon-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    color: $on-surface-variant;
+    border: 1px solid $outline-variant;
+    border-radius: 8px;
+    background: transparent;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+      color: $on-surface;
+      background-color: rgba($surface-variant, 0.3);
+      border-color: $outline;
+    }
+  }
+}
+
+// Collapsible Drawer Styles
+.filters-advanced-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  background-color: $surface-container;
+  border: 1px solid rgba($outline-variant, 0.8);
+  border-radius: 8px;
+  padding: 20px;
+  width: 100%;
+
+  .advanced-fields-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    width: 100%;
+  }
+
+  .advanced-field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    label {
+      font-size: 12px;
+      font-weight: 600;
+      color: $on-surface-variant;
+    }
+
+    // Adjust rate-input wrapper layout inside panel
     .rate-input-wrapper {
       display: flex;
       align-items: center;
       gap: 4px;
-      padding: 2px 8px;
-      background-color: $surface-container;
-      border-radius: 4px;
+      padding: 6px 12px;
+      background-color: $surface-container-low;
       border: 1px solid $outline-variant;
+      border-radius: 4px;
+      height: 40px;
 
       .rate-label {
-        font-size: 12px;
+        font-size: 13px;
         color: $on-surface-variant;
-        white-space: nowrap;
       }
 
       .rate-input {
-        width: 80px;
         background: transparent;
         border: none;
         color: $on-surface;
-        font-size: 13px;
+        font-size: 14px;
         outline: none;
+        width: 100%;
         text-align: center;
         font-family: $font-primary;
 
-        // Hide browser spin arrows
         &::-webkit-inner-spin-button,
         &::-webkit-outer-spin-button {
           -webkit-appearance: none;
@@ -223,23 +317,18 @@
         }
       }
     }
+  }
 
-    .icon-btn {
-      padding: 4px 8px;
-      color: $on-surface-variant;
-      border-radius: 4px;
-      background: transparent;
-      border: none;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.2s ease;
+  .advanced-panel-footer {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 4px;
+    border-top: 1px solid rgba($outline-variant, 0.3);
+    padding-top: 16px;
 
-      &:hover {
-        color: $on-surface;
-        background-color: $surface-variant;
-      }
+    .btn-clear {
+      font-size: 12px;
+      padding: 6px 12px;
     }
   }
 }
@@ -576,6 +665,15 @@
               .profit-toman {
                 color: #fbbf24;
                 opacity: 0.7;
+              }
+            }
+
+            &.profit-missed {
+              color: $on-surface-variant;
+              opacity: 0.55;
+
+              .profit-usd {
+                text-decoration: line-through;
               }
             }
           }
@@ -1594,5 +1692,530 @@ input[type="checkbox"] {
     font-size: 13px;
     font-weight: 500;
     font-family: $font-primary;
+  }
+}
+
+// Manual Trade Modal
+.manual-trade-modal {
+  background-color: $surface-container-high;
+  border: 1px solid rgba($outline-variant, 0.4);
+  border-radius: 16px;
+  width: 720px;
+  max-width: 90vw;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: modalSlideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  font-family: $font-primary;
+
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 24px;
+    border-bottom: 1px solid rgba($outline-variant, 0.4);
+    background-color: rgba($surface-container-high, 0.95);
+
+    h3 {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 700;
+      color: $on-surface;
+    }
+
+    .close-btn {
+      background: transparent;
+      border: none;
+      color: $on-surface-variant;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      transition: background-color 0.2s ease;
+
+      &:hover {
+        background-color: $surface-variant;
+        color: $on-surface;
+      }
+    }
+  }
+
+  .modal-form {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    max-height: 80vh;
+
+    .form-error-alert {
+      background-color: rgba($error, 0.12);
+      color: $error;
+      border: 1px solid rgba($error, 0.25);
+      border-radius: 8px;
+      padding: 10px 16px;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .form-toggles {
+      display: flex;
+      gap: 24px;
+
+      .toggle-group {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+
+        label {
+          font-size: 13px;
+          color: $on-surface-variant;
+          font-weight: 500;
+        }
+
+        .pill-selector {
+          display: flex;
+          background-color: $surface-container;
+          border: 1px solid rgba($outline-variant, 0.4);
+          border-radius: 8px;
+          padding: 4px;
+          gap: 4px;
+
+          button {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: $on-surface-variant;
+            font-size: 14px;
+            font-weight: 500;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: $font-primary;
+
+            &:hover {
+              color: $on-surface;
+            }
+
+            &.active {
+              background-color: $surface-variant;
+              color: $on-surface;
+              box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+            }
+          }
+
+          &.direction-selector {
+            button.buy-btn.active {
+              background-color: rgba(#10b981, 0.15);
+              color: #34d399;
+              border: 1px solid rgba(#10b981, 0.3);
+            }
+            button.sell-btn.active {
+              background-color: rgba(#ff6b6b, 0.15);
+              color: #ff8787;
+              border: 1px solid rgba(#ff6b6b, 0.3);
+            }
+          }
+        }
+      }
+    }
+
+    .form-columns {
+      display: flex;
+      gap: 24px;
+
+      .form-column {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        transition: all 0.3s ease;
+
+        &.disabled-column {
+          opacity: 0.3;
+          pointer-events: none;
+        }
+
+        h4 {
+          margin: 0 0 4px 0;
+          font-size: 15px;
+          font-weight: 600;
+          color: $secondary;
+          border-bottom: 1px solid rgba($outline-variant, 0.3);
+          padding-bottom: 4px;
+        }
+
+        .form-group-row {
+          display: flex;
+          gap: 12px;
+          
+          .form-group {
+            flex: 1;
+          }
+        }
+
+        .form-group {
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+
+          label {
+            font-size: 13px;
+            color: $on-surface-variant;
+          }
+
+          input {
+            width: 100%;
+            box-sizing: border-box;
+            background-color: $surface-container;
+            border: 1px solid rgba($outline-variant, 0.4);
+            border-radius: 8px;
+            padding: 10px 14px;
+            color: $on-surface;
+            font-size: 15px;
+            outline: none;
+            transition: all 0.2s ease;
+            font-family: $font-primary;
+
+            &::placeholder {
+              color: rgba($on-surface-variant, 0.4);
+            }
+
+            &:focus {
+              border-color: $primary;
+              box-shadow: 0 0 0 1px $primary;
+            }
+
+            &:disabled {
+              background-color: rgba($surface-container, 0.5);
+              border-color: transparent;
+              color: rgba($on-surface, 0.3);
+            }
+          }
+        }
+      }
+    }
+
+    .modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      margin-top: 12px;
+      border-top: 1px solid rgba($outline-variant, 0.3);
+      padding-top: 16px;
+
+      .btn {
+        padding: 10px 20px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        font-family: $font-primary;
+
+        &.btn-secondary {
+          background-color: transparent;
+          border: 1px solid rgba($outline-variant, 0.6);
+          color: $on-surface-variant;
+
+          &:hover {
+            border-color: $outline;
+            color: $on-surface;
+          }
+        }
+
+        &.btn-primary {
+          background-color: rgba($primary, 0.1);
+          color: $primary;
+          border: 1px solid rgba($primary, 0.3);
+
+          &:hover {
+            background-color: rgba($primary, 0.2);
+          }
+
+          &:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+          }
+        }
+      }
+    }
+  }
+}
+
+@keyframes modalSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Import MT4 Modal
+.import-mt4-modal {
+  width: 500px;
+
+  .import-description {
+    font-size: 14px;
+    line-height: 22px;
+    color: $on-surface-variant;
+    margin-bottom: 16px;
+    font-family: $font-primary;
+    text-align: justify;
+
+    code {
+      background-color: rgba($primary, 0.1);
+      color: $primary;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: monospace;
+      direction: ltr;
+      display: inline-block;
+    }
+  }
+
+  .import-dropzone {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border: 2px dashed rgba($primary, 0.3);
+    background-color: rgba($primary, 0.02);
+    border-radius: 12px;
+    padding: 32px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    min-height: 180px;
+
+    &.drag-active {
+      border-color: $primary;
+      background-color: rgba($primary, 0.08);
+      transform: scale(1.02);
+    }
+
+    &.has-file {
+      border-style: solid;
+      border-color: rgba($primary, 0.6);
+      background-color: rgba($primary, 0.04);
+    }
+
+    .dropzone-prompt {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+
+      .upload-icon {
+        font-size: 48px;
+        color: $primary;
+        opacity: 0.8;
+        transition: transform 0.2s ease;
+      }
+
+      &:hover .upload-icon {
+        transform: translateY(-4px);
+      }
+
+      .primary-text {
+        font-size: 15px;
+        font-weight: 600;
+        color: $on-surface;
+        margin: 0;
+      }
+
+      .secondary-text {
+        font-size: 12px;
+        color: $on-surface-variant;
+        margin: 0;
+      }
+    }
+
+    .dropzone-file-info {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      width: 100%;
+      text-align: right;
+      padding: 8px 16px;
+
+      .file-icon {
+        font-size: 36px;
+        color: $primary;
+      }
+
+      .file-meta {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        min-width: 0;
+
+        .file-name {
+          font-size: 14px;
+          font-weight: 600;
+          color: $on-surface;
+          margin: 0;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          direction: ltr;
+          text-align: right;
+        }
+
+        .file-size {
+          font-size: 12px;
+          color: $on-surface-variant;
+          margin: 0;
+        }
+      }
+
+      .remove-file-btn {
+        background-color: rgba($error, 0.1);
+        border: none;
+        color: $error;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s ease;
+
+        &:hover {
+          background-color: rgba($error, 0.25);
+        }
+
+        span {
+          font-size: 18px;
+        }
+      }
+    }
+  }
+}
+
+// 7. Floating Contextual Bulk Actions Bar
+.floating-bulk-actions-bar {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background-color: rgba($surface-container-highest, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba($primary, 0.25);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), 0 0 15px rgba($primary, 0.1);
+  padding: 8px 24px;
+  border-radius: 50px; // Pill shape
+  direction: rtl;
+
+  .selection-count {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: $on-surface;
+    font-size: 14px;
+    font-weight: 500;
+    white-space: nowrap;
+
+    .count-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background-color: $primary;
+      color: $on-primary;
+      font-weight: 700;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      font-size: 12px;
+    }
+  }
+
+  .divider-vertical {
+    width: 1px;
+    height: 24px;
+    background-color: $outline-variant;
+  }
+
+  .action-buttons {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    .btn-danger {
+      padding: 6px 16px;
+      font-size: 13px;
+    }
+
+    .btn-cancel-selection {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: transparent;
+      border: none;
+      color: $on-surface-variant;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: $font-primary;
+      white-space: nowrap;
+
+      &:hover {
+        color: $on-surface;
+      }
+
+      .material-symbols-outlined {
+        font-size: 18px;
+      }
+    }
+  }
+}
+
+// Animations helper
+.animate-slide-down {
+  animation: slideDown 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-slide-up {
+  animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 16px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
   }
 }
