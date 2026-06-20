@@ -1,16 +1,16 @@
 # Graph Report - trade-journal  (2026-06-20)
 
 ## Corpus Check
-- 50 files · ~244,465 words
+- 50 files · ~244,463 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 361 nodes · 427 edges · 26 communities (22 shown, 4 thin omitted)
+- 361 nodes · 419 edges · 32 communities (28 shown, 4 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `5d8cbca2`
+- Built from commit: `59e494c3`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -39,6 +39,12 @@
 - [[_COMMUNITY_Community 22|Community 22]]
 - [[_COMMUNITY_Community 24|Community 24]]
 - [[_COMMUNITY_Community 25|Community 25]]
+- [[_COMMUNITY_Community 26|Community 26]]
+- [[_COMMUNITY_Community 27|Community 27]]
+- [[_COMMUNITY_Community 28|Community 28]]
+- [[_COMMUNITY_Community 29|Community 29]]
+- [[_COMMUNITY_Community 30|Community 30]]
+- [[_COMMUNITY_Community 31|Community 31]]
 
 ## God Nodes (most connected - your core abstractions)
 1. `Design Engineering` - 16 edges
@@ -46,28 +52,28 @@
 3. `toPersianDigits()` - 13 edges
 4. `معامله‌یار — Persian Trading Journal Platform` - 13 edges
 5. `✅ Done` - 12 edges
-6. `formatToman()` - 10 edges
-7. `معامله‌یار — Run Commands` - 10 edges
-8. `5. Feature Breakdown — V1` - 9 edges
-9. `Trade` - 8 edges
+6. `معامله‌یار — Run Commands` - 10 edges
+7. `5. Feature Breakdown — V1` - 9 edges
+8. `Trade` - 8 edges
+9. `formatToman()` - 8 edges
 10. `Component Building Principles` - 8 edges
 
 ## Surprising Connections (you probably didn't know these)
 - `DesktopTableProps` --references--> `Trade`  [EXTRACTED]
-  apps/web/src/components/DesktopTable.tsx → apps/web/src/components/TradesTable.tsx
+  apps/web/src/components/trades/DesktopTable.tsx → apps/web/src/components/trades/TradesTable.tsx
 - `DetailPanelProps` --references--> `Trade`  [EXTRACTED]
-  apps/web/src/components/DetailPanel.tsx → apps/web/src/components/TradesTable.tsx
+  apps/web/src/components/trades/DetailPanel.tsx → apps/web/src/components/trades/TradesTable.tsx
 - `MobileCardsListProps` --references--> `Trade`  [EXTRACTED]
-  apps/web/src/components/MobileCardsList.tsx → apps/web/src/components/TradesTable.tsx
+  apps/web/src/components/trades/MobileCardsList.tsx → apps/web/src/components/trades/TradesTable.tsx
+- `TradesTable()` --calls--> `toPersianDigits()`  [EXTRACTED]
+  apps/web/src/components/trades/TradesTable.tsx → apps/web/src/utils/farsi.ts
 - `ParsedTrade` --inherits--> `TradeData`  [EXTRACTED]
   apps/api/src/services/mt4Parser.ts → apps/api/src/types/trade.ts
-- `DetailPanel()` --calls--> `formatToman()`  [EXTRACTED]
-  apps/web/src/components/DetailPanel.tsx → apps/web/src/utils/farsi.ts
 
 ## Import Cycles
 - None detected.
 
-## Communities (26 total, 4 thin omitted)
+## Communities (32 total, 4 thin omitted)
 
 ### Community 0 - "Community 0"
 Cohesion: 0.06
@@ -98,8 +104,8 @@ Cohesion: 0.13
 Nodes (14): API Progress — معامله‌یار, Database Schema (`src/prisma/schema.prisma`), ✅ Done, Express Server (`src/server.ts`), File Upload & Screenshots Middleware, High Priority, Low Priority, Medium Priority (+6 more)
 
 ### Community 7 - "Community 7"
-Cohesion: 0.16
-Nodes (25): DesktopTableProps, DetailPanel(), DetailPanelProps, MobileCardsList(), MobileCardsListProps, SummaryBar(), SummaryBarProps, CandlestickData (+17 more)
+Cohesion: 0.10
+Nodes (32): ImportMT4Modal(), ImportMT4ModalProps, ManualTradeModal(), ManualTradeModalProps, DesktopTableProps, DetailPanel(), DetailPanelProps, MobileCardsList() (+24 more)
 
 ### Community 8 - "Community 8"
 Cohesion: 0.12
@@ -118,16 +124,16 @@ Cohesion: 0.25
 Nodes (7): compilerOptions, esModuleInterop, module, moduleResolution, skipLibCheck, strict, target
 
 ### Community 12 - "Community 12"
-Cohesion: 0.21
-Nodes (7): ConfirmModal(), ConfirmModalProps, ImportMT4Modal(), ImportMT4ModalProps, ManualTradeModal(), ManualTradeModalProps, MOCK_TRADES
+Cohesion: 0.33
+Nodes (6): 1. Should this animate at all?, 2. What is the purpose?, 3. What easing should it use?, 4. How fast should it be?, Perceived performance, The Animation Decision Framework
 
 ### Community 13 - "Community 13"
 Cohesion: 0.29
 Nodes (6): File, How it works, JSON payload format, MT5 Expert Advisor — Trade Sync, Notes, Setup
 
 ### Community 19 - "Community 19"
-Cohesion: 0.05
-Nodes (43): 1. Should this animate at all?, 2. What is the purpose?, 3. What easing should it use?, 3D transforms for depth, 4. How fast should it be?, Accessibility, Asymmetric enter/exit timing, Beauty is leverage (+35 more)
+Cohesion: 0.22
+Nodes (8): Accessibility, Design Engineering, Initial Response, prefers-reduced-motion, Review Checklist, Review Format (Required), Stagger Animations, Touch device hover states
 
 ### Community 20 - "Community 20"
 Cohesion: 0.32
@@ -149,6 +155,30 @@ Nodes (6): Damping at boundaries, Friction instead of hard stops, Gesture and Dr
 Cohesion: 0.25
 Nodes (8): Animate enter states with @starting-style, Buttons must feel responsive, Component Building Principles, Make popovers origin-aware, Never animate from scale(0), Tooltips: skip delay on subsequent hovers, Use blur to mask imperfect transitions, Use CSS transitions over keyframes for interruptible UI
 
+### Community 26 - "Community 26"
+Cohesion: 0.33
+Nodes (6): clip-path for Animation, Comparison sliders, Hold-to-delete pattern, Image reveals on scroll, Tabs with perfect color transitions, The inset shape
+
+### Community 27 - "Community 27"
+Cohesion: 0.40
+Nodes (5): 3D transforms for depth, CSS Transform Mastery, scale() scales children too, transform-origin, translateY with percentages
+
+### Community 28 - "Community 28"
+Cohesion: 0.40
+Nodes (5): Asymmetric enter/exit timing, Cohesion matters, Review your work the next day, The opacity + height combination, The Sonner Principles (Building Loved Components)
+
+### Community 29 - "Community 29"
+Cohesion: 0.40
+Nodes (5): Interruptibility advantage, Spring Animations, Spring-based mouse interactions, Spring configuration, When to use springs
+
+### Community 30 - "Community 30"
+Cohesion: 0.50
+Nodes (4): Beauty is leverage, Core Philosophy, Taste is trained, not innate, Unseen details compound
+
+### Community 31 - "Community 31"
+Cohesion: 0.50
+Nodes (4): Debugging Animations, Frame-by-frame inspection, Slow motion testing, Test on real devices
+
 ## Knowledge Gaps
 - **234 isolated node(s):** `name`, `version`, `private`, `dev`, `build` (+229 more)
   These have ≤1 connection - possible missing edges or undocumented components.
@@ -157,7 +187,7 @@ Nodes (8): Animate enter states with @starting-style, Buttons must feel responsi
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `Design Engineering` connect `Community 19` to `Community 24`, `Community 25`, `Community 22`?**
+- **Why does `Design Engineering` connect `Community 19` to `Community 12`, `Community 22`, `Community 24`, `Community 25`, `Community 26`, `Community 27`, `Community 28`, `Community 29`, `Community 30`, `Community 31`?**
   _High betweenness centrality (0.028) - this node is a cross-community bridge._
 - **Why does `Component Building Principles` connect `Community 25` to `Community 19`?**
   _High betweenness centrality (0.006) - this node is a cross-community bridge._

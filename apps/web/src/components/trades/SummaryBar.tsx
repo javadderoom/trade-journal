@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { toPersianDigits, formatPersianCurrency, formatToman } from '../utils/farsi';
+import { toPersianDigits, formatPersianCurrency, formatToman } from '../../utils/farsi';
 
 interface SummaryBarProps {
   count: number;

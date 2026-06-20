@@ -1,8 +1,8 @@
 'use client';
 
 import React from 'react';
-import Select from './Select';
-import { getSymbolFilterOptions } from '../utils/tradeHelpers';
+import Select from '../ui/Select';
+import { getSymbolFilterOptions } from '../../utils/tradeHelpers';
 
 interface FilterBarProps {
   searchQuery: string;

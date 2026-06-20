@@ -2,13 +2,13 @@
 
 import React from 'react';
 import { Trade } from './TradesTable';
-import { toPersianDigits, formatPersianCurrency, formatToman } from '../utils/farsi';
+import { toPersianDigits, formatPersianCurrency, formatToman } from '../../utils/farsi';
 import {
   getEmotionEmoji,
   getEmotionLabel,
   formatDate,
   getTradingSession
-} from '../utils/tradeHelpers';
+} from '../../utils/tradeHelpers';
 
 interface DesktopTableProps {
   paginatedTrades: Trade[];

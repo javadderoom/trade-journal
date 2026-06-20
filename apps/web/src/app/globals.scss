@@ -1,8 +1,8 @@
 /* Global styles for Next.js App Router (SCSS) */
 @use './variables' as *;
-@use '../components/trades';
-@use '../components/select';
-@use '../components/sidenav';
+@use '../components/trades/trades';
+@use '../components/ui/select';
+@use '../components/layout/sidenav';
 /* Vazirmatn is loaded via /fonts/vazirmatn.css in layout.tsx (self-hosted, no CDN) */
 
 

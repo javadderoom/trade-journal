@@ -1,14 +1,14 @@
 'use client';
 
 import React, { useState, useEffect, useMemo } from 'react';
-import { toPersianDigits } from '../utils/farsi';
-import ConfirmModal from './ConfirmModal';
+import { toPersianDigits } from '../../utils/farsi';
+import ConfirmModal from '../ui/ConfirmModal';
 import SummaryBar from './SummaryBar';
 import FilterBar from './FilterBar';
 import DesktopTable from './DesktopTable';
 import MobileCardsList from './MobileCardsList';
 import DetailPanel from './DetailPanel';
-import { getMainPair } from '../utils/tradeHelpers';
+import { getMainPair } from '../../utils/tradeHelpers';
 
 export interface Trade {
   id: string;

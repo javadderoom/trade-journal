@@ -1,7 +1,6 @@
 'use client';
 
 import React from 'react';
-import './trades.scss';
 
 interface ConfirmModalProps {
   isOpen: boolean;

@@ -930,7 +930,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "trades_page",
-      "community": 12,
+      "community": 7,
       "norm_label": "page.tsx"
     },
     {
@@ -940,7 +940,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "trades_page_mock_trades",
-      "community": 12,
+      "community": 7,
       "norm_label": "mock_trades"
     },
     {
@@ -950,428 +950,428 @@
       "source_location": "L181",
       "_origin": "ast",
       "id": "trades_page_tradespage",
-      "community": 12,
+      "community": 7,
       "norm_label": "tradespage()"
     },
     {
       "label": "BottomNavBar.tsx",
       "file_type": "code",
-      "source_file": "apps/web/src/components/BottomNavBar.tsx",
+      "source_file": "apps/web/src/components/layout/BottomNavBar.tsx",
       "source_location": "L1",
       "_origin": "ast",
-      "id": "components_bottomnavbar",
+      "id": "layout_bottomnavbar",
       "community": 14,
       "norm_label": "bottomnavbar.tsx"
     },
     {
       "label": "BottomNavBar()",
       "file_type": "code",
-      "source_file": "apps/web/src/components/BottomNavBar.tsx",
+      "source_file": "apps/web/src/components/layout/BottomNavBar.tsx",
       "source_location": "L7",
       "_origin": "ast",
-      "id": "components_bottomnavbar_bottomnavbar",
+      "id": "layout_bottomnavbar_bottomnavbar",
       "community": 14,
       "norm_label": "bottomnavbar()"
     },
     {
-      "label": "ConfirmModal.tsx",
-      "file_type": "code",
-      "source_file": "apps/web/src/components/ConfirmModal.tsx",
-      "source_location": "L1",
-      "_origin": "ast",
-      "id": "components_confirmmodal",
-      "community": 12,
-      "norm_label": "confirmmodal.tsx"
-    },
-    {
-      "label": "ConfirmModalProps",
-      "file_type": "code",
-      "source_file": "apps/web/src/components/ConfirmModal.tsx",
-      "source_location": "L6",
-      "_origin": "ast",
-      "id": "components_confirmmodal_confirmmodalprops",
-      "community": 12,
-      "norm_label": "confirmmodalprops"
-    },
-    {
-      "label": "ConfirmModal()",
-      "file_type": "code",
-      "source_file": "apps/web/src/components/ConfirmModal.tsx",
-      "source_location": "L18",
-      "_origin": "ast",
-      "id": "components_confirmmodal_confirmmodal",
-      "community": 12,
-      "norm_label": "confirmmodal()"
-    },
-    {
-      "label": "DesktopTable.tsx",
-      "file_type": "code",
-      "source_file": "apps/web/src/components/DesktopTable.tsx",
-      "source_location": "L1",
-      "_origin": "ast",
-      "id": "components_desktoptable",
-      "community": 7,
-      "norm_label": "desktoptable.tsx"
-    },
-    {
-      "label": "DesktopTableProps",
-      "file_type": "code",
-      "source_file": "apps/web/src/components/DesktopTable.tsx",
-      "source_location": "L13",
-      "_origin": "ast",
-      "id": "components_desktoptable_desktoptableprops",
-      "community": 7,
-      "norm_label": "desktoptableprops"
-    },
-    {
-      "label": "DesktopTable()",
-      "file_type": "code",
-      "source_file": "apps/web/src/components/DesktopTable.tsx",
-      "source_location": "L26",
-      "_origin": "ast",
-      "id": "components_desktoptable_desktoptable",
-      "community": 7,
-      "norm_label": "desktoptable()"
-    },
-    {
-      "label": "DetailPanel.tsx",
-      "file_type": "code",
-      "source_file": "apps/web/src/components/DetailPanel.tsx",
-      "source_location": "L1",
-      "_origin": "ast",
-      "id": "components_detailpanel",
-      "community": 7,
-      "norm_label": "detailpanel.tsx"
-    },
-    {
-      "label": "DetailPanelProps",
-      "file_type": "code",
-      "source_file": "apps/web/src/components/DetailPanel.tsx",
-      "source_location": "L14",
-      "_origin": "ast",
-      "id": "components_detailpanel_detailpanelprops",
-      "community": 7,
-      "norm_label": "detailpanelprops"
-    },
-    {
-      "label": "DetailPanel()",
-      "file_type": "code",
-      "source_file": "apps/web/src/components/DetailPanel.tsx",
-      "source_location": "L33",
-      "_origin": "ast",
-      "id": "components_detailpanel_detailpanel",
-      "community": 7,
-      "norm_label": "detailpanel()"
-    },
-    {
-      "label": "FilterBar.tsx",
-      "file_type": "code",
-      "source_file": "apps/web/src/components/FilterBar.tsx",
-      "source_location": "L1",
-      "_origin": "ast",
-      "id": "components_filterbar",
-      "community": 20,
-      "norm_label": "filterbar.tsx"
-    },
-    {
-      "label": "FilterBarProps",
-      "file_type": "code",
-      "source_file": "apps/web/src/components/FilterBar.tsx",
-      "source_location": "L7",
-      "_origin": "ast",
-      "id": "components_filterbar_filterbarprops",
-      "community": 20,
-      "norm_label": "filterbarprops"
-    },
-    {
-      "label": "FilterBar()",
-      "file_type": "code",
-      "source_file": "apps/web/src/components/FilterBar.tsx",
-      "source_location": "L30",
-      "_origin": "ast",
-      "id": "components_filterbar_filterbar",
-      "community": 20,
-      "norm_label": "filterbar()"
-    },
-    {
-      "label": "ImportMT4Modal.tsx",
-      "file_type": "code",
-      "source_file": "apps/web/src/components/ImportMT4Modal.tsx",
-      "source_location": "L1",
-      "_origin": "ast",
-      "id": "components_importmt4modal",
-      "community": 12,
-      "norm_label": "importmt4modal.tsx"
-    },
-    {
-      "label": "ImportMT4ModalProps",
-      "file_type": "code",
-      "source_file": "apps/web/src/components/ImportMT4Modal.tsx",
-      "source_location": "L5",
-      "_origin": "ast",
-      "id": "components_importmt4modal_importmt4modalprops",
-      "community": 12,
-      "norm_label": "importmt4modalprops"
-    },
-    {
-      "label": "ImportMT4Modal()",
-      "file_type": "code",
-      "source_file": "apps/web/src/components/ImportMT4Modal.tsx",
-      "source_location": "L11",
-      "_origin": "ast",
-      "id": "components_importmt4modal_importmt4modal",
-      "community": 12,
-      "norm_label": "importmt4modal()"
-    },
-    {
-      "label": "ManualTradeModal.tsx",
-      "file_type": "code",
-      "source_file": "apps/web/src/components/ManualTradeModal.tsx",
-      "source_location": "L1",
-      "_origin": "ast",
-      "id": "components_manualtrademodal",
-      "community": 12,
-      "norm_label": "manualtrademodal.tsx"
-    },
-    {
-      "label": "ManualTradeModalProps",
-      "file_type": "code",
-      "source_file": "apps/web/src/components/ManualTradeModal.tsx",
-      "source_location": "L5",
-      "_origin": "ast",
-      "id": "components_manualtrademodal_manualtrademodalprops",
-      "community": 12,
-      "norm_label": "manualtrademodalprops"
-    },
-    {
-      "label": "ManualTradeModal()",
-      "file_type": "code",
-      "source_file": "apps/web/src/components/ManualTradeModal.tsx",
-      "source_location": "L11",
-      "_origin": "ast",
-      "id": "components_manualtrademodal_manualtrademodal",
-      "community": 12,
-      "norm_label": "manualtrademodal()"
-    },
-    {
-      "label": "MobileCardsList.tsx",
-      "file_type": "code",
-      "source_file": "apps/web/src/components/MobileCardsList.tsx",
-      "source_location": "L1",
-      "_origin": "ast",
-      "id": "components_mobilecardslist",
-      "community": 7,
-      "norm_label": "mobilecardslist.tsx"
-    },
-    {
-      "label": "MobileCardsListProps",
-      "file_type": "code",
-      "source_file": "apps/web/src/components/MobileCardsList.tsx",
-      "source_location": "L13",
-      "_origin": "ast",
-      "id": "components_mobilecardslist_mobilecardslistprops",
-      "community": 7,
-      "norm_label": "mobilecardslistprops"
-    },
-    {
-      "label": "MobileCardsList()",
-      "file_type": "code",
-      "source_file": "apps/web/src/components/MobileCardsList.tsx",
-      "source_location": "L28",
-      "_origin": "ast",
-      "id": "components_mobilecardslist_mobilecardslist",
-      "community": 7,
-      "norm_label": "mobilecardslist()"
-    },
-    {
-      "label": "Select.tsx",
-      "file_type": "code",
-      "source_file": "apps/web/src/components/Select.tsx",
-      "source_location": "L1",
-      "_origin": "ast",
-      "id": "components_select",
-      "community": 20,
-      "norm_label": "select.tsx"
-    },
-    {
-      "label": "SelectOption",
-      "file_type": "code",
-      "source_file": "apps/web/src/components/Select.tsx",
-      "source_location": "L5",
-      "_origin": "ast",
-      "id": "components_select_selectoption",
-      "community": 20,
-      "norm_label": "selectoption"
-    },
-    {
-      "label": "SelectProps",
-      "file_type": "code",
-      "source_file": "apps/web/src/components/Select.tsx",
-      "source_location": "L10",
-      "_origin": "ast",
-      "id": "components_select_selectprops",
-      "community": 20,
-      "norm_label": "selectprops"
-    },
-    {
-      "label": "Select()",
-      "file_type": "code",
-      "source_file": "apps/web/src/components/Select.tsx",
-      "source_location": "L19",
-      "_origin": "ast",
-      "id": "components_select_select",
-      "community": 20,
-      "norm_label": "select()"
-    },
-    {
       "label": "SideNavBar.tsx",
       "file_type": "code",
-      "source_file": "apps/web/src/components/SideNavBar.tsx",
+      "source_file": "apps/web/src/components/layout/SideNavBar.tsx",
       "source_location": "L1",
       "_origin": "ast",
-      "id": "components_sidenavbar",
+      "id": "layout_sidenavbar",
       "community": 14,
       "norm_label": "sidenavbar.tsx"
     },
     {
       "label": "SideNavBar()",
       "file_type": "code",
-      "source_file": "apps/web/src/components/SideNavBar.tsx",
+      "source_file": "apps/web/src/components/layout/SideNavBar.tsx",
       "source_location": "L7",
       "_origin": "ast",
-      "id": "components_sidenavbar_sidenavbar",
+      "id": "layout_sidenavbar_sidenavbar",
       "community": 14,
       "norm_label": "sidenavbar()"
     },
     {
-      "label": "SummaryBar.tsx",
+      "label": "ImportMT4Modal.tsx",
       "file_type": "code",
-      "source_file": "apps/web/src/components/SummaryBar.tsx",
+      "source_file": "apps/web/src/components/modals/ImportMT4Modal.tsx",
       "source_location": "L1",
       "_origin": "ast",
-      "id": "components_summarybar",
+      "id": "modals_importmt4modal",
+      "community": 7,
+      "norm_label": "importmt4modal.tsx"
+    },
+    {
+      "label": "ImportMT4ModalProps",
+      "file_type": "code",
+      "source_file": "apps/web/src/components/modals/ImportMT4Modal.tsx",
+      "source_location": "L5",
+      "_origin": "ast",
+      "id": "modals_importmt4modal_importmt4modalprops",
+      "community": 7,
+      "norm_label": "importmt4modalprops"
+    },
+    {
+      "label": "ImportMT4Modal()",
+      "file_type": "code",
+      "source_file": "apps/web/src/components/modals/ImportMT4Modal.tsx",
+      "source_location": "L11",
+      "_origin": "ast",
+      "id": "modals_importmt4modal_importmt4modal",
+      "community": 7,
+      "norm_label": "importmt4modal()"
+    },
+    {
+      "label": "ManualTradeModal.tsx",
+      "file_type": "code",
+      "source_file": "apps/web/src/components/modals/ManualTradeModal.tsx",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "modals_manualtrademodal",
+      "community": 7,
+      "norm_label": "manualtrademodal.tsx"
+    },
+    {
+      "label": "ManualTradeModalProps",
+      "file_type": "code",
+      "source_file": "apps/web/src/components/modals/ManualTradeModal.tsx",
+      "source_location": "L5",
+      "_origin": "ast",
+      "id": "modals_manualtrademodal_manualtrademodalprops",
+      "community": 7,
+      "norm_label": "manualtrademodalprops"
+    },
+    {
+      "label": "ManualTradeModal()",
+      "file_type": "code",
+      "source_file": "apps/web/src/components/modals/ManualTradeModal.tsx",
+      "source_location": "L11",
+      "_origin": "ast",
+      "id": "modals_manualtrademodal_manualtrademodal",
+      "community": 7,
+      "norm_label": "manualtrademodal()"
+    },
+    {
+      "label": "DesktopTable.tsx",
+      "file_type": "code",
+      "source_file": "apps/web/src/components/trades/DesktopTable.tsx",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "trades_desktoptable",
+      "community": 7,
+      "norm_label": "desktoptable.tsx"
+    },
+    {
+      "label": "DesktopTableProps",
+      "file_type": "code",
+      "source_file": "apps/web/src/components/trades/DesktopTable.tsx",
+      "source_location": "L13",
+      "_origin": "ast",
+      "id": "trades_desktoptable_desktoptableprops",
+      "community": 7,
+      "norm_label": "desktoptableprops"
+    },
+    {
+      "label": "DesktopTable()",
+      "file_type": "code",
+      "source_file": "apps/web/src/components/trades/DesktopTable.tsx",
+      "source_location": "L26",
+      "_origin": "ast",
+      "id": "trades_desktoptable_desktoptable",
+      "community": 7,
+      "norm_label": "desktoptable()"
+    },
+    {
+      "label": "DetailPanel.tsx",
+      "file_type": "code",
+      "source_file": "apps/web/src/components/trades/DetailPanel.tsx",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "trades_detailpanel",
+      "community": 7,
+      "norm_label": "detailpanel.tsx"
+    },
+    {
+      "label": "DetailPanelProps",
+      "file_type": "code",
+      "source_file": "apps/web/src/components/trades/DetailPanel.tsx",
+      "source_location": "L14",
+      "_origin": "ast",
+      "id": "trades_detailpanel_detailpanelprops",
+      "community": 7,
+      "norm_label": "detailpanelprops"
+    },
+    {
+      "label": "DetailPanel()",
+      "file_type": "code",
+      "source_file": "apps/web/src/components/trades/DetailPanel.tsx",
+      "source_location": "L33",
+      "_origin": "ast",
+      "id": "trades_detailpanel_detailpanel",
+      "community": 7,
+      "norm_label": "detailpanel()"
+    },
+    {
+      "label": "FilterBar.tsx",
+      "file_type": "code",
+      "source_file": "apps/web/src/components/trades/FilterBar.tsx",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "trades_filterbar",
+      "community": 20,
+      "norm_label": "filterbar.tsx"
+    },
+    {
+      "label": "FilterBarProps",
+      "file_type": "code",
+      "source_file": "apps/web/src/components/trades/FilterBar.tsx",
+      "source_location": "L7",
+      "_origin": "ast",
+      "id": "trades_filterbar_filterbarprops",
+      "community": 20,
+      "norm_label": "filterbarprops"
+    },
+    {
+      "label": "FilterBar()",
+      "file_type": "code",
+      "source_file": "apps/web/src/components/trades/FilterBar.tsx",
+      "source_location": "L30",
+      "_origin": "ast",
+      "id": "trades_filterbar_filterbar",
+      "community": 20,
+      "norm_label": "filterbar()"
+    },
+    {
+      "label": "MobileCardsList.tsx",
+      "file_type": "code",
+      "source_file": "apps/web/src/components/trades/MobileCardsList.tsx",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "trades_mobilecardslist",
+      "community": 7,
+      "norm_label": "mobilecardslist.tsx"
+    },
+    {
+      "label": "MobileCardsListProps",
+      "file_type": "code",
+      "source_file": "apps/web/src/components/trades/MobileCardsList.tsx",
+      "source_location": "L13",
+      "_origin": "ast",
+      "id": "trades_mobilecardslist_mobilecardslistprops",
+      "community": 7,
+      "norm_label": "mobilecardslistprops"
+    },
+    {
+      "label": "MobileCardsList()",
+      "file_type": "code",
+      "source_file": "apps/web/src/components/trades/MobileCardsList.tsx",
+      "source_location": "L28",
+      "_origin": "ast",
+      "id": "trades_mobilecardslist_mobilecardslist",
+      "community": 7,
+      "norm_label": "mobilecardslist()"
+    },
+    {
+      "label": "SummaryBar.tsx",
+      "file_type": "code",
+      "source_file": "apps/web/src/components/trades/SummaryBar.tsx",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "trades_summarybar",
       "community": 7,
       "norm_label": "summarybar.tsx"
     },
     {
       "label": "SummaryBarProps",
       "file_type": "code",
-      "source_file": "apps/web/src/components/SummaryBar.tsx",
+      "source_file": "apps/web/src/components/trades/SummaryBar.tsx",
       "source_location": "L6",
       "_origin": "ast",
-      "id": "components_summarybar_summarybarprops",
+      "id": "trades_summarybar_summarybarprops",
       "community": 7,
       "norm_label": "summarybarprops"
     },
     {
       "label": "SummaryBar()",
       "file_type": "code",
-      "source_file": "apps/web/src/components/SummaryBar.tsx",
+      "source_file": "apps/web/src/components/trades/SummaryBar.tsx",
       "source_location": "L13",
       "_origin": "ast",
-      "id": "components_summarybar_summarybar",
+      "id": "trades_summarybar_summarybar",
       "community": 7,
       "norm_label": "summarybar()"
     },
     {
       "label": "TradeChart.tsx",
       "file_type": "code",
-      "source_file": "apps/web/src/components/TradeChart.tsx",
+      "source_file": "apps/web/src/components/trades/TradeChart.tsx",
       "source_location": "L1",
       "_origin": "ast",
-      "id": "components_tradechart",
+      "id": "trades_tradechart",
       "community": 7,
       "norm_label": "tradechart.tsx"
     },
     {
       "label": "CandlestickData",
       "file_type": "code",
-      "source_file": "apps/web/src/components/TradeChart.tsx",
+      "source_file": "apps/web/src/components/trades/TradeChart.tsx",
       "source_location": "L6",
       "_origin": "ast",
-      "id": "components_tradechart_candlestickdata",
+      "id": "trades_tradechart_candlestickdata",
       "community": 7,
       "norm_label": "candlestickdata"
     },
     {
       "label": "TradeChartProps",
       "file_type": "code",
-      "source_file": "apps/web/src/components/TradeChart.tsx",
+      "source_file": "apps/web/src/components/trades/TradeChart.tsx",
       "source_location": "L14",
       "_origin": "ast",
-      "id": "components_tradechart_tradechartprops",
+      "id": "trades_tradechart_tradechartprops",
       "community": 7,
       "norm_label": "tradechartprops"
     },
     {
       "label": "TradeChart()",
       "file_type": "code",
-      "source_file": "apps/web/src/components/TradeChart.tsx",
+      "source_file": "apps/web/src/components/trades/TradeChart.tsx",
       "source_location": "L25",
       "_origin": "ast",
-      "id": "components_tradechart_tradechart",
+      "id": "trades_tradechart_tradechart",
       "community": 7,
       "norm_label": "tradechart()"
     },
     {
       "label": "TradesTable.tsx",
       "file_type": "code",
-      "source_file": "apps/web/src/components/TradesTable.tsx",
+      "source_file": "apps/web/src/components/trades/TradesTable.tsx",
       "source_location": "L1",
       "_origin": "ast",
-      "id": "components_tradestable",
+      "id": "trades_tradestable",
       "community": 7,
       "norm_label": "tradestable.tsx"
     },
     {
       "label": "Trade",
       "file_type": "code",
-      "source_file": "apps/web/src/components/TradesTable.tsx",
+      "source_file": "apps/web/src/components/trades/TradesTable.tsx",
       "source_location": "L13",
       "_origin": "ast",
-      "id": "components_tradestable_trade",
+      "id": "trades_tradestable_trade",
       "community": 7,
       "norm_label": "trade"
     },
     {
       "label": "TradesTableProps",
       "file_type": "code",
-      "source_file": "apps/web/src/components/TradesTable.tsx",
+      "source_file": "apps/web/src/components/trades/TradesTable.tsx",
       "source_location": "L38",
       "_origin": "ast",
-      "id": "components_tradestable_tradestableprops",
+      "id": "trades_tradestable_tradestableprops",
       "community": 7,
       "norm_label": "tradestableprops"
     },
     {
       "label": "DEFAULT_TAGS",
       "file_type": "code",
-      "source_file": "apps/web/src/components/TradesTable.tsx",
+      "source_file": "apps/web/src/components/trades/TradesTable.tsx",
       "source_location": "L53",
       "_origin": "ast",
-      "id": "components_tradestable_default_tags",
+      "id": "trades_tradestable_default_tags",
       "community": 7,
       "norm_label": "default_tags"
     },
     {
       "label": "DEFAULT_EMOTIONS",
       "file_type": "code",
-      "source_file": "apps/web/src/components/TradesTable.tsx",
+      "source_file": "apps/web/src/components/trades/TradesTable.tsx",
       "source_location": "L72",
       "_origin": "ast",
-      "id": "components_tradestable_default_emotions",
+      "id": "trades_tradestable_default_emotions",
       "community": 7,
       "norm_label": "default_emotions"
     },
     {
       "label": "TradesTable()",
       "file_type": "code",
-      "source_file": "apps/web/src/components/TradesTable.tsx",
+      "source_file": "apps/web/src/components/trades/TradesTable.tsx",
       "source_location": "L80",
       "_origin": "ast",
-      "id": "components_tradestable_tradestable",
+      "id": "trades_tradestable_tradestable",
       "community": 7,
       "norm_label": "tradestable()"
+    },
+    {
+      "label": "ConfirmModal.tsx",
+      "file_type": "code",
+      "source_file": "apps/web/src/components/ui/ConfirmModal.tsx",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "ui_confirmmodal",
+      "community": 7,
+      "norm_label": "confirmmodal.tsx"
+    },
+    {
+      "label": "ConfirmModalProps",
+      "file_type": "code",
+      "source_file": "apps/web/src/components/ui/ConfirmModal.tsx",
+      "source_location": "L5",
+      "_origin": "ast",
+      "id": "ui_confirmmodal_confirmmodalprops",
+      "community": 7,
+      "norm_label": "confirmmodalprops"
+    },
+    {
+      "label": "ConfirmModal()",
+      "file_type": "code",
+      "source_file": "apps/web/src/components/ui/ConfirmModal.tsx",
+      "source_location": "L17",
+      "_origin": "ast",
+      "id": "ui_confirmmodal_confirmmodal",
+      "community": 7,
+      "norm_label": "confirmmodal()"
+    },
+    {
+      "label": "Select.tsx",
+      "file_type": "code",
+      "source_file": "apps/web/src/components/ui/Select.tsx",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "ui_select",
+      "community": 20,
+      "norm_label": "select.tsx"
+    },
+    {
+      "label": "SelectOption",
+      "file_type": "code",
+      "source_file": "apps/web/src/components/ui/Select.tsx",
+      "source_location": "L5",
+      "_origin": "ast",
+      "id": "ui_select_selectoption",
+      "community": 20,
+      "norm_label": "selectoption"
+    },
+    {
+      "label": "SelectProps",
+      "file_type": "code",
+      "source_file": "apps/web/src/components/ui/Select.tsx",
+      "source_location": "L10",
+      "_origin": "ast",
+      "id": "ui_select_selectprops",
+      "community": 20,
+      "norm_label": "selectprops"
+    },
+    {
+      "label": "Select()",
+      "file_type": "code",
+      "source_file": "apps/web/src/components/ui/Select.tsx",
+      "source_location": "L19",
+      "_origin": "ast",
+      "id": "ui_select_select",
+      "community": 20,
+      "norm_label": "select()"
     },
     {
       "label": "farsi.ts",
@@ -1980,7 +1980,7 @@
       "source_location": "L18",
       "_origin": "ast",
       "id": "emil_design_eng_skill_core_philosophy",
-      "community": 19,
+      "community": 30,
       "norm_label": "core philosophy"
     },
     {
@@ -1990,7 +1990,7 @@
       "source_location": "L20",
       "_origin": "ast",
       "id": "emil_design_eng_skill_taste_is_trained_not_innate",
-      "community": 19,
+      "community": 30,
       "norm_label": "taste is trained, not innate"
     },
     {
@@ -2000,7 +2000,7 @@
       "source_location": "L26",
       "_origin": "ast",
       "id": "emil_design_eng_skill_unseen_details_compound",
-      "community": 19,
+      "community": 30,
       "norm_label": "unseen details compound"
     },
     {
@@ -2010,7 +2010,7 @@
       "source_location": "L34",
       "_origin": "ast",
       "id": "emil_design_eng_skill_beauty_is_leverage",
-      "community": 19,
+      "community": 30,
       "norm_label": "beauty is leverage"
     },
     {
@@ -2030,7 +2030,7 @@
       "source_location": "L62",
       "_origin": "ast",
       "id": "emil_design_eng_skill_the_animation_decision_framework",
-      "community": 19,
+      "community": 12,
       "norm_label": "the animation decision framework"
     },
     {
@@ -2040,7 +2040,7 @@
       "source_location": "L66",
       "_origin": "ast",
       "id": "emil_design_eng_skill_1_should_this_animate_at_all",
-      "community": 19,
+      "community": 12,
       "norm_label": "1. should this animate at all?"
     },
     {
@@ -2050,7 +2050,7 @@
       "source_location": "L81",
       "_origin": "ast",
       "id": "emil_design_eng_skill_2_what_is_the_purpose",
-      "community": 19,
+      "community": 12,
       "norm_label": "2. what is the purpose?"
     },
     {
@@ -2060,7 +2060,7 @@
       "source_location": "L95",
       "_origin": "ast",
       "id": "emil_design_eng_skill_3_what_easing_should_it_use",
-      "community": 19,
+      "community": 12,
       "norm_label": "3. what easing should it use?"
     },
     {
@@ -2070,7 +2070,7 @@
       "source_location": "L125",
       "_origin": "ast",
       "id": "emil_design_eng_skill_4_how_fast_should_it_be",
-      "community": 19,
+      "community": 12,
       "norm_label": "4. how fast should it be?"
     },
     {
@@ -2080,7 +2080,7 @@
       "source_location": "L137",
       "_origin": "ast",
       "id": "emil_design_eng_skill_perceived_performance",
-      "community": 19,
+      "community": 12,
       "norm_label": "perceived performance"
     },
     {
@@ -2090,7 +2090,7 @@
       "source_location": "L147",
       "_origin": "ast",
       "id": "emil_design_eng_skill_spring_animations",
-      "community": 19,
+      "community": 29,
       "norm_label": "spring animations"
     },
     {
@@ -2100,7 +2100,7 @@
       "source_location": "L151",
       "_origin": "ast",
       "id": "emil_design_eng_skill_when_to_use_springs",
-      "community": 19,
+      "community": 29,
       "norm_label": "when to use springs"
     },
     {
@@ -2110,7 +2110,7 @@
       "source_location": "L158",
       "_origin": "ast",
       "id": "emil_design_eng_skill_spring_based_mouse_interactions",
-      "community": 19,
+      "community": 29,
       "norm_label": "spring-based mouse interactions"
     },
     {
@@ -2120,7 +2120,7 @@
       "source_location": "L177",
       "_origin": "ast",
       "id": "emil_design_eng_skill_spring_configuration",
-      "community": 19,
+      "community": 29,
       "norm_label": "spring configuration"
     },
     {
@@ -2130,7 +2130,7 @@
       "source_location": "L193",
       "_origin": "ast",
       "id": "emil_design_eng_skill_interruptibility_advantage",
-      "community": 19,
+      "community": 29,
       "norm_label": "interruptibility advantage"
     },
     {
@@ -2220,7 +2220,7 @@
       "source_location": "L351",
       "_origin": "ast",
       "id": "emil_design_eng_skill_css_transform_mastery",
-      "community": 19,
+      "community": 27,
       "norm_label": "css transform mastery"
     },
     {
@@ -2230,7 +2230,7 @@
       "source_location": "L353",
       "_origin": "ast",
       "id": "emil_design_eng_skill_translatey_with_percentages",
-      "community": 19,
+      "community": 27,
       "norm_label": "translatey with percentages"
     },
     {
@@ -2240,7 +2240,7 @@
       "source_location": "L371",
       "_origin": "ast",
       "id": "emil_design_eng_skill_scale_scales_children_too",
-      "community": 19,
+      "community": 27,
       "norm_label": "scale() scales children too"
     },
     {
@@ -2250,7 +2250,7 @@
       "source_location": "L375",
       "_origin": "ast",
       "id": "emil_design_eng_skill_3d_transforms_for_depth",
-      "community": 19,
+      "community": 27,
       "norm_label": "3d transforms for depth"
     },
     {
@@ -2260,7 +2260,7 @@
       "source_location": "L394",
       "_origin": "ast",
       "id": "emil_design_eng_skill_transform_origin",
-      "community": 19,
+      "community": 27,
       "norm_label": "transform-origin"
     },
     {
@@ -2270,7 +2270,7 @@
       "source_location": "L398",
       "_origin": "ast",
       "id": "emil_design_eng_skill_clip_path_for_animation",
-      "community": 19,
+      "community": 26,
       "norm_label": "clip-path for animation"
     },
     {
@@ -2280,7 +2280,7 @@
       "source_location": "L402",
       "_origin": "ast",
       "id": "emil_design_eng_skill_the_inset_shape",
-      "community": 19,
+      "community": 26,
       "norm_label": "the inset shape"
     },
     {
@@ -2290,7 +2290,7 @@
       "source_location": "L428",
       "_origin": "ast",
       "id": "emil_design_eng_skill_tabs_with_perfect_color_transitions",
-      "community": 19,
+      "community": 26,
       "norm_label": "tabs with perfect color transitions"
     },
     {
@@ -2300,7 +2300,7 @@
       "source_location": "L432",
       "_origin": "ast",
       "id": "emil_design_eng_skill_hold_to_delete_pattern",
-      "community": 19,
+      "community": 26,
       "norm_label": "hold-to-delete pattern"
     },
     {
@@ -2310,7 +2310,7 @@
       "source_location": "L436",
       "_origin": "ast",
       "id": "emil_design_eng_skill_image_reveals_on_scroll",
-      "community": 19,
+      "community": 26,
       "norm_label": "image reveals on scroll"
     },
     {
@@ -2320,7 +2320,7 @@
       "source_location": "L440",
       "_origin": "ast",
       "id": "emil_design_eng_skill_comparison_sliders",
-      "community": 19,
+      "community": 26,
       "norm_label": "comparison sliders"
     },
     {
@@ -2480,7 +2480,7 @@
       "source_location": "L562",
       "_origin": "ast",
       "id": "emil_design_eng_skill_the_sonner_principles_building_loved_components",
-      "community": 19,
+      "community": 28,
       "norm_label": "the sonner principles (building loved components)"
     },
     {
@@ -2490,7 +2490,7 @@
       "source_location": "L578",
       "_origin": "ast",
       "id": "emil_design_eng_skill_cohesion_matters",
-      "community": 19,
+      "community": 28,
       "norm_label": "cohesion matters"
     },
     {
@@ -2500,7 +2500,7 @@
       "source_location": "L584",
       "_origin": "ast",
       "id": "emil_design_eng_skill_the_opacity_height_combination",
-      "community": 19,
+      "community": 28,
       "norm_label": "the opacity + height combination"
     },
     {
@@ -2510,7 +2510,7 @@
       "source_location": "L588",
       "_origin": "ast",
       "id": "emil_design_eng_skill_review_your_work_the_next_day",
-      "community": 19,
+      "community": 28,
       "norm_label": "review your work the next day"
     },
     {
@@ -2520,7 +2520,7 @@
       "source_location": "L592",
       "_origin": "ast",
       "id": "emil_design_eng_skill_asymmetric_enter_exit_timing",
-      "community": 19,
+      "community": 28,
       "norm_label": "asymmetric enter/exit timing"
     },
     {
@@ -2540,7 +2540,7 @@
       "source_location": "L642",
       "_origin": "ast",
       "id": "emil_design_eng_skill_debugging_animations",
-      "community": 19,
+      "community": 31,
       "norm_label": "debugging animations"
     },
     {
@@ -2550,7 +2550,7 @@
       "source_location": "L644",
       "_origin": "ast",
       "id": "emil_design_eng_skill_slow_motion_testing",
-      "community": 19,
+      "community": 31,
       "norm_label": "slow motion testing"
     },
     {
@@ -2560,7 +2560,7 @@
       "source_location": "L655",
       "_origin": "ast",
       "id": "emil_design_eng_skill_frame_by_frame_inspection",
-      "community": 19,
+      "community": 31,
       "norm_label": "frame-by-frame inspection"
     },
     {
@@ -2570,7 +2570,7 @@
       "source_location": "L659",
       "_origin": "ast",
       "id": "emil_design_eng_skill_test_on_real_devices",
-      "community": 19,
+      "community": 31,
       "norm_label": "test on real devices"
     },
     {
@@ -4601,7 +4601,7 @@
       "source_location": "L3",
       "weight": 1.0,
       "source": "app_layout",
-      "target": "components_bottomnavbar",
+      "target": "layout_bottomnavbar",
       "confidence_score": 1.0
     },
     {
@@ -4612,7 +4612,7 @@
       "source_location": "L3",
       "weight": 1.0,
       "source": "app_layout",
-      "target": "components_bottomnavbar_bottomnavbar",
+      "target": "layout_bottomnavbar_bottomnavbar",
       "confidence_score": 1.0
     },
     {
@@ -4622,9 +4622,9 @@
       "source_file": "apps/web/src/app/layout.tsx",
       "source_location": "L2",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "app_layout",
-      "target": "components_sidenavbar"
+      "target": "layout_sidenavbar",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
@@ -4633,9 +4633,9 @@
       "source_file": "apps/web/src/app/layout.tsx",
       "source_location": "L2",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "app_layout",
-      "target": "components_sidenavbar_sidenavbar"
+      "target": "layout_sidenavbar_sidenavbar",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -4652,33 +4652,11 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "apps/web/src/app/trades/page.tsx",
-      "source_location": "L7",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "trades_page",
-      "target": "components_confirmmodal"
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "apps/web/src/app/trades/page.tsx",
-      "source_location": "L7",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "trades_page",
-      "target": "components_confirmmodal_confirmmodal"
-    },
-    {
-      "relation": "imports_from",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "apps/web/src/app/trades/page.tsx",
       "source_location": "L6",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "trades_page",
-      "target": "components_importmt4modal"
+      "target": "modals_importmt4modal",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
@@ -4687,9 +4665,9 @@
       "source_file": "apps/web/src/app/trades/page.tsx",
       "source_location": "L6",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "trades_page",
-      "target": "components_importmt4modal_importmt4modal"
+      "target": "modals_importmt4modal_importmt4modal",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports_from",
@@ -4698,9 +4676,9 @@
       "source_file": "apps/web/src/app/trades/page.tsx",
       "source_location": "L5",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "trades_page",
-      "target": "components_manualtrademodal"
+      "target": "modals_manualtrademodal",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
@@ -4709,42 +4687,9 @@
       "source_file": "apps/web/src/app/trades/page.tsx",
       "source_location": "L5",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "trades_page",
-      "target": "components_manualtrademodal_manualtrademodal"
-    },
-    {
-      "relation": "imports_from",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "apps/web/src/app/trades/page.tsx",
-      "source_location": "L4",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "trades_page",
-      "target": "components_tradestable"
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "apps/web/src/app/trades/page.tsx",
-      "source_location": "L4",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "trades_page",
-      "target": "components_tradestable_trade"
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "apps/web/src/app/trades/page.tsx",
-      "source_location": "L4",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "trades_page",
-      "target": "components_tradestable_tradestable"
+      "target": "modals_manualtrademodal_manualtrademodal",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -4767,851 +4712,444 @@
       "target": "trades_page_tradespage"
     },
     {
-      "relation": "contains",
+      "relation": "imports_from",
+      "context": "import",
       "confidence": "EXTRACTED",
-      "source_file": "apps/web/src/components/BottomNavBar.tsx",
+      "source_file": "apps/web/src/app/trades/page.tsx",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "trades_page",
+      "target": "trades_tradestable",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/app/trades/page.tsx",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "trades_page",
+      "target": "trades_tradestable_trade",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/app/trades/page.tsx",
       "source_location": "L7",
       "weight": 1.0,
-      "source": "components_bottomnavbar",
-      "target": "components_bottomnavbar_bottomnavbar",
+      "source": "trades_page",
+      "target": "ui_confirmmodal",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/app/trades/page.tsx",
+      "source_location": "L7",
+      "weight": 1.0,
+      "source": "trades_page",
+      "target": "ui_confirmmodal_confirmmodal",
       "confidence_score": 1.0
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "apps/web/src/components/ConfirmModal.tsx",
-      "source_location": "L18",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "components_confirmmodal",
-      "target": "components_confirmmodal_confirmmodal"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "apps/web/src/components/ConfirmModal.tsx",
-      "source_location": "L6",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "components_confirmmodal",
-      "target": "components_confirmmodal_confirmmodalprops"
-    },
-    {
-      "relation": "imports_from",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "apps/web/src/components/TradesTable.tsx",
-      "source_location": "L8",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "components_tradestable",
-      "target": "components_confirmmodal"
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "apps/web/src/components/TradesTable.tsx",
-      "source_location": "L8",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "components_tradestable",
-      "target": "components_confirmmodal_confirmmodal"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "apps/web/src/components/DesktopTable.tsx",
-      "source_location": "L25",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "components_desktoptable",
-      "target": "components_desktoptable_desktoptable"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "apps/web/src/components/DesktopTable.tsx",
-      "source_location": "L13",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "components_desktoptable",
-      "target": "components_desktoptable_desktoptableprops"
-    },
-    {
-      "relation": "imports_from",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "apps/web/src/components/DesktopTable.tsx",
-      "source_location": "L4",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "components_desktoptable",
-      "target": "components_tradestable"
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "apps/web/src/components/DesktopTable.tsx",
-      "source_location": "L4",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "components_desktoptable",
-      "target": "components_tradestable_trade"
-    },
-    {
-      "relation": "imports_from",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "apps/web/src/components/DesktopTable.tsx",
-      "source_location": "L5",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "components_desktoptable",
-      "target": "utils_farsi"
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "apps/web/src/components/DesktopTable.tsx",
-      "source_location": "L5",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "components_desktoptable",
-      "target": "utils_farsi_formatpersiancurrency"
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "apps/web/src/components/DesktopTable.tsx",
-      "source_location": "L5",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "components_desktoptable",
-      "target": "utils_farsi_formattoman"
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "apps/web/src/components/DesktopTable.tsx",
-      "source_location": "L5",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "components_desktoptable",
-      "target": "utils_farsi_topersiandigits"
-    },
-    {
-      "relation": "imports_from",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "apps/web/src/components/DesktopTable.tsx",
-      "source_location": "L6",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "components_desktoptable",
-      "target": "utils_tradehelpers"
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "apps/web/src/components/DesktopTable.tsx",
-      "source_location": "L6",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "components_desktoptable",
-      "target": "utils_tradehelpers_formatdate"
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "apps/web/src/components/DesktopTable.tsx",
-      "source_location": "L6",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "components_desktoptable",
-      "target": "utils_tradehelpers_getemotionemoji"
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "apps/web/src/components/DesktopTable.tsx",
-      "source_location": "L6",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "components_desktoptable",
-      "target": "utils_tradehelpers_getemotionlabel"
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "apps/web/src/components/DesktopTable.tsx",
-      "source_location": "L6",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "components_desktoptable",
-      "target": "utils_tradehelpers_gettradingsession"
-    },
-    {
-      "relation": "references",
-      "context": "field",
-      "confidence": "EXTRACTED",
-      "source_file": "apps/web/src/components/DesktopTable.tsx",
-      "source_location": "L14",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "components_desktoptable_desktoptableprops",
-      "target": "components_tradestable_trade"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "apps/web/src/components/DetailPanel.tsx",
-      "source_location": "L32",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "components_detailpanel",
-      "target": "components_detailpanel_detailpanel"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "apps/web/src/components/DetailPanel.tsx",
-      "source_location": "L14",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "components_detailpanel",
-      "target": "components_detailpanel_detailpanelprops"
-    },
-    {
-      "relation": "imports_from",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "apps/web/src/components/DetailPanel.tsx",
-      "source_location": "L5",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "components_detailpanel",
-      "target": "components_tradechart"
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "apps/web/src/components/DetailPanel.tsx",
-      "source_location": "L5",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "components_detailpanel",
-      "target": "components_tradechart_tradechart"
-    },
-    {
-      "relation": "imports_from",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "apps/web/src/components/DetailPanel.tsx",
-      "source_location": "L4",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "components_detailpanel",
-      "target": "components_tradestable"
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "apps/web/src/components/DetailPanel.tsx",
-      "source_location": "L4",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "components_detailpanel",
-      "target": "components_tradestable_trade"
-    },
-    {
-      "relation": "imports_from",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "apps/web/src/components/DetailPanel.tsx",
-      "source_location": "L6",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "components_detailpanel",
-      "target": "utils_farsi"
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "apps/web/src/components/DetailPanel.tsx",
-      "source_location": "L6",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "components_detailpanel",
-      "target": "utils_farsi_formatpersiancurrency"
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "apps/web/src/components/DetailPanel.tsx",
-      "source_location": "L6",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "components_detailpanel",
-      "target": "utils_farsi_formattoman"
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "apps/web/src/components/DetailPanel.tsx",
-      "source_location": "L6",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "components_detailpanel",
-      "target": "utils_farsi_topersiandigits"
-    },
-    {
-      "relation": "imports_from",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "apps/web/src/components/DetailPanel.tsx",
+      "source_file": "apps/web/src/components/layout/BottomNavBar.tsx",
       "source_location": "L7",
       "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "components_detailpanel",
-      "target": "utils_tradehelpers"
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "apps/web/src/components/DetailPanel.tsx",
-      "source_location": "L7",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "components_detailpanel",
-      "target": "utils_tradehelpers_formatdate"
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "apps/web/src/components/DetailPanel.tsx",
-      "source_location": "L7",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "components_detailpanel",
-      "target": "utils_tradehelpers_getemotionemoji"
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "apps/web/src/components/DetailPanel.tsx",
-      "source_location": "L7",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "components_detailpanel",
-      "target": "utils_tradehelpers_getemotionlabel"
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "apps/web/src/components/DetailPanel.tsx",
-      "source_location": "L7",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "components_detailpanel",
-      "target": "utils_tradehelpers_gettradingsession"
-    },
-    {
-      "relation": "references",
-      "context": "field",
-      "confidence": "EXTRACTED",
-      "source_file": "apps/web/src/components/DetailPanel.tsx",
-      "source_location": "L15",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "components_detailpanel_detailpanelprops",
-      "target": "components_tradestable_trade"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "apps/web/src/components/DetailPanel.tsx",
-      "source_location": "L114",
-      "weight": 1.0,
-      "source": "components_detailpanel_detailpanel",
-      "target": "utils_farsi_formattoman"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "apps/web/src/components/DetailPanel.tsx",
-      "source_location": "L70",
-      "weight": 1.0,
-      "source": "components_detailpanel_detailpanel",
-      "target": "utils_farsi_topersiandigits"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "apps/web/src/components/DetailPanel.tsx",
-      "source_location": "L158",
-      "weight": 1.0,
-      "source": "components_detailpanel_detailpanel",
-      "target": "utils_tradehelpers_formatdate"
+      "source": "layout_bottomnavbar",
+      "target": "layout_bottomnavbar_bottomnavbar",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "apps/web/src/components/FilterBar.tsx",
+      "source_file": "apps/web/src/components/layout/SideNavBar.tsx",
+      "source_location": "L7",
+      "weight": 1.0,
+      "source": "layout_sidenavbar",
+      "target": "layout_sidenavbar_sidenavbar",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/components/modals/ImportMT4Modal.tsx",
+      "source_location": "L11",
+      "weight": 1.0,
+      "source": "modals_importmt4modal",
+      "target": "modals_importmt4modal_importmt4modal",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/components/modals/ImportMT4Modal.tsx",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "modals_importmt4modal",
+      "target": "modals_importmt4modal_importmt4modalprops",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/components/modals/ManualTradeModal.tsx",
+      "source_location": "L11",
+      "weight": 1.0,
+      "source": "modals_manualtrademodal",
+      "target": "modals_manualtrademodal_manualtrademodal",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/components/modals/ManualTradeModal.tsx",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "modals_manualtrademodal",
+      "target": "modals_manualtrademodal_manualtrademodalprops",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/components/trades/DesktopTable.tsx",
       "source_location": "L26",
       "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "components_filterbar",
-      "target": "components_filterbar_filterbar"
+      "source": "trades_desktoptable",
+      "target": "trades_desktoptable_desktoptable",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "apps/web/src/components/FilterBar.tsx",
-      "source_location": "L6",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "components_filterbar",
-      "target": "components_filterbar_filterbarprops"
-    },
-    {
-      "relation": "imports_from",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "apps/web/src/components/FilterBar.tsx",
-      "source_location": "L4",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "components_filterbar",
-      "target": "components_select"
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "apps/web/src/components/FilterBar.tsx",
-      "source_location": "L4",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "components_filterbar",
-      "target": "components_select_select"
-    },
-    {
-      "relation": "imports_from",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "apps/web/src/components/FilterBar.tsx",
-      "source_location": "L5",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "components_filterbar",
-      "target": "utils_tradehelpers"
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "apps/web/src/components/FilterBar.tsx",
-      "source_location": "L5",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "components_filterbar",
-      "target": "utils_tradehelpers_getsymbolfilteroptions"
-    },
-    {
-      "relation": "imports_from",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "apps/web/src/components/TradesTable.tsx",
-      "source_location": "L8",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "components_tradestable",
-      "target": "components_filterbar"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "apps/web/src/components/FilterBar.tsx",
-      "source_location": "L160",
-      "weight": 1.0,
-      "source": "components_filterbar_filterbar",
-      "target": "utils_tradehelpers_getsymbolfilteroptions"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "apps/web/src/components/ImportMT4Modal.tsx",
-      "source_location": "L11",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "components_importmt4modal",
-      "target": "components_importmt4modal_importmt4modal"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "apps/web/src/components/ImportMT4Modal.tsx",
-      "source_location": "L5",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "components_importmt4modal",
-      "target": "components_importmt4modal_importmt4modalprops"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "apps/web/src/components/ManualTradeModal.tsx",
-      "source_location": "L11",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "components_manualtrademodal",
-      "target": "components_manualtrademodal_manualtrademodal"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "apps/web/src/components/ManualTradeModal.tsx",
-      "source_location": "L5",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "components_manualtrademodal",
-      "target": "components_manualtrademodal_manualtrademodalprops"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "apps/web/src/components/MobileCardsList.tsx",
-      "source_location": "L25",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "components_mobilecardslist",
-      "target": "components_mobilecardslist_mobilecardslist"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "apps/web/src/components/MobileCardsList.tsx",
+      "source_file": "apps/web/src/components/trades/DesktopTable.tsx",
       "source_location": "L13",
       "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "components_mobilecardslist",
-      "target": "components_mobilecardslist_mobilecardslistprops"
+      "source": "trades_desktoptable",
+      "target": "trades_desktoptable_desktoptableprops",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports_from",
       "context": "import",
       "confidence": "EXTRACTED",
-      "source_file": "apps/web/src/components/MobileCardsList.tsx",
+      "source_file": "apps/web/src/components/trades/DesktopTable.tsx",
       "source_location": "L4",
       "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "components_mobilecardslist",
-      "target": "components_tradestable"
+      "source": "trades_desktoptable",
+      "target": "trades_tradestable",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
       "context": "import",
       "confidence": "EXTRACTED",
-      "source_file": "apps/web/src/components/MobileCardsList.tsx",
+      "source_file": "apps/web/src/components/trades/DesktopTable.tsx",
       "source_location": "L4",
       "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "components_mobilecardslist",
-      "target": "components_tradestable_trade"
+      "source": "trades_desktoptable",
+      "target": "trades_tradestable_trade",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports_from",
       "context": "import",
       "confidence": "EXTRACTED",
-      "source_file": "apps/web/src/components/MobileCardsList.tsx",
+      "source_file": "apps/web/src/components/trades/DesktopTable.tsx",
       "source_location": "L5",
       "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "components_mobilecardslist",
-      "target": "utils_farsi"
+      "source": "trades_desktoptable",
+      "target": "utils_farsi",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
       "context": "import",
       "confidence": "EXTRACTED",
-      "source_file": "apps/web/src/components/MobileCardsList.tsx",
+      "source_file": "apps/web/src/components/trades/DesktopTable.tsx",
       "source_location": "L5",
       "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "components_mobilecardslist",
-      "target": "utils_farsi_formatpersiancurrency"
+      "source": "trades_desktoptable",
+      "target": "utils_farsi_formatpersiancurrency",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
       "context": "import",
       "confidence": "EXTRACTED",
-      "source_file": "apps/web/src/components/MobileCardsList.tsx",
+      "source_file": "apps/web/src/components/trades/DesktopTable.tsx",
       "source_location": "L5",
       "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "components_mobilecardslist",
-      "target": "utils_farsi_formattoman"
+      "source": "trades_desktoptable",
+      "target": "utils_farsi_formattoman",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
       "context": "import",
       "confidence": "EXTRACTED",
-      "source_file": "apps/web/src/components/MobileCardsList.tsx",
+      "source_file": "apps/web/src/components/trades/DesktopTable.tsx",
       "source_location": "L5",
       "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "components_mobilecardslist",
-      "target": "utils_farsi_topersiandigits"
+      "source": "trades_desktoptable",
+      "target": "utils_farsi_topersiandigits",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports_from",
       "context": "import",
       "confidence": "EXTRACTED",
-      "source_file": "apps/web/src/components/MobileCardsList.tsx",
+      "source_file": "apps/web/src/components/trades/DesktopTable.tsx",
       "source_location": "L6",
       "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "components_mobilecardslist",
-      "target": "utils_tradehelpers"
+      "source": "trades_desktoptable",
+      "target": "utils_tradehelpers",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
       "context": "import",
       "confidence": "EXTRACTED",
-      "source_file": "apps/web/src/components/MobileCardsList.tsx",
+      "source_file": "apps/web/src/components/trades/DesktopTable.tsx",
       "source_location": "L6",
       "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "components_mobilecardslist",
-      "target": "utils_tradehelpers_formatdate"
+      "source": "trades_desktoptable",
+      "target": "utils_tradehelpers_formatdate",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
       "context": "import",
       "confidence": "EXTRACTED",
-      "source_file": "apps/web/src/components/MobileCardsList.tsx",
+      "source_file": "apps/web/src/components/trades/DesktopTable.tsx",
       "source_location": "L6",
       "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "components_mobilecardslist",
-      "target": "utils_tradehelpers_getemotionemoji"
+      "source": "trades_desktoptable",
+      "target": "utils_tradehelpers_getemotionemoji",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
       "context": "import",
       "confidence": "EXTRACTED",
-      "source_file": "apps/web/src/components/MobileCardsList.tsx",
+      "source_file": "apps/web/src/components/trades/DesktopTable.tsx",
       "source_location": "L6",
       "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "components_mobilecardslist",
-      "target": "utils_tradehelpers_getemotionlabel"
+      "source": "trades_desktoptable",
+      "target": "utils_tradehelpers_getemotionlabel",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
       "context": "import",
       "confidence": "EXTRACTED",
-      "source_file": "apps/web/src/components/MobileCardsList.tsx",
+      "source_file": "apps/web/src/components/trades/DesktopTable.tsx",
       "source_location": "L6",
       "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "components_mobilecardslist",
-      "target": "utils_tradehelpers_gettradingsession"
+      "source": "trades_desktoptable",
+      "target": "utils_tradehelpers_gettradingsession",
+      "confidence_score": 1.0
     },
     {
       "relation": "references",
       "context": "field",
       "confidence": "EXTRACTED",
-      "source_file": "apps/web/src/components/MobileCardsList.tsx",
+      "source_file": "apps/web/src/components/trades/DesktopTable.tsx",
       "source_location": "L14",
       "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "components_mobilecardslist_mobilecardslistprops",
-      "target": "components_tradestable_trade"
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "apps/web/src/components/TradesTable.tsx",
-      "source_location": "L10",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "components_tradestable",
-      "target": "components_mobilecardslist_mobilecardslist"
+      "source": "trades_desktoptable_desktoptableprops",
+      "target": "trades_tradestable_trade",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "apps/web/src/components/Select.tsx",
-      "source_location": "L20",
+      "source_file": "apps/web/src/components/trades/DetailPanel.tsx",
+      "source_location": "L33",
       "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "components_select",
-      "target": "components_select_select"
+      "source": "trades_detailpanel",
+      "target": "trades_detailpanel_detailpanel",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "apps/web/src/components/Select.tsx",
-      "source_location": "L6",
+      "source_file": "apps/web/src/components/trades/DetailPanel.tsx",
+      "source_location": "L14",
       "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "components_select",
-      "target": "components_select_selectoption"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "apps/web/src/components/Select.tsx",
-      "source_location": "L11",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "components_select",
-      "target": "components_select_selectprops"
+      "source": "trades_detailpanel",
+      "target": "trades_detailpanel_detailpanelprops",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports_from",
       "context": "import",
       "confidence": "EXTRACTED",
-      "source_file": "apps/web/src/components/TradesTable.tsx",
-      "source_location": "L6",
+      "source_file": "apps/web/src/components/trades/DetailPanel.tsx",
+      "source_location": "L5",
       "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "components_tradestable",
-      "target": "components_select"
+      "source": "trades_detailpanel",
+      "target": "trades_tradechart",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
       "context": "import",
       "confidence": "EXTRACTED",
-      "source_file": "apps/web/src/components/TradesTable.tsx",
-      "source_location": "L6",
+      "source_file": "apps/web/src/components/trades/DetailPanel.tsx",
+      "source_location": "L5",
       "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "components_tradestable",
-      "target": "components_select_select"
+      "source": "trades_detailpanel",
+      "target": "trades_tradechart_tradechart",
+      "confidence_score": 1.0
     },
     {
-      "relation": "contains",
+      "relation": "imports_from",
+      "context": "import",
       "confidence": "EXTRACTED",
-      "source_file": "apps/web/src/components/SideNavBar.tsx",
+      "source_file": "apps/web/src/components/trades/DetailPanel.tsx",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "trades_detailpanel",
+      "target": "trades_tradestable",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/components/trades/DetailPanel.tsx",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "trades_detailpanel",
+      "target": "trades_tradestable_trade",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/components/trades/DetailPanel.tsx",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "trades_detailpanel",
+      "target": "utils_farsi",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/components/trades/DetailPanel.tsx",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "trades_detailpanel",
+      "target": "utils_farsi_formatpersiancurrency",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/components/trades/DetailPanel.tsx",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "trades_detailpanel",
+      "target": "utils_farsi_formattoman",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/components/trades/DetailPanel.tsx",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "trades_detailpanel",
+      "target": "utils_farsi_topersiandigits",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/components/trades/DetailPanel.tsx",
       "source_location": "L7",
       "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "components_sidenavbar",
-      "target": "components_sidenavbar_sidenavbar"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "apps/web/src/components/SummaryBar.tsx",
-      "source_location": "L13",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "components_summarybar",
-      "target": "components_summarybar_summarybar"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "apps/web/src/components/SummaryBar.tsx",
-      "source_location": "L6",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "components_summarybar",
-      "target": "components_summarybar_summarybarprops"
-    },
-    {
-      "relation": "imports_from",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "apps/web/src/components/SummaryBar.tsx",
-      "source_location": "L4",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "components_summarybar",
-      "target": "utils_farsi"
+      "source": "trades_detailpanel",
+      "target": "utils_tradehelpers",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
       "context": "import",
       "confidence": "EXTRACTED",
-      "source_file": "apps/web/src/components/SummaryBar.tsx",
-      "source_location": "L4",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "components_summarybar",
-      "target": "utils_farsi_formatpersiancurrency"
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "apps/web/src/components/SummaryBar.tsx",
-      "source_location": "L4",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "components_summarybar",
-      "target": "utils_farsi_formattoman"
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "apps/web/src/components/SummaryBar.tsx",
-      "source_location": "L4",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "components_summarybar",
-      "target": "utils_farsi_topersiandigits"
-    },
-    {
-      "relation": "imports_from",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "apps/web/src/components/TradesTable.tsx",
+      "source_file": "apps/web/src/components/trades/DetailPanel.tsx",
       "source_location": "L7",
       "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "components_tradestable",
-      "target": "components_summarybar"
+      "source": "trades_detailpanel",
+      "target": "utils_tradehelpers_formatdate",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/components/trades/DetailPanel.tsx",
+      "source_location": "L7",
+      "weight": 1.0,
+      "source": "trades_detailpanel",
+      "target": "utils_tradehelpers_getemotionemoji",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/components/trades/DetailPanel.tsx",
+      "source_location": "L7",
+      "weight": 1.0,
+      "source": "trades_detailpanel",
+      "target": "utils_tradehelpers_getemotionlabel",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/components/trades/DetailPanel.tsx",
+      "source_location": "L7",
+      "weight": 1.0,
+      "source": "trades_detailpanel",
+      "target": "utils_tradehelpers_gettradingsession",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "context": "field",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/components/trades/DetailPanel.tsx",
+      "source_location": "L15",
+      "weight": 1.0,
+      "source": "trades_detailpanel_detailpanelprops",
+      "target": "trades_tradestable_trade",
+      "confidence_score": 1.0
     },
     {
       "relation": "calls",
       "context": "call",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
-      "source_file": "apps/web/src/components/SummaryBar.tsx",
-      "source_location": "L41",
+      "source_file": "apps/web/src/components/trades/DetailPanel.tsx",
+      "source_location": "L116",
       "weight": 1.0,
-      "source": "components_summarybar_summarybar",
+      "source": "trades_detailpanel_detailpanel",
       "target": "utils_farsi_formattoman"
     },
     {
@@ -5619,200 +5157,356 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
-      "source_file": "apps/web/src/components/SummaryBar.tsx",
-      "source_location": "L24",
+      "source_file": "apps/web/src/components/trades/DetailPanel.tsx",
+      "source_location": "L72",
       "weight": 1.0,
-      "source": "components_summarybar_summarybar",
+      "source": "trades_detailpanel_detailpanel",
       "target": "utils_farsi_topersiandigits"
     },
     {
-      "relation": "imports",
-      "context": "import",
+      "relation": "calls",
+      "context": "call",
       "confidence": "EXTRACTED",
-      "source_file": "apps/web/src/components/TradesTable.tsx",
-      "source_location": "L7",
-      "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "components_tradestable",
-      "target": "components_summarybar_summarybar"
+      "source_file": "apps/web/src/components/trades/DetailPanel.tsx",
+      "source_location": "L188",
+      "weight": 1.0,
+      "source": "trades_detailpanel_detailpanel",
+      "target": "utils_tradehelpers_formatdate"
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "apps/web/src/components/TradeChart.tsx",
-      "source_location": "L6",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "components_tradechart",
-      "target": "components_tradechart_candlestickdata"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "apps/web/src/components/TradeChart.tsx",
-      "source_location": "L25",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "components_tradechart",
-      "target": "components_tradechart_tradechart"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "apps/web/src/components/TradeChart.tsx",
-      "source_location": "L14",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "components_tradechart",
-      "target": "components_tradechart_tradechartprops"
-    },
-    {
-      "relation": "imports_from",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "apps/web/src/components/TradesTable.tsx",
-      "source_location": "L7",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "components_tradestable",
-      "target": "components_tradechart"
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "apps/web/src/components/TradesTable.tsx",
-      "source_location": "L7",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "components_tradestable",
-      "target": "components_tradechart_tradechart"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "apps/web/src/components/TradesTable.tsx",
-      "source_location": "L59",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "components_tradestable",
-      "target": "components_tradestable_default_emotions"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "apps/web/src/components/TradesTable.tsx",
-      "source_location": "L41",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "components_tradestable",
-      "target": "components_tradestable_default_tags"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "apps/web/src/components/TradesTable.tsx",
-      "source_location": "L7",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "components_tradestable",
-      "target": "components_tradestable_trade"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "apps/web/src/components/TradesTable.tsx",
-      "source_location": "L67",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "components_tradestable",
-      "target": "components_tradestable_tradestable"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "apps/web/src/components/TradesTable.tsx",
+      "source_file": "apps/web/src/components/trades/FilterBar.tsx",
       "source_location": "L30",
       "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "components_tradestable",
-      "target": "components_tradestable_tradestableprops"
+      "source": "trades_filterbar",
+      "target": "trades_filterbar_filterbar",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/components/trades/FilterBar.tsx",
+      "source_location": "L7",
+      "weight": 1.0,
+      "source": "trades_filterbar",
+      "target": "trades_filterbar_filterbarprops",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports_from",
       "context": "import",
       "confidence": "EXTRACTED",
-      "source_file": "apps/web/src/components/TradesTable.tsx",
-      "source_location": "L5",
+      "source_file": "apps/web/src/components/trades/FilterBar.tsx",
+      "source_location": "L4",
       "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "components_tradestable",
-      "target": "utils_farsi"
+      "source": "trades_filterbar",
+      "target": "ui_select",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
       "context": "import",
       "confidence": "EXTRACTED",
-      "source_file": "apps/web/src/components/TradesTable.tsx",
-      "source_location": "L5",
+      "source_file": "apps/web/src/components/trades/FilterBar.tsx",
+      "source_location": "L4",
       "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "components_tradestable",
-      "target": "utils_farsi_formatpersiancurrency"
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "apps/web/src/components/TradesTable.tsx",
-      "source_location": "L5",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "components_tradestable",
-      "target": "utils_farsi_formattoman"
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "apps/web/src/components/TradesTable.tsx",
-      "source_location": "L5",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "components_tradestable",
-      "target": "utils_farsi_topersiandigits"
+      "source": "trades_filterbar",
+      "target": "ui_select_select",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports_from",
       "context": "import",
       "confidence": "EXTRACTED",
-      "source_file": "apps/web/src/components/TradesTable.tsx",
-      "source_location": "L11",
+      "source_file": "apps/web/src/components/trades/FilterBar.tsx",
+      "source_location": "L5",
       "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "components_tradestable",
-      "target": "utils_tradehelpers"
+      "source": "trades_filterbar",
+      "target": "utils_tradehelpers",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
       "context": "import",
       "confidence": "EXTRACTED",
-      "source_file": "apps/web/src/components/TradesTable.tsx",
-      "source_location": "L11",
+      "source_file": "apps/web/src/components/trades/FilterBar.tsx",
+      "source_location": "L5",
       "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "components_tradestable",
-      "target": "utils_tradehelpers_getmainpair"
+      "source": "trades_filterbar",
+      "target": "utils_tradehelpers_getsymbolfilteroptions",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/components/trades/TradesTable.tsx",
+      "source_location": "L7",
+      "weight": 1.0,
+      "source": "trades_tradestable",
+      "target": "trades_filterbar",
+      "confidence_score": 1.0
     },
     {
       "relation": "calls",
       "context": "call",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
-      "source_file": "apps/web/src/components/TradesTable.tsx",
-      "source_location": "L446",
+      "source_file": "apps/web/src/components/trades/FilterBar.tsx",
+      "source_location": "L160",
       "weight": 1.0,
-      "source": "components_tradestable_tradestable",
+      "source": "trades_filterbar_filterbar",
+      "target": "utils_tradehelpers_getsymbolfilteroptions"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/components/trades/MobileCardsList.tsx",
+      "source_location": "L28",
+      "weight": 1.0,
+      "source": "trades_mobilecardslist",
+      "target": "trades_mobilecardslist_mobilecardslist",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/components/trades/MobileCardsList.tsx",
+      "source_location": "L13",
+      "weight": 1.0,
+      "source": "trades_mobilecardslist",
+      "target": "trades_mobilecardslist_mobilecardslistprops",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/components/trades/MobileCardsList.tsx",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "trades_mobilecardslist",
+      "target": "trades_tradestable",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/components/trades/MobileCardsList.tsx",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "trades_mobilecardslist",
+      "target": "trades_tradestable_trade",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/components/trades/MobileCardsList.tsx",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "trades_mobilecardslist",
+      "target": "utils_farsi",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/components/trades/MobileCardsList.tsx",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "trades_mobilecardslist",
+      "target": "utils_farsi_formatpersiancurrency",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/components/trades/MobileCardsList.tsx",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "trades_mobilecardslist",
+      "target": "utils_farsi_formattoman",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/components/trades/MobileCardsList.tsx",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "trades_mobilecardslist",
+      "target": "utils_farsi_topersiandigits",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/components/trades/MobileCardsList.tsx",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "trades_mobilecardslist",
+      "target": "utils_tradehelpers",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/components/trades/MobileCardsList.tsx",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "trades_mobilecardslist",
+      "target": "utils_tradehelpers_formatdate",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/components/trades/MobileCardsList.tsx",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "trades_mobilecardslist",
+      "target": "utils_tradehelpers_getemotionemoji",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/components/trades/MobileCardsList.tsx",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "trades_mobilecardslist",
+      "target": "utils_tradehelpers_getemotionlabel",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/components/trades/MobileCardsList.tsx",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "trades_mobilecardslist",
+      "target": "utils_tradehelpers_gettradingsession",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "context": "field",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/components/trades/MobileCardsList.tsx",
+      "source_location": "L14",
+      "weight": 1.0,
+      "source": "trades_mobilecardslist_mobilecardslistprops",
+      "target": "trades_tradestable_trade",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/components/trades/TradesTable.tsx",
+      "source_location": "L9",
+      "weight": 1.0,
+      "source": "trades_tradestable",
+      "target": "trades_mobilecardslist_mobilecardslist",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/components/trades/SummaryBar.tsx",
+      "source_location": "L13",
+      "weight": 1.0,
+      "source": "trades_summarybar",
+      "target": "trades_summarybar_summarybar",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/components/trades/SummaryBar.tsx",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "trades_summarybar",
+      "target": "trades_summarybar_summarybarprops",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/components/trades/SummaryBar.tsx",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "trades_summarybar",
+      "target": "utils_farsi",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/components/trades/SummaryBar.tsx",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "trades_summarybar",
+      "target": "utils_farsi_formatpersiancurrency",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/components/trades/SummaryBar.tsx",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "trades_summarybar",
+      "target": "utils_farsi_formattoman",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/components/trades/SummaryBar.tsx",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "trades_summarybar",
+      "target": "utils_farsi_topersiandigits",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/components/trades/TradesTable.tsx",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "trades_tradestable",
+      "target": "trades_summarybar",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "apps/web/src/components/trades/SummaryBar.tsx",
+      "source_location": "L41",
+      "weight": 1.0,
+      "source": "trades_summarybar_summarybar",
       "target": "utils_farsi_formattoman"
     },
     {
@@ -5820,11 +5514,229 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
-      "source_file": "apps/web/src/components/TradesTable.tsx",
-      "source_location": "L429",
+      "source_file": "apps/web/src/components/trades/SummaryBar.tsx",
+      "source_location": "L24",
       "weight": 1.0,
-      "source": "components_tradestable_tradestable",
+      "source": "trades_summarybar_summarybar",
       "target": "utils_farsi_topersiandigits"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/components/trades/TradesTable.tsx",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "trades_tradestable",
+      "target": "trades_summarybar_summarybar",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/components/trades/TradeChart.tsx",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "trades_tradechart",
+      "target": "trades_tradechart_candlestickdata",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/components/trades/TradeChart.tsx",
+      "source_location": "L25",
+      "weight": 1.0,
+      "source": "trades_tradechart",
+      "target": "trades_tradechart_tradechart",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/components/trades/TradeChart.tsx",
+      "source_location": "L14",
+      "weight": 1.0,
+      "source": "trades_tradechart",
+      "target": "trades_tradechart_tradechartprops",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/components/trades/TradesTable.tsx",
+      "source_location": "L72",
+      "weight": 1.0,
+      "source": "trades_tradestable",
+      "target": "trades_tradestable_default_emotions",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/components/trades/TradesTable.tsx",
+      "source_location": "L53",
+      "weight": 1.0,
+      "source": "trades_tradestable",
+      "target": "trades_tradestable_default_tags",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/components/trades/TradesTable.tsx",
+      "source_location": "L13",
+      "weight": 1.0,
+      "source": "trades_tradestable",
+      "target": "trades_tradestable_trade",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/components/trades/TradesTable.tsx",
+      "source_location": "L80",
+      "weight": 1.0,
+      "source": "trades_tradestable",
+      "target": "trades_tradestable_tradestable",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/components/trades/TradesTable.tsx",
+      "source_location": "L38",
+      "weight": 1.0,
+      "source": "trades_tradestable",
+      "target": "trades_tradestable_tradestableprops",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/components/trades/TradesTable.tsx",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "trades_tradestable",
+      "target": "ui_confirmmodal",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/components/trades/TradesTable.tsx",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "trades_tradestable",
+      "target": "ui_confirmmodal_confirmmodal",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/components/trades/TradesTable.tsx",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "trades_tradestable",
+      "target": "utils_farsi",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/components/trades/TradesTable.tsx",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "trades_tradestable",
+      "target": "utils_farsi_topersiandigits",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/components/trades/TradesTable.tsx",
+      "source_location": "L11",
+      "weight": 1.0,
+      "source": "trades_tradestable",
+      "target": "utils_tradehelpers",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/components/trades/TradesTable.tsx",
+      "source_location": "L11",
+      "weight": 1.0,
+      "source": "trades_tradestable",
+      "target": "utils_tradehelpers_getmainpair",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "apps/web/src/components/trades/TradesTable.tsx",
+      "source_location": "L549",
+      "weight": 1.0,
+      "source": "trades_tradestable_tradestable",
+      "target": "utils_farsi_topersiandigits"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/components/ui/ConfirmModal.tsx",
+      "source_location": "L17",
+      "weight": 1.0,
+      "source": "ui_confirmmodal",
+      "target": "ui_confirmmodal_confirmmodal",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/components/ui/ConfirmModal.tsx",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "ui_confirmmodal",
+      "target": "ui_confirmmodal_confirmmodalprops",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/components/ui/Select.tsx",
+      "source_location": "L19",
+      "weight": 1.0,
+      "source": "ui_select",
+      "target": "ui_select_select",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/components/ui/Select.tsx",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "ui_select",
+      "target": "ui_select_selectoption",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/components/ui/Select.tsx",
+      "source_location": "L10",
+      "weight": 1.0,
+      "source": "ui_select",
+      "target": "ui_select_selectprops",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -7994,5 +7906,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "5d8cbca25c1c3ff601bcd65c1b36410a2096150c"
+  "built_at_commit": "59e494c347468d2b89d2a41eeb81c2c3c743e861"
 }

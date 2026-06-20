@@ -1,10 +1,10 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import TradesTable, { Trade } from '../../components/TradesTable';
-import ManualTradeModal from '../../components/ManualTradeModal';
-import ImportMT4Modal from '../../components/ImportMT4Modal';
-import ConfirmModal from '../../components/ConfirmModal';
+import TradesTable, { Trade } from '../../components/trades/TradesTable';
+import ManualTradeModal from '../../components/modals/ManualTradeModal';
+import ImportMT4Modal from '../../components/modals/ImportMT4Modal';
+import ConfirmModal from '../../components/ui/ConfirmModal';
 
 // Premium high-fidelity mock trades matching code.html
 const MOCK_TRADES: Trade[] = [

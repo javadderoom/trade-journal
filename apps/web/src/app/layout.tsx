@@ -1,6 +1,6 @@
 import "./globals.scss";
-import SideNavBar from "../components/SideNavBar";
-import BottomNavBar from "../components/BottomNavBar";
+import SideNavBar from "../components/layout/SideNavBar";
+import BottomNavBar from "../components/layout/BottomNavBar";
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
