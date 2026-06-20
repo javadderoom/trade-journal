@@ -35,10 +35,11 @@
 | Callback | API call |
 |----------|----------|
 | `onRefresh` | Re-fetches `GET /api/trades` |
-| `onUpdateTrade` | `PUT /api/trades/:ticket` — sends `notes`, `emotion`, `stopLoss`, `takeProfit`, `tags` |
-| `onDeleteTrade` | `DELETE /api/trades/:ticket` |
-| `onImportMT4` | Alert placeholder (not yet implemented) |
-| `onAddManualTrade` | Alert placeholder (not yet implemented) |
+| `onUpdateTrade` | `PUT /api/trades/:id` — sends `notes`, `emotion`, `stopLoss`, `takeProfit`, `tags` |
+| `onDeleteTrade` | `DELETE /api/trades/:id` |
+| `onDeleteMultipleTrades` | `POST /api/trades/bulk-delete` — bulk delete multiple trades |
+| `onImportMT4` | Triggers file upload and import modal |
+| `onAddManualTrade` | Opens manual trade creator modal |
 
 ### Exchange Rate API Route (`src/app/api/exchange-rate/route.ts`)
 - Next.js Route Handler: `GET /api/exchange-rate`
@@ -47,30 +48,41 @@
 - Requires `NAVASAN_API_KEY` env var; falls back to 90,000 Toman/USD if missing or on error
 - Response: `{ usdToToman: number, source: 'navasan' | 'fallback', cachedAt: string }`
 
+### Manual Trade Entry Modal (`src/components/ManualTradeModal.tsx`)
+- Form-based creation dialog including input fields for ticket, symbol, direction, open/close details (price/time), lot size, SL, TP, profit, commission, swap, emotion, tags, and notes.
+- Submits directly to the backend API via `POST /api/trades`.
+
+### Import MT4/MT5 statement Modal (`src/components/ImportMT4Modal.tsx`)
+- Drag-and-drop or file pick area for HTML or CSV statements.
+- Performs multipart uploads to the backend server endpoint `POST /api/trades/import-mt4` and handles parsing statistics (found, imported, skipped).
+
 ### TradesTable Component (`src/components/TradesTable.tsx`)
 Full-featured trades workspace split into:
 
 **Left/Main area:**
-- Page header with "واردات MT4" and "ثبت معامله دستی" buttons
-- Filter bar: date search, symbol dropdown, direction dropdown, strategy dropdown, clear + refresh buttons
-- Summary bar: trade count, win rate, total P&L in USD + Toman equivalent (filtered)
-- Paginated data table (10 rows/page) with: date, day-of-week badge, symbol, direction badge (buy/sell), lot size, R-multiple, P&L (color-coded) with Toman sub-value, strategy badge, open/closed status icon
-- Pagination controls with Persian numerals
+- Page header with "واردات MT4/MT5" and "ثبت معامله دستی" action buttons.
+- Filter bar: search, symbol group dropdown, direction dropdown, status tabs (All, Open, Closed, Missed), refresh buttons, and toggleable account switcher.
+- Summary bar: trade count, win rate, total P&L in USD + Toman equivalent (filtered).
+- Desktop view: Paginated data table (10 rows/page) with date, day session badge, symbol, direction badge (buy/sell), lot size, R-multiple, P&L (color-coded) with Toman sub-value, open/closed status icon.
+- Mobile view: Infinite scroll card list layout displaying crucial transaction parameters.
+- Reusable Modal Confirm alerts for warning dialogs.
 
-**Right/Detail panel (slide-out aside):**
-- Triggered by clicking any table row
-- Shows: symbol + direction header, P&L financial box (profit/loss colored + Toman), execution details grid (entry time/price, SL, TP, exit time/price)
-- **Strategy selector** — text input (local-only, `setupName` is **not** sent to API — strategy entity was removed from backend)
-- **Trade tags** — all known tags shown as clickable chips; selected = green highlight; add custom tag via input (Enter or button); tag pool is additive-only (never shrinks on deselect)
-- **Emotion tags** — all 5 emotions always shown as chips (با اطمینان, آرام/خنثی, مضطرب, FOMO, انتقام); click to select/deselect
-- **Journal notes** — free-text textarea
-- Save and Delete buttons in sticky footer
+**Right/Detail panel (slide-out aside drawer):**
+- Triggered by clicking any table row or mobile card.
+- Shows: symbol + direction header, P&L financial box (profit/loss colored + Toman), execution details grid (entry time/price, SL, TP, exit time/price, account selector dropdown).
+- **Trade tags** — selected = green highlight; add custom tag via input; tag pool is additive.
+- **Emotion tags** — all 5 emotions always shown as chips; click to select/deselect.
+- **Journal notes** — free-text textarea.
+- Screenshot attachments view with drag-and-drop upload/delete directly connected to backend storage.
 
-**State & Logic:**
-- `allTags` is a `useState` seeded from all trade tag arrays on load — additive only, never shrinks when a tag is deselected from a trade
-- `updateActiveTradeField` — local optimistic updates; recalculates `rMultiple` live when `stopLoss` changes
-- `formatDate` — Gregorian ISO → Persian display string (e.g. `۱۴۰۵/۰۳/۲۵ - ۱۳:۳۰`) + day-of-week name
-- Persian digits throughout (`toPersianDigits`, `formatPersianCurrency`, `formatToman`)
+### Responsive Optimization & Infinite Scroll
+- Implemented desktop header actions vs mobile Floating Action Button (FAB) Speed Dial speed dial menus.
+- Mobile view uses an IntersectionObserver-based infinite scroll in `MobileCardsList.tsx` instead of page links; page selectors are dynamically hidden via SCSS under 768px.
+- Polished emotion chips and card layout rendering on mobile layouts.
+
+### Main and Sub-pair Grouping Filter
+- Created `getMainPair` helper to extract the base prefix (e.g. `XAUUSD` from `XAUUSD_O`).
+- Created `getSymbolFilterOptions` grouping unique items in the Filter Bar. Choosing a main pair automatically filters for all its children.
 
 ### Select Component (`src/components/Select.tsx` + `select.scss`)
 - Custom accessible dropdown (`role="combobox"` + `role="listbox"`)
@@ -80,22 +92,13 @@ Full-featured trades workspace split into:
 - Scroll focused item into view
 - Used by TradesTable for filter dropdowns
 
-### Stylesheet (`src/components/trades.scss`)
-- ~1280 lines, fully custom SCSS
-- Custom scrollbar, slide-in animation (detail panel)
-- **Active trade styling** — open trades (`closeTime === null`) get:
-  - `.open-row`: subtle pulsing background + glowing right-border indicator
-  - `.status-open`: green `sync` icon with `pulse-glow` animation and drop-shadow
-  - `.profit-open`: amber color (#f59e0b) for unrealized P&L with pulsing dot indicator
-  - 4 custom `@keyframes`: `pulse`, `pulse-glow`, `row-pulse`, `border-glow`
-- Responsive RTL layout, glassmorphism panel header
-- Custom checkbox styling
-
-### Utilities (`src/utils/farsi.ts`)
+### Utilities (`src/utils/farsi.ts`, `src/utils/tradeHelpers.ts`)
 - `toPersianDigits(val)` — converts ASCII digits to Persian (۰-۹)
 - `formatPersianNumber(val, decimals?)` — formats with thousand separators + Persian digits
 - `formatPersianCurrency(val)` — formats USD P&L with sign prefix (`+$۳۷۵.۰۰`)
 - `formatToman(usd, usdToToman)` — converts USD to Tomans with abbreviated display (میلیون / هزار / ت)
+- `formatDate` — Gregorian ISO → Persian display string (e.g. `۱۴۰۵/۰۳/۲۵ - ۱۳:۳۰`) + day-of-week name
+- `getTradingSession` — NY/London/Asian session parsing.
 
 ---
 
@@ -103,8 +106,6 @@ Full-featured trades workspace split into:
 
 ### High Priority
 - **Persistent tag library** — tags currently derived from trade records only; a user-level tag pool (API-backed) is needed so custom tags survive removal from all trades, and sync across devices
-- **Manual trade entry** — `onAddManualTrade` is a placeholder alert; needs a form/modal
-- **MT4/MT5 file import** — `onImportMT4` is a placeholder; needs file picker + multipart upload to API
 - **Strategy/setup persistence** — `setupName` exists in the UI as a text input but is not sent to API (backend `Setup` model was removed). Needs a decision: re-add as a model, use tags, or store as a string field on Trade
 
 ### Medium Priority
@@ -112,13 +113,11 @@ Full-featured trades workspace split into:
 - Analytics page (win rate by symbol/strategy/emotion, drawdown, expectancy)
 - Jalali (Shamsi) calendar date picker for the filter bar
 - Sorting: clicking table column headers should sort the data
-- Multi-select row actions (bulk delete)
 - Auth pages (Login, Register) — currently no auth at all
 - Error/success toast notifications instead of `alert()`
 - Remove unused Chakra UI / Emotion dependencies from `package.json`
 
 ### Low Priority
-- Responsive / mobile layout
 - Settings page (account info, broker connection)
 - i18n abstraction (currently hardcoded Persian strings throughout)
 - Dark/light theme toggle

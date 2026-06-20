@@ -1,16 +1,16 @@
 # Graph Report - trade-journal  (2026-06-20)
 
 ## Corpus Check
-- 47 files · ~243,957 words
+- 47 files · ~244,060 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 351 nodes · 416 edges · 32 communities (29 shown, 3 thin omitted)
+- 355 nodes · 420 edges · 25 communities (22 shown, 3 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `5e2d9298`
+- Built from commit: `26bcae57`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -35,25 +35,18 @@
 - [[_COMMUNITY_Community 19|Community 19]]
 - [[_COMMUNITY_Community 20|Community 20]]
 - [[_COMMUNITY_Community 21|Community 21]]
-- [[_COMMUNITY_Community 22|Community 22]]
-- [[_COMMUNITY_Community 23|Community 23]]
 - [[_COMMUNITY_Community 24|Community 24]]
 - [[_COMMUNITY_Community 25|Community 25]]
 - [[_COMMUNITY_Community 26|Community 26]]
-- [[_COMMUNITY_Community 27|Community 27]]
-- [[_COMMUNITY_Community 28|Community 28]]
-- [[_COMMUNITY_Community 29|Community 29]]
-- [[_COMMUNITY_Community 30|Community 30]]
-- [[_COMMUNITY_Community 31|Community 31]]
 
 ## God Nodes (most connected - your core abstractions)
 1. `Design Engineering` - 16 edges
 2. `compilerOptions` - 15 edges
 3. `toPersianDigits()` - 13 edges
 4. `معامله‌یار — Persian Trading Journal Platform` - 13 edges
-5. `formatToman()` - 10 edges
-6. `معامله‌یار — Run Commands` - 10 edges
-7. `✅ Done` - 9 edges
+5. `✅ Done` - 12 edges
+6. `formatToman()` - 10 edges
+7. `معامله‌یار — Run Commands` - 10 edges
 8. `5. Feature Breakdown — V1` - 9 edges
 9. `Trade` - 8 edges
 10. `Component Building Principles` - 8 edges
@@ -73,7 +66,7 @@
 ## Import Cycles
 - None detected.
 
-## Communities (32 total, 3 thin omitted)
+## Communities (25 total, 3 thin omitted)
 
 ### Community 0 - "Community 0"
 Cohesion: 0.06
@@ -96,12 +89,12 @@ Cohesion: 0.11
 Nodes (17): compilerOptions, allowJs, esModuleInterop, incremental, isolatedModules, jsx, lib, module (+9 more)
 
 ### Community 5 - "Community 5"
-Cohesion: 0.12
-Nodes (16): API Integration in `page.tsx`, App Layout (`src/app/layout.tsx`), Design System (`src/app/variables.scss`, `src/app/globals.scss`), ✅ Done, Exchange Rate API Route (`src/app/api/exchange-rate/route.ts`), High Priority, Low Priority, Medium Priority (+8 more)
+Cohesion: 0.10
+Nodes (19): API Integration in `page.tsx`, App Layout (`src/app/layout.tsx`), Design System (`src/app/variables.scss`, `src/app/globals.scss`), ✅ Done, Exchange Rate API Route (`src/app/api/exchange-rate/route.ts`), High Priority, Import MT4/MT5 statement Modal (`src/components/ImportMT4Modal.tsx`), Low Priority (+11 more)
 
 ### Community 6 - "Community 6"
-Cohesion: 0.14
-Nodes (13): API Progress — معامله‌یار, Database Schema (`src/prisma/schema.prisma`), ✅ Done, Express Server (`src/server.ts`), High Priority, Low Priority, Medium Priority, MT4/MT5 Parser (`src/services/mt4Parser.ts`) (+5 more)
+Cohesion: 0.13
+Nodes (14): API Progress — معامله‌یار, Database Schema (`src/prisma/schema.prisma`), ✅ Done, Express Server (`src/server.ts`), File Upload & Screenshots Middleware, High Priority, Low Priority, Medium Priority (+6 more)
 
 ### Community 7 - "Community 7"
 Cohesion: 0.16
@@ -132,8 +125,8 @@ Cohesion: 0.29
 Nodes (6): File, How it works, JSON payload format, MT5 Expert Advisor — Trade Sync, Notes, Setup
 
 ### Community 19 - "Community 19"
-Cohesion: 0.22
-Nodes (8): Accessibility, Design Engineering, Initial Response, prefers-reduced-motion, Review Checklist, Review Format (Required), Stagger Animations, Touch device hover states
+Cohesion: 0.05
+Nodes (43): 3D transforms for depth, Accessibility, Asymmetric enter/exit timing, Beauty is leverage, Cohesion matters, Core Philosophy, CSS animations beat JS under load, CSS Transform Mastery (+35 more)
 
 ### Community 20 - "Community 20"
 Cohesion: 0.32
@@ -142,14 +135,6 @@ Nodes (6): FilterBar(), FilterBarProps, Select(), SelectOption, SelectProps, get
 ### Community 21 - "Community 21"
 Cohesion: 0.29
 Nodes (6): compilerOptions, outDir, rootDir, types, extends, include
-
-### Community 22 - "Community 22"
-Cohesion: 0.33
-Nodes (6): Damping at boundaries, Friction instead of hard stops, Gesture and Drag Interactions, Momentum-based dismissal, Multi-touch protection, Pointer capture for drag
-
-### Community 23 - "Community 23"
-Cohesion: 0.40
-Nodes (5): 3D transforms for depth, CSS Transform Mastery, scale() scales children too, transform-origin, translateY with percentages
 
 ### Community 24 - "Community 24"
 Cohesion: 0.33
@@ -163,40 +148,20 @@ Nodes (8): Animate enter states with @starting-style, Buttons must feel responsi
 Cohesion: 0.33
 Nodes (6): clip-path for Animation, Comparison sliders, Hold-to-delete pattern, Image reveals on scroll, Tabs with perfect color transitions, The inset shape
 
-### Community 27 - "Community 27"
-Cohesion: 0.33
-Nodes (6): CSS animations beat JS under load, CSS variables are inheritable, Framer Motion hardware acceleration caveat, Only animate transform and opacity, Performance Rules, Use WAAPI for programmatic CSS animations
-
-### Community 28 - "Community 28"
-Cohesion: 0.40
-Nodes (5): Asymmetric enter/exit timing, Cohesion matters, Review your work the next day, The opacity + height combination, The Sonner Principles (Building Loved Components)
-
-### Community 29 - "Community 29"
-Cohesion: 0.40
-Nodes (5): Interruptibility advantage, Spring Animations, Spring-based mouse interactions, Spring configuration, When to use springs
-
-### Community 30 - "Community 30"
-Cohesion: 0.50
-Nodes (4): Beauty is leverage, Core Philosophy, Taste is trained, not innate, Unseen details compound
-
-### Community 31 - "Community 31"
-Cohesion: 0.50
-Nodes (4): Debugging Animations, Frame-by-frame inspection, Slow motion testing, Test on real devices
-
 ## Knowledge Gaps
-- **230 isolated node(s):** `name`, `version`, `private`, `dev`, `build` (+225 more)
+- **234 isolated node(s):** `name`, `version`, `private`, `dev`, `build` (+229 more)
   These have ≤1 connection - possible missing edges or undocumented components.
 - **3 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `Design Engineering` connect `Community 19` to `Community 22`, `Community 23`, `Community 24`, `Community 25`, `Community 26`, `Community 27`, `Community 28`, `Community 29`, `Community 30`, `Community 31`?**
-  _High betweenness centrality (0.030) - this node is a cross-community bridge._
+- **Why does `Design Engineering` connect `Community 19` to `Community 24`, `Community 25`, `Community 26`?**
+  _High betweenness centrality (0.029) - this node is a cross-community bridge._
 - **Why does `Component Building Principles` connect `Community 25` to `Community 19`?**
   _High betweenness centrality (0.007) - this node is a cross-community bridge._
 - **What connects `name`, `version`, `private` to the rest of the system?**
-  _230 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _234 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Community 0` be split into smaller, more focused modules?**
   _Cohesion score 0.05714285714285714 - nodes in this community are weakly interconnected._
 - **Should `Community 1` be split into smaller, more focused modules?**

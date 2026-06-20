@@ -45,14 +45,24 @@
 | Method | Path | Description |
 |--------|------|-------------|
 | `GET` | `/api/trades` | List trades for account (query: `userId`, `accountId`, `limit`, `offset`) |
+| `GET` | `/api/trades/accounts` | List all accounts for the current user |
+| `POST` | `/api/trades` | Create manual trade record |
 | `POST` | `/api/trades/sync` | Sync trades from MT5 EA (accepts EA array or `{ userId, accountId, trades }`) |
-| `PUT` | `/api/trades/:ticket` | Update trade: `notes`, `emotion`, `stopLoss`, `takeProfit`, `tags` |
-| `DELETE` | `/api/trades/:ticket` | Delete trade by ticket |
+| `PUT` | `/api/trades/:id` | Update trade: `notes`, `emotion`, `stopLoss`, `takeProfit`, `tags` |
+| `DELETE` | `/api/trades/:id` | Delete trade by ID |
+| `POST` | `/api/trades/bulk-delete` | Bulk delete multiple trades |
+| `POST` | `/api/trades/:id/screenshots` | Upload screenshot image (Multipart/Form-Data via Multer) |
+| `DELETE` | `/api/trades/:id/screenshots` | Delete screenshot image |
+| `POST` | `/api/trades/import-mt4` | Upload and parse MT4/MT5 HTML/CSV statement file |
 
 - `PUT` recalculates `r_multiple` when `stopLoss` is updated
 - `PUT` saves `tags` array directly to `Trade.tags`
 - `PUT` does **not** handle `setupName` — strategy entity was decommissioned
 - Dev mode: no auth — defaults to `userId=dev-user`, `accountId=dev-account`
+
+### File Upload & Screenshots Middleware
+- Configured local disk storage engine for Multer to manage screenshot uploads in `public/uploads/` directory.
+- Configured memory storage engine for parsing and importing HTML/CSV statements without persistent files.
 
 ### TypeScript
 - `tsconfig.json` at API root. All type errors resolved.
@@ -65,10 +75,9 @@
 ### High Priority
 - **Persistent tags library** — no dedicated tags table; tags live only on trade records. A user-level tag pool that survives tag removal from all trades is needed
 - **Auth** — JWT/session, phone OTP for Iran. Currently all endpoints are unauthenticated dev-mode
-- **Multer upload middleware** — file-based MT4/MT5 HTML/CSV import via browser (parser exists, no upload route)
 
 ### Medium Priority
-- `GET /api/trades/:ticket` — single trade detail endpoint
+- `GET /api/trades/:id` — single trade detail endpoint
 - Journal entries CRUD (`JournalEntry` model exists, no routes)
 - Analytics endpoints (win rate, P&L over time, emotion breakdown)
 - Error handling middleware (global Express error handler)
