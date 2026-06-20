@@ -2,7 +2,7 @@ import "./globals.scss";
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html dir="rtl" lang="fa">
+    <html dir="rtl" lang="fa" suppressHydrationWarning>
       <head>
         <title>معامله‌یار</title>
         {/* Vazirmatn — self-hosted, no CDN (Google Fonts is blocked in Iran) */}
@@ -13,7 +13,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           rel="stylesheet"
         />
       </head>
-      <body>{children}</body>
+      <body suppressHydrationWarning>{children}</body>
     </html>
   );
 }

@@ -2323,3 +2323,566 @@ input[type="checkbox"] {
     opacity: 1;
   }
 }
+
+ // ==========================================
+ // RESPONSIVE STYLES & MOBILE LAYOUT
+ // ==========================================
+
+ // Default display states
+ .desktop-table-view {
+   display: block;
+ }
+ .mobile-select-all-bar {
+   display: none;
+ }
+ .mobile-cards-view {
+   display: none;
+ }
+
+ // Tablet adjustments
+ @media (max-width: 1024px) {
+   .detail-panel {
+     width: 480px;
+   }
+ }
+
+ // Mobile adjustments
+ @media (max-width: 768px) {
+   .trades-main-content {
+     padding: 16px;
+   }
+
+   .trades-page-header {
+     flex-direction: column;
+     align-items: stretch;
+     gap: 16px;
+     margin-bottom: 24px;
+
+     h1 {
+       font-size: 24px;
+       line-height: 36px;
+     }
+
+     .header-actions {
+       flex-direction: column;
+       gap: 8px;
+
+       .btn {
+         width: 100%;
+       }
+     }
+   }
+
+    .summary-bar {
+      flex-direction: row;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 24px;
+
+      .summary-card {
+        box-sizing: border-box;
+        justify-content: space-between;
+        padding: 10px 16px;
+
+        &:not(.glow-profit-card) {
+          flex: 1 1 calc(50% - 4px);
+          width: calc(50% - 4px);
+        }
+
+        &.glow-profit-card {
+          flex: 1 1 100%;
+          width: 100%;
+        }
+      }
+    }
+
+   // Display Switch
+   .desktop-table-view {
+     display: none;
+   }
+
+   .mobile-select-all-bar {
+     display: flex;
+     align-items: center;
+     gap: 8px;
+     margin-bottom: 12px;
+     padding: 8px 12px;
+     background-color: $surface-container-low;
+     border: 1px solid $outline-variant;
+     border-radius: 8px;
+     color: $on-surface-variant;
+     font-size: 13px;
+     font-family: $font-primary;
+
+     input[type="checkbox"] {
+       margin: 0;
+     }
+     label {
+       cursor: pointer;
+       user-select: none;
+     }
+   }
+
+   .mobile-cards-view {
+     display: flex;
+     flex-direction: column;
+     gap: 12px;
+     width: 100%;
+   }
+
+   // Mobile card styling
+   .trade-mobile-card {
+     background-color: $surface-container-low;
+     border: 1px solid $outline-variant;
+     border-radius: 12px;
+     padding: 16px;
+     display: flex;
+     flex-direction: column;
+     gap: 12px;
+     cursor: pointer;
+     position: relative;
+     transition: border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+
+     &:hover {
+       border-color: rgba($primary, 0.4);
+       background-color: rgba($surface-variant, 0.2);
+       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+     }
+
+     &.active-card {
+       background-color: rgba($primary, 0.05);
+       border-color: $primary;
+
+       &::before {
+         content: '';
+         position: absolute;
+         right: 0;
+         top: 0;
+         bottom: 0;
+         width: 4px;
+         background-color: $primary;
+         border-top-right-radius: 12px;
+         border-bottom-right-radius: 12px;
+       }
+     }
+
+     &.open-card {
+       background-color: rgba($secondary, 0.04);
+       border-color: rgba($secondary, 0.4);
+
+       &::before {
+         content: '';
+         position: absolute;
+         right: 0;
+         top: 0;
+         bottom: 0;
+         width: 4px;
+         background-color: $secondary;
+         border-top-right-radius: 12px;
+         border-bottom-right-radius: 12px;
+         box-shadow: 0 0 8px rgba($secondary, 0.5);
+         animation: border-glow 2s ease-in-out infinite;
+       }
+     }
+
+     .card-top-row {
+       display: flex;
+       justify-content: space-between;
+       align-items: center;
+
+       .top-right-group {
+         display: flex;
+         align-items: center;
+         gap: 8px;
+
+         .symbol-name {
+           font-size: 16px;
+           font-weight: 700;
+           color: $on-surface;
+         }
+       }
+
+       .top-left-group {
+         display: flex;
+         align-items: center;
+       }
+     }
+
+      .card-middle-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background-color: rgba($surface-container, 0.4);
+        padding: 8px 12px;
+        border-radius: 8px;
+
+        .card-metric {
+          display: flex;
+          align-items: center;
+          gap: 4px;
+
+          .metric-label {
+            font-size: 12px;
+            color: $on-surface-variant;
+          }
+
+          .metric-value {
+            font-size: 13px;
+            font-weight: 600;
+            color: $on-surface;
+          }
+        }
+
+        .col-profit {
+          display: flex;
+          flex-direction: column;
+          align-items: flex-end;
+          gap: 2px;
+
+          .profit-usd {
+            font-size: 14px;
+            font-weight: 700;
+          }
+
+          .profit-toman {
+            font-size: 11px;
+            color: $on-surface-variant;
+          }
+
+          &.profit-positive {
+            color: $primary;
+            .profit-usd { color: $primary; }
+          }
+          &.profit-negative {
+            color: $error;
+            .profit-usd { color: $error; }
+          }
+          &.profit-zero {
+            color: $on-surface-variant;
+          }
+          &.profit-open {
+            color: $secondary;
+          }
+          &.profit-missed {
+            color: #9ca3af;
+          }
+        }
+      }
+
+      .card-bottom-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 12px;
+        color: $on-surface-variant;
+
+        .date-value {
+          display: flex;
+          align-items: center;
+          gap: 4px;
+
+          .card-icon {
+            font-size: 16px;
+            color: rgba($on-surface-variant, 0.6);
+          }
+        }
+
+        .session-badge {
+          font-size: 11px;
+          padding: 2px 8px;
+          border-radius: 12px;
+          font-weight: 600;
+
+          &.session-tokyo {
+            background-color: rgba(#3b82f6, 0.12);
+            color: #60a5fa;
+          }
+          &.session-london {
+            background-color: rgba(#eab308, 0.12);
+            color: #facc15;
+          }
+          &.session-newyork {
+            background-color: rgba(#10b981, 0.12);
+            color: #34d399;
+          }
+          &.session-sydney {
+            background-color: rgba(#8b5cf6, 0.12);
+            color: #c084fc;
+          }
+          &.session-unknown {
+            background-color: rgba($outline, 0.12);
+            color: $on-surface-variant;
+          }
+        }
+      }
+
+      .card-tags-row {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        flex-wrap: wrap;
+        margin-top: 4px;
+
+        .emotion-mini-badge {
+          display: inline-flex;
+          align-items: center;
+          gap: 2px;
+
+         &.emotion-confident {
+           background-color: rgba($primary, 0.12);
+           color: $primary;
+           border: 1px solid rgba($primary, 0.2);
+         }
+         &.emotion-neutral {
+           background-color: rgba($outline, 0.12);
+           color: $on-surface-variant;
+           border: 1px solid rgba($outline, 0.2);
+         }
+         &.emotion-anxious {
+           background-color: rgba($secondary, 0.12);
+           color: $secondary;
+           border: 1px solid rgba($secondary, 0.2);
+         }
+         &.emotion-fomo {
+           background-color: rgba(#8b5cf6, 0.12);
+           color: #c084fc;
+           border: 1px solid rgba(#8b5cf6, 0.2);
+         }
+         &.emotion-revenge {
+           background-color: rgba($error, 0.12);
+           color: $error;
+           border: 1px solid rgba($error, 0.2);
+         }
+       }
+
+       .tag-mini-pill {
+         font-size: 10px;
+         padding: 2px 6px;
+         border-radius: 4px;
+         background-color: rgba($surface-variant, 0.4);
+         border: 1px solid rgba($outline-variant, 0.3);
+         color: $on-surface-variant;
+       }
+     }
+   }
+
+   .no-trades-card {
+     text-align: center;
+     padding: 32px;
+     color: $on-surface-variant;
+     background-color: $surface-container-low;
+     border: 1px dashed $outline-variant;
+     border-radius: 12px;
+     font-size: 14px;
+   }
+
+   // Sidebar detail panel overlays the page
+   .detail-panel {
+     width: 100% !important;
+     max-width: 100vw;
+     border-right: none;
+     box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.5);
+   }
+
+   // Floating bulk actions responsiveness
+   .floating-bulk-actions-bar {
+     width: calc(100% - 32px);
+     bottom: 16px;
+     flex-direction: column;
+     border-radius: 16px;
+     padding: 12px 16px;
+     gap: 8px;
+
+     .selection-count {
+       font-size: 13px;
+     }
+     .divider-vertical {
+       display: none;
+     }
+     .action-buttons {
+       width: 100%;
+       justify-content: space-between;
+
+       .btn-danger {
+         flex: 1;
+         justify-content: center;
+       }
+       .btn-cancel-selection {
+         flex: 1;
+         justify-content: center;
+       }
+     }
+   }
+
+   // Manual Trade Modal responsiveness
+   .manual-trade-modal {
+     width: calc(100vw - 24px);
+     max-height: 90vh;
+
+     .modal-form {
+       padding: 16px;
+       max-height: calc(90vh - 60px);
+
+       .form-toggles {
+         flex-direction: column;
+         gap: 12px;
+
+         .toggle-group {
+           width: 100%;
+         }
+       }
+
+       .form-columns {
+         flex-direction: column;
+         gap: 16px;
+       }
+     }
+   }
+ }
+
+ // Floating Action Button (FAB) Speed Dial styles
+.fab-container {
+  position: fixed;
+  bottom: 80px;
+  right: 16px;
+  z-index: 999;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start; // RTL start = right
+  gap: 16px;
+  transition: bottom 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+
+  // If bulk action bar is active, shift FAB up
+  .floating-bulk-actions-bar ~ & {
+    bottom: 150px;
+  }
+
+  .fab-main-btn {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background-color: $primary;
+    color: $on-primary;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 20px rgba($primary, 0.35);
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.2s ease;
+    outline: none;
+
+    &:hover {
+      background-color: lighten($primary, 5%);
+      transform: scale(1.05);
+    }
+
+    .fab-icon {
+      font-size: 28px;
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+  }
+
+  .fab-options {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start; // RTL start = right
+    gap: 12px;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(16px);
+    transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+
+    .fab-sub-btn {
+      display: flex;
+      flex-direction: row-reverse;
+      align-items: center;
+      gap: 12px;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      padding: 0;
+      outline: none;
+
+      .fab-label {
+        background-color: $surface-container-highest;
+        color: $on-surface;
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-size: 13px;
+        font-weight: 500;
+        font-family: $font-primary;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+        border: 1px solid $outline-variant;
+        white-space: nowrap;
+        opacity: 0;
+        transform: translateX(-8px);
+        transition: opacity 0.2s ease, transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+
+      .fab-icon-wrapper {
+        width: 56px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-shrink: 0;
+      }
+
+      .material-symbols-outlined {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background-color: $surface-container-high;
+        color: $primary;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        border: 1px solid $outline-variant;
+        font-size: 20px;
+        transition: transform 0.2s ease, background-color 0.2s ease;
+
+        &:hover {
+          background-color: $surface-variant;
+          color: lighten($primary, 5%);
+          transform: scale(1.05);
+        }
+      }
+    }
+  }
+
+  &.active {
+    .fab-main-btn {
+      transform: rotate(135deg);
+      background-color: $error;
+      color: $on-error;
+      box-shadow: 0 4px 20px rgba($error, 0.35);
+    }
+
+    .fab-options {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0);
+
+      .fab-sub-btn {
+        .fab-label {
+          opacity: 1;
+          transform: translateX(0);
+        }
+      }
+    }
+  }
+}
+
+// Media query overrides for mobile
+@media (max-width: 768px) {
+  .fab-container {
+    bottom: 80px;
+    right: 12px;
+
+    // Shift up even more on mobile when bulk actions bar is active
+    .floating-bulk-actions-bar ~ & {
+      bottom: 180px;
+    }
+  }
+}

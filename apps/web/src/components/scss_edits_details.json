@@ -1,0 +1,87 @@
+{
+  "1416": [
+    {
+      "name": "replace_file_content",
+      "args": {
+        "AllowMultiple": "false",
+        "Description": "\"Append FAB Speed Dial CSS and responsive overrides to the end of trades.scss.\"",
+        "EndLine": "2749",
+        "Instruction": "\"Append styles for .fab-container, .fab-main-btn, .fab-options, and active states.\"",
+        "ReplacementContent": "\"      .form-columns {\\n        flex-direction: column;\\n        gap: 16px;\\n      }\\n    }\\n  }\\n}\\n\\n// Floating Action Button (FAB) Speed Dial styles\\n.fab-container {\\n  position: fixed;\\n  bottom: 24px;\\n  right: 24px;\\n  z-index: 999;\\n  display: flex;\\n  flex-direction: column;\\n  align-items: flex-end;\\n  gap: 16px;\\n  transition: bottom 0.3s cubic-bezier(0.16, 1, 0.3, 1);\\n\\n  // If bulk action bar is active, shift FAB up\\n  .floating-bulk-actions-bar ~ & {\\n    bottom: 90px;\\n  }\\n\\n  .fab-main-btn {\\n    width: 56px;\\n    height: 56px;\\n    border-radius: 50%;\\n    background-color: $primary;\\n    color: $on-primary;\\n    border: none;\\n    cursor: pointer;\\n    display: flex;\\n    align-items: center;\\n    justify-content: center;\\n    box-shadow: 0 4px 20px rgba($primary, 0.35);\\n    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.2s ease;\\n    outline: none;\\n\\n    &:hover {\\n      background-color: lighten($primary, 5%);\\n      transform: scale(1.05);\\n    }\\n\\n    .fab-icon {\\n      font-size: 28px;\\n      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);\\n    }\\n  }\\n\\n  .fab-options {\\n    display: flex;\\n    flex-direction: column;\\n    align-items: flex-end;\\n    gap: 12px;\\n    opacity: 0;\\n    pointer-events: none;\\n    transform: translateY(16px);\\n    transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);\\n\\n    .fab-sub-btn {\\n      display: flex;\\n      align-items: center;\\n      gap: 12px;\\n      background: transparent;\\n      border: none;\\n      cursor: pointer;\\n      padding: 0;\\n      outline: none;\\n\\n      .fab-label {\\n        background-color: $surface-container-highest;\\n        color: $on-surface;\\n        padding: 6px 12px;\\n        border-radius: 6px;\\n        font-size: 13px;\\n        font-weight: 500;\\n        font-family: $font-primary;\\n        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);\\n        border: 1px solid $outline-variant;\\n        white-space: nowrap;\\n        opacity: 0;\\n        transform: translat\n<truncated 1539 bytes>",
+        "StartLine": "2443",
+        "TargetContent": "\"      .form-columns {\\n        flex-direction: column;\\n        gap: 16px;\\n      }\\n    }\\n  }\\n}\"",
+        "TargetFile": "\"g:\\\\Code\\\\trade-journal\\\\apps\\\\web\\\\src\\\\components\\\\trades.scss\"",
+        "toolAction": "\"Appending FAB Speed Dial styles to trades.scss\"",
+        "toolSummary": "\"Add FAB styles to trades.scss\""
+      }
+    }
+  ],
+  "1434": [
+    {
+      "name": "replace_file_content",
+      "args": {
+        "AllowMultiple": "false",
+        "Description": "\"Adjust FAB Speed Dial position, shift offsets, and horizontal text placement in RTL (move text labels to the left of the button icons).\"",
+        "EndLine": "2889",
+        "Instruction": "\"Modify the position coordinates, shift offsets, and add flex-direction: row-reverse to place text labels to the left of icons. Change transition starting offset for text labels.\"",
+        "ReplacementContent": "\"// Floating Action Button (FAB) Speed Dial styles\\n.fab-container {\\n  position: fixed;\\n  bottom: 80px;\\n  right: 16px;\\n  z-index: 999;\\n  display: flex;\\n  flex-direction: column;\\n  align-items: flex-end;\\n  gap: 16px;\\n  transition: bottom 0.3s cubic-bezier(0.16, 1, 0.3, 1);\\n\\n  // If bulk action bar is active, shift FAB up\\n  .floating-bulk-actions-bar ~ & {\\n    bottom: 150px;\\n  }\\n\\n  .fab-main-btn {\\n    width: 56px;\\n    height: 56px;\\n    border-radius: 50%;\\n    background-color: $primary;\\n    color: $on-primary;\\n    border: none;\\n    cursor: pointer;\\n    display: flex;\\n    align-items: center;\\n    justify-content: center;\\n    box-shadow: 0 4px 20px rgba($primary, 0.35);\\n    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.2s ease;\\n    outline: none;\\n\\n    &:hover {\\n      background-color: lighten($primary, 5%);\\n      transform: scale(1.05);\\n    }\\n\\n    .fab-icon {\\n      font-size: 28px;\\n      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);\\n    }\\n  }\\n\\n  .fab-options {\\n    display: flex;\\n    flex-direction: column;\\n    align-items: flex-end;\\n    gap: 12px;\\n    opacity: 0;\\n    pointer-events: none;\\n    transform: translateY(16px);\\n    transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);\\n\\n    .fab-sub-btn {\\n      display: flex;\\n      flex-direction: row-reverse;\\n      align-items: center;\\n      gap: 12px;\\n      background: transparent;\\n      border: none;\\n      cursor: pointer;\\n      padding: 0;\\n      outline: none;\\n\\n      .fab-label {\\n        background-color: $surface-container-highest;\\n        color: $on-surface;\\n        padding: 6px 12px;\\n        border-radius: 6px;\\n        font-size: 13px;\\n        font-weight: 500;\\n        font-family: $font-primary;\\n        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);\\n        border: 1px solid $outline-variant;\\n        white-space: nowrap;\\n        opacity: 0;\\n        transform: translateX(-8px);\\n        transition: opacity 0.2s ease, transform 0.2s \n<truncated 1473 bytes>",
+        "StartLine": "2751",
+        "TargetContent": "\"// Floating Action Button (FAB) Speed Dial styles\\n.fab-container {\\n  position: fixed;\\n  bottom: 24px;\\n  right: 24px;\\n  z-index: 999;\\n  display: flex;\\n  flex-direction: column;\\n  align-items: flex-end;\\n  gap: 16px;\\n  transition: bottom 0.3s cubic-bezier(0.16, 1, 0.3, 1);\\n\\n  // If bulk action bar is active, shift FAB up\\n  .floating-bulk-actions-bar ~ & {\\n    bottom: 90px;\\n  }\\n\\n  .fab-main-btn {\\n    width: 56px;\\n    height: 56px;\\n    border-radius: 50%;\\n    background-color: $primary;\\n    color: $on-primary;\\n    border: none;\\n    cursor: pointer;\\n    display: flex;\\n    align-items: center;\\n    justify-content: center;\\n    box-shadow: 0 4px 20px rgba($primary, 0.35);\\n    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.2s ease;\\n    outline: none;\\n\\n    &:hover {\\n      background-color: lighten($primary, 5%);\\n      transform: scale(1.05);\\n    }\\n\\n    .fab-icon {\\n      font-size: 28px;\\n      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);\\n    }\\n  }\\n\\n  .fab-options {\\n    display: flex;\\n    flex-direction: column;\\n    align-items: flex-end;\\n    gap: 12px;\\n    opacity: 0;\\n    pointer-events: none;\\n    transform: translateY(16px);\\n    transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);\\n\\n    .fab-sub-btn {\\n      display: flex;\\n      align-items: center;\\n      gap: 12px;\\n      background: transparent;\\n      border: none;\\n      cursor: pointer;\\n      padding: 0;\\n      outline: none;\\n\\n      .fab-label {\\n        background-color: $surface-container-highest;\\n        color: $on-surface;\\n        padding: 6px 12px;\\n        border-radius: 6px;\\n        font-size: 13px;\\n        font-weight: 500;\\n        font-family: $font-primary;\\n        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);\\n        border: 1px solid $outline-variant;\\n        white-space: nowrap;\\n        opacity: 0;\\n        transform: translateX(8px);\\n        transition: opacity 0.2s ease, transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);\\n      \n<truncated 1435 bytes>",
+        "TargetFile": "\"g:\\\\Code\\\\trade-journal\\\\apps\\\\web\\\\src\\\\components\\\\trades.scss\"",
+        "toolAction": "\"Updating FAB positioning and RTL text alignment in SCSS\"",
+        "toolSummary": "\"Update FAB styles in trades.scss\""
+      }
+    }
+  ],
+  "1450": [
+    {
+      "name": "replace_file_content",
+      "args": {
+        "AllowMultiple": "false",
+        "Description": "\"Update FAB container flex alignment to flex-start (which is right in RTL) and define fab-icon-wrapper to center sub-buttons vertically relative to the main FAB.\"",
+        "EndLine": "2877",
+        "Instruction": "\"Replace flex-end alignment with flex-start, and add .fab-icon-wrapper styles inside .fab-sub-btn.\"",
+        "ReplacementContent": "\".fab-container {\\n  position: fixed;\\n  bottom: 80px;\\n  right: 16px;\\n  z-index: 999;\\n  display: flex;\\n  flex-direction: column;\\n  align-items: flex-start; // RTL start = right\\n  gap: 16px;\\n  transition: bottom 0.3s cubic-bezier(0.16, 1, 0.3, 1);\\n\\n  // If bulk action bar is active, shift FAB up\\n  .floating-bulk-actions-bar ~ & {\\n    bottom: 150px;\\n  }\\n\\n  .fab-main-btn {\\n    width: 56px;\\n    height: 56px;\\n    border-radius: 50%;\\n    background-color: $primary;\\n    color: $on-primary;\\n    border: none;\\n    cursor: pointer;\\n    display: flex;\\n    align-items: center;\\n    justify-content: center;\\n    box-shadow: 0 4px 20px rgba($primary, 0.35);\\n    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.2s ease;\\n    outline: none;\\n\\n    &:hover {\\n      background-color: lighten($primary, 5%);\\n      transform: scale(1.05);\\n    }\\n\\n    .fab-icon {\\n      font-size: 28px;\\n      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);\\n    }\\n  }\\n\\n  .fab-options {\\n    display: flex;\\n    flex-direction: column;\\n    align-items: flex-start; // RTL start = right\\n    gap: 12px;\\n    opacity: 0;\\n    pointer-events: none;\\n    transform: translateY(16px);\\n    transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);\\n\\n    .fab-sub-btn {\\n      display: flex;\\n      flex-direction: row-reverse;\\n      align-items: center;\\n      gap: 12px;\\n      background: transparent;\\n      border: none;\\n      cursor: pointer;\\n      padding: 0;\\n      outline: none;\\n\\n      .fab-label {\\n        background-color: $surface-container-highest;\\n        color: $on-surface;\\n        padding: 6px 12px;\\n        border-radius: 6px;\\n        font-size: 13px;\\n        font-weight: 500;\\n        font-family: $font-primary;\\n        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);\\n        border: 1px solid $outline-variant;\\n        white-space: nowrap;\\n        opacity: 0;\\n        transform: translateX(-8px);\\n        transition: opacity 0.2s ease, transform 0.2s cubic\n<truncated 1366 bytes>",
+        "StartLine": "2752",
+        "TargetContent": "\".fab-container {\\n  position: fixed;\\n  bottom: 80px;\\n  right: 16px;\\n  z-index: 999;\\n  display: flex;\\n  flex-direction: column;\\n  align-items: flex-end;\\n  gap: 16px;\\n  transition: bottom 0.3s cubic-bezier(0.16, 1, 0.3, 1);\\n\\n  // If bulk action bar is active, shift FAB up\\n  .floating-bulk-actions-bar ~ & {\\n    bottom: 150px;\\n  }\\n\\n  .fab-main-btn {\\n    width: 56px;\\n    height: 56px;\\n    border-radius: 50%;\\n    background-color: $primary;\\n    color: $on-primary;\\n    border: none;\\n    cursor: pointer;\\n    display: flex;\\n    align-items: center;\\n    justify-content: center;\\n    box-shadow: 0 4px 20px rgba($primary, 0.35);\\n    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.2s ease;\\n    outline: none;\\n\\n    &:hover {\\n      background-color: lighten($primary, 5%);\\n      transform: scale(1.05);\\n    }\\n\\n    .fab-icon {\\n      font-size: 28px;\\n      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);\\n    }\\n  }\\n\\n  .fab-options {\\n    display: flex;\\n    flex-direction: column;\\n    align-items: flex-end;\\n    gap: 12px;\\n    opacity: 0;\\n    pointer-events: none;\\n    transform: translateY(16px);\\n    transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);\\n\\n    .fab-sub-btn {\\n      display: flex;\\n      flex-direction: row-reverse;\\n      align-items: center;\\n      gap: 12px;\\n      background: transparent;\\n      border: none;\\n      cursor: pointer;\\n      padding: 0;\\n      outline: none;\\n\\n      .fab-label {\\n        background-color: $surface-container-highest;\\n        color: $on-surface;\\n        padding: 6px 12px;\\n        border-radius: 6px;\\n        font-size: 13px;\\n        font-weight: 500;\\n        font-family: $font-primary;\\n        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);\\n        border: 1px solid $outline-variant;\\n        white-space: nowrap;\\n        opacity: 0;\\n        transform: translateX(-8px);\\n        transition: opacity 0.2s ease, transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);\\n      }\\n\\n      &:\n<truncated 1147 bytes>",
+        "TargetFile": "\"g:\\\\Code\\\\trade-journal\\\\apps\\\\web\\\\src\\\\components\\\\trades.scss\"",
+        "toolAction": "\"Updating FAB layout alignment in SCSS\"",
+        "toolSummary": "\"Update trades.scss for FAB alignment\""
+      }
+    }
+  ],
+  "1464": [
+    {
+      "name": "replace_file_content",
+      "args": {
+        "AllowMultiple": "false",
+        "Description": "\"Modify mobile summary-bar flex layout to place the first two stats cards side-by-side (50% width) and the profit stats card on its own full-width row.\"",
+        "EndLine": "2427",
+        "Instruction": "\"Change summary-bar under mobile query to use flex-direction: row and flex-wrap: wrap, adjusting card widths.\"",
+        "ReplacementContent": "\"  .summary-bar {\\n    flex-direction: row;\\n    flex-wrap: wrap;\\n    gap: 8px;\\n    margin-bottom: 24px;\\n\\n    .summary-card {\\n      box-sizing: border-box;\\n      justify-content: space-between;\\n      padding: 10px 16px;\\n\\n      &:not(.glow-profit-card) {\\n        flex: 1 1 calc(50% - 4px);\\n        width: calc(50% - 4px);\\n      }\\n\\n      &.glow-profit-card {\\n        flex: 1 1 100%;\\n        width: 100%;\\n      }\\n    }\\n  }\"",
+        "StartLine": "2416",
+        "TargetContent": "\"  .summary-bar {\\n    flex-direction: column;\\n    gap: 8px;\\n    margin-bottom: 24px;\\n\\n    .summary-card {\\n      width: 100%;\\n      box-sizing: border-box;\\n      justify-content: space-between;\\n      padding: 10px 16px;\\n    }\\n  }\"",
+        "TargetFile": "\"g:\\\\Code\\\\trade-journal\\\\apps\\\\web\\\\src\\\\components\\\\trades.scss\"",
+        "toolAction": "\"Updating mobile summary-bar layout in SCSS\"",
+        "toolSummary": "\"Update summary-bar styles in trades.scss\""
+      }
+    }
+  ],
+  "1578": [
+    {
+      "name": "replace_file_content",
+      "args": {
+        "AllowMultiple": "false",
+        "Description": "\"Hide pagination container on mobile views in trades.scss\"",
+        "EndLine": "2760",
+        "Instruction": "\"Add .pagination-container { display: none; } inside the media query before it closes at line 2759.\"",
+        "ReplacementContent": "\"      .form-columns {\\n        flex-direction: column;\\n        gap: 16px;\\n      }\\n    }\\n  }\\n\\n  // Hide pagination on mobile since infinite scroll is used instead\\n  .pagination-container {\\n    display: none;\\n  }\\n}\"",
+        "StartLine": "2752",
+        "TargetContent": "\"      .form-columns {\\n        flex-direction: column;\\n        gap: 16px;\\n      }\\n    }\\n  }\\n}\"",
+        "TargetFile": "\"g:\\\\Code\\\\trade-journal\\\\apps\\\\web\\\\src\\\\components\\\\trades.scss\"",
+        "toolAction": "\"Editing trades.scss to hide mobile pagination\"",
+        "toolSummary": "\"SCSS mobile pagination update\""
+      }
+    }
+  ]
+}

@@ -1,5 +1,7 @@
 /* Global styles for Next.js App Router (SCSS) */
 @use './variables' as *;
+@use '../components/trades';
+@use '../components/select';
 /* Vazirmatn is loaded via /fonts/vazirmatn.css in layout.tsx (self-hosted, no CDN) */
 
 
@@ -126,3 +128,5 @@ label.small {
 .m-xl {
   margin: $spaceing * 4;
 }
+
+// Component Styles

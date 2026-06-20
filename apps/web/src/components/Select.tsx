@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import './select.scss';
 
 export interface SelectOption {
   value: string;
