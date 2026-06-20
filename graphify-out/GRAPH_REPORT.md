@@ -1,16 +1,16 @@
 # Graph Report - trade-journal  (2026-06-20)
 
 ## Corpus Check
-- 50 files · ~244,463 words
+- 51 files · ~244,691 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 361 nodes · 419 edges · 32 communities (28 shown, 4 thin omitted)
+- 366 nodes · 423 edges · 34 communities (30 shown, 4 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `59e494c3`
+- Built from commit: `6d9d8499`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -45,6 +45,8 @@
 - [[_COMMUNITY_Community 29|Community 29]]
 - [[_COMMUNITY_Community 30|Community 30]]
 - [[_COMMUNITY_Community 31|Community 31]]
+- [[_COMMUNITY_Community 32|Community 32]]
+- [[_COMMUNITY_Community 33|Community 33]]
 
 ## God Nodes (most connected - your core abstractions)
 1. `Design Engineering` - 16 edges
@@ -73,7 +75,7 @@
 ## Import Cycles
 - None detected.
 
-## Communities (32 total, 4 thin omitted)
+## Communities (34 total, 4 thin omitted)
 
 ### Community 0 - "Community 0"
 Cohesion: 0.06
@@ -89,7 +91,7 @@ Nodes (25): dependencies, csv-parser, depd, express, multer, node-html-parser, p
 
 ### Community 3 - "Community 3"
 Cohesion: 0.10
-Nodes (19): dependencies, @chakra-ui/react, @emotion/react, @emotion/styled, lightweight-charts, next, react, react-dom (+11 more)
+Nodes (20): dependencies, @chakra-ui/react, @emotion/react, @emotion/styled, lightweight-charts, next, react, react-dom (+12 more)
 
 ### Community 4 - "Community 4"
 Cohesion: 0.11
@@ -104,8 +106,8 @@ Cohesion: 0.13
 Nodes (14): API Progress — معامله‌یار, Database Schema (`src/prisma/schema.prisma`), ✅ Done, Express Server (`src/server.ts`), File Upload & Screenshots Middleware, High Priority, Low Priority, Medium Priority (+6 more)
 
 ### Community 7 - "Community 7"
-Cohesion: 0.10
-Nodes (32): ImportMT4Modal(), ImportMT4ModalProps, ManualTradeModal(), ManualTradeModalProps, DesktopTableProps, DetailPanel(), DetailPanelProps, MobileCardsList() (+24 more)
+Cohesion: 0.16
+Nodes (25): DesktopTableProps, DetailPanel(), DetailPanelProps, MobileCardsList(), MobileCardsListProps, SummaryBar(), SummaryBarProps, CandlestickData (+17 more)
 
 ### Community 8 - "Community 8"
 Cohesion: 0.12
@@ -179,8 +181,16 @@ Nodes (4): Beauty is leverage, Core Philosophy, Taste is trained, not innate, Un
 Cohesion: 0.50
 Nodes (4): Debugging Animations, Frame-by-frame inspection, Slow motion testing, Test on real devices
 
+### Community 32 - "Community 32"
+Cohesion: 0.21
+Nodes (7): ImportMT4Modal(), ImportMT4ModalProps, ManualTradeModal(), ManualTradeModalProps, MOCK_TRADES, ConfirmModal(), ConfirmModalProps
+
+### Community 33 - "Community 33"
+Cohesion: 0.50
+Nodes (3): AppState, TradingAccount, useAppStore
+
 ## Knowledge Gaps
-- **234 isolated node(s):** `name`, `version`, `private`, `dev`, `build` (+229 more)
+- **238 isolated node(s):** `name`, `version`, `private`, `dev`, `build` (+233 more)
   These have ≤1 connection - possible missing edges or undocumented components.
 - **4 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
@@ -188,11 +198,11 @@ Nodes (4): Debugging Animations, Frame-by-frame inspection, Slow motion testing,
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `Design Engineering` connect `Community 19` to `Community 12`, `Community 22`, `Community 24`, `Community 25`, `Community 26`, `Community 27`, `Community 28`, `Community 29`, `Community 30`, `Community 31`?**
-  _High betweenness centrality (0.028) - this node is a cross-community bridge._
+  _High betweenness centrality (0.027) - this node is a cross-community bridge._
 - **Why does `Component Building Principles` connect `Community 25` to `Community 19`?**
   _High betweenness centrality (0.006) - this node is a cross-community bridge._
 - **What connects `name`, `version`, `private` to the rest of the system?**
-  _234 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _238 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Community 0` be split into smaller, more focused modules?**
   _Cohesion score 0.05714285714285714 - nodes in this community are weakly interconnected._
 - **Should `Community 1` be split into smaller, more focused modules?**
@@ -200,4 +210,4 @@ _Questions this graph is uniquely positioned to answer:_
 - **Should `Community 2` be split into smaller, more focused modules?**
   _Cohesion score 0.07692307692307693 - nodes in this community are weakly interconnected._
 - **Should `Community 3` be split into smaller, more focused modules?**
-  _Cohesion score 0.1 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.09523809523809523 - nodes in this community are weakly interconnected._

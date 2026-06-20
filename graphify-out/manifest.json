@@ -50,8 +50,8 @@
     "semantic_hash": ""
   },
   "apps/web/package.json": {
-    "mtime": 1781902883.218412,
-    "ast_hash": "4bcc99ffba22b66fd51c5556e9b3e963",
+    "mtime": 1781984141.7653995,
+    "ast_hash": "6fb0fa8ad6ce884bd5874aa2d07f0f6f",
     "semantic_hash": ""
   },
   "apps/web/src/app/api/exchange-rate/route.ts": {
@@ -235,8 +235,8 @@
     "semantic_hash": ""
   },
   "apps/web/src/components/layout/SideNavBar.tsx": {
-    "mtime": 1781982926.0156832,
-    "ast_hash": "8e41df2e0a9d77a2ccd8d7fcbd2c9751",
+    "mtime": 1781982992.3377256,
+    "ast_hash": "3cd769df00beaf6e2d704b64dc911e4e",
     "semantic_hash": ""
   },
   "apps/web/src/components/modals/ImportMT4Modal.tsx": {
@@ -292,6 +292,11 @@
   "apps/web/src/components/ui/Select.tsx": {
     "mtime": 1781967223.7332702,
     "ast_hash": "a5fef86001c6c16dcadf561406d30d27",
+    "semantic_hash": ""
+  },
+  "apps/web/src/store/useAppStore.ts": {
+    "mtime": 1781984147.5031703,
+    "ast_hash": "c9d2ac23ef280738d1569ce1c88e1e62",
     "semantic_hash": ""
   }
 }
