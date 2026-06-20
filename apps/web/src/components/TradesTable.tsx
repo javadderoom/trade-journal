@@ -8,6 +8,7 @@ import FilterBar from './FilterBar';
 import DesktopTable from './DesktopTable';
 import MobileCardsList from './MobileCardsList';
 import DetailPanel from './DetailPanel';
+import { getMainPair } from '../utils/tradeHelpers';
 
 export interface Trade {
   id: string;
@@ -211,8 +212,15 @@ export default function TradesTable({
   // Filtered trades
   const filteredTrades = useMemo(() => {
     return trades.filter(trade => {
-      if (selectedSymbol !== 'همه نمادها' && trade.symbol !== selectedSymbol) {
-        return false;
+      if (selectedSymbol !== 'همه نمادها') {
+        if (selectedSymbol.startsWith('main:')) {
+          const mainPair = selectedSymbol.substring(5);
+          if (getMainPair(trade.symbol) !== mainPair) {
+            return false;
+          }
+        } else if (trade.symbol !== selectedSymbol) {
+          return false;
+        }
       }
       if (selectedDirection !== 'همه جهت‌ها') {
         const dir = selectedDirection === 'خرید (Buy)' ? 'BUY' : 'SELL';

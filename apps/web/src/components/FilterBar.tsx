@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Select from './Select';
+import { getSymbolFilterOptions } from '../utils/tradeHelpers';
 
 interface FilterBarProps {
   searchQuery: string;
@@ -154,7 +155,10 @@ export default function FilterBar({
                   setSelectedSymbol(val);
                   setCurrentPage(1);
                 }}
-                options={symbolOptions.map(s => ({ value: s, label: s }))}
+                options={[
+                  { value: 'همه نمادها', label: 'همه نمادها' },
+                  ...getSymbolFilterOptions(symbolOptions.filter(s => s !== 'همه نمادها'))
+                ]}
               />
             </div>
 

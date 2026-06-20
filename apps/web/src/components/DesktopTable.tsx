@@ -139,7 +139,7 @@ export default function DesktopTable({
                     {(() => {
                       const account = accounts.find(a => a.id === trade.accountId);
                       return account
-                        ? `${account.broker_name || 'MT5'} (${account.account_number || ''})`
+                        ? `${account.broker_name || 'MT5'} (${account.account_number || account.id})`
                         : (trade.accountId === 'dev-account' ? 'حساب پیش‌فرض' : '-');
                     })()}
                   </td>

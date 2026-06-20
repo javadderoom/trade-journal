@@ -124,3 +124,62 @@ export const getTradingSession = (dateStr: string): TradingSessionInfo => {
     return { name: 'UNKNOWN', label: 'نامشخص', emoji: '❓', className: 'session-unknown' };
   }
 };
+
+export const getMainPair = (symbol: string): string => {
+  if (!symbol) return '';
+  const clean = symbol.trim();
+  // Split by common separators: ., _, +, -
+  const base = clean.split(/[\._\+-]/)[0];
+  
+  // If the base ends with lowercase suffix (e.g. EURUSDpro, XAUUSDraw), strip trailing lowercase/numeric characters
+  // Forex/Commodities bases are typically 6 uppercase letters (e.g. EURUSD).
+  const matchForex = base.match(/^([A-Z]{6})[a-z0-9]*$/);
+  if (matchForex) {
+    return matchForex[1];
+  }
+  
+  // Default to just the uppercase base
+  return base.toUpperCase();
+};
+
+export const getSymbolFilterOptions = (uniqueSymbols: string[]): { value: string; label: string }[] => {
+  const groups: { [main: string]: string[] } = {};
+  
+  uniqueSymbols.forEach(sym => {
+    const main = getMainPair(sym);
+    if (!groups[main]) {
+      groups[main] = [];
+    }
+    if (!groups[main].includes(sym)) {
+      groups[main].push(sym);
+    }
+  });
+
+  const options: { value: string; label: string }[] = [];
+  const mainPairs = Object.keys(groups).sort();
+
+  mainPairs.forEach(main => {
+    const syms = groups[main];
+    if (syms.length === 1) {
+      options.push({
+        value: syms[0],
+        label: syms[0],
+      });
+    } else {
+      // Main pair group
+      options.push({
+        value: `main:${main}`,
+        label: `${main} (همه)`,
+      });
+      // Indented sub-pairs using non-breaking spaces
+      syms.sort().forEach(sym => {
+        options.push({
+          value: sym,
+          label: `\u00A0\u00A0\u00A0\u00A0↳ ${sym}`,
+        });
+      });
+    }
+  });
+
+  return options;
+};

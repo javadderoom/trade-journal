@@ -2682,6 +2682,12 @@ input[type="checkbox"] {
           display: inline-flex;
           align-items: center;
           gap: 2px;
+          font-size: 10px;
+          padding: 2px 6px;
+          border-radius: 4px;
+          font-weight: 500;
+          white-space: nowrap;
+          font-family: $font-primary;
 
          &.emotion-confident {
            background-color: rgba($primary, 0.12);
@@ -2792,6 +2798,11 @@ input[type="checkbox"] {
          gap: 16px;
        }
      }
+   }
+
+   // Hide pagination container on mobile views in favor of infinite scroll
+   .pagination-container {
+     display: none;
    }
  }
 

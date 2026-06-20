@@ -1,16 +1,16 @@
 # Graph Report - trade-journal  (2026-06-20)
 
 ## Corpus Check
-- 47 files · ~243,732 words
+- 47 files · ~243,957 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 349 nodes · 409 edges · 25 communities (22 shown, 3 thin omitted)
+- 351 nodes · 416 edges · 32 communities (29 shown, 3 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `afb8efbd`
+- Built from commit: `5e2d9298`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -38,6 +38,13 @@
 - [[_COMMUNITY_Community 22|Community 22]]
 - [[_COMMUNITY_Community 23|Community 23]]
 - [[_COMMUNITY_Community 24|Community 24]]
+- [[_COMMUNITY_Community 25|Community 25]]
+- [[_COMMUNITY_Community 26|Community 26]]
+- [[_COMMUNITY_Community 27|Community 27]]
+- [[_COMMUNITY_Community 28|Community 28]]
+- [[_COMMUNITY_Community 29|Community 29]]
+- [[_COMMUNITY_Community 30|Community 30]]
+- [[_COMMUNITY_Community 31|Community 31]]
 
 ## God Nodes (most connected - your core abstractions)
 1. `Design Engineering` - 16 edges
@@ -66,7 +73,7 @@
 ## Import Cycles
 - None detected.
 
-## Communities (25 total, 3 thin omitted)
+## Communities (32 total, 3 thin omitted)
 
 ### Community 0 - "Community 0"
 Cohesion: 0.06
@@ -97,8 +104,8 @@ Cohesion: 0.14
 Nodes (13): API Progress — معامله‌یار, Database Schema (`src/prisma/schema.prisma`), ✅ Done, Express Server (`src/server.ts`), High Priority, Low Priority, Medium Priority, MT4/MT5 Parser (`src/services/mt4Parser.ts`) (+5 more)
 
 ### Community 7 - "Community 7"
-Cohesion: 0.17
-Nodes (24): DesktopTableProps, DetailPanel(), DetailPanelProps, MobileCardsList(), MobileCardsListProps, SummaryBar(), SummaryBarProps, CandlestickData (+16 more)
+Cohesion: 0.16
+Nodes (25): DesktopTableProps, DetailPanel(), DetailPanelProps, MobileCardsList(), MobileCardsListProps, SummaryBar(), SummaryBarProps, CandlestickData (+17 more)
 
 ### Community 8 - "Community 8"
 Cohesion: 0.12
@@ -125,12 +132,12 @@ Cohesion: 0.29
 Nodes (6): File, How it works, JSON payload format, MT5 Expert Advisor — Trade Sync, Notes, Setup
 
 ### Community 19 - "Community 19"
-Cohesion: 0.04
-Nodes (46): Accessibility, Animate enter states with @starting-style, Asymmetric enter/exit timing, Beauty is leverage, Buttons must feel responsive, clip-path for Animation, Cohesion matters, Comparison sliders (+38 more)
+Cohesion: 0.22
+Nodes (8): Accessibility, Design Engineering, Initial Response, prefers-reduced-motion, Review Checklist, Review Format (Required), Stagger Animations, Touch device hover states
 
 ### Community 20 - "Community 20"
-Cohesion: 0.33
-Nodes (4): FilterBarProps, Select(), SelectOption, SelectProps
+Cohesion: 0.32
+Nodes (6): FilterBar(), FilterBarProps, Select(), SelectOption, SelectProps, getSymbolFilterOptions()
 
 ### Community 21 - "Community 21"
 Cohesion: 0.29
@@ -148,6 +155,34 @@ Nodes (5): 3D transforms for depth, CSS Transform Mastery, scale() scales childr
 Cohesion: 0.33
 Nodes (6): 1. Should this animate at all?, 2. What is the purpose?, 3. What easing should it use?, 4. How fast should it be?, Perceived performance, The Animation Decision Framework
 
+### Community 25 - "Community 25"
+Cohesion: 0.25
+Nodes (8): Animate enter states with @starting-style, Buttons must feel responsive, Component Building Principles, Make popovers origin-aware, Never animate from scale(0), Tooltips: skip delay on subsequent hovers, Use blur to mask imperfect transitions, Use CSS transitions over keyframes for interruptible UI
+
+### Community 26 - "Community 26"
+Cohesion: 0.33
+Nodes (6): clip-path for Animation, Comparison sliders, Hold-to-delete pattern, Image reveals on scroll, Tabs with perfect color transitions, The inset shape
+
+### Community 27 - "Community 27"
+Cohesion: 0.33
+Nodes (6): CSS animations beat JS under load, CSS variables are inheritable, Framer Motion hardware acceleration caveat, Only animate transform and opacity, Performance Rules, Use WAAPI for programmatic CSS animations
+
+### Community 28 - "Community 28"
+Cohesion: 0.40
+Nodes (5): Asymmetric enter/exit timing, Cohesion matters, Review your work the next day, The opacity + height combination, The Sonner Principles (Building Loved Components)
+
+### Community 29 - "Community 29"
+Cohesion: 0.40
+Nodes (5): Interruptibility advantage, Spring Animations, Spring-based mouse interactions, Spring configuration, When to use springs
+
+### Community 30 - "Community 30"
+Cohesion: 0.50
+Nodes (4): Beauty is leverage, Core Philosophy, Taste is trained, not innate, Unseen details compound
+
+### Community 31 - "Community 31"
+Cohesion: 0.50
+Nodes (4): Debugging Animations, Frame-by-frame inspection, Slow motion testing, Test on real devices
+
 ## Knowledge Gaps
 - **230 isolated node(s):** `name`, `version`, `private`, `dev`, `build` (+225 more)
   These have ≤1 connection - possible missing edges or undocumented components.
@@ -156,8 +191,10 @@ Nodes (6): 1. Should this animate at all?, 2. What is the purpose?, 3. What easi
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `Design Engineering` connect `Community 19` to `Community 24`, `Community 22`, `Community 23`?**
+- **Why does `Design Engineering` connect `Community 19` to `Community 22`, `Community 23`, `Community 24`, `Community 25`, `Community 26`, `Community 27`, `Community 28`, `Community 29`, `Community 30`, `Community 31`?**
   _High betweenness centrality (0.030) - this node is a cross-community bridge._
+- **Why does `Component Building Principles` connect `Community 25` to `Community 19`?**
+  _High betweenness centrality (0.007) - this node is a cross-community bridge._
 - **What connects `name`, `version`, `private` to the rest of the system?**
   _230 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Community 0` be split into smaller, more focused modules?**
@@ -168,5 +205,3 @@ _Questions this graph is uniquely positioned to answer:_
   _Cohesion score 0.07692307692307693 - nodes in this community are weakly interconnected._
 - **Should `Community 3` be split into smaller, more focused modules?**
   _Cohesion score 0.1 - nodes in this community are weakly interconnected._
-- **Should `Community 4` be split into smaller, more focused modules?**
-  _Cohesion score 0.1111111111111111 - nodes in this community are weakly interconnected._

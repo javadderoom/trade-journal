@@ -70,8 +70,8 @@
     "semantic_hash": ""
   },
   "apps/web/src/components/TradesTable.tsx": {
-    "mtime": 1781977914.9130518,
-    "ast_hash": "6823a414c36b8449a7894dd49e9230f3",
+    "mtime": 1781979364.0741777,
+    "ast_hash": "0e1767f33411cacb200d94c3d2c94663",
     "semantic_hash": ""
   },
   "apps/web/src/utils/farsi.ts": {
@@ -235,8 +235,8 @@
     "semantic_hash": ""
   },
   "apps/web/src/components/DesktopTable.tsx": {
-    "mtime": 1781977950.310029,
-    "ast_hash": "f999e25efce15e01825184503ce4cc94",
+    "mtime": 1781978286.2287235,
+    "ast_hash": "4d73a479434d671022727a0944c2f013",
     "semantic_hash": ""
   },
   "apps/web/src/components/DetailPanel.tsx": {
@@ -245,8 +245,8 @@
     "semantic_hash": ""
   },
   "apps/web/src/components/FilterBar.tsx": {
-    "mtime": 1781977936.1726782,
-    "ast_hash": "1da4238f4f8ef298d18929d0de6d5e1c",
+    "mtime": 1781979335.2537882,
+    "ast_hash": "bfa41e68e961c08da274d651b930e23e",
     "semantic_hash": ""
   },
   "apps/web/src/components/MobileCardsList.tsx": {
@@ -260,8 +260,8 @@
     "semantic_hash": ""
   },
   "apps/web/src/utils/tradeHelpers.ts": {
-    "mtime": 1781965244.4162502,
-    "ast_hash": "df50bbf2b2b4895f82efccd409b72048",
+    "mtime": 1781979312.8751097,
+    "ast_hash": "aef34574090786a949e797b1c683812d",
     "semantic_hash": ""
   },
   "apps/web/src/components/restored_scss_chunks.json": {
