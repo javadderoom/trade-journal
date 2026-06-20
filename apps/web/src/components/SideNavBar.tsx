@@ -1,0 +1,70 @@
+'use client';
+
+import React from 'react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+
+export default function SideNavBar() {
+  const pathname = usePathname();
+
+  const navItems = [
+    { href: '/dashboard', label: 'داشبورد', icon: 'dashboard' },
+    { href: '/trades', label: 'معاملات', icon: 'analytics', fillIcon: true },
+    { href: '/import', label: 'وارد کردن داده', icon: 'file_upload' },
+    { href: '/journal', label: 'ژورنال', icon: 'menu_book' },
+    { href: '/strategies', label: 'استراتژی‌ها', icon: 'query_stats' },
+    { href: '/settings', label: 'تنظیمات', icon: 'settings' },
+  ];
+
+  return (
+    <nav className="sidenav-container">
+      <div className="sidenav-inner">
+        {/* Header */}
+        <div className="sidenav-header">
+          <div className="logo-box">
+            <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>ssid_chart</span>
+          </div>
+          <div className="title-group">
+            <span className="title-text">پنل معامله‌گر</span>
+            <span className="subtitle-text">نسخه حرفه‌ای</span>
+          </div>
+        </div>
+
+        {/* Navigation Links */}
+        <div className="sidenav-links">
+          {navItems.map((item) => {
+            const isActive = pathname === item.href || (item.href === '/trades' && pathname.startsWith('/trades'));
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`sidenav-link-item ${isActive ? 'active' : ''}`}
+              >
+                <span
+                  className="material-symbols-outlined icon"
+                  style={item.fillIcon && isActive ? { fontVariationSettings: "'FILL' 1" } : undefined}
+                >
+                  {item.icon}
+                </span>
+                <span className="label">{item.label}</span>
+              </Link>
+            );
+          })}
+        </div>
+
+        {/* CTA Upgrade */}
+        <div className="sidenav-cta-box">
+          <button className="upgrade-btn">ارتقاء حساب</button>
+        </div>
+
+        {/* Footer Link */}
+        <div className="sidenav-footer">
+          <Link href="/logout" className="logout-link">
+            <span className="material-symbols-outlined icon">logout</span>
+            <span className="label">خروج</span>
+          </Link>
+        </div>
+      </div>
+    </nav>
+  );
+}

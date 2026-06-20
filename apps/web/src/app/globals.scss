@@ -2,6 +2,7 @@
 @use './variables' as *;
 @use '../components/trades';
 @use '../components/select';
+@use '../components/sidenav';
 /* Vazirmatn is loaded via /fonts/vazirmatn.css in layout.tsx (self-hosted, no CDN) */
 
 
@@ -130,3 +131,25 @@ label.small {
 }
 
 // Component Styles
+.app-container {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+  direction: rtl;
+}
+
+.main-content-wrapper {
+  flex: 1;
+  margin-right: 256px;
+  min-height: 100vh;
+  background-color: $background;
+  position: relative;
+  width: calc(100% - 256px);
+}
+
+@media (max-width: 1024px) {
+  .main-content-wrapper {
+    margin-right: 0;
+    width: 100%;
+  }
+}

@@ -1,4 +1,5 @@
 import "./globals.scss";
+import SideNavBar from "../components/SideNavBar";
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -13,7 +14,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           rel="stylesheet"
         />
       </head>
-      <body suppressHydrationWarning>{children}</body>
+      <body suppressHydrationWarning>
+        <div className="app-container">
+          <SideNavBar />
+          <div className="main-content-wrapper">{children}</div>
+        </div>
+      </body>
     </html>
   );
 }

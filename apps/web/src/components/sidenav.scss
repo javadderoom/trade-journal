@@ -1,0 +1,175 @@
+@use '../app/variables' as *;
+
+.sidenav-container {
+  position: fixed;
+  right: 0;
+  top: 0;
+  height: 100vh;
+  width: 256px;
+  display: flex;
+  flex-direction: column;
+  background-color: $surface-container;
+  border-left: 1px solid $outline-variant;
+  z-index: 20;
+
+  // RTL alignment
+  direction: rtl;
+
+  .sidenav-inner {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding: 24px 16px;
+    gap: 8px;
+  }
+
+  .sidenav-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 32px;
+    padding: 0 8px;
+
+    .logo-box {
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      background-color: rgba($primary, 0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid rgba($primary, 0.25);
+
+      span {
+        color: $primary;
+        font-size: 24px;
+      }
+    }
+
+    .title-group {
+      display: flex;
+      flex-direction: column;
+
+      .title-text {
+        font-size: 20px;
+        font-weight: 600;
+        line-height: 32px;
+        color: $primary;
+      }
+
+      .subtitle-text {
+        font-size: 12px;
+        font-weight: 500;
+        line-height: 16px;
+        color: $secondary;
+      }
+    }
+  }
+
+  .sidenav-links {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1;
+
+    .sidenav-link-item {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 16px;
+      color: $on-surface-variant;
+      text-decoration: none;
+      transition: all 0.2s ease-in-out;
+      border-radius: 8px;
+
+      &:hover {
+        background-color: $surface-variant;
+        color: $on-surface;
+      }
+
+      &.active {
+        background-color: $primary-container;
+        color: $on-primary-container;
+        font-weight: 700;
+
+        .icon {
+          color: $on-primary-container;
+        }
+      }
+
+      .icon {
+        font-size: 24px;
+      }
+
+      .label {
+        font-size: 14px;
+        font-weight: 500;
+        line-height: 20px;
+      }
+    }
+  }
+
+  .sidenav-cta-box {
+    margin-top: auto;
+    margin-bottom: 24px;
+    background-color: $surface-container-high;
+    padding: 16px;
+    border-radius: 8px;
+    border: 1px solid $outline-variant;
+
+    .upgrade-btn {
+      width: 100%;
+      padding: 8px 0;
+      background-color: rgba($primary, 0.1);
+      color: $primary;
+      font-size: 14px;
+      font-weight: 500;
+      line-height: 20px;
+      border-radius: 8px;
+      border: 1px solid rgba($primary, 0.2);
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+
+      &:hover {
+        background-color: rgba($primary, 0.2);
+      }
+    }
+  }
+
+  .sidenav-footer {
+    border-top: 1px solid $outline-variant;
+    padding-top: 16px;
+
+    .logout-link {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 16px;
+      color: $error;
+      text-decoration: none;
+      border-radius: 8px;
+      transition: all 0.2s ease-in-out;
+
+      &:hover {
+        background-color: rgba($error, 0.1);
+      }
+
+      .icon {
+        font-size: 24px;
+      }
+
+      .label {
+        font-size: 14px;
+        font-weight: 500;
+        line-height: 20px;
+      }
+    }
+  }
+}
+
+// Mobile responsiveness for SideNavBar
+@media (max-width: 1024px) {
+  .sidenav-container {
+    display: none; // Hide on mobile/tablet view
+  }
+}

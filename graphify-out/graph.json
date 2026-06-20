@@ -897,11 +897,31 @@
       "label": "RootLayout()",
       "file_type": "code",
       "source_file": "apps/web/src/app/layout.tsx",
-      "source_location": "L3",
+      "source_location": "L4",
       "_origin": "ast",
       "id": "app_layout_rootlayout",
       "community": 14,
       "norm_label": "rootlayout()"
+    },
+    {
+      "label": "page.tsx",
+      "file_type": "code",
+      "source_file": "apps/web/src/app/page.tsx",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "app_page",
+      "community": 23,
+      "norm_label": "page.tsx"
+    },
+    {
+      "label": "RootPage()",
+      "file_type": "code",
+      "source_file": "apps/web/src/app/page.tsx",
+      "source_location": "L3",
+      "_origin": "ast",
+      "id": "app_page_rootpage",
+      "community": 23,
+      "norm_label": "rootpage()"
     },
     {
       "label": "page.tsx",
@@ -1182,6 +1202,26 @@
       "id": "components_select_select",
       "community": 20,
       "norm_label": "select()"
+    },
+    {
+      "label": "SideNavBar.tsx",
+      "file_type": "code",
+      "source_file": "apps/web/src/components/SideNavBar.tsx",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "components_sidenavbar",
+      "community": 14,
+      "norm_label": "sidenavbar.tsx"
+    },
+    {
+      "label": "SideNavBar()",
+      "file_type": "code",
+      "source_file": "apps/web/src/components/SideNavBar.tsx",
+      "source_location": "L7",
+      "_origin": "ast",
+      "id": "components_sidenavbar_sidenavbar",
+      "community": 14,
+      "norm_label": "sidenavbar()"
     },
     {
       "label": "SummaryBar.tsx",
@@ -3330,7 +3370,7 @@
       "source_location": "L209",
       "_origin": "ast",
       "id": "persian_trading_journal_architecture_5_feature_breakdown_v1",
-      "community": 0,
+      "community": 22,
       "norm_label": "5. feature breakdown \u2014 v1"
     },
     {
@@ -3340,7 +3380,7 @@
       "source_location": "L211",
       "_origin": "ast",
       "id": "persian_trading_journal_architecture_5_1_authentication",
-      "community": 0,
+      "community": 22,
       "norm_label": "5.1 authentication"
     },
     {
@@ -3350,7 +3390,7 @@
       "source_location": "L217",
       "_origin": "ast",
       "id": "persian_trading_journal_architecture_5_2_manual_trade_entry",
-      "community": 0,
+      "community": 22,
       "norm_label": "5.2 manual trade entry"
     },
     {
@@ -3360,7 +3400,7 @@
       "source_location": "L230",
       "_origin": "ast",
       "id": "persian_trading_journal_architecture_5_3_mt4_mt5_import",
-      "community": 0,
+      "community": 22,
       "norm_label": "5.3 mt4/mt5 import"
     },
     {
@@ -3370,7 +3410,7 @@
       "source_location": "L238",
       "_origin": "ast",
       "id": "persian_trading_journal_architecture_5_4_analytics_dashboard",
-      "community": 0,
+      "community": 22,
       "norm_label": "5.4 analytics dashboard"
     },
     {
@@ -3380,7 +3420,7 @@
       "source_location": "L258",
       "_origin": "ast",
       "id": "persian_trading_journal_architecture_5_5_trade_list_detail",
-      "community": 0,
+      "community": 22,
       "norm_label": "5.5 trade list & detail"
     },
     {
@@ -3390,7 +3430,7 @@
       "source_location": "L264",
       "_origin": "ast",
       "id": "persian_trading_journal_architecture_5_6_daily_journal",
-      "community": 0,
+      "community": 22,
       "norm_label": "5.6 daily journal"
     },
     {
@@ -3400,7 +3440,7 @@
       "source_location": "L270",
       "_origin": "ast",
       "id": "persian_trading_journal_architecture_5_7_setup_playbook",
-      "community": 0,
+      "community": 22,
       "norm_label": "5.7 setup / playbook"
     },
     {
@@ -3410,7 +3450,7 @@
       "source_location": "L275",
       "_origin": "ast",
       "id": "persian_trading_journal_architecture_5_8_payments_plans",
-      "community": 0,
+      "community": 22,
       "norm_label": "5.8 payments & plans"
     },
     {
@@ -4537,6 +4577,38 @@
       "relation": "imports_from",
       "context": "import",
       "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/app/layout.tsx",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "app_layout",
+      "target": "components_sidenavbar",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/app/layout.tsx",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "app_layout",
+      "target": "components_sidenavbar_sidenavbar",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/app/page.tsx",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "app_page",
+      "target": "app_page_rootpage",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
       "source_file": "apps/web/src/app/trades/page.tsx",
       "source_location": "L7",
       "weight": 1.0,
@@ -5393,6 +5465,16 @@
       "confidence_score": 1.0,
       "source": "components_tradestable",
       "target": "components_select_select"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/components/SideNavBar.tsx",
+      "source_location": "L7",
+      "weight": 1.0,
+      "source": "components_sidenavbar",
+      "target": "components_sidenavbar_sidenavbar",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -7074,9 +7156,9 @@
       "source_file": "apps/api/PROGRESS.md",
       "source_location": "L63",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "api_progress_done",
-      "target": "api_progress_file_upload_screenshots_middleware",
-      "confidence_score": 1.0
+      "target": "api_progress_file_upload_screenshots_middleware"
     },
     {
       "relation": "contains",
@@ -7284,9 +7366,9 @@
       "source_file": "apps/web/PROGRESS.md",
       "source_location": "L55",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "web_progress_done",
-      "target": "web_progress_import_mt4_mt5_statement_modal_src_components_importmt4modal_tsx",
-      "confidence_score": 1.0
+      "target": "web_progress_import_mt4_mt5_statement_modal_src_components_importmt4modal_tsx"
     },
     {
       "relation": "contains",
@@ -7294,9 +7376,9 @@
       "source_file": "apps/web/PROGRESS.md",
       "source_location": "L83",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "web_progress_done",
-      "target": "web_progress_main_and_sub_pair_grouping_filter",
-      "confidence_score": 1.0
+      "target": "web_progress_main_and_sub_pair_grouping_filter"
     },
     {
       "relation": "contains",
@@ -7304,9 +7386,9 @@
       "source_file": "apps/web/PROGRESS.md",
       "source_location": "L51",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "web_progress_done",
-      "target": "web_progress_manual_trade_entry_modal_src_components_manualtrademodal_tsx",
-      "confidence_score": 1.0
+      "target": "web_progress_manual_trade_entry_modal_src_components_manualtrademodal_tsx"
     },
     {
       "relation": "contains",
@@ -7314,9 +7396,9 @@
       "source_file": "apps/web/PROGRESS.md",
       "source_location": "L78",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "web_progress_done",
-      "target": "web_progress_responsive_optimization_infinite_scroll",
-      "confidence_score": 1.0
+      "target": "web_progress_responsive_optimization_infinite_scroll"
     },
     {
       "relation": "contains",
@@ -7354,9 +7436,9 @@
       "source_file": "apps/web/PROGRESS.md",
       "source_location": "L95",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "web_progress_done",
-      "target": "web_progress_utilities_src_utils_farsi_ts_src_utils_tradehelpers_ts",
-      "confidence_score": 1.0
+      "target": "web_progress_utilities_src_utils_farsi_ts_src_utils_tradehelpers_ts"
     },
     {
       "relation": "contains",
@@ -7860,5 +7942,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "26bcae572fe4ff40db49d2eac3f5476e851f0abf"
+  "built_at_commit": "57b7ed4a327ea1133b59bb03b94dbb58564e87a7"
 }

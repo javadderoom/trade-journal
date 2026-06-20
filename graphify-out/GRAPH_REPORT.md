@@ -1,16 +1,16 @@
 # Graph Report - trade-journal  (2026-06-20)
 
 ## Corpus Check
-- 47 files · ~244,060 words
+- 49 files · ~244,284 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 355 nodes · 420 edges · 25 communities (22 shown, 3 thin omitted)
+- 359 nodes · 424 edges · 27 communities (23 shown, 4 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `26bcae57`
+- Built from commit: `57b7ed4a`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -29,12 +29,14 @@
 - [[_COMMUNITY_Community 11|Community 11]]
 - [[_COMMUNITY_Community 12|Community 12]]
 - [[_COMMUNITY_Community 13|Community 13]]
+- [[_COMMUNITY_Community 14|Community 14]]
 - [[_COMMUNITY_Community 16|Community 16]]
 - [[_COMMUNITY_Community 17|Community 17]]
 - [[_COMMUNITY_Community 18|Community 18]]
 - [[_COMMUNITY_Community 19|Community 19]]
 - [[_COMMUNITY_Community 20|Community 20]]
 - [[_COMMUNITY_Community 21|Community 21]]
+- [[_COMMUNITY_Community 22|Community 22]]
 - [[_COMMUNITY_Community 24|Community 24]]
 - [[_COMMUNITY_Community 25|Community 25]]
 - [[_COMMUNITY_Community 26|Community 26]]
@@ -66,11 +68,11 @@
 ## Import Cycles
 - None detected.
 
-## Communities (25 total, 3 thin omitted)
+## Communities (27 total, 4 thin omitted)
 
 ### Community 0 - "Community 0"
-Cohesion: 0.06
-Nodes (34): 10. Key Risks & Mitigations, 11. Suggested Next Steps, 1. Project Overview, 2. System Architecture Overview, 3.1 Frontend, 3.2 Backend, 3.3 Database — PostgreSQL Schema (core tables), 3.4 Infrastructure (+26 more)
+Cohesion: 0.08
+Nodes (25): 10. Key Risks & Mitigations, 11. Suggested Next Steps, 1. Project Overview, 2. System Architecture Overview, 3.1 Frontend, 3.2 Backend, 3.3 Database — PostgreSQL Schema (core tables), 3.4 Infrastructure (+17 more)
 
 ### Community 1 - "Community 1"
 Cohesion: 0.09
@@ -136,6 +138,10 @@ Nodes (6): FilterBar(), FilterBarProps, Select(), SelectOption, SelectProps, get
 Cohesion: 0.29
 Nodes (6): compilerOptions, outDir, rootDir, types, extends, include
 
+### Community 22 - "Community 22"
+Cohesion: 0.22
+Nodes (9): 5.1 Authentication, 5.2 Manual Trade Entry, 5.3 MT4/MT5 Import, 5.4 Analytics Dashboard, 5.5 Trade List & Detail, 5.6 Daily Journal, 5.7 Setup / Playbook, 5.8 Payments & Plans (+1 more)
+
 ### Community 24 - "Community 24"
 Cohesion: 0.33
 Nodes (6): 1. Should this animate at all?, 2. What is the purpose?, 3. What easing should it use?, 4. How fast should it be?, Perceived performance, The Animation Decision Framework
@@ -151,22 +157,22 @@ Nodes (6): clip-path for Animation, Comparison sliders, Hold-to-delete pattern, 
 ## Knowledge Gaps
 - **234 isolated node(s):** `name`, `version`, `private`, `dev`, `build` (+229 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **3 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **4 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `Design Engineering` connect `Community 19` to `Community 24`, `Community 25`, `Community 26`?**
-  _High betweenness centrality (0.029) - this node is a cross-community bridge._
+  _High betweenness centrality (0.028) - this node is a cross-community bridge._
+- **Why does `معامله‌یار — Persian Trading Journal Platform` connect `Community 0` to `Community 22`?**
+  _High betweenness centrality (0.008) - this node is a cross-community bridge._
 - **Why does `Component Building Principles` connect `Community 25` to `Community 19`?**
-  _High betweenness centrality (0.007) - this node is a cross-community bridge._
+  _High betweenness centrality (0.006) - this node is a cross-community bridge._
 - **What connects `name`, `version`, `private` to the rest of the system?**
   _234 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Community 0` be split into smaller, more focused modules?**
-  _Cohesion score 0.05714285714285714 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.07692307692307693 - nodes in this community are weakly interconnected._
 - **Should `Community 1` be split into smaller, more focused modules?**
   _Cohesion score 0.09247311827956989 - nodes in this community are weakly interconnected._
 - **Should `Community 2` be split into smaller, more focused modules?**
   _Cohesion score 0.07692307692307693 - nodes in this community are weakly interconnected._
-- **Should `Community 3` be split into smaller, more focused modules?**
-  _Cohesion score 0.1 - nodes in this community are weakly interconnected._
