@@ -452,6 +452,16 @@ export default function TradesTable({
         {/* 1. Header */}
         <header className="trades-page-header">
           <h1>معاملات</h1>
+          <div className="header-actions">
+            <button className="btn btn-secondary" onClick={onImportMT4}>
+              <span className="material-symbols-outlined">cloud_download</span>
+              واردات MT4/MT5
+            </button>
+            <button className="btn btn-primary" onClick={onAddManualTrade}>
+              <span className="material-symbols-outlined">edit_note</span>
+              ثبت معامله دستی
+            </button>
+          </div>
         </header>
 
         {/* 2. Filter Bar */}

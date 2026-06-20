@@ -70,8 +70,8 @@
     "semantic_hash": ""
   },
   "apps/web/src/components/TradesTable.tsx": {
-    "mtime": 1781967218.9897032,
-    "ast_hash": "5a5e3a977f8e8b29f3044e771a7cad82",
+    "mtime": 1781977089.6511505,
+    "ast_hash": "24790fc1d36c8dfca5e26f68810ddb0d",
     "semantic_hash": ""
   },
   "apps/web/src/utils/farsi.ts": {
