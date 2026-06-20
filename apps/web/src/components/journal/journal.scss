@@ -1,0 +1,686 @@
+@use '../../app/variables' as *;
+
+.journal-container {
+  display: flex;
+  flex-direction: column;
+  padding: 24px 32px;
+  min-height: 100vh;
+  background-color: $background;
+  color: $on-surface;
+  font-family: $font-primary;
+  direction: rtl;
+
+  // Custom scrollbar
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: $background;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: $outline-variant;
+    border-radius: 4px;
+
+    &:hover {
+      background: $outline;
+    }
+  }
+}
+
+.journal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32px;
+
+  h1 {
+    font-size: 32px;
+    font-weight: 700;
+    line-height: 48px;
+    color: $on-surface;
+    margin: 0;
+  }
+
+  .header-actions {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+  }
+}
+
+// Stats Cards Grid Layout
+.journal-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 20px;
+  width: 100%;
+  margin-bottom: 24px;
+}
+
+// Base Glassmorphic Card
+.journal-card {
+  position: relative;
+  background: rgba($surface-container, 0.65);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border: 1px solid rgba($outline-variant, 0.4);
+  border-radius: 18px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  transition: transform 0.25s cubic-bezier(0.23, 1, 0.32, 1), 
+              border-color 0.25s ease,
+              box-shadow 0.25s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    border-color: rgba($outline, 0.5);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+  }
+
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    
+    .card-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: $on-surface-variant;
+      opacity: 0.9;
+    }
+
+    .card-icon {
+      font-size: 20px;
+      color: $on-surface-variant;
+      opacity: 0.7;
+    }
+  }
+}
+
+// Special P&L Accent Card
+.journal-card--pnl {
+  &.profit {
+    border-color: rgba($primary, 0.25);
+    box-shadow: 0 4px 24px rgba($primary, 0.08);
+
+    &:hover {
+      border-color: rgba($primary, 0.45);
+      box-shadow: 0 8px 32px rgba($primary, 0.15);
+    }
+  }
+
+  &.loss {
+    border-color: rgba($error, 0.25);
+    box-shadow: 0 4px 24px rgba($error, 0.08);
+
+    &:hover {
+      border-color: rgba($error, 0.45);
+      box-shadow: 0 8px 32px rgba($error, 0.15);
+    }
+  }
+
+  .pnl-value {
+    font-size: 28px;
+    font-weight: 800;
+    line-height: 1.2;
+    font-family: inherit;
+
+    &.profit {
+      color: $primary;
+    }
+
+    &.loss {
+      color: $error;
+    }
+  }
+
+  .pnl-toman {
+    font-size: 13px;
+    opacity: 0.8;
+    font-weight: 500;
+    margin-top: -6px;
+
+    &.profit {
+      color: $primary-fixed-dim;
+    }
+
+    &.loss {
+      color: $error-container;
+    }
+  }
+
+  .pnl-subtext-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    border-top: 1px solid rgba($outline-variant, 0.3);
+    padding-top: 14px;
+    margin-top: 4px;
+
+    .sub-item {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+
+      .sub-label {
+        font-size: 11px;
+        color: $on-surface-variant;
+        opacity: 0.75;
+      }
+
+      .sub-val {
+        font-size: 13px;
+        font-weight: 700;
+        color: $on-surface;
+      }
+    }
+  }
+}
+
+// Win Rate Visual Ring and Progress
+.win-rate-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  gap: 16px;
+  flex: 1;
+
+  .radial-progress-wrapper {
+    position: relative;
+    width: 90px;
+    height: 90px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    svg {
+      transform: rotate(-90deg);
+    }
+
+    .circle-bg {
+      fill: none;
+      stroke: rgba($outline-variant, 0.3);
+      stroke-width: 8px;
+    }
+
+    .circle-bar {
+      fill: none;
+      stroke: $primary;
+      stroke-dasharray: 251.2; // 2 * PI * r (r=40)
+      stroke-linecap: round;
+      stroke-width: 8px;
+      transition: stroke-dashoffset 0.6s ease;
+    }
+
+    .radial-label-val {
+      position: absolute;
+      font-size: 18px;
+      font-weight: 800;
+      color: $on-surface;
+    }
+  }
+
+  .direction-progress-group {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+
+    .progress-item {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+
+      .progress-label-row {
+        display: flex;
+        justify-content: space-between;
+        font-size: 12px;
+        font-weight: 500;
+        
+        .lbl {
+          color: $on-surface-variant;
+        }
+        .val {
+          color: $on-surface;
+          font-weight: 700;
+        }
+      }
+
+      .progress-track {
+        height: 6px;
+        background-color: rgba($outline-variant, 0.3);
+        border-radius: 4px;
+        overflow: hidden;
+
+        .progress-bar {
+          height: 100%;
+          background-color: $secondary;
+          border-radius: 4px;
+          transition: width 0.6s ease;
+
+          &.bar-buy {
+            background-color: $primary;
+          }
+          &.bar-sell {
+            background-color: $error;
+          }
+        }
+      }
+    }
+  }
+}
+
+// Expectancy and Gauges
+.gauge-metric-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  flex: 1;
+
+  .gauge-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: rgba($surface-container-low, 0.4);
+    border: 1px solid rgba($outline-variant, 0.2);
+    border-radius: 12px;
+    padding: 16px;
+    gap: 6px;
+    text-align: center;
+
+    .gauge-label {
+      font-size: 11px;
+      color: $on-surface-variant;
+      opacity: 0.8;
+    }
+
+    .gauge-val {
+      font-size: 20px;
+      font-weight: 800;
+      color: $on-surface;
+      direction: ltr;
+
+      &.positive {
+        color: $primary;
+      }
+      &.negative {
+        color: $error;
+      }
+    }
+
+    .gauge-indicator-text {
+      font-size: 10px;
+      color: $on-surface-variant;
+      opacity: 0.6;
+    }
+  }
+}
+
+// R-Multiple Visual Bar Comparison
+.r-compare-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  flex: 1;
+
+  .r-row {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+
+    .r-label-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      
+      .lbl {
+        color: $on-surface-variant;
+      }
+      
+      .val {
+        font-size: 14px;
+        font-weight: 700;
+        color: $on-surface;
+        direction: ltr;
+      }
+    }
+
+    // Bar comparison layout
+    .compare-bar-track {
+      height: 8px;
+      background-color: rgba($outline-variant, 0.3);
+      border-radius: 4px;
+      position: relative;
+      overflow: hidden;
+
+      .compare-bar-fill {
+        height: 100%;
+        border-radius: 4px;
+        transition: width 0.6s ease;
+
+        &.bar-planned {
+          background-color: rgba($muted, 0.6);
+        }
+
+        &.bar-achieved {
+          background-color: $primary;
+          
+          &.underperforming {
+            background-color: $secondary;
+          }
+          
+          &.negative {
+            background-color: $error;
+          }
+        }
+      }
+    }
+  }
+
+  .r-footer-ratio {
+    font-size: 11px;
+    color: $on-surface-variant;
+    opacity: 0.7;
+    text-align: center;
+    border-top: 1px solid rgba($outline-variant, 0.2);
+    padding-top: 10px;
+    margin-top: 4px;
+  }
+}
+
+// Drawdown Card Details
+.drawdown-subgrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  flex: 1;
+
+  .sub-card {
+    display: flex;
+    flex-direction: column;
+    background: rgba($surface-container-low, 0.4);
+    border: 1px solid rgba($outline-variant, 0.2);
+    border-radius: 12px;
+    padding: 14px;
+    gap: 4px;
+
+    .sub-lbl {
+      font-size: 11px;
+      color: $on-surface-variant;
+      opacity: 0.8;
+    }
+
+    .sub-val {
+      font-size: 18px;
+      font-weight: 800;
+      color: $on-surface;
+      direction: ltr;
+
+      &.warning {
+        color: $error;
+      }
+    }
+
+    .sub-info {
+      font-size: 9px;
+      color: $on-surface-variant;
+      opacity: 0.6;
+    }
+  }
+}
+
+// Empty State for clean layout
+.journal-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 20px;
+  text-align: center;
+  background: rgba($surface-container, 0.4);
+  border: 1px dashed rgba($outline-variant, 0.4);
+  border-radius: 18px;
+  gap: 16px;
+
+  .empty-icon {
+    font-size: 48px;
+    color: $on-surface-variant;
+    opacity: 0.5;
+  }
+
+  h3 {
+    margin: 0;
+    font-size: 18px;
+    color: $on-surface;
+  }
+
+  p {
+    margin: 0;
+    font-size: 14px;
+    color: $on-surface-variant;
+    opacity: 0.8;
+    max-width: 400px;
+  }
+}
+
+// ─── Step 2: Patterns Switcher & Analytics Styles ───────────────────────────
+
+.journal-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 28px;
+  border-bottom: 1px solid rgba($outline-variant, 0.2);
+  padding-bottom: 8px;
+  width: 100%;
+
+  .journal-tab-btn {
+    background: transparent;
+    border: none;
+    outline: none;
+    color: $on-surface-variant;
+    padding: 8px 20px;
+    font-size: 14px;
+    font-weight: 500;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.23, 1, 0.32, 1);
+    font-family: inherit;
+
+    &:hover {
+      color: $on-surface;
+      background-color: rgba($surface-variant, 0.4);
+    }
+
+    &.active {
+      color: $primary;
+      background-color: rgba($primary, 0.08);
+      font-weight: 700;
+    }
+  }
+}
+
+// Double card grid row
+.patterns-split-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 20px;
+  width: 100%;
+  margin-bottom: 20px;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+// Data List layout inside cards
+.stats-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+.stats-list-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: rgba($surface-container-low, 0.3);
+  border: 1px solid rgba($outline-variant, 0.15);
+  border-radius: 12px;
+  font-size: 14px;
+
+  .item-meta {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    
+    .item-emoji {
+      font-size: 18px;
+    }
+    
+    .item-label {
+      font-weight: 600;
+      color: $on-surface;
+    }
+
+    .item-count {
+      font-size: 11px;
+      color: $on-surface-variant;
+      opacity: 0.7;
+    }
+  }
+
+  .item-stats {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+
+    .item-winrate {
+      font-weight: 700;
+      color: $primary;
+      
+      &.neutral {
+        color: $secondary;
+      }
+      &.losing {
+        color: $error;
+      }
+    }
+
+    .item-pnl {
+      font-weight: 700;
+      direction: ltr;
+
+      &.positive {
+        color: $primary;
+      }
+      &.negative {
+        color: $error;
+      }
+    }
+  }
+}
+
+// Custom Data Tables
+.journal-table-wrapper {
+  overflow-x: auto;
+  width: 100%;
+}
+
+.journal-data-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: right;
+  font-size: 14px;
+
+  th {
+    padding: 12px 14px;
+    border-bottom: 2px solid rgba($outline-variant, 0.4);
+    color: $on-surface-variant;
+    font-weight: 600;
+  }
+
+  td {
+    padding: 12px 14px;
+    border-bottom: 1px solid rgba($outline-variant, 0.2);
+    color: $on-surface;
+  }
+
+  tr:last-child td {
+    border-bottom: none;
+  }
+}
+
+// 24-Hour P&L Heatmap Grid
+.hour-heatmap-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+}
+
+.hour-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(76px, 1fr));
+  gap: 10px;
+  width: 100%;
+
+  .hour-block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 64px;
+    border-radius: 10px;
+    border: 1px solid rgba($outline-variant, 0.15);
+    background-color: rgba($surface-container-low, 0.4);
+    transition: transform 0.15s cubic-bezier(0.23, 1, 0.32, 1);
+    cursor: default;
+
+    &:hover {
+      transform: scale(1.06);
+    }
+
+    .hour-num {
+      font-size: 11px;
+      font-weight: 500;
+      color: $on-surface-variant;
+      opacity: 0.8;
+    }
+
+    .hour-pnl {
+      font-size: 12px;
+      font-weight: 700;
+      margin-top: 4px;
+      direction: ltr;
+
+      &.positive {
+        color: $primary;
+      }
+      &.negative {
+        color: $error;
+      }
+    }
+
+    // Heatmap opacity scaling based on strength classes
+    &.heat-profit-1 { background-color: rgba($primary, 0.08); border-color: rgba($primary, 0.2); }
+    &.heat-profit-2 { background-color: rgba($primary, 0.18); border-color: rgba($primary, 0.3); }
+    &.heat-profit-3 { background-color: rgba($primary, 0.28); border-color: rgba($primary, 0.4); }
+    &.heat-profit-4 { background-color: rgba($primary, 0.42); border-color: rgba($primary, 0.5); .hour-num { color: $on-primary; } .hour-pnl { color: $on-primary; } }
+
+    &.heat-loss-1 { background-color: rgba($error, 0.08); border-color: rgba($error, 0.2); }
+    &.heat-loss-2 { background-color: rgba($error, 0.18); border-color: rgba($error, 0.3); }
+    &.heat-loss-3 { background-color: rgba($error, 0.28); border-color: rgba($error, 0.4); }
+    &.heat-loss-4 { background-color: rgba($error, 0.42); border-color: rgba($error, 0.5); .hour-num { color: $on-error; } .hour-pnl { color: $on-error; } }
+  }
+}
+

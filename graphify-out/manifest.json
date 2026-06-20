@@ -65,8 +65,8 @@
     "semantic_hash": ""
   },
   "apps/web/src/app/trades/page.tsx": {
-    "mtime": 1781981632.537892,
-    "ast_hash": "546cf2e0c10d8ba9b594a81e0cc0a464",
+    "mtime": 1781984626.855095,
+    "ast_hash": "19c3d825a08191f30dca70ad3849b846",
     "semantic_hash": ""
   },
   "apps/web/src/utils/farsi.ts": {
@@ -297,6 +297,16 @@
   "apps/web/src/store/useAppStore.ts": {
     "mtime": 1781984147.5031703,
     "ast_hash": "c9d2ac23ef280738d1569ce1c88e1e62",
+    "semantic_hash": ""
+  },
+  "apps/web/src/store/useTradeStore.ts": {
+    "mtime": 1781984563.1836152,
+    "ast_hash": "a8b15af824338cc739a3805911c81018",
+    "semantic_hash": ""
+  },
+  "apps/web/src/app/journal/page.tsx": {
+    "mtime": 1781985806.290056,
+    "ast_hash": "c933c145f12e7acbf3c06b99b31464fe",
     "semantic_hash": ""
   }
 }

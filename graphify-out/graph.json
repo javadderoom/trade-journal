@@ -894,6 +894,46 @@
       "norm_label": "get()"
     },
     {
+      "label": "page.tsx",
+      "file_type": "code",
+      "source_file": "apps/web/src/app/journal/page.tsx",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "journal_page",
+      "community": 7,
+      "norm_label": "page.tsx"
+    },
+    {
+      "label": "EMOTION_MAP",
+      "file_type": "code",
+      "source_file": "apps/web/src/app/journal/page.tsx",
+      "source_location": "L12",
+      "_origin": "ast",
+      "id": "journal_page_emotion_map",
+      "community": 7,
+      "norm_label": "emotion_map"
+    },
+    {
+      "label": "WEEKDAY_NAMES",
+      "file_type": "code",
+      "source_file": "apps/web/src/app/journal/page.tsx",
+      "source_location": "L22",
+      "_origin": "ast",
+      "id": "journal_page_weekday_names",
+      "community": 7,
+      "norm_label": "weekday_names"
+    },
+    {
+      "label": "JournalPage()",
+      "file_type": "code",
+      "source_file": "apps/web/src/app/journal/page.tsx",
+      "source_location": "L24",
+      "_origin": "ast",
+      "id": "journal_page_journalpage",
+      "community": 7,
+      "norm_label": "journalpage()"
+    },
+    {
       "label": "layout.tsx",
       "file_type": "code",
       "source_file": "apps/web/src/app/layout.tsx",
@@ -944,20 +984,10 @@
       "norm_label": "page.tsx"
     },
     {
-      "label": "MOCK_TRADES",
-      "file_type": "code",
-      "source_file": "apps/web/src/app/trades/page.tsx",
-      "source_location": "L10",
-      "_origin": "ast",
-      "id": "trades_page_mock_trades",
-      "community": 32,
-      "norm_label": "mock_trades"
-    },
-    {
       "label": "TradesPage()",
       "file_type": "code",
       "source_file": "apps/web/src/app/trades/page.tsx",
-      "source_location": "L181",
+      "source_location": "L12",
       "_origin": "ast",
       "id": "trades_page_tradespage",
       "community": 32,
@@ -1390,7 +1420,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "store_useappstore",
-      "community": 33,
+      "community": 32,
       "norm_label": "useappstore.ts"
     },
     {
@@ -1400,7 +1430,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "store_useappstore_tradingaccount",
-      "community": 33,
+      "community": 32,
       "norm_label": "tradingaccount"
     },
     {
@@ -1410,7 +1440,7 @@
       "source_location": "L12",
       "_origin": "ast",
       "id": "store_useappstore_appstate",
-      "community": 33,
+      "community": 32,
       "norm_label": "appstate"
     },
     {
@@ -1420,8 +1450,48 @@
       "source_location": "L34",
       "_origin": "ast",
       "id": "store_useappstore_useappstore",
-      "community": 33,
+      "community": 32,
       "norm_label": "useappstore"
+    },
+    {
+      "label": "useTradeStore.ts",
+      "file_type": "code",
+      "source_file": "apps/web/src/store/useTradeStore.ts",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "store_usetradestore",
+      "community": 7,
+      "norm_label": "usetradestore.ts"
+    },
+    {
+      "label": "MOCK_TRADES",
+      "file_type": "code",
+      "source_file": "apps/web/src/store/useTradeStore.ts",
+      "source_location": "L4",
+      "_origin": "ast",
+      "id": "store_usetradestore_mock_trades",
+      "community": 7,
+      "norm_label": "mock_trades"
+    },
+    {
+      "label": "TradeState",
+      "file_type": "code",
+      "source_file": "apps/web/src/store/useTradeStore.ts",
+      "source_location": "L175",
+      "_origin": "ast",
+      "id": "store_usetradestore_tradestate",
+      "community": 7,
+      "norm_label": "tradestate"
+    },
+    {
+      "label": "useTradeStore",
+      "file_type": "code",
+      "source_file": "apps/web/src/store/useTradeStore.ts",
+      "source_location": "L186",
+      "_origin": "ast",
+      "id": "store_usetradestore_usetradestore",
+      "community": 32,
+      "norm_label": "usetradestore"
     },
     {
       "label": "farsi.ts",
@@ -4609,9 +4679,9 @@
       "source_file": "apps/web/package.json",
       "source_location": "L19",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "web_package_dependencies",
-      "target": "web_package_dependencies_zustand",
-      "confidence_score": 1.0
+      "target": "web_package_dependencies_zustand"
     },
     {
       "relation": "contains",
@@ -4642,6 +4712,234 @@
       "confidence_score": 1.0,
       "source": "exchange_rate_route",
       "target": "exchange_rate_route_get"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/app/journal/page.tsx",
+      "source_location": "L12",
+      "weight": 1.0,
+      "source": "journal_page",
+      "target": "journal_page_emotion_map",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/app/journal/page.tsx",
+      "source_location": "L10",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "journal_page",
+      "target": "journal_page_journalpage"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/app/journal/page.tsx",
+      "source_location": "L22",
+      "weight": 1.0,
+      "source": "journal_page",
+      "target": "journal_page_weekday_names",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/app/journal/page.tsx",
+      "source_location": "L4",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "journal_page",
+      "target": "store_useappstore"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/app/journal/page.tsx",
+      "source_location": "L4",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "journal_page",
+      "target": "store_useappstore_useappstore"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/app/journal/page.tsx",
+      "source_location": "L5",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "journal_page",
+      "target": "store_usetradestore"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/app/journal/page.tsx",
+      "source_location": "L5",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "journal_page",
+      "target": "store_usetradestore_usetradestore"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/app/journal/page.tsx",
+      "source_location": "L6",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "journal_page",
+      "target": "ui_select"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/app/journal/page.tsx",
+      "source_location": "L6",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "journal_page",
+      "target": "ui_select_select"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/app/journal/page.tsx",
+      "source_location": "L7",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "journal_page",
+      "target": "utils_farsi"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/app/journal/page.tsx",
+      "source_location": "L7",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "journal_page",
+      "target": "utils_farsi_formatpersiancurrency"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/app/journal/page.tsx",
+      "source_location": "L7",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "journal_page",
+      "target": "utils_farsi_formattoman"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/app/journal/page.tsx",
+      "source_location": "L7",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "journal_page",
+      "target": "utils_farsi_topersiandigits"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/app/journal/page.tsx",
+      "source_location": "L8",
+      "weight": 1.0,
+      "source": "journal_page",
+      "target": "utils_tradehelpers",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/app/journal/page.tsx",
+      "source_location": "L8",
+      "weight": 1.0,
+      "source": "journal_page",
+      "target": "utils_tradehelpers_getemotionemoji",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/app/journal/page.tsx",
+      "source_location": "L8",
+      "weight": 1.0,
+      "source": "journal_page",
+      "target": "utils_tradehelpers_getmainpair",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/app/journal/page.tsx",
+      "source_location": "L8",
+      "weight": 1.0,
+      "source": "journal_page",
+      "target": "utils_tradehelpers_gettradingsession",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "apps/web/src/app/journal/page.tsx",
+      "source_location": "L16",
+      "weight": 1.0,
+      "source": "journal_page_journalpage",
+      "target": "store_useappstore_useappstore"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "apps/web/src/app/journal/page.tsx",
+      "source_location": "L22",
+      "weight": 1.0,
+      "source": "journal_page_journalpage",
+      "target": "store_usetradestore_usetradestore"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "apps/web/src/app/journal/page.tsx",
+      "source_location": "L222",
+      "weight": 1.0,
+      "source": "journal_page_journalpage",
+      "target": "utils_farsi_formattoman"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "apps/web/src/app/journal/page.tsx",
+      "source_location": "L219",
+      "weight": 1.0,
+      "source": "journal_page_journalpage",
+      "target": "utils_farsi_topersiandigits"
     },
     {
       "relation": "contains",
@@ -4752,14 +5050,48 @@
       "target": "modals_manualtrademodal_manualtrademodal"
     },
     {
-      "relation": "contains",
+      "relation": "imports_from",
+      "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "apps/web/src/app/trades/page.tsx",
-      "source_location": "L7",
+      "source_location": "L5",
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "trades_page",
-      "target": "trades_page_mock_trades"
+      "target": "store_useappstore"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/app/trades/page.tsx",
+      "source_location": "L5",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "trades_page",
+      "target": "store_useappstore_useappstore"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/app/trades/page.tsx",
+      "source_location": "L6",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "trades_page",
+      "target": "store_usetradestore"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/app/trades/page.tsx",
+      "source_location": "L6",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "trades_page",
+      "target": "store_usetradestore_usetradestore"
     },
     {
       "relation": "contains",
@@ -4814,6 +5146,28 @@
       "confidence_score": 1.0,
       "source": "trades_page",
       "target": "ui_confirmmodal_confirmmodal"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "apps/web/src/app/trades/page.tsx",
+      "source_location": "L200",
+      "weight": 1.0,
+      "source": "trades_page_tradespage",
+      "target": "store_useappstore_useappstore"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "apps/web/src/app/trades/page.tsx",
+      "source_location": "L38",
+      "weight": 1.0,
+      "source": "trades_page_tradespage",
+      "target": "store_usetradestore_usetradestore"
     },
     {
       "relation": "contains",
@@ -5622,6 +5976,17 @@
       "target": "trades_tradechart_tradechartprops"
     },
     {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/store/useTradeStore.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "store_usetradestore",
+      "target": "trades_tradestable"
+    },
+    {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "apps/web/src/components/trades/TradesTable.tsx",
@@ -5738,6 +6103,28 @@
       "target": "utils_tradehelpers_getmainpair"
     },
     {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/store/useTradeStore.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "store_usetradestore",
+      "target": "trades_tradestable_trade"
+    },
+    {
+      "relation": "references",
+      "context": "field",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/store/useTradeStore.ts",
+      "source_location": "L176",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "store_usetradestore_tradestate",
+      "target": "trades_tradestable_trade"
+    },
+    {
       "relation": "calls",
       "context": "call",
       "confidence": "EXTRACTED",
@@ -5804,9 +6191,9 @@
       "source_file": "apps/web/src/store/useAppStore.ts",
       "source_location": "L12",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "store_useappstore",
-      "target": "store_useappstore_appstate",
-      "confidence_score": 1.0
+      "target": "store_useappstore_appstate"
     },
     {
       "relation": "contains",
@@ -5814,9 +6201,9 @@
       "source_file": "apps/web/src/store/useAppStore.ts",
       "source_location": "L3",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "store_useappstore",
-      "target": "store_useappstore_tradingaccount",
-      "confidence_score": 1.0
+      "target": "store_useappstore_tradingaccount"
     },
     {
       "relation": "contains",
@@ -5824,9 +6211,39 @@
       "source_file": "apps/web/src/store/useAppStore.ts",
       "source_location": "L34",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "store_useappstore",
-      "target": "store_useappstore_useappstore",
-      "confidence_score": 1.0
+      "target": "store_useappstore_useappstore"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/store/useTradeStore.ts",
+      "source_location": "L4",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "store_usetradestore",
+      "target": "store_usetradestore_mock_trades"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/store/useTradeStore.ts",
+      "source_location": "L175",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "store_usetradestore",
+      "target": "store_usetradestore_tradestate"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/store/useTradeStore.ts",
+      "source_location": "L186",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "store_usetradestore",
+      "target": "store_usetradestore_usetradestore"
     },
     {
       "relation": "contains",
@@ -7996,5 +8413,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "6d9d84997c7768802290a694f25e67bc151ec7a5"
+  "built_at_commit": "b6a96dc188fbe4a8854e96ec00ce4f7668f7d39b"
 }
