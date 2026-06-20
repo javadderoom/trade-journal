@@ -60,8 +60,8 @@
     "semantic_hash": ""
   },
   "apps/web/src/app/layout.tsx": {
-    "mtime": 1781980649.6498075,
-    "ast_hash": "1f4c5c4a97b2cac4f1d16379ca699bad",
+    "mtime": 1781980839.0177858,
+    "ast_hash": "93c22fa27fa69a390d03932be2908428",
     "semantic_hash": ""
   },
   "apps/web/src/app/trades/page.tsx": {
@@ -287,6 +287,11 @@
   "apps/web/src/components/SideNavBar.tsx": {
     "mtime": 1781980612.9249518,
     "ast_hash": "e2ae9df751a65cf643039a1f3164a20a",
+    "semantic_hash": ""
+  },
+  "apps/web/src/components/BottomNavBar.tsx": {
+    "mtime": 1781980806.4069605,
+    "ast_hash": "8fdbe577398a50fe95a333abf9487547",
     "semantic_hash": ""
   }
 }

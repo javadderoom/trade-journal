@@ -1,5 +1,6 @@
 import "./globals.scss";
 import SideNavBar from "../components/SideNavBar";
+import BottomNavBar from "../components/BottomNavBar";
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -18,6 +19,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <div className="app-container">
           <SideNavBar />
           <div className="main-content-wrapper">{children}</div>
+          <BottomNavBar />
         </div>
       </body>
     </html>

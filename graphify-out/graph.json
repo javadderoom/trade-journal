@@ -897,7 +897,7 @@
       "label": "RootLayout()",
       "file_type": "code",
       "source_file": "apps/web/src/app/layout.tsx",
-      "source_location": "L4",
+      "source_location": "L5",
       "_origin": "ast",
       "id": "app_layout_rootlayout",
       "community": 14,
@@ -952,6 +952,26 @@
       "id": "trades_page_tradespage",
       "community": 12,
       "norm_label": "tradespage()"
+    },
+    {
+      "label": "BottomNavBar.tsx",
+      "file_type": "code",
+      "source_file": "apps/web/src/components/BottomNavBar.tsx",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "components_bottomnavbar",
+      "community": 14,
+      "norm_label": "bottomnavbar.tsx"
+    },
+    {
+      "label": "BottomNavBar()",
+      "file_type": "code",
+      "source_file": "apps/web/src/components/BottomNavBar.tsx",
+      "source_location": "L7",
+      "_origin": "ast",
+      "id": "components_bottomnavbar_bottomnavbar",
+      "community": 14,
+      "norm_label": "bottomnavbar()"
     },
     {
       "label": "ConfirmModal.tsx",
@@ -2010,7 +2030,7 @@
       "source_location": "L62",
       "_origin": "ast",
       "id": "emil_design_eng_skill_the_animation_decision_framework",
-      "community": 24,
+      "community": 19,
       "norm_label": "the animation decision framework"
     },
     {
@@ -2020,7 +2040,7 @@
       "source_location": "L66",
       "_origin": "ast",
       "id": "emil_design_eng_skill_1_should_this_animate_at_all",
-      "community": 24,
+      "community": 19,
       "norm_label": "1. should this animate at all?"
     },
     {
@@ -2030,7 +2050,7 @@
       "source_location": "L81",
       "_origin": "ast",
       "id": "emil_design_eng_skill_2_what_is_the_purpose",
-      "community": 24,
+      "community": 19,
       "norm_label": "2. what is the purpose?"
     },
     {
@@ -2040,7 +2060,7 @@
       "source_location": "L95",
       "_origin": "ast",
       "id": "emil_design_eng_skill_3_what_easing_should_it_use",
-      "community": 24,
+      "community": 19,
       "norm_label": "3. what easing should it use?"
     },
     {
@@ -2050,7 +2070,7 @@
       "source_location": "L125",
       "_origin": "ast",
       "id": "emil_design_eng_skill_4_how_fast_should_it_be",
-      "community": 24,
+      "community": 19,
       "norm_label": "4. how fast should it be?"
     },
     {
@@ -2060,7 +2080,7 @@
       "source_location": "L137",
       "_origin": "ast",
       "id": "emil_design_eng_skill_perceived_performance",
-      "community": 24,
+      "community": 19,
       "norm_label": "perceived performance"
     },
     {
@@ -2250,7 +2270,7 @@
       "source_location": "L398",
       "_origin": "ast",
       "id": "emil_design_eng_skill_clip_path_for_animation",
-      "community": 26,
+      "community": 19,
       "norm_label": "clip-path for animation"
     },
     {
@@ -2260,7 +2280,7 @@
       "source_location": "L402",
       "_origin": "ast",
       "id": "emil_design_eng_skill_the_inset_shape",
-      "community": 26,
+      "community": 19,
       "norm_label": "the inset shape"
     },
     {
@@ -2270,7 +2290,7 @@
       "source_location": "L428",
       "_origin": "ast",
       "id": "emil_design_eng_skill_tabs_with_perfect_color_transitions",
-      "community": 26,
+      "community": 19,
       "norm_label": "tabs with perfect color transitions"
     },
     {
@@ -2280,7 +2300,7 @@
       "source_location": "L432",
       "_origin": "ast",
       "id": "emil_design_eng_skill_hold_to_delete_pattern",
-      "community": 26,
+      "community": 19,
       "norm_label": "hold-to-delete pattern"
     },
     {
@@ -2290,7 +2310,7 @@
       "source_location": "L436",
       "_origin": "ast",
       "id": "emil_design_eng_skill_image_reveals_on_scroll",
-      "community": 26,
+      "community": 19,
       "norm_label": "image reveals on scroll"
     },
     {
@@ -2300,7 +2320,7 @@
       "source_location": "L440",
       "_origin": "ast",
       "id": "emil_design_eng_skill_comparison_sliders",
-      "community": 26,
+      "community": 19,
       "norm_label": "comparison sliders"
     },
     {
@@ -2310,7 +2330,7 @@
       "source_location": "L444",
       "_origin": "ast",
       "id": "emil_design_eng_skill_gesture_and_drag_interactions",
-      "community": 19,
+      "community": 24,
       "norm_label": "gesture and drag interactions"
     },
     {
@@ -2320,7 +2340,7 @@
       "source_location": "L446",
       "_origin": "ast",
       "id": "emil_design_eng_skill_momentum_based_dismissal",
-      "community": 19,
+      "community": 24,
       "norm_label": "momentum-based dismissal"
     },
     {
@@ -2330,7 +2350,7 @@
       "source_location": "L459",
       "_origin": "ast",
       "id": "emil_design_eng_skill_damping_at_boundaries",
-      "community": 19,
+      "community": 24,
       "norm_label": "damping at boundaries"
     },
     {
@@ -2340,7 +2360,7 @@
       "source_location": "L463",
       "_origin": "ast",
       "id": "emil_design_eng_skill_pointer_capture_for_drag",
-      "community": 19,
+      "community": 24,
       "norm_label": "pointer capture for drag"
     },
     {
@@ -2350,7 +2370,7 @@
       "source_location": "L467",
       "_origin": "ast",
       "id": "emil_design_eng_skill_multi_touch_protection",
-      "community": 19,
+      "community": 24,
       "norm_label": "multi-touch protection"
     },
     {
@@ -2360,7 +2380,7 @@
       "source_location": "L478",
       "_origin": "ast",
       "id": "emil_design_eng_skill_friction_instead_of_hard_stops",
-      "community": 19,
+      "community": 24,
       "norm_label": "friction instead of hard stops"
     },
     {
@@ -2370,7 +2390,7 @@
       "source_location": "L482",
       "_origin": "ast",
       "id": "emil_design_eng_skill_performance_rules",
-      "community": 19,
+      "community": 22,
       "norm_label": "performance rules"
     },
     {
@@ -2380,7 +2400,7 @@
       "source_location": "L484",
       "_origin": "ast",
       "id": "emil_design_eng_skill_only_animate_transform_and_opacity",
-      "community": 19,
+      "community": 22,
       "norm_label": "only animate transform and opacity"
     },
     {
@@ -2390,7 +2410,7 @@
       "source_location": "L488",
       "_origin": "ast",
       "id": "emil_design_eng_skill_css_variables_are_inheritable",
-      "community": 19,
+      "community": 22,
       "norm_label": "css variables are inheritable"
     },
     {
@@ -2400,7 +2420,7 @@
       "source_location": "L500",
       "_origin": "ast",
       "id": "emil_design_eng_skill_framer_motion_hardware_acceleration_caveat",
-      "community": 19,
+      "community": 22,
       "norm_label": "framer motion hardware acceleration caveat"
     },
     {
@@ -2410,7 +2430,7 @@
       "source_location": "L514",
       "_origin": "ast",
       "id": "emil_design_eng_skill_css_animations_beat_js_under_load",
-      "community": 19,
+      "community": 22,
       "norm_label": "css animations beat js under load"
     },
     {
@@ -2420,7 +2440,7 @@
       "source_location": "L518",
       "_origin": "ast",
       "id": "emil_design_eng_skill_use_waapi_for_programmatic_css_animations",
-      "community": 19,
+      "community": 22,
       "norm_label": "use waapi for programmatic css animations"
     },
     {
@@ -3370,7 +3390,7 @@
       "source_location": "L209",
       "_origin": "ast",
       "id": "persian_trading_journal_architecture_5_feature_breakdown_v1",
-      "community": 22,
+      "community": 0,
       "norm_label": "5. feature breakdown \u2014 v1"
     },
     {
@@ -3380,7 +3400,7 @@
       "source_location": "L211",
       "_origin": "ast",
       "id": "persian_trading_journal_architecture_5_1_authentication",
-      "community": 22,
+      "community": 0,
       "norm_label": "5.1 authentication"
     },
     {
@@ -3390,7 +3410,7 @@
       "source_location": "L217",
       "_origin": "ast",
       "id": "persian_trading_journal_architecture_5_2_manual_trade_entry",
-      "community": 22,
+      "community": 0,
       "norm_label": "5.2 manual trade entry"
     },
     {
@@ -3400,7 +3420,7 @@
       "source_location": "L230",
       "_origin": "ast",
       "id": "persian_trading_journal_architecture_5_3_mt4_mt5_import",
-      "community": 22,
+      "community": 0,
       "norm_label": "5.3 mt4/mt5 import"
     },
     {
@@ -3410,7 +3430,7 @@
       "source_location": "L238",
       "_origin": "ast",
       "id": "persian_trading_journal_architecture_5_4_analytics_dashboard",
-      "community": 22,
+      "community": 0,
       "norm_label": "5.4 analytics dashboard"
     },
     {
@@ -3420,7 +3440,7 @@
       "source_location": "L258",
       "_origin": "ast",
       "id": "persian_trading_journal_architecture_5_5_trade_list_detail",
-      "community": 22,
+      "community": 0,
       "norm_label": "5.5 trade list & detail"
     },
     {
@@ -3430,7 +3450,7 @@
       "source_location": "L264",
       "_origin": "ast",
       "id": "persian_trading_journal_architecture_5_6_daily_journal",
-      "community": 22,
+      "community": 0,
       "norm_label": "5.6 daily journal"
     },
     {
@@ -3440,7 +3460,7 @@
       "source_location": "L270",
       "_origin": "ast",
       "id": "persian_trading_journal_architecture_5_7_setup_playbook",
-      "community": 22,
+      "community": 0,
       "norm_label": "5.7 setup / playbook"
     },
     {
@@ -3450,7 +3470,7 @@
       "source_location": "L275",
       "_origin": "ast",
       "id": "persian_trading_journal_architecture_5_8_payments_plans",
-      "community": 22,
+      "community": 0,
       "norm_label": "5.8 payments & plans"
     },
     {
@@ -4578,11 +4598,33 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "apps/web/src/app/layout.tsx",
-      "source_location": "L2",
+      "source_location": "L3",
       "weight": 1.0,
       "source": "app_layout",
-      "target": "components_sidenavbar",
+      "target": "components_bottomnavbar",
       "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/app/layout.tsx",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "app_layout",
+      "target": "components_bottomnavbar_bottomnavbar",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/app/layout.tsx",
+      "source_location": "L2",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "app_layout",
+      "target": "components_sidenavbar"
     },
     {
       "relation": "imports",
@@ -4591,9 +4633,9 @@
       "source_file": "apps/web/src/app/layout.tsx",
       "source_location": "L2",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "app_layout",
-      "target": "components_sidenavbar_sidenavbar",
-      "confidence_score": 1.0
+      "target": "components_sidenavbar_sidenavbar"
     },
     {
       "relation": "contains",
@@ -4601,9 +4643,9 @@
       "source_file": "apps/web/src/app/page.tsx",
       "source_location": "L3",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "app_page",
-      "target": "app_page_rootpage",
-      "confidence_score": 1.0
+      "target": "app_page_rootpage"
     },
     {
       "relation": "imports_from",
@@ -4723,6 +4765,16 @@
       "confidence_score": 1.0,
       "source": "trades_page",
       "target": "trades_page_tradespage"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/components/BottomNavBar.tsx",
+      "source_location": "L7",
+      "weight": 1.0,
+      "source": "components_bottomnavbar",
+      "target": "components_bottomnavbar_bottomnavbar",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -5472,9 +5524,9 @@
       "source_file": "apps/web/src/components/SideNavBar.tsx",
       "source_location": "L7",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "components_sidenavbar",
-      "target": "components_sidenavbar_sidenavbar",
-      "confidence_score": 1.0
+      "target": "components_sidenavbar_sidenavbar"
     },
     {
       "relation": "contains",
@@ -7942,5 +7994,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "57b7ed4a327ea1133b59bb03b94dbb58564e87a7"
+  "built_at_commit": "5d8cbca25c1c3ff601bcd65c1b36410a2096150c"
 }

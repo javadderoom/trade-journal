@@ -173,3 +173,111 @@
     display: none; // Hide on mobile/tablet view
   }
 }
+
+// Bottom navigation bar for mobile view
+.bottom-nav-container {
+  display: none;
+}
+
+@media (max-width: 1024px) {
+  .bottom-nav-container {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 64px;
+    background-color: $surface-container;
+    border-top: 1px solid $outline-variant;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    z-index: 1000;
+    padding-bottom: env(safe-area-inset-bottom);
+    direction: rtl;
+
+    .bottom-nav-item {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      color: $on-surface-variant;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      gap: 4px;
+
+      .icon {
+        font-size: 22px;
+      }
+
+      .label {
+        font-size: 10px;
+        font-weight: 500;
+        font-family: $font-primary;
+      }
+
+      &:hover {
+        color: $on-surface;
+      }
+
+      &.active {
+        color: $primary;
+        
+        .icon {
+          color: $primary;
+        }
+      }
+    }
+
+    .bottom-nav-raised-wrapper {
+      position: relative;
+      width: 64px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      height: 100%;
+      padding-bottom: 6px;
+
+      .bottom-nav-raised-item {
+        position: absolute;
+        top: -18px;
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background-color: $surface-container-high;
+        border: 2px solid $outline-variant;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: $on-surface-variant;
+        box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.3);
+        transition: all 0.2s ease-in-out;
+
+        .icon {
+          font-size: 24px;
+        }
+
+        &.active {
+          background-color: $primary-container;
+          border-color: $primary;
+          color: $on-primary-container;
+          box-shadow: 0 4px 16px rgba($primary, 0.4);
+          transform: scale(1.05);
+        }
+
+        &:hover {
+          color: $on-surface;
+        }
+      }
+
+      .raised-label {
+        font-size: 10px;
+        font-weight: 500;
+        color: $on-surface-variant;
+        font-family: $font-primary;
+      }
+    }
+  }
+}
