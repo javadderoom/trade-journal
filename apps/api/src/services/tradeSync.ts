@@ -128,6 +128,7 @@ export async function syncTradesFromEA(
 
 export type TradeListRow = {
   id: string;
+  accountId: string;
   ticket: number | null;
   symbol: string;
   direction: 'BUY' | 'SELL';
@@ -152,7 +153,7 @@ export type TradeListRow = {
 
 export async function getTradesForAccount(params: {
   userId: string;
-  accountId: string;
+  accountId?: string;
   limit?: number;
   offset?: number;
 }): Promise<TradeListRow[]> {
@@ -160,13 +161,19 @@ export async function getTradesForAccount(params: {
   const limit = Math.min(Math.max(params.limit ?? 100, 1), 500);
   const offset = Math.max(params.offset ?? 0, 0);
 
+  const filterAccount = accountId && accountId !== 'all';
+
   const trades = await prisma.trade.findMany({
-    where: { user_id: userId, account_id: accountId },
+    where: {
+      user_id: userId,
+      ...(filterAccount ? { account_id: accountId } : {}),
+    },
     orderBy: { open_time: 'desc' },
     skip: offset,
     take: limit,
     select: {
       id: true,
+      account_id: true,
       ticket: true,
       symbol: true,
       direction: true,
@@ -192,6 +199,7 @@ export async function getTradesForAccount(params: {
 
   return trades.map(t => ({
     id: t.id,
+    accountId: t.account_id,
     ticket: t.ticket,
     symbol: t.symbol,
     direction: t.direction as 'BUY' | 'SELL',

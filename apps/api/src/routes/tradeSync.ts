@@ -15,13 +15,53 @@ const router = Router();
  * Body: { userId: string, accountId: string, trades: EATrade[] }
  * Or:   EATrade[] (defaults to first user/account for development)
  */
+router.get('/accounts', async (req: Request, res: Response) => {
+  try {
+    const userId = (req.query.userId as string) || 'dev-user';
+
+    // Auto-create dev-user if not exists (development mode)
+    let user = await prisma.user.findUnique({ where: { id: userId } });
+    if (!user) {
+      user = await prisma.user.create({
+        data: {
+          id: userId,
+          password_hash: 'dev-hash',
+          name: userId,
+        },
+      });
+    }
+
+    // Auto-create default account if no accounts exist
+    let accounts = await prisma.account.findMany({
+      where: { user_id: userId },
+    });
+
+    if (accounts.length === 0) {
+      const defaultAccount = await prisma.account.create({
+        data: {
+          id: 'dev-account',
+          user_id: userId,
+          broker_name: 'MT5 پیش‌فرض',
+          account_number: '123456',
+        },
+      });
+      accounts = [defaultAccount];
+    }
+
+    res.status(200).json(accounts);
+  } catch (err: any) {
+    console.error('Accounts list error:', err);
+    res.status(500).json({ error: err.message || 'Internal server error' });
+  }
+});
+
 router.get('/', async (req: Request, res: Response) => {
   try {
     const body = req.query as any;
 
     // Development defaults (no auth in this repo yet)
     const userId = (body.userId as string | undefined) || 'dev-user';
-    const accountId = (body.accountId as string | undefined) || 'dev-account';
+    const accountId = (body.accountId as string | undefined) || 'all';
 
     const limitRaw = body.limit as string | undefined;
     const offsetRaw = body.offset as string | undefined;
@@ -210,7 +250,7 @@ router.post('/', async (req: Request, res: Response) => {
 router.put('/:id', async (req: Request, res: Response) => {
   try {
     const id = req.params.id as string;
-    const { notes, emotion, stopLoss, takeProfit, tags } = req.body;
+    const { notes, emotion, stopLoss, takeProfit, tags, accountId } = req.body;
 
     const existing = await prisma.trade.findUnique({
       where: { id },
@@ -243,6 +283,7 @@ router.put('/:id', async (req: Request, res: Response) => {
     const updated = await prisma.trade.update({
       where: { id },
       data: {
+        account_id: accountId !== undefined ? accountId : undefined,
         notes: notes !== undefined ? notes : undefined,
         emotion: emotion !== undefined ? emotion : undefined,
         stop_loss: stopLoss !== undefined ? (stopLoss === null ? null : parseFloat(stopLoss)) : undefined,

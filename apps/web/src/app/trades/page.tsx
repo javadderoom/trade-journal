@@ -186,6 +186,8 @@ export default function TradesPage() {
   const [isManualModalOpen, setIsManualModalOpen] = useState(false);
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [autoOpenTradeId, setAutoOpenTradeId] = useState<string | null>(null);
+  const [accounts, setAccounts] = useState<any[]>([]);
+  const [selectedAccountId, setSelectedAccountId] = useState<string>('all');
 
   // Dialog State for custom alerts
   const [dialogConfig, setDialogConfig] = useState<{
@@ -201,15 +203,16 @@ export default function TradesPage() {
     type: 'info',
   });
 
-  const fetchTrades = async (isManualRefresh = false) => {
+  const fetchTrades = async (isManualRefresh = false, accId?: string) => {
     try {
       if (!isManualRefresh) {
         setLoading(true);
       }
       setError(null);
 
+      const targetAccount = accId !== undefined ? accId : selectedAccountId;
       const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://127.0.0.1:3000';
-      const res = await fetch(`${baseUrl}/api/trades?limit=200&offset=0&t=${Date.now()}`, {
+      const res = await fetch(`${baseUrl}/api/trades?limit=200&offset=0&accountId=${targetAccount}&t=${Date.now()}`, {
         cache: 'no-store',
       });
       
@@ -249,6 +252,7 @@ export default function TradesPage() {
 
           return {
             id: item.id,
+            accountId: item.accountId,
             ticket: item.ticket ?? null,
             symbol: item.symbol,
             direction: item.direction,
@@ -285,8 +289,21 @@ export default function TradesPage() {
     }
   };
 
+  const fetchAccounts = async () => {
+    try {
+      const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://127.0.0.1:3000';
+      const res = await fetch(`${baseUrl}/api/trades/accounts`);
+      if (res.ok) {
+        const data = await res.json();
+        setAccounts(data);
+      }
+    } catch (err) {
+      console.error('Failed to fetch accounts:', err);
+    }
+  };
+
   useEffect(() => {
-    fetchTrades();
+    fetchAccounts();
     // Fetch live USD→Toman rate (cached 6h server-side, safe within 120/month quota)
     fetch('/api/exchange-rate')
       .then(r => r.json())
@@ -297,6 +314,10 @@ export default function TradesPage() {
       })
       .catch(() => { /* keep default 90,000 */ });
   }, []);
+
+  useEffect(() => {
+    fetchTrades(false, selectedAccountId);
+  }, [selectedAccountId]);
 
   const handleUpdateTrade = async (updatedTrade: Trade): Promise<boolean> => {
     // Optimistic state update in local state
@@ -416,6 +437,9 @@ export default function TradesPage() {
         onDeleteTrade={handleDeleteTrade}
         onDeleteMultipleTrades={handleDeleteMultipleTrades}
         initialActiveTradeId={autoOpenTradeId}
+        accounts={accounts}
+        selectedAccountId={selectedAccountId}
+        onAccountIdChange={setSelectedAccountId}
       />
       <ManualTradeModal
         isOpen={isManualModalOpen}

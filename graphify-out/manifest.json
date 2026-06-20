@@ -20,8 +20,8 @@
     "semantic_hash": ""
   },
   "apps/api/src/routes/tradeSync.ts": {
-    "mtime": 1781960105.6210365,
-    "ast_hash": "8f49cdc6cfea4fadb0c5cb62f38e5bf1",
+    "mtime": 1781977975.5275316,
+    "ast_hash": "157ced983399c8dfed87126dc85cd0a4",
     "semantic_hash": ""
   },
   "apps/api/src/server.ts": {
@@ -35,8 +35,8 @@
     "semantic_hash": ""
   },
   "apps/api/src/services/tradeSync.ts": {
-    "mtime": 1781909611.5659063,
-    "ast_hash": "26f0d5cf65e86be967d2d436246a4285",
+    "mtime": 1781977804.649639,
+    "ast_hash": "d4a54589da7a9120e5c6ddd7b1065fcd",
     "semantic_hash": ""
   },
   "apps/api/src/types/index.ts": {
@@ -65,13 +65,13 @@
     "semantic_hash": ""
   },
   "apps/web/src/app/trades/page.tsx": {
-    "mtime": 1781962940.4387245,
-    "ast_hash": "506ed4c21279f358b29f40228dbbe35b",
+    "mtime": 1781977877.5313227,
+    "ast_hash": "296960261eeb50965b7063312609ff88",
     "semantic_hash": ""
   },
   "apps/web/src/components/TradesTable.tsx": {
-    "mtime": 1781977089.6511505,
-    "ast_hash": "24790fc1d36c8dfca5e26f68810ddb0d",
+    "mtime": 1781977914.9130518,
+    "ast_hash": "6823a414c36b8449a7894dd49e9230f3",
     "semantic_hash": ""
   },
   "apps/web/src/utils/farsi.ts": {
@@ -235,18 +235,18 @@
     "semantic_hash": ""
   },
   "apps/web/src/components/DesktopTable.tsx": {
-    "mtime": 1781965283.7314186,
-    "ast_hash": "a58d7b61d33078fe08a78c40343b4b92",
+    "mtime": 1781977950.310029,
+    "ast_hash": "f999e25efce15e01825184503ce4cc94",
     "semantic_hash": ""
   },
   "apps/web/src/components/DetailPanel.tsx": {
-    "mtime": 1781965312.0988648,
-    "ast_hash": "688294d8ac809156f0ffd3ee87296372",
+    "mtime": 1781977998.5187025,
+    "ast_hash": "3d5295bdeb090b728caf30ef13313876",
     "semantic_hash": ""
   },
   "apps/web/src/components/FilterBar.tsx": {
-    "mtime": 1781965269.2846682,
-    "ast_hash": "01fbe079f085a0fa2d7c5681fa759745",
+    "mtime": 1781977936.1726782,
+    "ast_hash": "1da4238f4f8ef298d18929d0de6d5e1c",
     "semantic_hash": ""
   },
   "apps/web/src/components/MobileCardsList.tsx": {

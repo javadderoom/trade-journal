@@ -11,6 +11,7 @@ import DetailPanel from './DetailPanel';
 
 export interface Trade {
   id: string;
+  accountId?: string;
   ticket?: number | null;
   symbol: string;
   direction: 'BUY' | 'SELL';
@@ -43,6 +44,9 @@ interface TradesTableProps {
   onDeleteTrade?: (tradeId: string) => Promise<boolean>;
   onDeleteMultipleTrades?: (tradeIds: string[]) => Promise<boolean>;
   initialActiveTradeId?: string | null;
+  accounts?: any[];
+  selectedAccountId?: string;
+  onAccountIdChange?: (val: string) => void;
 }
 
 const DEFAULT_TAGS = [
@@ -82,6 +86,9 @@ export default function TradesTable({
   onDeleteTrade,
   onDeleteMultipleTrades,
   initialActiveTradeId,
+  accounts = [],
+  selectedAccountId = 'all',
+  onAccountIdChange,
 }: TradesTableProps) {
   const [trades, setTrades] = useState<Trade[]>([]);
   const [selectedTrades, setSelectedTrades] = useState<Set<string>>(new Set());
@@ -483,6 +490,9 @@ export default function TradesTable({
           setSelectedTimezone={setSelectedTimezone}
           usdToToman={usdToToman}
           setUsdToToman={setUsdToToman}
+          accounts={accounts}
+          selectedAccountId={selectedAccountId}
+          onAccountIdChange={onAccountIdChange}
         />
 
         {/* 3. Summary Bar */}
@@ -505,6 +515,7 @@ export default function TradesTable({
             selectedTimezone={selectedTimezone}
             usdToToman={usdToToman}
             allEmotions={allEmotions}
+            accounts={accounts}
           />
         </div>
 
@@ -574,6 +585,7 @@ export default function TradesTable({
           handleDeleteScreenshot={handleDeleteScreenshot}
           selectedTimezone={selectedTimezone}
           usdToToman={usdToToman}
+          accounts={accounts}
         />
       )}
 

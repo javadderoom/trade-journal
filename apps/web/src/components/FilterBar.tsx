@@ -21,6 +21,9 @@ interface FilterBarProps {
   setSelectedTimezone: (val: string) => void;
   usdToToman: number;
   setUsdToToman: (val: number) => void;
+  accounts?: any[];
+  selectedAccountId?: string;
+  onAccountIdChange?: (val: string) => void;
 }
 
 export default function FilterBar({
@@ -41,6 +44,9 @@ export default function FilterBar({
   setSelectedTimezone,
   usdToToman,
   setUsdToToman,
+  accounts = [],
+  selectedAccountId = 'all',
+  onAccountIdChange,
 }: FilterBarProps) {
   return (
     <div className="filters-bar-container">
@@ -122,6 +128,24 @@ export default function FilterBar({
       {isAdvancedFiltersOpen && (
         <div className="filters-advanced-panel animate-slide-down">
           <div className="advanced-fields-grid">
+            <div className="advanced-field">
+              <label>حساب معاملاتی</label>
+              <Select
+                value={selectedAccountId || 'all'}
+                onChange={(val) => {
+                  onAccountIdChange?.(val);
+                  setCurrentPage(1);
+                }}
+                options={[
+                  { value: 'all', label: 'همه حساب‌ها' },
+                  ...accounts.map(acc => ({
+                    value: acc.id,
+                    label: `${acc.broker_name || 'MT5'} (${acc.account_number || acc.id})`,
+                  })),
+                ]}
+              />
+            </div>
+
             <div className="advanced-field">
               <label>نماد معاملاتی</label>
               <Select

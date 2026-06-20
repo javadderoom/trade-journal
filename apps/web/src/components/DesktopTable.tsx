@@ -20,6 +20,7 @@ interface DesktopTableProps {
   selectedTimezone: string;
   usdToToman: number;
   allEmotions: { value: string; label: string }[];
+  accounts?: any[];
 }
 
 export default function DesktopTable({
@@ -32,6 +33,7 @@ export default function DesktopTable({
   selectedTimezone,
   usdToToman,
   allEmotions,
+  accounts = [],
 }: DesktopTableProps) {
   const formatCurrency = (val: number) => {
     return formatPersianCurrency(val);
@@ -58,6 +60,7 @@ export default function DesktopTable({
               </th>
               <th>روز</th>
               <th>نماد</th>
+              <th>حساب</th>
               <th>جهت</th>
               <th>حجم</th>
               <th>R:R</th>
@@ -133,6 +136,14 @@ export default function DesktopTable({
                     </div>
                   </td>
                   <td>
+                    {(() => {
+                      const account = accounts.find(a => a.id === trade.accountId);
+                      return account
+                        ? `${account.broker_name || 'MT5'} (${account.account_number || ''})`
+                        : (trade.accountId === 'dev-account' ? 'حساب پیش‌فرض' : '-');
+                    })()}
+                  </td>
+                  <td>
                     <span className={`direction-badge ${isBuy ? 'buy' : 'sell'}`}>
                       <span className="material-symbols-outlined badge-icon">
                         {isBuy ? 'trending_up' : 'trending_down'}
@@ -176,7 +187,7 @@ export default function DesktopTable({
             })}
             {paginatedTrades.length === 0 && (
               <tr>
-                <td colSpan={9} style={{ textAlign: 'center', padding: '48px', color: '#94a3b8' }}>
+                <td colSpan={10} style={{ textAlign: 'center', padding: '48px', color: '#94a3b8' }}>
                   معامله‌ای یافت نشد.
                 </td>
               </tr>

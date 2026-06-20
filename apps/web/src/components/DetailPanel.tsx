@@ -27,6 +27,7 @@ interface DetailPanelProps {
   handleDeleteScreenshot: (url: string) => void;
   selectedTimezone: string;
   usdToToman: number;
+  accounts?: any[];
 }
 
 export default function DetailPanel({
@@ -45,6 +46,7 @@ export default function DetailPanel({
   handleDeleteScreenshot,
   selectedTimezone,
   usdToToman,
+  accounts = [],
 }: DetailPanelProps) {
   const [activeTab, setActiveTab] = useState<'stats' | 'journal'>('stats');
   const [isAddingTag, setIsAddingTag] = useState(false);
@@ -153,10 +155,38 @@ export default function DetailPanel({
             <div className="details-section">
               <h3>جزئیات اجرا</h3>
               <div className="details-grid">
-                <span className="grid-label">زمان ورود:</span>
-                <span className="grid-value direction-ltr">
-                  {formatDate(activeTrade.openTime, selectedTimezone).date}
-                </span>
+                 <span className="grid-label">حساب معاملاتی:</span>
+                 <span className="grid-value">
+                   <select
+                     className="grid-input"
+                     value={activeTrade.accountId || 'dev-account'}
+                     onChange={e => updateActiveTradeField('accountId', e.target.value)}
+                     style={{
+                       backgroundColor: 'transparent',
+                       border: '1px solid rgba(255, 255, 255, 0.1)',
+                       color: '#fff',
+                       borderRadius: '4px',
+                       padding: '2px 8px',
+                       width: '100%',
+                       fontFamily: 'Vazirmatn',
+                       fontSize: '13px',
+                       outline: 'none',
+                       height: '32px',
+                       cursor: 'pointer',
+                     }}
+                   >
+                     {accounts.map((acc: any) => (
+                       <option key={acc.id} value={acc.id} style={{ backgroundColor: '#1e222b', color: '#fff' }}>
+                         {acc.broker_name || 'MT5'} ({acc.account_number || acc.id})
+                       </option>
+                     ))}
+                   </select>
+                 </span>
+
+                 <span className="grid-label">زمان ورود:</span>
+                 <span className="grid-value direction-ltr">
+                   {formatDate(activeTrade.openTime, selectedTimezone).date}
+                 </span>
 
                 <span className="grid-label">سشن ورود:</span>
                 <span className="grid-value">
