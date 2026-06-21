@@ -716,10 +716,19 @@
   .chart-wrapper {
     min-height: 280px;
     height: 280px;
+
+    @media (max-width: 768px) {
+      min-height: 180px;
+      height: 180px;
+    }
   }
 
   .svg-chart {
     max-height: 280px;
+
+    @media (max-width: 768px) {
+      max-height: 180px;
+    }
   }
 }
 
