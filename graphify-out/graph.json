@@ -307,7 +307,7 @@
       "label": "uploadDir",
       "file_type": "code",
       "source_file": "apps/api/src/routes/tradeSync.ts",
-      "source_location": "L476",
+      "source_location": "L482",
       "_origin": "ast",
       "id": "routes_tradesync_uploaddir",
       "community": 1,
@@ -317,7 +317,7 @@
       "label": "storage",
       "file_type": "code",
       "source_file": "apps/api/src/routes/tradeSync.ts",
-      "source_location": "L481",
+      "source_location": "L487",
       "_origin": "ast",
       "id": "routes_tradesync_storage",
       "community": 1,
@@ -327,7 +327,7 @@
       "label": "upload",
       "file_type": "code",
       "source_file": "apps/api/src/routes/tradeSync.ts",
-      "source_location": "L492",
+      "source_location": "L498",
       "_origin": "ast",
       "id": "routes_tradesync_upload",
       "community": 1,
@@ -337,7 +337,7 @@
       "label": "uploadMemory",
       "file_type": "code",
       "source_file": "apps/api/src/routes/tradeSync.ts",
-      "source_location": "L601",
+      "source_location": "L607",
       "_origin": "ast",
       "id": "routes_tradesync_uploadmemory",
       "community": 1,
@@ -347,7 +347,7 @@
       "label": "parseMT4Date()",
       "file_type": "code",
       "source_file": "apps/api/src/routes/tradeSync.ts",
-      "source_location": "L603",
+      "source_location": "L609",
       "_origin": "ast",
       "id": "routes_tradesync_parsemt4date",
       "community": 1,
@@ -357,7 +357,7 @@
       "label": "findHeaderMapping()",
       "file_type": "code",
       "source_file": "apps/api/src/routes/tradeSync.ts",
-      "source_location": "L631",
+      "source_location": "L637",
       "_origin": "ast",
       "id": "routes_tradesync_findheadermapping",
       "community": 1,
@@ -5833,9 +5833,9 @@
       "source_file": "apps/web/src/components/trades/DetailPanel.tsx",
       "source_location": "L4",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "trades_detailpanel",
-      "target": "trades_tradestable_tagobject",
-      "confidence_score": 1.0
+      "target": "trades_tradestable_tagobject"
     },
     {
       "relation": "imports",
@@ -5954,9 +5954,9 @@
       "source_file": "apps/web/src/components/trades/DetailPanel.tsx",
       "source_location": "L18",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "trades_detailpanel_detailpanelprops",
-      "target": "trades_tradestable_tagobject",
-      "confidence_score": 1.0
+      "target": "trades_tradestable_tagobject"
     },
     {
       "relation": "references",
@@ -6416,9 +6416,9 @@
       "source_file": "apps/web/src/components/trades/TradesTable.tsx",
       "source_location": "L61",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "trades_tradestable",
-      "target": "trades_tradestable_default_system_tags",
-      "confidence_score": 1.0
+      "target": "trades_tradestable_default_system_tags"
     },
     {
       "relation": "contains",
@@ -6446,9 +6446,9 @@
       "source_file": "apps/web/src/components/trades/TradesTable.tsx",
       "source_location": "L54",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "trades_tradestable",
-      "target": "trades_tradestable_tagobject",
-      "confidence_score": 1.0
+      "target": "trades_tradestable_tagobject"
     },
     {
       "relation": "contains",
@@ -8343,9 +8343,9 @@
       "source_file": "apps/web/PROGRESS.md",
       "source_location": "L87",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "web_progress_done",
-      "target": "web_progress_persistent_tag_library_trade_ignoring_system",
-      "confidence_score": 1.0
+      "target": "web_progress_persistent_tag_library_trade_ignoring_system"
     },
     {
       "relation": "contains",
@@ -8899,5 +8899,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "580dc849e6143d3e5228ecebfd9ee840999b4e8b"
+  "built_at_commit": "5cc38fb26c7394d6a5ca67d4dd20d6bb5bec6f5f"
 }

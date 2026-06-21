@@ -398,14 +398,20 @@ router.put('/tags/:name', async (req: Request, res: Response) => {
     const { is_ignored, show_first } = req.body;
     const userId = req.body.userId || 'dev-user';
 
-    const updated = await prisma.tag.update({
+    const updated = await prisma.tag.upsert({
       where: {
         user_id_name: {
           user_id: userId,
           name: name,
         },
       },
-      data: {
+      create: {
+        user_id: userId,
+        name: name,
+        is_ignored: is_ignored !== undefined ? Boolean(is_ignored) : false,
+        show_first: show_first !== undefined ? Boolean(show_first) : false,
+      },
+      update: {
         is_ignored: is_ignored !== undefined ? Boolean(is_ignored) : undefined,
         show_first: show_first !== undefined ? Boolean(show_first) : undefined,
       },
