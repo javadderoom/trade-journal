@@ -61,7 +61,7 @@ Full-featured trades workspace split into:
 
 **Left/Main area:**
 - Page header with "واردات MT4/MT5" and "ثبت معامله دستی" action buttons.
-- Filter bar: search, symbol group dropdown, direction dropdown, status tabs (All, Open, Closed, Missed), refresh buttons, and toggleable account switcher.
+- Filter bar: search, symbol group dropdown, direction dropdown, status tabs (All, Open, Closed, Missed), refresh buttons, and toggleable account switcher. Supports a clearable active date filter badge that displays when navigating from the trading calendar with date queries.
 - Summary bar: trade count, win rate, total P&L in USD + Toman equivalent (filtered).
 - Desktop view: Paginated data table (10 rows/page) with date, day session badge, symbol, direction badge (buy/sell), lot size, R-multiple, P&L (color-coded) with Toman sub-value, open/closed status icon.
 - Mobile view: Infinite scroll card list layout displaying crucial transaction parameters.
@@ -100,6 +100,13 @@ Full-featured trades workspace split into:
 - `formatDate` — Gregorian ISO → Persian display string (e.g. `۱۴۰۵/۰۳/۲۵ - ۱۳:۳۰`) + day-of-week name
 - `getTradingSession` — NY/London/Asian session parsing.
 
+### Dashboard & Analytics (Journal Page - Overview & Charts Tabs)
+- **Overview (Tier 1):** Real-time performance summary showing Net P&L (USD + Toman), Win Rate (gauge + Buy/Sell breakdown), Profit Factor, Expectancy, Risk (Planned vs Achieved R-multiples), Max Drawdown, and Loss Streaks.
+- **Patterns (Tier 2):** Breakdown stats by Session (New York, London, Tokyo Badges), Emotions impact (Confident, Revenge, FOMO etc.), main Symbol win rates, Strategy tags, Weekday performance list, and 24-hour Tehran-timezone Heatmap.
+- **Equity Curve Chart (`EquityChart.tsx`):** Interactive financial chart powered by TradingView `lightweight-charts`, supporting zooming, panning, Persian crosshairs, and custom tooltips.
+- **Weekday P&L Bar Chart (`WeekdayPnlChart.tsx`):** Responsive custom SVG bar chart displaying weekday performance from Saturday to Friday. Features dynamic width scaling (no margins on desktop/mobile), single-character abbreviations on mobile (`ش`, `ی`, `د`...) to prevent text overlap, and floating HTML tooltips.
+- **Trading Calendar (`TradingCalendar.tsx`):** Modular Jalali calendar component with month/year navigation controls (`<` and `>`). Automatically adjusts day counts dynamically via browser `Intl` (handles leap years/366 days and 30-day Esfand correctly), displaying daily trade frequencies, P&L counts, and hover metrics. Supports selecting multiple dates to view cumulative trades on the Trades page via a bottom floating action banner.
+
 ---
 
 ## ❌ Not Done (Next Steps)
@@ -109,8 +116,6 @@ Full-featured trades workspace split into:
 - **Strategy/setup persistence** — `setupName` exists in the UI as a text input but is not sent to API (backend `Setup` model was removed). Needs a decision: re-add as a model, use tags, or store as a string field on Trade
 
 ### Medium Priority
-- Dashboard page (equity curve, calendar heatmap, emotion stats)
-- Analytics page (win rate by symbol/strategy/emotion, drawdown, expectancy)
 - Jalali (Shamsi) calendar date picker for the filter bar
 - Sorting: clicking table column headers should sort the data
 - Auth pages (Login, Register) — currently no auth at all

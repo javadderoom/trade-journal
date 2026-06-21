@@ -97,6 +97,12 @@ export default function DesktopTable({
                   </td>
                   <td className="col-time">
                     <span className="date-value">{formatDate(trade.openTime, selectedTimezone).date}</span>
+                    {trade.closeTime && (
+                      <div style={{ fontSize: '11px', color: 'rgba(255, 255, 255, 0.4)', marginTop: '4px', display: 'flex', alignItems: 'center', gap: '2px' }}>
+                        <span className="material-symbols-outlined" style={{ fontSize: '12px' }}>logout</span>
+                        خروج: {formatDate(trade.closeTime, selectedTimezone).date}
+                      </div>
+                    )}
                   </td>
                   <td>
                     <div className="day-session-wrapper">

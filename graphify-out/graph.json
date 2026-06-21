@@ -960,7 +960,7 @@
       "source_location": "L12",
       "_origin": "ast",
       "id": "trades_page_tradespage",
-      "community": 7,
+      "community": 32,
       "norm_label": "tradespage()"
     },
     {
@@ -1017,7 +1017,7 @@
       "label": "Trade",
       "file_type": "code",
       "source_file": "apps/web/src/components/journal/TradingCalendar.tsx",
-      "source_location": "L6",
+      "source_location": "L7",
       "_origin": "ast",
       "id": "journal_tradingcalendar_trade",
       "community": 24,
@@ -1027,7 +1027,7 @@
       "label": "TradingCalendarProps",
       "file_type": "code",
       "source_file": "apps/web/src/components/journal/TradingCalendar.tsx",
-      "source_location": "L13",
+      "source_location": "L14",
       "_origin": "ast",
       "id": "journal_tradingcalendar_tradingcalendarprops",
       "community": 24,
@@ -1037,7 +1037,7 @@
       "label": "JALALI_MONTH_NAMES",
       "file_type": "code",
       "source_file": "apps/web/src/components/journal/TradingCalendar.tsx",
-      "source_location": "L17",
+      "source_location": "L18",
       "_origin": "ast",
       "id": "journal_tradingcalendar_jalali_month_names",
       "community": 24,
@@ -1047,7 +1047,7 @@
       "label": "WEEKDAY_NAMES_CALENDAR",
       "file_type": "code",
       "source_file": "apps/web/src/components/journal/TradingCalendar.tsx",
-      "source_location": "L21",
+      "source_location": "L22",
       "_origin": "ast",
       "id": "journal_tradingcalendar_weekday_names_calendar",
       "community": 24,
@@ -1057,7 +1057,7 @@
       "label": "getJalaliDate()",
       "file_type": "code",
       "source_file": "apps/web/src/components/journal/TradingCalendar.tsx",
-      "source_location": "L24",
+      "source_location": "L25",
       "_origin": "ast",
       "id": "journal_tradingcalendar_getjalalidate",
       "community": 24,
@@ -1067,7 +1067,7 @@
       "label": "TradingCalendar()",
       "file_type": "code",
       "source_file": "apps/web/src/components/journal/TradingCalendar.tsx",
-      "source_location": "L45",
+      "source_location": "L46",
       "_origin": "ast",
       "id": "journal_tradingcalendar_tradingcalendar",
       "community": 24,
@@ -1437,7 +1437,7 @@
       "label": "DEFAULT_TAGS",
       "file_type": "code",
       "source_file": "apps/web/src/components/trades/TradesTable.tsx",
-      "source_location": "L53",
+      "source_location": "L54",
       "_origin": "ast",
       "id": "trades_tradestable_default_tags",
       "community": 7,
@@ -1447,17 +1447,37 @@
       "label": "DEFAULT_EMOTIONS",
       "file_type": "code",
       "source_file": "apps/web/src/components/trades/TradesTable.tsx",
-      "source_location": "L72",
+      "source_location": "L73",
       "_origin": "ast",
       "id": "trades_tradestable_default_emotions",
       "community": 7,
       "norm_label": "default_emotions"
     },
     {
+      "label": "getJalaliDisplayDate()",
+      "file_type": "code",
+      "source_file": "apps/web/src/components/trades/TradesTable.tsx",
+      "source_location": "L81",
+      "_origin": "ast",
+      "id": "trades_tradestable_getjalalidisplaydate",
+      "community": 7,
+      "norm_label": "getjalalidisplaydate()"
+    },
+    {
+      "label": "getLocalDateStr()",
+      "file_type": "code",
+      "source_file": "apps/web/src/components/trades/TradesTable.tsx",
+      "source_location": "L97",
+      "_origin": "ast",
+      "id": "trades_tradestable_getlocaldatestr",
+      "community": 7,
+      "norm_label": "getlocaldatestr()"
+    },
+    {
       "label": "TradesTable()",
       "file_type": "code",
       "source_file": "apps/web/src/components/trades/TradesTable.tsx",
-      "source_location": "L80",
+      "source_location": "L115",
       "_origin": "ast",
       "id": "trades_tradestable_tradestable",
       "community": 7,
@@ -1570,7 +1590,7 @@
       "source_location": "L34",
       "_origin": "ast",
       "id": "store_useappstore_useappstore",
-      "community": 7,
+      "community": 32,
       "norm_label": "useappstore"
     },
     {
@@ -1610,7 +1630,7 @@
       "source_location": "L186",
       "_origin": "ast",
       "id": "store_usetradestore_usetradestore",
-      "community": 7,
+      "community": 32,
       "norm_label": "usetradestore"
     },
     {
@@ -3334,10 +3354,20 @@
       "norm_label": "utilities (`src/utils/farsi.ts`, `src/utils/tradehelpers.ts`)"
     },
     {
+      "label": "Dashboard & Analytics (Journal Page - Overview & Charts Tabs)",
+      "file_type": "document",
+      "source_file": "apps/web/PROGRESS.md",
+      "source_location": "L103",
+      "_origin": "ast",
+      "id": "web_progress_dashboard_analytics_journal_page_overview_charts_tabs",
+      "community": 5,
+      "norm_label": "dashboard & analytics (journal page - overview & charts tabs)"
+    },
+    {
       "label": "\u274c Not Done (Next Steps)",
       "file_type": "document",
       "source_file": "apps/web/PROGRESS.md",
-      "source_location": "L105",
+      "source_location": "L112",
       "_origin": "ast",
       "id": "web_progress_not_done_next_steps",
       "community": 5,
@@ -3347,7 +3377,7 @@
       "label": "High Priority",
       "file_type": "document",
       "source_file": "apps/web/PROGRESS.md",
-      "source_location": "L107",
+      "source_location": "L114",
       "_origin": "ast",
       "id": "web_progress_high_priority",
       "community": 5,
@@ -3357,7 +3387,7 @@
       "label": "Medium Priority",
       "file_type": "document",
       "source_file": "apps/web/PROGRESS.md",
-      "source_location": "L111",
+      "source_location": "L118",
       "_origin": "ast",
       "id": "web_progress_medium_priority",
       "community": 5,
@@ -3367,7 +3397,7 @@
       "label": "Low Priority",
       "file_type": "document",
       "source_file": "apps/web/PROGRESS.md",
-      "source_location": "L120",
+      "source_location": "L125",
       "_origin": "ast",
       "id": "web_progress_low_priority",
       "community": 5,
@@ -4862,9 +4892,9 @@
       "source_file": "apps/web/src/app/journal/page.tsx",
       "source_location": "L12",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "journal_page",
-      "target": "journal_tradingcalendar",
-      "confidence_score": 1.0
+      "target": "journal_tradingcalendar"
     },
     {
       "relation": "imports_from",
@@ -5361,9 +5391,9 @@
       "source_file": "apps/web/src/components/journal/TradingCalendar.tsx",
       "source_location": "L24",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "journal_tradingcalendar",
-      "target": "journal_tradingcalendar_getjalalidate",
-      "confidence_score": 1.0
+      "target": "journal_tradingcalendar_getjalalidate"
     },
     {
       "relation": "contains",
@@ -5371,9 +5401,9 @@
       "source_file": "apps/web/src/components/journal/TradingCalendar.tsx",
       "source_location": "L17",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "journal_tradingcalendar",
-      "target": "journal_tradingcalendar_jalali_month_names",
-      "confidence_score": 1.0
+      "target": "journal_tradingcalendar_jalali_month_names"
     },
     {
       "relation": "contains",
@@ -5381,9 +5411,9 @@
       "source_file": "apps/web/src/components/journal/TradingCalendar.tsx",
       "source_location": "L6",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "journal_tradingcalendar",
-      "target": "journal_tradingcalendar_trade",
-      "confidence_score": 1.0
+      "target": "journal_tradingcalendar_trade"
     },
     {
       "relation": "contains",
@@ -5391,9 +5421,9 @@
       "source_file": "apps/web/src/components/journal/TradingCalendar.tsx",
       "source_location": "L45",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "journal_tradingcalendar",
-      "target": "journal_tradingcalendar_tradingcalendar",
-      "confidence_score": 1.0
+      "target": "journal_tradingcalendar_tradingcalendar"
     },
     {
       "relation": "contains",
@@ -5401,9 +5431,9 @@
       "source_file": "apps/web/src/components/journal/TradingCalendar.tsx",
       "source_location": "L13",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "journal_tradingcalendar",
-      "target": "journal_tradingcalendar_tradingcalendarprops",
-      "confidence_score": 1.0
+      "target": "journal_tradingcalendar_tradingcalendarprops"
     },
     {
       "relation": "contains",
@@ -5411,9 +5441,9 @@
       "source_file": "apps/web/src/components/journal/TradingCalendar.tsx",
       "source_location": "L21",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "journal_tradingcalendar",
-      "target": "journal_tradingcalendar_weekday_names_calendar",
-      "confidence_score": 1.0
+      "target": "journal_tradingcalendar_weekday_names_calendar"
     },
     {
       "relation": "imports_from",
@@ -5422,9 +5452,9 @@
       "source_file": "apps/web/src/components/journal/TradingCalendar.tsx",
       "source_location": "L4",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "journal_tradingcalendar",
-      "target": "utils_farsi",
-      "confidence_score": 1.0
+      "target": "utils_farsi"
     },
     {
       "relation": "imports",
@@ -5433,9 +5463,9 @@
       "source_file": "apps/web/src/components/journal/TradingCalendar.tsx",
       "source_location": "L4",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "journal_tradingcalendar",
-      "target": "utils_farsi_topersiandigits",
-      "confidence_score": 1.0
+      "target": "utils_farsi_topersiandigits"
     },
     {
       "relation": "calls",
@@ -6352,6 +6382,26 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "apps/web/src/components/trades/TradesTable.tsx",
+      "source_location": "L81",
+      "weight": 1.0,
+      "source": "trades_tradestable",
+      "target": "trades_tradestable_getjalalidisplaydate",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/components/trades/TradesTable.tsx",
+      "source_location": "L97",
+      "weight": 1.0,
+      "source": "trades_tradestable",
+      "target": "trades_tradestable_getlocaldatestr",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/components/trades/TradesTable.tsx",
       "source_location": "L13",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -6465,6 +6515,28 @@
       "confidence_score": 1.0,
       "source": "store_usetradestore_tradestate",
       "target": "trades_tradestable_trade"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/components/trades/TradesTable.tsx",
+      "source_location": "L93",
+      "weight": 1.0,
+      "source": "trades_tradestable_getjalalidisplaydate",
+      "target": "utils_farsi_topersiandigits",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/components/trades/TradesTable.tsx",
+      "source_location": "L546",
+      "weight": 1.0,
+      "source": "trades_tradestable_tradestable",
+      "target": "trades_tradestable_getjalalidisplaydate",
+      "confidence_score": 1.0
     },
     {
       "relation": "calls",
@@ -8157,6 +8229,16 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "apps/web/PROGRESS.md",
+      "source_location": "L103",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "web_progress_done",
+      "target": "web_progress_dashboard_analytics_journal_page_overview_charts_tabs"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/PROGRESS.md",
       "source_location": "L21",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -8755,5 +8837,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "7af58a100dde57781d3acf79d126bf2728638cb4"
+  "built_at_commit": "e16bb72c5afb2aa5094344ca46e7ad1a48a54fe6"
 }

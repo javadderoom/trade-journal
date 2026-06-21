@@ -65,8 +65,8 @@
     "semantic_hash": ""
   },
   "apps/web/src/app/trades/page.tsx": {
-    "mtime": 1781984626.855095,
-    "ast_hash": "19c3d825a08191f30dca70ad3849b846",
+    "mtime": 1782049163.3725927,
+    "ast_hash": "baf10552d926f8709e221badb14c63f3",
     "semantic_hash": ""
   },
   "apps/web/src/utils/farsi.ts": {
@@ -105,8 +105,8 @@
     "semantic_hash": ""
   },
   "apps/api/PROGRESS.md": {
-    "mtime": 1781980398.093436,
-    "ast_hash": "549ec05cf135d831a4158af3dce6bb38",
+    "mtime": 1782048724.567695,
+    "ast_hash": "46e9a5debcf8525800585dd35ccd9406",
     "semantic_hash": ""
   },
   "apps/ea/README.md": {
@@ -115,8 +115,8 @@
     "semantic_hash": ""
   },
   "apps/web/PROGRESS.md": {
-    "mtime": 1781980408.985944,
-    "ast_hash": "78513d9e0010a287cfca73783c63da00",
+    "mtime": 1782049326.1060147,
+    "ast_hash": "c1add296ebedc9bc69b838c02ced8083",
     "semantic_hash": ""
   },
   "apps/web/ui_sample/DESIGN.md": {
@@ -250,8 +250,8 @@
     "semantic_hash": ""
   },
   "apps/web/src/components/trades/DesktopTable.tsx": {
-    "mtime": 1781981755.4145658,
-    "ast_hash": "49801993d70a6be35f1b266680fb4b5d",
+    "mtime": 1782049820.8779786,
+    "ast_hash": "985db3f55b6315916f1d4e91db44681c",
     "semantic_hash": ""
   },
   "apps/web/src/components/trades/DetailPanel.tsx": {
@@ -265,8 +265,8 @@
     "semantic_hash": ""
   },
   "apps/web/src/components/trades/MobileCardsList.tsx": {
-    "mtime": 1781981736.7026277,
-    "ast_hash": "067fa0fdc5bbaaa7ec3a5f273fa629ec",
+    "mtime": 1782049815.481742,
+    "ast_hash": "e6b7f1e68f23a2484dad63debcb713fa",
     "semantic_hash": ""
   },
   "apps/web/src/components/trades/SummaryBar.tsx": {
@@ -280,8 +280,8 @@
     "semantic_hash": ""
   },
   "apps/web/src/components/trades/TradesTable.tsx": {
-    "mtime": 1781981705.9790368,
-    "ast_hash": "ad4f171b5ad866e7032b1d43f3b594db",
+    "mtime": 1782049829.4416912,
+    "ast_hash": "27bbb2b48a9877f62b5a970a791a7958",
     "semantic_hash": ""
   },
   "apps/web/src/components/ui/ConfirmModal.tsx": {
@@ -325,8 +325,8 @@
     "semantic_hash": ""
   },
   "apps/web/src/components/journal/TradingCalendar.tsx": {
-    "mtime": 1782048479.0007973,
-    "ast_hash": "e71c3f7a6d4d7374f0abefbe287e6ff2",
+    "mtime": 1782049121.9211106,
+    "ast_hash": "023d1d83e17a7821a99d4e0616b872da",
     "semantic_hash": ""
   }
 }

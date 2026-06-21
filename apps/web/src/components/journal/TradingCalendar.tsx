@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useMemo } from 'react';
+import { useRouter } from 'next/navigation';
 import { toPersianDigits } from '../../utils/farsi';
 
 interface Trade {
@@ -43,8 +44,10 @@ const getJalaliDate = (date: Date) => {
 };
 
 export default function TradingCalendar({ closedTrades }: TradingCalendarProps) {
+  const router = useRouter();
   const [calendarYear, setCalendarYear] = useState<number>(1405);
   const [calendarMonth, setCalendarMonth] = useState<number>(4);
+  const [selectedDates, setSelectedDates] = useState<string[]>([]);
 
   // Initialize with today's Jalali date on mount
   useEffect(() => {
@@ -52,6 +55,16 @@ export default function TradingCalendar({ closedTrades }: TradingCalendarProps) 
     setCalendarYear(todayJ.year);
     setCalendarMonth(todayJ.month);
   }, []);
+
+  const handleDayClick = (dateStr: string) => {
+    setSelectedDates((prev) => {
+      if (prev.includes(dateStr)) {
+        return prev.filter((d) => d !== dateStr);
+      } else {
+        return [...prev, dateStr];
+      }
+    });
+  };
 
   const handlePrevMonth = () => {
     if (calendarMonth === 1) {
@@ -245,6 +258,7 @@ export default function TradingCalendar({ closedTrades }: TradingCalendarProps) 
 
           {/* Day cells */}
           {jalaliCalendarData.days.map((day) => {
+            const isSelected = selectedDates.includes(day.dateStr);
             const cellClass = day.count === 0 
               ? 'calendar-cell-empty'
               : day.netPnl > 0 
@@ -262,8 +276,10 @@ export default function TradingCalendar({ closedTrades }: TradingCalendarProps) 
             return (
               <div 
                 key={day.jDay} 
-                className={`calendar-day-cell ${cellClass}`}
+                className={`calendar-day-cell ${cellClass} ${isSelected ? 'selected' : ''}`}
                 title={tooltipText}
+                onClick={() => day.count > 0 && handleDayClick(day.dateStr)}
+                style={{ cursor: day.count > 0 ? 'pointer' : 'default' }}
               >
                 <span className="cell-day-num">{toPersianDigits(day.jDay)}</span>
                 {day.count > 0 && (
@@ -300,6 +316,33 @@ export default function TradingCalendar({ closedTrades }: TradingCalendarProps) 
           <span>سود سنگین</span>
         </div>
       </div>
+
+      {/* Floating/Bottom Action Bar for multi-date navigation */}
+      {selectedDates.length > 0 && (
+        <div className="calendar-action-bar" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(97, 249, 177, 0.08)', border: '1px solid rgba(97, 249, 177, 0.25)', borderRadius: '12px', padding: '12px 16px', marginTop: '20px' }}>
+          <span style={{ fontSize: '13px', fontWeight: '500', color: '#e2e2eb' }}>
+            {toPersianDigits(selectedDates.length)} روز انتخاب شده است
+          </span>
+          <div style={{ display: 'flex', gap: '8px' }}>
+            <button 
+              onClick={() => setSelectedDates([])}
+              className="btn btn-secondary" 
+              style={{ padding: '6px 12px', fontSize: '12px', height: 'auto', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: '#bbcabe' }}
+            >
+              لغو انتخاب
+            </button>
+            <button 
+              onClick={() => {
+                router.push(`/trades?date=${selectedDates.join(',')}`);
+              }}
+              className="btn btn-primary" 
+              style={{ padding: '6px 12px', fontSize: '12px', height: 'auto', background: '#61f9b1', border: 'none', color: '#003822', fontWeight: '700' }}
+            >
+              مشاهده معاملات
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

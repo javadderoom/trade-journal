@@ -79,7 +79,7 @@
 ### Medium Priority
 - `GET /api/trades/:id` — single trade detail endpoint
 - Journal entries CRUD (`JournalEntry` model exists, no routes)
-- Analytics endpoints (win rate, P&L over time, emotion breakdown)
+- Analytics endpoints (win rate, P&L over time, emotion breakdown) — Note: Client-side currently handles all dashboard statistics calculations dynamically
 - Error handling middleware (global Express error handler)
 - Strategy/setup system — `Setup` model was removed; if re-needed, consider a simpler approach (e.g., string field on Trade or a tags-based strategy system)
 

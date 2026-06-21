@@ -11,6 +11,17 @@ import ConfirmModal from '../../components/ui/ConfirmModal';
 // Premium high-fidelity mock trades matching code.html
 export default function TradesPage() {
   const [autoOpenTradeId, setAutoOpenTradeId] = useState<string | null>(null);
+  const [dateFilter, setDateFilter] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const dateParam = params.get('date');
+      if (dateParam) {
+        setDateFilter(dateParam);
+      }
+    }
+  }, []);
 
   // Destructure global states from Zustand useAppStore
   const {
@@ -126,6 +137,7 @@ export default function TradesPage() {
       <TradesTable
         initialTrades={trades}
         initialUsdToToman={usdToToman}
+        initialDateFilter={dateFilter}
         onRefresh={() => fetchTrades(true)}
         onImportMT4={handleImportMT4}
         onAddManualTrade={handleAddManualTrade}

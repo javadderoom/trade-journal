@@ -926,6 +926,14 @@
     z-index: 10;
   }
 
+  &.selected {
+    outline: 2px solid $primary;
+    outline-offset: -2px;
+    box-shadow: 0 0 12px rgba($primary, 0.4);
+    transform: scale(1.04);
+    z-index: 5;
+  }
+
   .cell-day-num {
     font-size: 10px;
     font-weight: 700;

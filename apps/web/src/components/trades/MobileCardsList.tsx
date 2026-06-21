@@ -178,10 +178,18 @@ export default function MobileCardsList({
 
               {/* Bottom Row: Date & Time, Trading Session */}
               <div className="card-bottom-row">
-                <span className="date-value">
-                  <span className="material-symbols-outlined card-icon">calendar_month</span>
-                  {formatDate(trade.openTime, selectedTimezone).date} ({formatDate(trade.openTime, selectedTimezone).day})
-                </span>
+                <div className="date-time-group">
+                  <span className="date-value">
+                    <span className="material-symbols-outlined card-icon">calendar_month</span>
+                    {formatDate(trade.openTime, selectedTimezone).date} ({formatDate(trade.openTime, selectedTimezone).day})
+                  </span>
+                  {trade.closeTime && (
+                    <span className="date-value close-date-val">
+                      <span className="material-symbols-outlined card-icon close-icon">logout</span>
+                      خروج: {formatDate(trade.closeTime, selectedTimezone).date}
+                    </span>
+                  )}
+                </div>
                 {(() => {
                   const sess = getTradingSession(trade.openTime);
                   return (

@@ -38,6 +38,7 @@ export interface Trade {
 interface TradesTableProps {
   initialTrades: Trade[];
   initialUsdToToman?: number;
+  initialDateFilter?: string | null;
   onRefresh?: () => void;
   onAddManualTrade?: () => void;
   onImportMT4?: () => void;
@@ -77,9 +78,44 @@ const DEFAULT_EMOTIONS = [
   { value: 'REVENGE', label: 'انتقام' },
 ];
 
+const getJalaliDisplayDate = (gregorianDateStr: string) => {
+  try {
+    const d = new Date(`${gregorianDateStr}T12:00:00Z`);
+    if (isNaN(d.getTime())) return gregorianDateStr;
+    const formatter = new Intl.DateTimeFormat('fa-IR', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      timeZone: 'Asia/Tehran'
+    });
+    return formatter.format(d);
+  } catch {
+    return toPersianDigits(gregorianDateStr);
+  }
+};
+
+const getLocalDateStr = (dateStr: string | null, timezone: string): string | null => {
+  if (!dateStr) return null;
+  try {
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return null;
+    const formatter = new Intl.DateTimeFormat('en-US', {
+      timeZone: timezone,
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    });
+    const parts = formatter.format(d).split('/');
+    return `${parts[2]}-${parts[0]}-${parts[1]}`;
+  } catch {
+    return dateStr.substring(0, 10);
+  }
+};
+
 export default function TradesTable({
   initialTrades,
   initialUsdToToman = 90_000,
+  initialDateFilter,
   onRefresh,
   onImportMT4,
   onAddManualTrade,
@@ -97,6 +133,19 @@ export default function TradesTable({
   const [lightboxUrl, setLightboxUrl] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [isFabOpen, setIsFabOpen] = useState(false);
+  const [dateFilter, setDateFilter] = useState<string | null>(null);
+
+  // Sync prop-level initialDateFilter if provided by parent
+  useEffect(() => {
+    setDateFilter(initialDateFilter || null);
+    setCurrentPage(1);
+  }, [initialDateFilter]);
+
+  // Parse dateFilter into an array of date strings
+  const filterDatesArray = useMemo(() => {
+    if (!dateFilter) return [];
+    return dateFilter.split(',').map(d => d.trim()).filter(Boolean);
+  }, [dateFilter]);
 
   // Dialog state for custom alerts & confirmations
   const [dialogConfig, setDialogConfig] = useState<{
@@ -212,6 +261,13 @@ export default function TradesTable({
   // Filtered trades
   const filteredTrades = useMemo(() => {
     return trades.filter(trade => {
+      if (filterDatesArray.length > 0) {
+        const closeDate = getLocalDateStr(trade.closeTime, selectedTimezone);
+        const matchClose = closeDate ? filterDatesArray.includes(closeDate) : false;
+        if (!matchClose) {
+          return false;
+        }
+      }
       if (selectedSymbol !== 'همه نمادها') {
         if (selectedSymbol.startsWith('main:')) {
           const mainPair = selectedSymbol.substring(5);
@@ -244,7 +300,7 @@ export default function TradesTable({
       }
       return true;
     });
-  }, [trades, selectedSymbol, selectedDirection, searchQuery, selectedStatus]);
+  }, [trades, selectedSymbol, selectedDirection, searchQuery, selectedStatus, filterDatesArray, selectedTimezone]);
 
   // Summary Metrics
   const summary = useMemo(() => {
@@ -478,6 +534,34 @@ export default function TradesTable({
             </button>
           </div>
         </header>
+
+        {/* Date Filter Active Badge */}
+        {dateFilter && (
+          <div className="active-date-filter-badge-container animate-fade-in">
+            <span className="material-symbols-outlined badge-icon-calendar">calendar_month</span>
+            <span className="badge-text">
+              {filterDatesArray.length === 1 
+                ? `نمایش معاملات تاریخ: ${getJalaliDisplayDate(filterDatesArray[0])}` 
+                : `نمایش معاملات: ${toPersianDigits(filterDatesArray.length)} روز انتخاب شده`
+              }
+            </span>
+            <button 
+              onClick={() => {
+                setDateFilter(null);
+                setCurrentPage(1);
+                if (typeof window !== 'undefined') {
+                  const url = new URL(window.location.href);
+                  url.searchParams.delete('date');
+                  window.history.pushState({}, '', url.toString());
+                }
+              }}
+              className="badge-clear-btn"
+              title="پاک کردن فیلتر تاریخ"
+            >
+              <span className="material-symbols-outlined badge-icon-close">close</span>
+            </button>
+          </div>
+        )}
 
         {/* 2. Filter Bar */}
         <FilterBar
