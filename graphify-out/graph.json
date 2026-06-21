@@ -877,7 +877,7 @@
       "label": "EMOTION_MAP",
       "file_type": "code",
       "source_file": "apps/web/src/app/journal/page.tsx",
-      "source_location": "L14",
+      "source_location": "L15",
       "_origin": "ast",
       "id": "journal_page_emotion_map",
       "community": 7,
@@ -887,40 +887,20 @@
       "label": "WEEKDAY_NAMES",
       "file_type": "code",
       "source_file": "apps/web/src/app/journal/page.tsx",
-      "source_location": "L24",
+      "source_location": "L25",
       "_origin": "ast",
       "id": "journal_page_weekday_names",
       "community": 7,
       "norm_label": "weekday_names"
     },
     {
-      "label": "JALALI_MONTH_NAMES",
-      "file_type": "code",
-      "source_file": "apps/web/src/app/journal/page.tsx",
-      "source_location": "L25",
-      "_origin": "ast",
-      "id": "journal_page_jalali_month_names",
-      "community": 7,
-      "norm_label": "jalali_month_names"
-    },
-    {
-      "label": "WEEKDAY_NAMES_CALENDAR",
-      "file_type": "code",
-      "source_file": "apps/web/src/app/journal/page.tsx",
-      "source_location": "L29",
-      "_origin": "ast",
-      "id": "journal_page_weekday_names_calendar",
-      "community": 7,
-      "norm_label": "weekday_names_calendar"
-    },
-    {
       "label": "JournalPage()",
       "file_type": "code",
       "source_file": "apps/web/src/app/journal/page.tsx",
-      "source_location": "L31",
+      "source_location": "L28",
       "_origin": "ast",
       "id": "journal_page_journalpage",
-      "community": 32,
+      "community": 7,
       "norm_label": "journalpage()"
     },
     {
@@ -980,7 +960,7 @@
       "source_location": "L12",
       "_origin": "ast",
       "id": "trades_page_tradespage",
-      "community": 32,
+      "community": 7,
       "norm_label": "tradespage()"
     },
     {
@@ -1022,6 +1002,76 @@
       "id": "journal_equitychart_equitychart",
       "community": 7,
       "norm_label": "equitychart()"
+    },
+    {
+      "label": "TradingCalendar.tsx",
+      "file_type": "code",
+      "source_file": "apps/web/src/components/journal/TradingCalendar.tsx",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "journal_tradingcalendar",
+      "community": 24,
+      "norm_label": "tradingcalendar.tsx"
+    },
+    {
+      "label": "Trade",
+      "file_type": "code",
+      "source_file": "apps/web/src/components/journal/TradingCalendar.tsx",
+      "source_location": "L6",
+      "_origin": "ast",
+      "id": "journal_tradingcalendar_trade",
+      "community": 24,
+      "norm_label": "trade"
+    },
+    {
+      "label": "TradingCalendarProps",
+      "file_type": "code",
+      "source_file": "apps/web/src/components/journal/TradingCalendar.tsx",
+      "source_location": "L13",
+      "_origin": "ast",
+      "id": "journal_tradingcalendar_tradingcalendarprops",
+      "community": 24,
+      "norm_label": "tradingcalendarprops"
+    },
+    {
+      "label": "JALALI_MONTH_NAMES",
+      "file_type": "code",
+      "source_file": "apps/web/src/components/journal/TradingCalendar.tsx",
+      "source_location": "L17",
+      "_origin": "ast",
+      "id": "journal_tradingcalendar_jalali_month_names",
+      "community": 24,
+      "norm_label": "jalali_month_names"
+    },
+    {
+      "label": "WEEKDAY_NAMES_CALENDAR",
+      "file_type": "code",
+      "source_file": "apps/web/src/components/journal/TradingCalendar.tsx",
+      "source_location": "L21",
+      "_origin": "ast",
+      "id": "journal_tradingcalendar_weekday_names_calendar",
+      "community": 24,
+      "norm_label": "weekday_names_calendar"
+    },
+    {
+      "label": "getJalaliDate()",
+      "file_type": "code",
+      "source_file": "apps/web/src/components/journal/TradingCalendar.tsx",
+      "source_location": "L24",
+      "_origin": "ast",
+      "id": "journal_tradingcalendar_getjalalidate",
+      "community": 24,
+      "norm_label": "getjalalidate()"
+    },
+    {
+      "label": "TradingCalendar()",
+      "file_type": "code",
+      "source_file": "apps/web/src/components/journal/TradingCalendar.tsx",
+      "source_location": "L45",
+      "_origin": "ast",
+      "id": "journal_tradingcalendar_tradingcalendar",
+      "community": 24,
+      "norm_label": "tradingcalendar()"
     },
     {
       "label": "WeekdayPnlChart.tsx",
@@ -1520,7 +1570,7 @@
       "source_location": "L34",
       "_origin": "ast",
       "id": "store_useappstore_useappstore",
-      "community": 32,
+      "community": 7,
       "norm_label": "useappstore"
     },
     {
@@ -1560,7 +1610,7 @@
       "source_location": "L186",
       "_origin": "ast",
       "id": "store_usetradestore_usetradestore",
-      "community": 32,
+      "community": 7,
       "norm_label": "usetradestore"
     },
     {
@@ -2170,7 +2220,7 @@
       "source_location": "L18",
       "_origin": "ast",
       "id": "emil_design_eng_skill_core_philosophy",
-      "community": 19,
+      "community": 31,
       "norm_label": "core philosophy"
     },
     {
@@ -2180,7 +2230,7 @@
       "source_location": "L20",
       "_origin": "ast",
       "id": "emil_design_eng_skill_taste_is_trained_not_innate",
-      "community": 19,
+      "community": 31,
       "norm_label": "taste is trained, not innate"
     },
     {
@@ -2190,7 +2240,7 @@
       "source_location": "L26",
       "_origin": "ast",
       "id": "emil_design_eng_skill_unseen_details_compound",
-      "community": 19,
+      "community": 31,
       "norm_label": "unseen details compound"
     },
     {
@@ -2200,7 +2250,7 @@
       "source_location": "L34",
       "_origin": "ast",
       "id": "emil_design_eng_skill_beauty_is_leverage",
-      "community": 19,
+      "community": 31,
       "norm_label": "beauty is leverage"
     },
     {
@@ -2280,7 +2330,7 @@
       "source_location": "L147",
       "_origin": "ast",
       "id": "emil_design_eng_skill_spring_animations",
-      "community": 19,
+      "community": 30,
       "norm_label": "spring animations"
     },
     {
@@ -2290,7 +2340,7 @@
       "source_location": "L151",
       "_origin": "ast",
       "id": "emil_design_eng_skill_when_to_use_springs",
-      "community": 19,
+      "community": 30,
       "norm_label": "when to use springs"
     },
     {
@@ -2300,7 +2350,7 @@
       "source_location": "L158",
       "_origin": "ast",
       "id": "emil_design_eng_skill_spring_based_mouse_interactions",
-      "community": 19,
+      "community": 30,
       "norm_label": "spring-based mouse interactions"
     },
     {
@@ -2310,7 +2360,7 @@
       "source_location": "L177",
       "_origin": "ast",
       "id": "emil_design_eng_skill_spring_configuration",
-      "community": 19,
+      "community": 30,
       "norm_label": "spring configuration"
     },
     {
@@ -2320,7 +2370,7 @@
       "source_location": "L193",
       "_origin": "ast",
       "id": "emil_design_eng_skill_interruptibility_advantage",
-      "community": 19,
+      "community": 30,
       "norm_label": "interruptibility advantage"
     },
     {
@@ -2410,7 +2460,7 @@
       "source_location": "L351",
       "_origin": "ast",
       "id": "emil_design_eng_skill_css_transform_mastery",
-      "community": 19,
+      "community": 28,
       "norm_label": "css transform mastery"
     },
     {
@@ -2420,7 +2470,7 @@
       "source_location": "L353",
       "_origin": "ast",
       "id": "emil_design_eng_skill_translatey_with_percentages",
-      "community": 19,
+      "community": 28,
       "norm_label": "translatey with percentages"
     },
     {
@@ -2430,7 +2480,7 @@
       "source_location": "L371",
       "_origin": "ast",
       "id": "emil_design_eng_skill_scale_scales_children_too",
-      "community": 19,
+      "community": 28,
       "norm_label": "scale() scales children too"
     },
     {
@@ -2440,7 +2490,7 @@
       "source_location": "L375",
       "_origin": "ast",
       "id": "emil_design_eng_skill_3d_transforms_for_depth",
-      "community": 19,
+      "community": 28,
       "norm_label": "3d transforms for depth"
     },
     {
@@ -2450,7 +2500,7 @@
       "source_location": "L394",
       "_origin": "ast",
       "id": "emil_design_eng_skill_transform_origin",
-      "community": 19,
+      "community": 28,
       "norm_label": "transform-origin"
     },
     {
@@ -2460,7 +2510,7 @@
       "source_location": "L398",
       "_origin": "ast",
       "id": "emil_design_eng_skill_clip_path_for_animation",
-      "community": 19,
+      "community": 26,
       "norm_label": "clip-path for animation"
     },
     {
@@ -2470,7 +2520,7 @@
       "source_location": "L402",
       "_origin": "ast",
       "id": "emil_design_eng_skill_the_inset_shape",
-      "community": 19,
+      "community": 26,
       "norm_label": "the inset shape"
     },
     {
@@ -2480,7 +2530,7 @@
       "source_location": "L428",
       "_origin": "ast",
       "id": "emil_design_eng_skill_tabs_with_perfect_color_transitions",
-      "community": 19,
+      "community": 26,
       "norm_label": "tabs with perfect color transitions"
     },
     {
@@ -2490,7 +2540,7 @@
       "source_location": "L432",
       "_origin": "ast",
       "id": "emil_design_eng_skill_hold_to_delete_pattern",
-      "community": 19,
+      "community": 26,
       "norm_label": "hold-to-delete pattern"
     },
     {
@@ -2500,7 +2550,7 @@
       "source_location": "L436",
       "_origin": "ast",
       "id": "emil_design_eng_skill_image_reveals_on_scroll",
-      "community": 19,
+      "community": 26,
       "norm_label": "image reveals on scroll"
     },
     {
@@ -2510,7 +2560,7 @@
       "source_location": "L440",
       "_origin": "ast",
       "id": "emil_design_eng_skill_comparison_sliders",
-      "community": 19,
+      "community": 26,
       "norm_label": "comparison sliders"
     },
     {
@@ -2520,7 +2570,7 @@
       "source_location": "L444",
       "_origin": "ast",
       "id": "emil_design_eng_skill_gesture_and_drag_interactions",
-      "community": 19,
+      "community": 27,
       "norm_label": "gesture and drag interactions"
     },
     {
@@ -2530,7 +2580,7 @@
       "source_location": "L446",
       "_origin": "ast",
       "id": "emil_design_eng_skill_momentum_based_dismissal",
-      "community": 19,
+      "community": 27,
       "norm_label": "momentum-based dismissal"
     },
     {
@@ -2540,7 +2590,7 @@
       "source_location": "L459",
       "_origin": "ast",
       "id": "emil_design_eng_skill_damping_at_boundaries",
-      "community": 19,
+      "community": 27,
       "norm_label": "damping at boundaries"
     },
     {
@@ -2550,7 +2600,7 @@
       "source_location": "L463",
       "_origin": "ast",
       "id": "emil_design_eng_skill_pointer_capture_for_drag",
-      "community": 19,
+      "community": 27,
       "norm_label": "pointer capture for drag"
     },
     {
@@ -2560,7 +2610,7 @@
       "source_location": "L467",
       "_origin": "ast",
       "id": "emil_design_eng_skill_multi_touch_protection",
-      "community": 19,
+      "community": 27,
       "norm_label": "multi-touch protection"
     },
     {
@@ -2570,7 +2620,7 @@
       "source_location": "L478",
       "_origin": "ast",
       "id": "emil_design_eng_skill_friction_instead_of_hard_stops",
-      "community": 19,
+      "community": 27,
       "norm_label": "friction instead of hard stops"
     },
     {
@@ -2670,7 +2720,7 @@
       "source_location": "L562",
       "_origin": "ast",
       "id": "emil_design_eng_skill_the_sonner_principles_building_loved_components",
-      "community": 19,
+      "community": 29,
       "norm_label": "the sonner principles (building loved components)"
     },
     {
@@ -2680,7 +2730,7 @@
       "source_location": "L578",
       "_origin": "ast",
       "id": "emil_design_eng_skill_cohesion_matters",
-      "community": 19,
+      "community": 29,
       "norm_label": "cohesion matters"
     },
     {
@@ -2690,7 +2740,7 @@
       "source_location": "L584",
       "_origin": "ast",
       "id": "emil_design_eng_skill_the_opacity_height_combination",
-      "community": 19,
+      "community": 29,
       "norm_label": "the opacity + height combination"
     },
     {
@@ -2700,7 +2750,7 @@
       "source_location": "L588",
       "_origin": "ast",
       "id": "emil_design_eng_skill_review_your_work_the_next_day",
-      "community": 19,
+      "community": 29,
       "norm_label": "review your work the next day"
     },
     {
@@ -2710,7 +2760,7 @@
       "source_location": "L592",
       "_origin": "ast",
       "id": "emil_design_eng_skill_asymmetric_enter_exit_timing",
-      "community": 19,
+      "community": 29,
       "norm_label": "asymmetric enter/exit timing"
     },
     {
@@ -2730,7 +2780,7 @@
       "source_location": "L642",
       "_origin": "ast",
       "id": "emil_design_eng_skill_debugging_animations",
-      "community": 19,
+      "community": 33,
       "norm_label": "debugging animations"
     },
     {
@@ -2740,7 +2790,7 @@
       "source_location": "L644",
       "_origin": "ast",
       "id": "emil_design_eng_skill_slow_motion_testing",
-      "community": 19,
+      "community": 33,
       "norm_label": "slow motion testing"
     },
     {
@@ -2750,7 +2800,7 @@
       "source_location": "L655",
       "_origin": "ast",
       "id": "emil_design_eng_skill_frame_by_frame_inspection",
-      "community": 19,
+      "community": 33,
       "norm_label": "frame-by-frame inspection"
     },
     {
@@ -2760,7 +2810,7 @@
       "source_location": "L659",
       "_origin": "ast",
       "id": "emil_design_eng_skill_test_on_real_devices",
-      "community": 19,
+      "community": 33,
       "norm_label": "test on real devices"
     },
     {
@@ -4789,16 +4839,6 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "apps/web/src/app/journal/page.tsx",
-      "source_location": "L23",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "journal_page",
-      "target": "journal_page_jalali_month_names"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "apps/web/src/app/journal/page.tsx",
       "source_location": "L10",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -4816,14 +4856,15 @@
       "target": "journal_page_weekday_names"
     },
     {
-      "relation": "contains",
+      "relation": "imports_from",
+      "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "apps/web/src/app/journal/page.tsx",
-      "source_location": "L27",
+      "source_location": "L12",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "journal_page",
-      "target": "journal_page_weekday_names_calendar"
+      "target": "journal_tradingcalendar",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports_from",
@@ -4832,9 +4873,9 @@
       "source_file": "apps/web/src/app/journal/page.tsx",
       "source_location": "L11",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "journal_page",
-      "target": "journal_weekdaypnlchart",
-      "confidence_score": 1.0
+      "target": "journal_weekdaypnlchart"
     },
     {
       "relation": "imports_from",
@@ -5317,12 +5358,105 @@
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/components/journal/TradingCalendar.tsx",
+      "source_location": "L24",
+      "weight": 1.0,
+      "source": "journal_tradingcalendar",
+      "target": "journal_tradingcalendar_getjalalidate",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/components/journal/TradingCalendar.tsx",
+      "source_location": "L17",
+      "weight": 1.0,
+      "source": "journal_tradingcalendar",
+      "target": "journal_tradingcalendar_jalali_month_names",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/components/journal/TradingCalendar.tsx",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "journal_tradingcalendar",
+      "target": "journal_tradingcalendar_trade",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/components/journal/TradingCalendar.tsx",
+      "source_location": "L45",
+      "weight": 1.0,
+      "source": "journal_tradingcalendar",
+      "target": "journal_tradingcalendar_tradingcalendar",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/components/journal/TradingCalendar.tsx",
+      "source_location": "L13",
+      "weight": 1.0,
+      "source": "journal_tradingcalendar",
+      "target": "journal_tradingcalendar_tradingcalendarprops",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/components/journal/TradingCalendar.tsx",
+      "source_location": "L21",
+      "weight": 1.0,
+      "source": "journal_tradingcalendar",
+      "target": "journal_tradingcalendar_weekday_names_calendar",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/components/journal/TradingCalendar.tsx",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "journal_tradingcalendar",
+      "target": "utils_farsi",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/components/journal/TradingCalendar.tsx",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "journal_tradingcalendar",
+      "target": "utils_farsi_topersiandigits",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "apps/web/src/components/journal/TradingCalendar.tsx",
+      "source_location": "L189",
+      "weight": 1.0,
+      "source": "journal_tradingcalendar_tradingcalendar",
+      "target": "utils_farsi_topersiandigits"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
       "source_file": "apps/web/src/components/journal/WeekdayPnlChart.tsx",
       "source_location": "L6",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "journal_weekdaypnlchart",
-      "target": "journal_weekdaypnlchart_trade",
-      "confidence_score": 1.0
+      "target": "journal_weekdaypnlchart_trade"
     },
     {
       "relation": "contains",
@@ -5330,9 +5464,9 @@
       "source_file": "apps/web/src/components/journal/WeekdayPnlChart.tsx",
       "source_location": "L17",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "journal_weekdaypnlchart",
-      "target": "journal_weekdaypnlchart_weekdaypnlchart",
-      "confidence_score": 1.0
+      "target": "journal_weekdaypnlchart_weekdaypnlchart"
     },
     {
       "relation": "contains",
@@ -5340,9 +5474,9 @@
       "source_file": "apps/web/src/components/journal/WeekdayPnlChart.tsx",
       "source_location": "L13",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "journal_weekdaypnlchart",
-      "target": "journal_weekdaypnlchart_weekdaypnlchartprops",
-      "confidence_score": 1.0
+      "target": "journal_weekdaypnlchart_weekdaypnlchartprops"
     },
     {
       "relation": "imports_from",
@@ -5351,9 +5485,9 @@
       "source_file": "apps/web/src/components/journal/WeekdayPnlChart.tsx",
       "source_location": "L4",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "journal_weekdaypnlchart",
-      "target": "utils_farsi",
-      "confidence_score": 1.0
+      "target": "utils_farsi"
     },
     {
       "relation": "imports",
@@ -5362,9 +5496,9 @@
       "source_file": "apps/web/src/components/journal/WeekdayPnlChart.tsx",
       "source_location": "L4",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "journal_weekdaypnlchart",
-      "target": "utils_farsi_topersiandigits",
-      "confidence_score": 1.0
+      "target": "utils_farsi_topersiandigits"
     },
     {
       "relation": "calls",
@@ -8621,5 +8755,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "3db8c6bc4c408f990cb4933917b27df10b40c76b"
+  "built_at_commit": "7af58a100dde57781d3acf79d126bf2728638cb4"
 }

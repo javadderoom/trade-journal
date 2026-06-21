@@ -305,8 +305,8 @@
     "semantic_hash": ""
   },
   "apps/web/src/app/journal/page.tsx": {
-    "mtime": 1782047687.1665785,
-    "ast_hash": "018ca5b4aa76bf287415185e7fedda98",
+    "mtime": 1782048525.7380779,
+    "ast_hash": "3c990835d23ea5bc90a9af28d6a1a110",
     "semantic_hash": ""
   },
   "apps/web/public/logo.png": {
@@ -322,6 +322,11 @@
   "apps/web/src/components/journal/WeekdayPnlChart.tsx": {
     "mtime": 1782048016.159706,
     "ast_hash": "faddb7ecf859c16d94fce330292a27ee",
+    "semantic_hash": ""
+  },
+  "apps/web/src/components/journal/TradingCalendar.tsx": {
+    "mtime": 1782048479.0007973,
+    "ast_hash": "e71c3f7a6d4d7374f0abefbe287e6ff2",
     "semantic_hash": ""
   }
 }
