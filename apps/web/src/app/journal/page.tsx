@@ -5,7 +5,7 @@ import { useAppStore } from '../../store/useAppStore';
 import { useTradeStore } from '../../store/useTradeStore';
 import Select from '../../components/ui/Select';
 import { toPersianDigits, formatPersianCurrency, formatToman } from '../../utils/farsi';
-import { getTradingSession, getMainPair, getEmotionEmoji } from '../../utils/tradeHelpers';
+import { getTradingSession, getMainPair, getEmotionEmoji, isTradeIgnored } from '../../utils/tradeHelpers';
 import '../../components/journal/journal.scss';
 import EquityChart from '../../components/journal/EquityChart';
 import WeekdayPnlChart from '../../components/journal/WeekdayPnlChart';
@@ -48,7 +48,7 @@ export default function JournalPage() {
 
   // Compute Statistics (Tier 1 & Tier 2)
   const stats = useMemo(() => {
-    const closedTrades = trades.filter((t) => t.closeTime !== null && t.closePrice !== null);
+    const closedTrades = trades.filter((t) => t.closeTime !== null && t.closePrice !== null && !isTradeIgnored(t.tags));
     const totalCount = closedTrades.length;
 
     if (totalCount === 0) {
@@ -349,7 +349,7 @@ export default function JournalPage() {
 
   const sortedClosedTrades = useMemo(() => {
     return [...trades]
-      .filter((t) => t.closeTime !== null && t.closePrice !== null)
+      .filter((t) => t.closeTime !== null && t.closePrice !== null && !isTradeIgnored(t.tags))
       .sort((a, b) => new Date(a.closeTime!).getTime() - new Date(b.closeTime!).getTime());
   }, [trades]);
 

@@ -84,6 +84,12 @@ Full-featured trades workspace split into:
 - Created `getMainPair` helper to extract the base prefix (e.g. `XAUUSD` from `XAUUSD_O`).
 - Created `getSymbolFilterOptions` grouping unique items in the Filter Bar. Choosing a main pair automatically filters for all its children.
 
+### Persistent Tag Library & Trade Ignoring System
+- Created database-backed `Tag` model (`@@unique([user_id, name])`) with cascade delete behavior.
+- Implemented API tag CRUD endpoints (`GET /api/trades/tags`, `POST /api/trades/tags`, `DELETE /api/trades/tags/:name`).
+- Removed standard hardcoded default tags pool, keeping choices pool clean and reserved for user-created custom tags.
+- Enabled special ignore-from-stats tags (`فرصت از دست رفته`, `Missed`, `ignore`, `Ignore`, `نادیده گرفتن`) to hide trades from summary metrics and exclude them from calendar P&L, statistics tables, weekday charts, and the cumulative equity curve.
+
 ### Select Component (`src/components/Select.tsx` + `select.scss`)
 - Custom accessible dropdown (`role="combobox"` + `role="listbox"`)
 - Full keyboard navigation: Arrow keys, Enter/Space to select, Escape to close, Tab to dismiss
@@ -112,7 +118,6 @@ Full-featured trades workspace split into:
 ## ❌ Not Done (Next Steps)
 
 ### High Priority
-- **Persistent tag library** — tags currently derived from trade records only; a user-level tag pool (API-backed) is needed so custom tags survive removal from all trades, and sync across devices
 - **Strategy/setup persistence** — `setupName` exists in the UI as a text input but is not sent to API (backend `Setup` model was removed). Needs a decision: re-add as a model, use tags, or store as a string field on Trade
 
 ### Medium Priority

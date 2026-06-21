@@ -183,3 +183,11 @@ export const getSymbolFilterOptions = (uniqueSymbols: string[]): { value: string
 
   return options;
 };
+
+export const isTradeIgnored = (tags: string[] | undefined | null): boolean => {
+  if (!tags || !Array.isArray(tags)) return false;
+  return tags.some(tag => 
+    ['فرصت از دست رفته', 'Missed', 'ignore', 'Ignore', 'نادیده گرفتن'].includes(tag)
+  );
+};
+

@@ -7,7 +7,8 @@ import {
   getEmotionEmoji,
   getEmotionLabel,
   formatDate,
-  getTradingSession
+  getTradingSession,
+  isTradeIgnored
 } from '../../utils/tradeHelpers';
 
 interface MobileCardsListProps {
@@ -106,7 +107,7 @@ export default function MobileCardsList({
           const isBuy = trade.direction === 'BUY';
           const isClosed = trade.closeTime !== null;
           const isActive = trade.id === activeTradeId;
-          const isMissed = trade.tags?.includes('فرصت از دست رفته') || trade.tags?.includes('Missed');
+          const isMissed = isTradeIgnored(trade.tags);
 
           let profitClass = 'profit-zero';
           if (trade.profitUsd > 0) profitClass = 'profit-positive';

@@ -8,7 +8,7 @@ import FilterBar from './FilterBar';
 import DesktopTable from './DesktopTable';
 import MobileCardsList from './MobileCardsList';
 import DetailPanel from './DetailPanel';
-import { getMainPair } from '../../utils/tradeHelpers';
+import { getMainPair, isTradeIgnored } from '../../utils/tradeHelpers';
 
 export interface Trade {
   id: string;
@@ -51,7 +51,7 @@ interface TradesTableProps {
   onAccountIdChange?: (val: string) => void;
 }
 
-const SYSTEM_TAGS = ['فرصت از دست رفته', 'Missed'];
+const SYSTEM_TAGS = ['فرصت از دست رفته', 'Missed', 'ignore', 'Ignore', 'نادیده گرفتن'];
 
 const DEFAULT_EMOTIONS = [
   { value: 'CONFIDENT', label: 'با اطمینان' },
@@ -310,12 +310,10 @@ export default function TradesTable({
           return false;
         }
       }
-      if (selectedStatus === 'OPEN' && trade.closeTime !== null) return false;
-      if (selectedStatus === 'CLOSED' && trade.closeTime === null) return false;
-      if (selectedStatus === 'MISSED') {
-        const isMissed = trade.tags?.includes('فرصت از دست رفته') || trade.tags?.includes('Missed');
-        if (!isMissed) return false;
-      }
+      const isMissed = isTradeIgnored(trade.tags);
+      if (selectedStatus === 'OPEN' && (isMissed || trade.closeTime !== null)) return false;
+      if (selectedStatus === 'CLOSED' && (isMissed || trade.closeTime === null)) return false;
+      if (selectedStatus === 'MISSED' && !isMissed) return false;
       return true;
     });
   }, [trades, selectedSymbol, selectedDirection, searchQuery, selectedStatus, filterDatesArray, selectedTimezone]);
@@ -323,7 +321,7 @@ export default function TradesTable({
   // Summary Metrics
   const summary = useMemo(() => {
     const activeTrades = filteredTrades.filter(
-      t => !t.tags?.includes('فرصت از دست رفته') && !t.tags?.includes('Missed')
+      t => !isTradeIgnored(t.tags)
     );
     const count = activeTrades.length;
     const wins = activeTrades.filter(t => t.profitUsd > 0).length;

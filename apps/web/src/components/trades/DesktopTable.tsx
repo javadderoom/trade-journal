@@ -7,7 +7,8 @@ import {
   getEmotionEmoji,
   getEmotionLabel,
   formatDate,
-  getTradingSession
+  getTradingSession,
+  isTradeIgnored
 } from '../../utils/tradeHelpers';
 
 interface DesktopTableProps {
@@ -75,7 +76,7 @@ export default function DesktopTable({
               const isActive = trade.id === activeTradeId;
 
               // P&L color logic
-              const isMissed = trade.tags?.includes('فرصت از دست رفته') || trade.tags?.includes('Missed');
+              const isMissed = isTradeIgnored(trade.tags);
               let profitClass = 'profit-zero';
               if (trade.profitUsd > 0) profitClass = 'profit-positive';
               else if (trade.profitUsd < 0) profitClass = 'profit-negative';
