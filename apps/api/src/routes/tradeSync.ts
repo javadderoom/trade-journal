@@ -329,6 +329,86 @@ router.post('/bulk-delete', async (req: Request, res: Response) => {
 });
 
 /**
+ * GET /api/trades/tags
+ * Fetches all persistent user-specific tags from database.
+ */
+router.get('/tags', async (req: Request, res: Response) => {
+  try {
+    const userId = (req.query.userId as string) || 'dev-user';
+    const tags = await prisma.tag.findMany({
+      where: { user_id: userId },
+      orderBy: { name: 'asc' },
+    });
+    res.status(200).json(tags.map(t => t.name));
+  } catch (err: any) {
+    console.error('Fetch tags error:', err);
+    res.status(500).json({ error: err.message || 'Internal server error' });
+  }
+});
+
+/**
+ * POST /api/trades/tags
+ * Creates/persists a custom tag in the user's library.
+ */
+router.post('/tags', async (req: Request, res: Response) => {
+  try {
+    const { name } = req.body;
+    const userId = req.body.userId || 'dev-user';
+
+    if (!name || typeof name !== 'string' || !name.trim()) {
+      res.status(400).json({ error: 'Tag name is required' });
+      return;
+    }
+
+    const cleanName = name.trim();
+
+    const tag = await prisma.tag.upsert({
+      where: {
+        user_id_name: {
+          user_id: userId,
+          name: cleanName,
+        },
+      },
+      create: {
+        user_id: userId,
+        name: cleanName,
+      },
+      update: {},
+    });
+
+    res.status(201).json(tag);
+  } catch (err: any) {
+    console.error('Create tag error:', err);
+    res.status(500).json({ error: err.message || 'Internal server error' });
+  }
+});
+
+/**
+ * DELETE /api/trades/tags/:name
+ * Deletes a tag from the user's persistent library.
+ */
+router.delete('/tags/:name', async (req: Request, res: Response) => {
+  try {
+    const name = req.params.name as string;
+    const userId = (req.query.userId as string) || 'dev-user';
+
+    await prisma.tag.deleteMany({
+      where: {
+        user_id: userId,
+        name: name,
+      },
+    });
+
+    res.status(200).json({ success: true });
+  } catch (err: any) {
+    console.error('Delete tag error:', err);
+    res.status(500).json({ error: err.message || 'Internal server error' });
+  }
+});
+
+
+
+/**
  * DELETE /api/trades/:id
  * Deletes a trade by ID.
  */

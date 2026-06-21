@@ -333,20 +333,26 @@
   }
 }
 
-// Active Date Filter Badge
-.active-date-filter-badge-container {
+// Active Filter Badges Layout
+.active-filters-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+  width: 100%;
+}
+
+.active-filter-badge {
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-bottom: 16px;
   background: rgba($primary, 0.08);
   border: 1px solid rgba($primary, 0.25);
   border-radius: 8px;
   padding: 8px 12px;
   width: fit-content;
-  align-self: flex-start;
 
-  .badge-icon-calendar {
+  .badge-icon-lead {
     color: $primary;
     font-size: 18px;
   }

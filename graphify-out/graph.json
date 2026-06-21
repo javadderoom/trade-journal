@@ -307,7 +307,7 @@
       "label": "uploadDir",
       "file_type": "code",
       "source_file": "apps/api/src/routes/tradeSync.ts",
-      "source_location": "L361",
+      "source_location": "L441",
       "_origin": "ast",
       "id": "routes_tradesync_uploaddir",
       "community": 1,
@@ -317,7 +317,7 @@
       "label": "storage",
       "file_type": "code",
       "source_file": "apps/api/src/routes/tradeSync.ts",
-      "source_location": "L366",
+      "source_location": "L446",
       "_origin": "ast",
       "id": "routes_tradesync_storage",
       "community": 1,
@@ -327,7 +327,7 @@
       "label": "upload",
       "file_type": "code",
       "source_file": "apps/api/src/routes/tradeSync.ts",
-      "source_location": "L377",
+      "source_location": "L457",
       "_origin": "ast",
       "id": "routes_tradesync_upload",
       "community": 1,
@@ -337,7 +337,7 @@
       "label": "uploadMemory",
       "file_type": "code",
       "source_file": "apps/api/src/routes/tradeSync.ts",
-      "source_location": "L486",
+      "source_location": "L566",
       "_origin": "ast",
       "id": "routes_tradesync_uploadmemory",
       "community": 1,
@@ -347,7 +347,7 @@
       "label": "parseMT4Date()",
       "file_type": "code",
       "source_file": "apps/api/src/routes/tradeSync.ts",
-      "source_location": "L488",
+      "source_location": "L568",
       "_origin": "ast",
       "id": "routes_tradesync_parsemt4date",
       "community": 1,
@@ -357,7 +357,7 @@
       "label": "findHeaderMapping()",
       "file_type": "code",
       "source_file": "apps/api/src/routes/tradeSync.ts",
-      "source_location": "L516",
+      "source_location": "L596",
       "_origin": "ast",
       "id": "routes_tradesync_findheadermapping",
       "community": 1,
@@ -1267,7 +1267,7 @@
       "label": "DetailPanel()",
       "file_type": "code",
       "source_file": "apps/web/src/components/trades/DetailPanel.tsx",
-      "source_location": "L33",
+      "source_location": "L34",
       "_origin": "ast",
       "id": "trades_detailpanel_detailpanel",
       "community": 7,
@@ -1434,20 +1434,20 @@
       "norm_label": "tradestableprops"
     },
     {
-      "label": "DEFAULT_TAGS",
+      "label": "SYSTEM_TAGS",
       "file_type": "code",
       "source_file": "apps/web/src/components/trades/TradesTable.tsx",
       "source_location": "L54",
       "_origin": "ast",
-      "id": "trades_tradestable_default_tags",
+      "id": "trades_tradestable_system_tags",
       "community": 7,
-      "norm_label": "default_tags"
+      "norm_label": "system_tags"
     },
     {
       "label": "DEFAULT_EMOTIONS",
       "file_type": "code",
       "source_file": "apps/web/src/components/trades/TradesTable.tsx",
-      "source_location": "L73",
+      "source_location": "L56",
       "_origin": "ast",
       "id": "trades_tradestable_default_emotions",
       "community": 7,
@@ -1457,7 +1457,7 @@
       "label": "getJalaliDisplayDate()",
       "file_type": "code",
       "source_file": "apps/web/src/components/trades/TradesTable.tsx",
-      "source_location": "L81",
+      "source_location": "L64",
       "_origin": "ast",
       "id": "trades_tradestable_getjalalidisplaydate",
       "community": 7,
@@ -1467,7 +1467,7 @@
       "label": "getLocalDateStr()",
       "file_type": "code",
       "source_file": "apps/web/src/components/trades/TradesTable.tsx",
-      "source_location": "L97",
+      "source_location": "L80",
       "_origin": "ast",
       "id": "trades_tradestable_getlocaldatestr",
       "community": 7,
@@ -1477,7 +1477,7 @@
       "label": "TradesTable()",
       "file_type": "code",
       "source_file": "apps/web/src/components/trades/TradesTable.tsx",
-      "source_location": "L115",
+      "source_location": "L98",
       "_origin": "ast",
       "id": "trades_tradestable_tradestable",
       "community": 7,
@@ -6372,21 +6372,11 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "apps/web/src/components/trades/TradesTable.tsx",
-      "source_location": "L53",
+      "source_location": "L81",
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "trades_tradestable",
-      "target": "trades_tradestable_default_tags"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "apps/web/src/components/trades/TradesTable.tsx",
-      "source_location": "L81",
-      "weight": 1.0,
-      "source": "trades_tradestable",
-      "target": "trades_tradestable_getjalalidisplaydate",
-      "confidence_score": 1.0
+      "target": "trades_tradestable_getjalalidisplaydate"
     },
     {
       "relation": "contains",
@@ -6394,8 +6384,18 @@
       "source_file": "apps/web/src/components/trades/TradesTable.tsx",
       "source_location": "L97",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "trades_tradestable",
-      "target": "trades_tradestable_getlocaldatestr",
+      "target": "trades_tradestable_getlocaldatestr"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/components/trades/TradesTable.tsx",
+      "source_location": "L54",
+      "weight": 1.0,
+      "source": "trades_tradestable",
+      "target": "trades_tradestable_system_tags",
       "confidence_score": 1.0
     },
     {
@@ -6523,9 +6523,9 @@
       "source_file": "apps/web/src/components/trades/TradesTable.tsx",
       "source_location": "L93",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "trades_tradestable_getjalalidisplaydate",
-      "target": "utils_farsi_topersiandigits",
-      "confidence_score": 1.0
+      "target": "utils_farsi_topersiandigits"
     },
     {
       "relation": "calls",
@@ -6534,9 +6534,9 @@
       "source_file": "apps/web/src/components/trades/TradesTable.tsx",
       "source_location": "L546",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "trades_tradestable_tradestable",
-      "target": "trades_tradestable_getjalalidisplaydate",
-      "confidence_score": 1.0
+      "target": "trades_tradestable_getjalalidisplaydate"
     },
     {
       "relation": "calls",
@@ -8837,5 +8837,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "e16bb72c5afb2aa5094344ca46e7ad1a48a54fe6"
+  "built_at_commit": "d9270874f7c868feea88ae8c1e46ae683f515275"
 }

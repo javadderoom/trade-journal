@@ -51,24 +51,7 @@ interface TradesTableProps {
   onAccountIdChange?: (val: string) => void;
 }
 
-const DEFAULT_TAGS = [
-  'پرایس اکشن',
-  'شکست ساختار',
-  'برگشت از حمایت',
-  'برگشت از مقاومت',
-  'روند گیری',
-  'واگرایی',
-  'اسکالپ',
-  'سوئینگ',
-  'خبری',
-  'تله خرسی',
-  'تله گاوی',
-  'نقض قانون',
-  'مدیریت خوب',
-  'خروج زود',
-  'حجم اضافه',
-  'فرصت از دست رفته',
-];
+const SYSTEM_TAGS = ['فرصت از دست رفته', 'Missed'];
 
 const DEFAULT_EMOTIONS = [
   { value: 'CONFIDENT', label: 'با اطمینان' },
@@ -222,7 +205,42 @@ export default function TradesTable({
     return ['همه نمادها', ...Array.from(symbols)];
   }, [trades]);
 
-  const [allTags, setAllTags] = useState<string[]>(DEFAULT_TAGS);
+  const [allTags, setAllTags] = useState<string[]>(SYSTEM_TAGS);
+
+  // Fetch custom persistent tags from database on mount
+  useEffect(() => {
+    const fetchCustomTags = async () => {
+      try {
+        const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://127.0.0.1:3000';
+        const res = await fetch(`${baseUrl}/api/trades/tags`);
+        if (res.ok) {
+          const customTags = await res.json();
+          if (Array.isArray(customTags)) {
+            setAllTags(prev => {
+              const set = new Set([...prev, ...customTags]);
+              return Array.from(set);
+            });
+          }
+        }
+      } catch (err) {
+        console.error('Failed to fetch custom tags:', err);
+      }
+    };
+    fetchCustomTags();
+  }, []);
+
+  const handleAddCustomTag = async (newTag: string) => {
+    try {
+      const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://127.0.0.1:3000';
+      await fetch(`${baseUrl}/api/trades/tags`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: newTag }),
+      });
+    } catch (err) {
+      console.error('Failed to persist custom tag:', err);
+    }
+  };
 
   // Seed allTags from trades
   useEffect(() => {
@@ -535,31 +553,141 @@ export default function TradesTable({
           </div>
         </header>
 
-        {/* Date Filter Active Badge */}
-        {dateFilter && (
-          <div className="active-date-filter-badge-container animate-fade-in">
-            <span className="material-symbols-outlined badge-icon-calendar">calendar_month</span>
-            <span className="badge-text">
-              {filterDatesArray.length === 1 
-                ? `نمایش معاملات تاریخ: ${getJalaliDisplayDate(filterDatesArray[0])}` 
-                : `نمایش معاملات: ${toPersianDigits(filterDatesArray.length)} روز انتخاب شده`
-              }
-            </span>
-            <button 
-              onClick={() => {
-                setDateFilter(null);
-                setCurrentPage(1);
-                if (typeof window !== 'undefined') {
-                  const url = new URL(window.location.href);
-                  url.searchParams.delete('date');
-                  window.history.pushState({}, '', url.toString());
-                }
-              }}
-              className="badge-clear-btn"
-              title="پاک کردن فیلتر تاریخ"
-            >
-              <span className="material-symbols-outlined badge-icon-close">close</span>
-            </button>
+        {/* Active Filter Badges */}
+        {(dateFilter || searchQuery || selectedSymbol !== 'همه نمادها' || selectedDirection !== 'همه جهت‌ها' || selectedStatus !== 'ALL' || (selectedAccountId && selectedAccountId !== 'all')) && (
+          <div className="active-filters-container animate-fade-in">
+            {/* Date Filter */}
+            {dateFilter && (
+              <div className="active-filter-badge">
+                <span className="material-symbols-outlined badge-icon-lead">calendar_month</span>
+                <span className="badge-text">
+                  {filterDatesArray.length === 1 
+                    ? `تاریخ: ${getJalaliDisplayDate(filterDatesArray[0])}` 
+                    : `${toPersianDigits(filterDatesArray.length)} روز انتخاب شده`
+                  }
+                </span>
+                <button 
+                  onClick={() => {
+                    setDateFilter(null);
+                    setCurrentPage(1);
+                    if (typeof window !== 'undefined') {
+                      const url = new URL(window.location.href);
+                      url.searchParams.delete('date');
+                      window.history.pushState({}, '', url.toString());
+                    }
+                  }}
+                  className="badge-clear-btn"
+                  title="پاک کردن فیلتر تاریخ"
+                >
+                  <span className="material-symbols-outlined badge-icon-close">close</span>
+                </button>
+              </div>
+            )}
+
+            {/* Search Query Filter */}
+            {searchQuery && (
+              <div className="active-filter-badge">
+                <span className="material-symbols-outlined badge-icon-lead">search</span>
+                <span className="badge-text">
+                  {`جستجو: "${searchQuery}"`}
+                </span>
+                <button 
+                  onClick={() => {
+                    setSearchQuery('');
+                    setCurrentPage(1);
+                  }}
+                  className="badge-clear-btn"
+                  title="پاک کردن جستجو"
+                >
+                  <span className="material-symbols-outlined badge-icon-close">close</span>
+                </button>
+              </div>
+            )}
+
+            {/* Symbol Filter */}
+            {selectedSymbol !== 'همه نمادها' && (
+              <div className="active-filter-badge">
+                <span className="material-symbols-outlined badge-icon-lead">toll</span>
+                <span className="badge-text">
+                  {`نماد: ${selectedSymbol.startsWith('main:') ? `${selectedSymbol.substring(5)} (همه)` : selectedSymbol}`}
+                </span>
+                <button 
+                  onClick={() => {
+                    setSelectedSymbol('همه نمادها');
+                    setCurrentPage(1);
+                  }}
+                  className="badge-clear-btn"
+                  title="پاک کردن فیلتر نماد"
+                >
+                  <span className="material-symbols-outlined badge-icon-close">close</span>
+                </button>
+              </div>
+            )}
+
+            {/* Direction Filter */}
+            {selectedDirection !== 'همه جهت‌ها' && (
+              <div className="active-filter-badge">
+                <span className="material-symbols-outlined badge-icon-lead">swap_vert</span>
+                <span className="badge-text">
+                  {`جهت: ${selectedDirection === 'خرید (Buy)' ? 'خرید' : 'فروش'}`}
+                </span>
+                <button 
+                  onClick={() => {
+                    setSelectedDirection('همه جهت‌ها');
+                    setCurrentPage(1);
+                  }}
+                  className="badge-clear-btn"
+                  title="پاک کردن فیلتر جهت"
+                >
+                  <span className="material-symbols-outlined badge-icon-close">close</span>
+                </button>
+              </div>
+            )}
+
+            {/* Status Filter */}
+            {selectedStatus !== 'ALL' && (
+              <div className="active-filter-badge">
+                <span className="material-symbols-outlined badge-icon-lead">check_circle</span>
+                <span className="badge-text">
+                  {`وضعیت: ${selectedStatus === 'OPEN' ? 'باز' : selectedStatus === 'CLOSED' ? 'بسته' : 'فرصت سوخته'}`}
+                </span>
+                <button 
+                  onClick={() => {
+                    setSelectedStatus('ALL');
+                    setCurrentPage(1);
+                  }}
+                  className="badge-clear-btn"
+                  title="پاک کردن فیلتر وضعیت"
+                >
+                  <span className="material-symbols-outlined badge-icon-close">close</span>
+                </button>
+              </div>
+            )}
+
+            {/* Account Filter */}
+            {selectedAccountId && selectedAccountId !== 'all' && (
+              <div className="active-filter-badge">
+                <span className="material-symbols-outlined badge-icon-lead">account_balance_wallet</span>
+                <span className="badge-text">
+                  {`حساب: ${(() => {
+                    const acc = accounts.find(a => a.id === selectedAccountId);
+                    return acc ? `${acc.broker_name || 'MT5'} (${acc.account_number || acc.id})` : selectedAccountId;
+                  })()}`}
+                </span>
+                <button 
+                  onClick={() => {
+                    if (onAccountIdChange) {
+                      onAccountIdChange('all');
+                    }
+                    setCurrentPage(1);
+                  }}
+                  className="badge-clear-btn"
+                  title="پاک کردن فیلتر حساب"
+                >
+                  <span className="material-symbols-outlined badge-icon-close">close</span>
+                </button>
+              </div>
+            )}
           </div>
         )}
 
@@ -667,6 +795,7 @@ export default function TradesTable({
           allTags={allTags}
           setAllTags={setAllTags}
           allEmotions={allEmotions}
+          onAddCustomTag={handleAddCustomTag}
           setAllEmotions={setAllEmotions}
           isUploading={isUploading}
           setLightboxUrl={setLightboxUrl}

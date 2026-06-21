@@ -23,6 +23,7 @@ model User {
   subscriptions  Subscription[]
   trades         Trade[]
   importJobs     ImportJob[]
+  tags           Tag[]
 }
 
 model Account {
@@ -102,6 +103,16 @@ model Subscription {
   start_date DateTime
   end_date   DateTime?
   created_at DateTime           @default(now())
+}
+
+model Tag {
+  id         String   @id @default(uuid())
+  user_id    String
+  user       User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  name       String
+  created_at DateTime @default(now())
+
+  @@unique([user_id, name])
 }
 
 // --- Enums ---

@@ -28,6 +28,7 @@ interface DetailPanelProps {
   selectedTimezone: string;
   usdToToman: number;
   accounts?: any[];
+  onAddCustomTag?: (newTag: string) => void;
 }
 
 export default function DetailPanel({
@@ -47,6 +48,7 @@ export default function DetailPanel({
   selectedTimezone,
   usdToToman,
   accounts = [],
+  onAddCustomTag,
 }: DetailPanelProps) {
   const [activeTab, setActiveTab] = useState<'stats' | 'journal'>('stats');
   const [isAddingTag, setIsAddingTag] = useState(false);
@@ -297,6 +299,7 @@ export default function DetailPanel({
                             updateActiveTradeField('tags', [...currentTags, val]);
                           }
                           setAllTags(prev => prev.includes(val) ? prev : [...prev, val]);
+                          onAddCustomTag?.(val);
                         }
                         setIsAddingTag(false);
                       } else if (e.key === 'Escape') {
