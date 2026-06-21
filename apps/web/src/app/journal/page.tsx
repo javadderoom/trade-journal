@@ -379,12 +379,12 @@ export default function JournalPage() {
   const equityChartData = useMemo(() => {
     if (equityPoints.length === 0) return null;
 
-    const width = 600;
+    const width = 1000;
     const height = 260;
     const paddingLeft = 70;
-    const paddingRight = 20;
+    const paddingRight = 30;
     const paddingTop = 30;
-    const paddingBottom = 30;
+    const paddingBottom = 40;
 
     const graphWidth = width - paddingLeft - paddingRight;
     const graphHeight = height - paddingTop - paddingBottom;
@@ -443,7 +443,13 @@ export default function JournalPage() {
       xTicks,
       zeroY,
       minY,
-      maxY
+      maxY,
+      width,
+      height,
+      paddingLeft,
+      paddingRight,
+      paddingTop,
+      paddingBottom
     };
   }, [equityPoints]);
 
@@ -1137,7 +1143,7 @@ export default function JournalPage() {
             
             <div className="chart-wrapper">
               {equityChartData ? (
-                <svg viewBox="0 0 600 260" width="100%" height="100%" className="svg-chart">
+                <svg viewBox={`0 0 ${equityChartData.width} ${equityChartData.height}`} width="100%" height="100%" className="svg-chart">
                   <defs>
                     <linearGradient id="equity-gradient" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="0%" stopColor="#61f9b1" stopOpacity="0.3"/>
@@ -1149,9 +1155,9 @@ export default function JournalPage() {
                   {equityChartData.yTicks.map((tick, i) => (
                     <line 
                       key={i} 
-                      x1="70" 
+                      x1={equityChartData.paddingLeft} 
                       y1={tick.y} 
-                      x2="580" 
+                      x2={equityChartData.width - equityChartData.paddingRight} 
                       y2={tick.y} 
                       className="grid-line" 
                     />
@@ -1161,7 +1167,7 @@ export default function JournalPage() {
                   {equityChartData.yTicks.map((tick, i) => (
                     <text 
                       key={i} 
-                      x="60" 
+                      x={equityChartData.paddingLeft - 10} 
                       y={tick.y + 4} 
                       className="axis-label axis-label-y"
                     >
@@ -1172,9 +1178,9 @@ export default function JournalPage() {
                   {/* Zero Baseline */}
                   {equityChartData.zeroY !== null && (
                     <line 
-                      x1="70" 
+                      x1={equityChartData.paddingLeft} 
                       y1={equityChartData.zeroY} 
-                      x2="580" 
+                      x2={equityChartData.width - equityChartData.paddingRight} 
                       y2={equityChartData.zeroY} 
                       className="zero-baseline" 
                     />
@@ -1208,14 +1214,14 @@ export default function JournalPage() {
                     <g key={i}>
                       <line 
                         x1={tick.x} 
-                        y1="230" 
+                        y1={equityChartData.height - equityChartData.paddingBottom} 
                         x2={tick.x} 
-                        y2="234" 
+                        y2={equityChartData.height - equityChartData.paddingBottom + 4} 
                         className="axis-line" 
                       />
                       <text 
                         x={tick.x} 
-                        y="246" 
+                        y={equityChartData.height - equityChartData.paddingBottom + 16} 
                         className="axis-label"
                       >
                         {toPersianDigits(tick.label)}
@@ -1224,7 +1230,13 @@ export default function JournalPage() {
                   ))}
                   
                   {/* Bottom axis line */}
-                  <line x1="70" y1="230" x2="580" y2="230" className="axis-line" />
+                  <line 
+                    x1={equityChartData.paddingLeft} 
+                    y1={equityChartData.height - equityChartData.paddingBottom} 
+                    x2={equityChartData.width - equityChartData.paddingRight} 
+                    y2={equityChartData.height - equityChartData.paddingBottom} 
+                    className="axis-line" 
+                  />
                 </svg>
               ) : (
                 <div style={{ color: '#bbcabe', fontSize: '13px' }}>اطلاعات کافی برای ترسیم وجود ندارد.</div>
@@ -1318,14 +1330,6 @@ export default function JournalPage() {
                 <span className="calendar-title-month">
                   تقویم معاملاتی ماه {jalaliCalendarData.monthName} ({toPersianDigits(jalaliCalendarData.year)})
                 </span>
-                <div className="calendar-legend">
-                  <span>راهنما:</span>
-                  <div className="legend-box empty" title="بدون معامله" />
-                  <div className="legend-box loss-light" title="زیان کم" />
-                  <div className="legend-box loss-dark" title="زیان زیاد" />
-                  <div className="legend-box profit-light" title="سود کم" />
-                  <div className="legend-box profit-dark" title="سود زیاد" />
-                </div>
               </div>
 
               <div className="calendar-grid-wrapper">
@@ -1354,7 +1358,7 @@ export default function JournalPage() {
 تعداد معاملات: ${toPersianDigits(day.count)}
 سود ناخالص: ${toPersianDigits(day.winners.toString())} معامله برد
 زیان ناخالص: ${toPersianDigits(day.losers.toString())} معامله باخت
-سود و زیان خالص: ${day.netPnl >= 0 ? '+' : ''}$${toPersianDigits(day.netPnl.toFixed(2))}`
+سود و زیان خالص: ${day.netPnl >= 0 ? '+' : '-'}$${toPersianDigits(Math.abs(day.netPnl).toFixed(2))}`
                       : `تاریخ: ${toPersianDigits(day.dateStr)}\nبدون معامله ثبت شده`;
 
                     return (
@@ -1366,12 +1370,36 @@ export default function JournalPage() {
                         <span className="cell-day-num">{toPersianDigits(day.jDay)}</span>
                         {day.count > 0 && (
                           <span className="cell-pnl-val">
-                            {day.netPnl >= 0 ? '+' : ''}${toPersianDigits(Math.round(day.netPnl).toString())}
+                            {day.netPnl >= 0 ? '+' : '-'}${toPersianDigits(Math.abs(Math.round(day.netPnl)).toString())}
                           </span>
                         )}
                       </div>
                     );
                   })}
+                </div>
+              </div>
+
+              {/* Labeled Calendar Legend */}
+              <div className="calendar-legend-bottom">
+                <div className="legend-item">
+                  <div className="legend-box empty" />
+                  <span>بدون معامله</span>
+                </div>
+                <div className="legend-item">
+                  <div className="legend-box loss-light" />
+                  <span>ضرر جزئی</span>
+                </div>
+                <div className="legend-item">
+                  <div className="legend-box loss-dark" />
+                  <span>ضرر سنگین</span>
+                </div>
+                <div className="legend-item">
+                  <div className="legend-box profit-light" />
+                  <span>سود جزئی</span>
+                </div>
+                <div className="legend-item">
+                  <div className="legend-box profit-dark" />
+                  <span>سود سنگین</span>
                 </div>
               </div>
             </div>

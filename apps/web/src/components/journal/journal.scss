@@ -712,6 +712,15 @@
 .journal-card--full-width {
   grid-column: 1 / -1;
   min-height: 360px;
+
+  .chart-wrapper {
+    min-height: 280px;
+    height: 280px;
+  }
+
+  .svg-chart {
+    max-height: 280px;
+  }
 }
 
 // Chart wrappers
@@ -824,32 +833,16 @@
     font-weight: 700;
     color: $primary;
   }
-
-  .calendar-legend {
-    display: flex;
-    gap: 8px;
-    align-items: center;
-    font-size: 11px;
-    color: $on-surface-variant;
-
-    .legend-box {
-      width: 12px;
-      height: 12px;
-      border-radius: 3px;
-
-      &.empty { background: rgba($surface-container-low, 0.4); border: 1px solid rgba($outline-variant, 0.15); }
-      &.profit-light { background: rgba($primary, 0.2); }
-      &.profit-dark { background: $primary; }
-      &.loss-light { background: rgba($error, 0.2); }
-      &.loss-dark { background: $error; }
-    }
-  }
 }
 
 .calendar-grid-wrapper {
   width: 100%;
-  max-width: 320px;
+  max-width: 480px;
   margin: 0 auto;
+
+  @media (max-width: 480px) {
+    max-width: 320px;
+  }
 }
 
 .calendar-weekdays-grid {
@@ -892,6 +885,10 @@
     font-weight: 700;
     color: $on-surface;
     align-self: flex-start;
+
+    @media (min-width: 768px) {
+      font-size: 12px;
+    }
   }
 
   .cell-pnl-val {
@@ -900,6 +897,10 @@
     align-self: center;
     direction: ltr;
     margin-bottom: 1px;
+
+    @media (min-width: 768px) {
+      font-size: 11px;
+    }
   }
 
   // Styles for empty/placeholder classes
@@ -958,6 +959,41 @@
     border: 1px solid rgba($error, 0.8);
     .cell-day-num { color: $on-error; }
     .cell-pnl-val { color: $on-error; }
+  }
+}
+
+// Labeled Legend below Calendar
+.calendar-legend-bottom {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 12px 20px;
+  margin-top: 20px;
+  border-top: 1px solid rgba($outline-variant, 0.2);
+  padding-top: 16px;
+  font-size: 11px;
+  color: $on-surface-variant;
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    .legend-box {
+      width: 12px;
+      height: 12px;
+      border-radius: 3px;
+
+      &.empty { background: rgba($surface-container-low, 0.4); border: 1px solid rgba($outline-variant, 0.15); }
+      &.profit-light { background: rgba($primary, 0.2); border: 1px solid rgba($primary, 0.25); }
+      &.profit-dark { background: $primary; }
+      &.loss-light { background: rgba($error, 0.2); border: 1px solid rgba($error, 0.25); }
+      &.loss-dark { background: $error; }
+    }
+
+    span {
+      font-weight: 500;
+    }
   }
 }
 

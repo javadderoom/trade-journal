@@ -50,8 +50,8 @@
     "semantic_hash": ""
   },
   "apps/web/package.json": {
-    "mtime": 1781984141.7653995,
-    "ast_hash": "6fb0fa8ad6ce884bd5874aa2d07f0f6f",
+    "mtime": 1782045230.4878623,
+    "ast_hash": "c7ffe2d3f129e2dbe3e73f6c95253e00",
     "semantic_hash": ""
   },
   "apps/web/src/app/api/exchange-rate/route.ts": {
@@ -305,8 +305,8 @@
     "semantic_hash": ""
   },
   "apps/web/src/app/journal/page.tsx": {
-    "mtime": 1781986399.1302612,
-    "ast_hash": "f12128ed669007cc6098df0de65c4bb8",
+    "mtime": 1782045661.532755,
+    "ast_hash": "6fa79c50048d33109383dca6e341a92a",
     "semantic_hash": ""
   },
   "apps/web/public/logo.png": {

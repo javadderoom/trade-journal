@@ -1,16 +1,16 @@
 # Graph Report - trade-journal  (2026-06-21)
 
 ## Corpus Check
-- 53 files · ~252,254 words
+- 53 files · ~252,248 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 375 nodes · 457 edges · 33 communities (29 shown, 4 thin omitted)
+- 372 nodes · 454 edges · 33 communities (29 shown, 4 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `a064d4c8`
+- Built from commit: `91299248`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -89,8 +89,8 @@ Cohesion: 0.08
 Nodes (25): dependencies, csv-parser, depd, express, multer, node-html-parser, pg, prisma (+17 more)
 
 ### Community 3 - "Community 3"
-Cohesion: 0.10
-Nodes (20): dependencies, @chakra-ui/react, @emotion/react, @emotion/styled, lightweight-charts, next, react, react-dom (+12 more)
+Cohesion: 0.11
+Nodes (17): dependencies, lightweight-charts, next, react, react-dom, sass, zustand, devDependencies (+9 more)
 
 ### Community 4 - "Community 4"
 Cohesion: 0.11
@@ -185,7 +185,7 @@ Cohesion: 0.17
 Nodes (11): ImportMT4Modal(), ImportMT4ModalProps, ManualTradeModal(), ManualTradeModalProps, AppState, TradingAccount, useAppStore, useTradeStore (+3 more)
 
 ## Knowledge Gaps
-- **241 isolated node(s):** `name`, `version`, `private`, `dev`, `build` (+236 more)
+- **238 isolated node(s):** `name`, `version`, `private`, `dev`, `build` (+233 more)
   These have ≤1 connection - possible missing edges or undocumented components.
 - **4 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
@@ -193,11 +193,11 @@ Nodes (11): ImportMT4Modal(), ImportMT4ModalProps, ManualTradeModal(), ManualTra
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `Design Engineering` connect `Community 19` to `Community 12`, `Community 22`, `Community 24`, `Community 25`, `Community 26`, `Community 27`, `Community 28`, `Community 29`, `Community 30`, `Community 31`?**
-  _High betweenness centrality (0.026) - this node is a cross-community bridge._
+  _High betweenness centrality (0.027) - this node is a cross-community bridge._
 - **Why does `Component Building Principles` connect `Community 25` to `Community 19`?**
   _High betweenness centrality (0.006) - this node is a cross-community bridge._
 - **What connects `name`, `version`, `private` to the rest of the system?**
-  _241 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _238 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Community 0` be split into smaller, more focused modules?**
   _Cohesion score 0.05714285714285714 - nodes in this community are weakly interconnected._
 - **Should `Community 1` be split into smaller, more focused modules?**
@@ -205,4 +205,4 @@ _Questions this graph is uniquely positioned to answer:_
 - **Should `Community 2` be split into smaller, more focused modules?**
   _Cohesion score 0.07692307692307693 - nodes in this community are weakly interconnected._
 - **Should `Community 3` be split into smaller, more focused modules?**
-  _Cohesion score 0.09523809523809523 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.1111111111111111 - nodes in this community are weakly interconnected._

@@ -754,40 +754,10 @@
       "norm_label": "dependencies"
     },
     {
-      "label": "@chakra-ui/react",
-      "file_type": "code",
-      "source_file": "apps/web/package.json",
-      "source_location": "L11",
-      "_origin": "ast",
-      "id": "web_package_dependencies_chakra_ui_react",
-      "community": 3,
-      "norm_label": "@chakra-ui/react"
-    },
-    {
-      "label": "@emotion/react",
-      "file_type": "code",
-      "source_file": "apps/web/package.json",
-      "source_location": "L12",
-      "_origin": "ast",
-      "id": "web_package_dependencies_emotion_react",
-      "community": 3,
-      "norm_label": "@emotion/react"
-    },
-    {
-      "label": "@emotion/styled",
-      "file_type": "code",
-      "source_file": "apps/web/package.json",
-      "source_location": "L13",
-      "_origin": "ast",
-      "id": "web_package_dependencies_emotion_styled",
-      "community": 3,
-      "norm_label": "@emotion/styled"
-    },
-    {
       "label": "lightweight-charts",
       "file_type": "code",
       "source_file": "apps/web/package.json",
-      "source_location": "L14",
+      "source_location": "L11",
       "_origin": "ast",
       "id": "web_package_dependencies_lightweight_charts",
       "community": 3,
@@ -797,7 +767,7 @@
       "label": "next",
       "file_type": "code",
       "source_file": "apps/web/package.json",
-      "source_location": "L15",
+      "source_location": "L12",
       "_origin": "ast",
       "id": "web_package_dependencies_next",
       "community": 3,
@@ -807,7 +777,7 @@
       "label": "react",
       "file_type": "code",
       "source_file": "apps/web/package.json",
-      "source_location": "L16",
+      "source_location": "L13",
       "_origin": "ast",
       "id": "web_package_dependencies_react",
       "community": 3,
@@ -817,7 +787,7 @@
       "label": "react-dom",
       "file_type": "code",
       "source_file": "apps/web/package.json",
-      "source_location": "L17",
+      "source_location": "L14",
       "_origin": "ast",
       "id": "web_package_dependencies_react_dom",
       "community": 3,
@@ -827,7 +797,7 @@
       "label": "sass",
       "file_type": "code",
       "source_file": "apps/web/package.json",
-      "source_location": "L18",
+      "source_location": "L15",
       "_origin": "ast",
       "id": "web_package_dependencies_sass",
       "community": 3,
@@ -837,7 +807,7 @@
       "label": "zustand",
       "file_type": "code",
       "source_file": "apps/web/package.json",
-      "source_location": "L19",
+      "source_location": "L16",
       "_origin": "ast",
       "id": "web_package_dependencies_zustand",
       "community": 3,
@@ -847,7 +817,7 @@
       "label": "devDependencies",
       "file_type": "code",
       "source_file": "apps/web/package.json",
-      "source_location": "L21",
+      "source_location": "L18",
       "_origin": "ast",
       "id": "web_package_devdependencies",
       "community": 3,
@@ -857,7 +827,7 @@
       "label": "@types/node",
       "file_type": "code",
       "source_file": "apps/web/package.json",
-      "source_location": "L22",
+      "source_location": "L19",
       "_origin": "ast",
       "id": "web_package_devdependencies_types_node",
       "community": 3,
@@ -867,7 +837,7 @@
       "label": "@types/react",
       "file_type": "code",
       "source_file": "apps/web/package.json",
-      "source_location": "L23",
+      "source_location": "L20",
       "_origin": "ast",
       "id": "web_package_devdependencies_types_react",
       "community": 3,
@@ -4612,36 +4582,6 @@
       "confidence_score": 1.0,
       "source": "web_package_scripts",
       "target": "web_package_scripts_start"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "apps/web/package.json",
-      "source_location": "L11",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "web_package_dependencies",
-      "target": "web_package_dependencies_chakra_ui_react"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "apps/web/package.json",
-      "source_location": "L12",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "web_package_dependencies",
-      "target": "web_package_dependencies_emotion_react"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "apps/web/package.json",
-      "source_location": "L13",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "web_package_dependencies",
-      "target": "web_package_dependencies_emotion_styled"
     },
     {
       "relation": "contains",
@@ -8453,5 +8393,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "a064d4c8ece64757e01a7141fb5a9251f4c04630"
+  "built_at_commit": "91299248175f85ed2a7a0ab7ac07d328f324b78b"
 }
