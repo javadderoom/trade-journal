@@ -3,6 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import Image from 'next/image';
 
 export default function SideNavBar() {
   const pathname = usePathname();
@@ -22,7 +23,14 @@ export default function SideNavBar() {
         {/* Header */}
         <div className="sidenav-header">
           <div className="logo-box">
-            <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>ssid_chart</span>
+            <Image
+              src="/logo.png"
+              alt="معامله‌یار"
+              width={40}
+              height={40}
+              className="logo-img"
+              priority
+            />
           </div>
           <div className="title-group">
             <span className="title-text">پنل معامله‌گر</span>

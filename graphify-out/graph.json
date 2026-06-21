@@ -1047,7 +1047,7 @@
       "label": "SideNavBar()",
       "file_type": "code",
       "source_file": "apps/web/src/components/layout/SideNavBar.tsx",
-      "source_location": "L7",
+      "source_location": "L8",
       "_origin": "ast",
       "id": "layout_sidenavbar_sidenavbar",
       "community": 14,
@@ -4749,9 +4749,9 @@
       "source_file": "apps/web/src/app/journal/page.tsx",
       "source_location": "L23",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "journal_page",
-      "target": "journal_page_jalali_month_names",
-      "confidence_score": 1.0
+      "target": "journal_page_jalali_month_names"
     },
     {
       "relation": "contains",
@@ -4779,9 +4779,9 @@
       "source_file": "apps/web/src/app/journal/page.tsx",
       "source_location": "L27",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "journal_page",
-      "target": "journal_page_weekday_names_calendar",
-      "confidence_score": 1.0
+      "target": "journal_page_weekday_names_calendar"
     },
     {
       "relation": "imports_from",
@@ -8453,5 +8453,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "9c64a57598134c6275fca74293f53300bad5b84f"
+  "built_at_commit": "a064d4c8ece64757e01a7141fb5a9251f4c04630"
 }

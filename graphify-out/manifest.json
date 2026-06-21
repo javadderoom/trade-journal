@@ -235,8 +235,8 @@
     "semantic_hash": ""
   },
   "apps/web/src/components/layout/SideNavBar.tsx": {
-    "mtime": 1781982992.3377256,
-    "ast_hash": "3cd769df00beaf6e2d704b64dc911e4e",
+    "mtime": 1781994903.801638,
+    "ast_hash": "305f43f68ef2a9e7fc07411479dd6aa8",
     "semantic_hash": ""
   },
   "apps/web/src/components/modals/ImportMT4Modal.tsx": {
@@ -307,6 +307,11 @@
   "apps/web/src/app/journal/page.tsx": {
     "mtime": 1781986399.1302612,
     "ast_hash": "f12128ed669007cc6098df0de65c4bb8",
+    "semantic_hash": ""
+  },
+  "apps/web/public/logo.png": {
+    "mtime": 1781994827.5169787,
+    "ast_hash": "d517b5a4dd4acb021ea07e3c07b03c3e",
     "semantic_hash": ""
   }
 }
