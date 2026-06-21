@@ -8,6 +8,7 @@ import { toPersianDigits, formatPersianCurrency, formatToman } from '../../utils
 import { getTradingSession, getMainPair, getEmotionEmoji } from '../../utils/tradeHelpers';
 import '../../components/journal/journal.scss';
 import EquityChart from '../../components/journal/EquityChart';
+import WeekdayPnlChart from '../../components/journal/WeekdayPnlChart';
 
 // Emotions helper mapping
 const EMOTION_MAP: { [key: string]: { label: string; emoji: string } } = {
@@ -355,97 +356,7 @@ export default function JournalPage() {
       .sort((a, b) => new Date(a.closeTime!).getTime() - new Date(b.closeTime!).getTime());
   }, [trades]);
 
-  const dailyPnlData = useMemo(() => {
-    const dailyMap: { [key: string]: number } = {};
 
-    sortedClosedTrades.forEach((t) => {
-      const net = t.profitUsd + (t.commission ?? 0) + (t.swap ?? 0);
-      let dateStr = '';
-      try {
-        const formatter = new Intl.DateTimeFormat('en-US', {
-          timeZone: 'Asia/Tehran',
-          year: 'numeric',
-          month: '2-digit',
-          day: '2-digit',
-        });
-        const parts = formatter.format(new Date(t.closeTime!)).split('/');
-        dateStr = `${parts[2]}-${parts[0]}-${parts[1]}`;
-      } catch {
-        dateStr = t.closeTime!.substring(0, 10);
-      }
-      dailyMap[dateStr] = (dailyMap[dateStr] || 0) + net;
-    });
-
-    const list = Object.keys(dailyMap).map((date) => {
-      let datePersian = date;
-      try {
-        const gDate = new Date(date);
-        datePersian = new Intl.DateTimeFormat('fa-IR', { month: 'numeric', day: 'numeric' }).format(gDate);
-      } catch {}
-
-      return {
-        date,
-        datePersian,
-        pnl: dailyMap[date]
-      };
-    }).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-
-    const last15 = list.slice(-15);
-
-    if (last15.length === 0) return null;
-
-    const width = 600;
-    const height = 220;
-    const paddingLeft = 70;
-    const paddingRight = 20;
-    const paddingTop = 20;
-    const paddingBottom = 30;
-
-    const graphWidth = width - paddingLeft - paddingRight;
-    const graphHeight = height - paddingTop - paddingBottom;
-
-    const maxAbsVal = Math.max(...last15.map((d) => Math.abs(d.pnl)), 50);
-    const zeroY = paddingTop + graphHeight / 2;
-
-    const barCount = last15.length;
-    const spacing = graphWidth / barCount;
-    const barWidth = Math.max(spacing * 0.5, 8);
-
-    const bars = last15.map((d, i) => {
-      const x = paddingLeft + i * spacing + (spacing - barWidth) / 2;
-      const barHeight = (Math.abs(d.pnl) / maxAbsVal) * (graphHeight / 2);
-      const y = d.pnl >= 0 ? zeroY - barHeight : zeroY;
-      return {
-        x,
-        y,
-        width: barWidth,
-        height: barHeight,
-        pnl: d.pnl,
-        date: d.date,
-        datePersian: d.datePersian,
-      };
-    });
-
-    const yTicks = [
-      { val: maxAbsVal, y: zeroY - graphHeight / 2 },
-      { val: 0, y: zeroY },
-      { val: -maxAbsVal, y: zeroY + graphHeight / 2 }
-    ];
-
-    return {
-      bars,
-      zeroY,
-      yTicks,
-      width,
-      height,
-      paddingLeft,
-      paddingRight,
-      paddingTop,
-      paddingBottom,
-      graphWidth,
-      graphHeight
-    };
-  }, [sortedClosedTrades]);
 
   const jalaliCalendarData = useMemo(() => {
     const today = new Date();
@@ -1053,82 +964,14 @@ export default function JournalPage() {
           </div>
 
           <div className="patterns-split-row">
-            {/* 2. Daily P&L Bar Chart */}
+            {/* 2. Weekday P&L Bar Chart */}
             <div className="journal-card">
               <div className="card-header">
-                <span className="card-title">سود و زیان روزانه (۱۵ روز معاملاتی اخیر)</span>
+                <span className="card-title">سود و زیان به تفکیک روزهای هفته</span>
                 <span className="material-symbols-outlined card-icon">bar_chart</span>
               </div>
               <div className="chart-wrapper">
-                {dailyPnlData ? (
-                  <svg viewBox="0 0 600 220" width="100%" height="100%" className="svg-chart">
-                    {/* Grid Lines */}
-                    {dailyPnlData.yTicks.map((tick, i) => (
-                      <line 
-                        key={i} 
-                        x1="70" 
-                        y1={tick.y} 
-                        x2="580" 
-                        y2={tick.y} 
-                        className="grid-line" 
-                      />
-                    ))}
-                    
-                    {/* Y Axis Labels */}
-                    {dailyPnlData.yTicks.map((tick, i) => (
-                      <text 
-                        key={i} 
-                        x="60" 
-                        y={tick.y + 4} 
-                        className="axis-label axis-label-y"
-                      >
-                        {tick.val >= 0 ? '+' : ''}${toPersianDigits(Math.round(tick.val).toString())}
-                      </text>
-                    ))}
-
-                    {/* Zero baseline */}
-                    <line 
-                      x1="70" 
-                      y1={dailyPnlData.zeroY} 
-                      x2="580" 
-                      y2={dailyPnlData.zeroY} 
-                      className="axis-line" 
-                      style={{ strokeWidth: 1.5 }}
-                    />
-                    
-                    {/* Bars */}
-                    {dailyPnlData.bars.map((bar, i) => (
-                      <rect 
-                        key={i}
-                        x={bar.x}
-                        y={bar.y}
-                        width={bar.width}
-                        height={bar.height}
-                        rx="2"
-                        className={`chart-bar ${bar.pnl >= 0 ? 'bar-profit' : 'bar-loss'}`}
-                      >
-                        <title>{`تاریخ: ${toPersianDigits(bar.date)} | سود/زیان: ${bar.pnl >= 0 ? '+' : ''}${toPersianDigits(bar.pnl.toFixed(2))}$`}</title>
-                      </rect>
-                    ))}
-
-                    {/* X Axis Labels */}
-                    {dailyPnlData.bars.map((bar, i) => (
-                      (dailyPnlData.bars.length <= 8 || i % 2 === 0) && (
-                        <text 
-                          key={i} 
-                          x={bar.x + bar.width / 2} 
-                          y="210" 
-                          className="axis-label"
-                          style={{ fontSize: '9px' }}
-                        >
-                          {toPersianDigits(bar.datePersian)}
-                        </text>
-                      )
-                    ))}
-                  </svg>
-                ) : (
-                  <div style={{ color: '#bbcabe', fontSize: '13px' }}>اطلاعات کافی برای ترسیم وجود ندارد.</div>
-                )}
+                <WeekdayPnlChart closedTrades={sortedClosedTrades} />
               </div>
             </div>
 

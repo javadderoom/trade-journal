@@ -1,16 +1,16 @@
 # Graph Report - trade-journal  (2026-06-21)
 
 ## Corpus Check
-- 54 files · ~252,201 words
+- 55 files · ~252,444 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 376 nodes · 461 edges · 33 communities (29 shown, 4 thin omitted)
+- 380 nodes · 468 edges · 26 communities (22 shown, 4 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `10641711`
+- Built from commit: `3db8c6bc`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -37,18 +37,11 @@
 - [[_COMMUNITY_Community 20|Community 20]]
 - [[_COMMUNITY_Community 21|Community 21]]
 - [[_COMMUNITY_Community 22|Community 22]]
-- [[_COMMUNITY_Community 24|Community 24]]
 - [[_COMMUNITY_Community 25|Community 25]]
-- [[_COMMUNITY_Community 26|Community 26]]
-- [[_COMMUNITY_Community 27|Community 27]]
-- [[_COMMUNITY_Community 28|Community 28]]
-- [[_COMMUNITY_Community 29|Community 29]]
-- [[_COMMUNITY_Community 30|Community 30]]
-- [[_COMMUNITY_Community 31|Community 31]]
 - [[_COMMUNITY_Community 32|Community 32]]
 
 ## God Nodes (most connected - your core abstractions)
-1. `toPersianDigits()` - 16 edges
+1. `toPersianDigits()` - 18 edges
 2. `Design Engineering` - 16 edges
 3. `compilerOptions` - 15 edges
 4. `معامله‌یار — Persian Trading Journal Platform` - 13 edges
@@ -60,21 +53,21 @@
 10. `Component Building Principles` - 8 edges
 
 ## Surprising Connections (you probably didn't know these)
-- `JournalPage()` --calls--> `useAppStore`  [EXTRACTED]
-  apps/web/src/app/journal/page.tsx → apps/web/src/store/useAppStore.ts
-- `JournalPage()` --calls--> `useTradeStore`  [EXTRACTED]
-  apps/web/src/app/journal/page.tsx → apps/web/src/store/useTradeStore.ts
+- `JournalPage()` --calls--> `formatToman()`  [EXTRACTED]
+  apps/web/src/app/journal/page.tsx → apps/web/src/utils/farsi.ts
+- `JournalPage()` --calls--> `toPersianDigits()`  [EXTRACTED]
+  apps/web/src/app/journal/page.tsx → apps/web/src/utils/farsi.ts
+- `WeekdayPnlChart()` --calls--> `toPersianDigits()`  [EXTRACTED]
+  apps/web/src/components/journal/WeekdayPnlChart.tsx → apps/web/src/utils/farsi.ts
 - `DesktopTableProps` --references--> `Trade`  [EXTRACTED]
   apps/web/src/components/trades/DesktopTable.tsx → apps/web/src/components/trades/TradesTable.tsx
 - `DetailPanelProps` --references--> `Trade`  [EXTRACTED]
   apps/web/src/components/trades/DetailPanel.tsx → apps/web/src/components/trades/TradesTable.tsx
-- `MobileCardsListProps` --references--> `Trade`  [EXTRACTED]
-  apps/web/src/components/trades/MobileCardsList.tsx → apps/web/src/components/trades/TradesTable.tsx
 
 ## Import Cycles
 - None detected.
 
-## Communities (33 total, 4 thin omitted)
+## Communities (26 total, 4 thin omitted)
 
 ### Community 0 - "Community 0"
 Cohesion: 0.06
@@ -105,8 +98,8 @@ Cohesion: 0.13
 Nodes (14): API Progress — معامله‌یار, Database Schema (`src/prisma/schema.prisma`), ✅ Done, Express Server (`src/server.ts`), File Upload & Screenshots Middleware, High Priority, Low Priority, Medium Priority (+6 more)
 
 ### Community 7 - "Community 7"
-Cohesion: 0.11
-Nodes (35): EquityChart(), EquityChartProps, Trade, EMOTION_MAP, JALALI_MONTH_NAMES, JournalPage(), WEEKDAY_NAMES, WEEKDAY_NAMES_CALENDAR (+27 more)
+Cohesion: 0.10
+Nodes (37): EquityChart(), EquityChartProps, Trade, EMOTION_MAP, JALALI_MONTH_NAMES, WEEKDAY_NAMES, WEEKDAY_NAMES_CALENDAR, Trade (+29 more)
 
 ### Community 8 - "Community 8"
 Cohesion: 0.12
@@ -133,8 +126,8 @@ Cohesion: 0.29
 Nodes (6): File, How it works, JSON payload format, MT5 Expert Advisor — Trade Sync, Notes, Setup
 
 ### Community 19 - "Community 19"
-Cohesion: 0.22
-Nodes (8): Accessibility, Design Engineering, Initial Response, prefers-reduced-motion, Review Checklist, Review Format (Required), Stagger Animations, Touch device hover states
+Cohesion: 0.05
+Nodes (43): 3D transforms for depth, Accessibility, Asymmetric enter/exit timing, Beauty is leverage, clip-path for Animation, Cohesion matters, Comparison sliders, Core Philosophy (+35 more)
 
 ### Community 20 - "Community 20"
 Cohesion: 0.32
@@ -148,56 +141,28 @@ Nodes (6): compilerOptions, outDir, rootDir, types, extends, include
 Cohesion: 0.33
 Nodes (6): CSS animations beat JS under load, CSS variables are inheritable, Framer Motion hardware acceleration caveat, Only animate transform and opacity, Performance Rules, Use WAAPI for programmatic CSS animations
 
-### Community 24 - "Community 24"
-Cohesion: 0.33
-Nodes (6): Damping at boundaries, Friction instead of hard stops, Gesture and Drag Interactions, Momentum-based dismissal, Multi-touch protection, Pointer capture for drag
-
 ### Community 25 - "Community 25"
 Cohesion: 0.25
 Nodes (8): Animate enter states with @starting-style, Buttons must feel responsive, Component Building Principles, Make popovers origin-aware, Never animate from scale(0), Tooltips: skip delay on subsequent hovers, Use blur to mask imperfect transitions, Use CSS transitions over keyframes for interruptible UI
 
-### Community 26 - "Community 26"
-Cohesion: 0.33
-Nodes (6): clip-path for Animation, Comparison sliders, Hold-to-delete pattern, Image reveals on scroll, Tabs with perfect color transitions, The inset shape
-
-### Community 27 - "Community 27"
-Cohesion: 0.40
-Nodes (5): 3D transforms for depth, CSS Transform Mastery, scale() scales children too, transform-origin, translateY with percentages
-
-### Community 28 - "Community 28"
-Cohesion: 0.40
-Nodes (5): Asymmetric enter/exit timing, Cohesion matters, Review your work the next day, The opacity + height combination, The Sonner Principles (Building Loved Components)
-
-### Community 29 - "Community 29"
-Cohesion: 0.40
-Nodes (5): Interruptibility advantage, Spring Animations, Spring-based mouse interactions, Spring configuration, When to use springs
-
-### Community 30 - "Community 30"
-Cohesion: 0.50
-Nodes (4): Beauty is leverage, Core Philosophy, Taste is trained, not innate, Unseen details compound
-
-### Community 31 - "Community 31"
-Cohesion: 0.50
-Nodes (4): Debugging Animations, Frame-by-frame inspection, Slow motion testing, Test on real devices
-
 ### Community 32 - "Community 32"
 Cohesion: 0.17
-Nodes (11): ImportMT4Modal(), ImportMT4ModalProps, ManualTradeModal(), ManualTradeModalProps, AppState, TradingAccount, useAppStore, useTradeStore (+3 more)
+Nodes (12): JournalPage(), ImportMT4Modal(), ImportMT4ModalProps, ManualTradeModal(), ManualTradeModalProps, AppState, TradingAccount, useAppStore (+4 more)
 
 ## Knowledge Gaps
-- **240 isolated node(s):** `name`, `version`, `private`, `dev`, `build` (+235 more)
+- **242 isolated node(s):** `name`, `version`, `private`, `dev`, `build` (+237 more)
   These have ≤1 connection - possible missing edges or undocumented components.
 - **4 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `Design Engineering` connect `Community 19` to `Community 12`, `Community 22`, `Community 24`, `Community 25`, `Community 26`, `Community 27`, `Community 28`, `Community 29`, `Community 30`, `Community 31`?**
-  _High betweenness centrality (0.026) - this node is a cross-community bridge._
+- **Why does `Design Engineering` connect `Community 19` to `Community 25`, `Community 12`, `Community 22`?**
+  _High betweenness centrality (0.025) - this node is a cross-community bridge._
 - **Why does `Component Building Principles` connect `Community 25` to `Community 19`?**
   _High betweenness centrality (0.006) - this node is a cross-community bridge._
 - **What connects `name`, `version`, `private` to the rest of the system?**
-  _240 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _242 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Community 0` be split into smaller, more focused modules?**
   _Cohesion score 0.05714285714285714 - nodes in this community are weakly interconnected._
 - **Should `Community 1` be split into smaller, more focused modules?**
