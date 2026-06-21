@@ -335,10 +335,37 @@ router.post('/bulk-delete', async (req: Request, res: Response) => {
 router.get('/tags', async (req: Request, res: Response) => {
   try {
     const userId = (req.query.userId as string) || 'dev-user';
-    const tags = await prisma.tag.findMany({
+    
+    let tags = await prisma.tag.findMany({
       where: { user_id: userId },
       orderBy: { name: 'asc' },
     });
+
+    // Auto-seed default tags in the database for the user if none exist
+    if (tags.length === 0) {
+      const defaultSystemTags = [
+        { name: 'فرصت از دست رفته', is_ignored: true, show_first: false },
+        { name: 'Missed', is_ignored: true, show_first: false },
+        { name: 'ignore', is_ignored: true, show_first: false },
+        { name: 'Ignore', is_ignored: true, show_first: false },
+        { name: 'نادیده گرفتن', is_ignored: true, show_first: false },
+      ];
+
+      await prisma.tag.createMany({
+        data: defaultSystemTags.map(t => ({
+          user_id: userId,
+          name: t.name,
+          is_ignored: t.is_ignored,
+          show_first: t.show_first,
+        })),
+      });
+
+      tags = await prisma.tag.findMany({
+        where: { user_id: userId },
+        orderBy: { name: 'asc' },
+      });
+    }
+
     res.status(200).json(tags);
   } catch (err: any) {
     console.error('Fetch tags error:', err);
@@ -389,6 +416,80 @@ router.post('/tags', async (req: Request, res: Response) => {
 });
 
 /**
+ * POST /api/trades/tags/bulk
+ * Bulk updates tag configurations and handles deletions.
+ */
+router.post('/tags/bulk', async (req: Request, res: Response) => {
+  try {
+    const { tags, deletes } = req.body;
+    const userId = req.body.userId || 'dev-user';
+
+    // 1. Handle deletes
+    if (Array.isArray(deletes) && deletes.length > 0) {
+      // Delete from Tag library
+      await prisma.tag.deleteMany({
+        where: {
+          user_id: userId,
+          name: { in: deletes },
+        },
+      });
+
+      // Remove from Trade tags arrays
+      const tradesWithTags = await prisma.trade.findMany({
+        where: {
+          user_id: userId,
+          tags: {
+            hasSome: deletes,
+          },
+        },
+        select: {
+          id: true,
+          tags: true,
+        },
+      });
+
+      for (const trade of tradesWithTags) {
+        await prisma.trade.update({
+          where: { id: trade.id },
+          data: {
+            tags: trade.tags.filter(t => !deletes.includes(t)),
+          },
+        });
+      }
+    }
+
+    // 2. Handle updates/upserts
+    if (Array.isArray(tags)) {
+      for (const t of tags) {
+        await prisma.tag.upsert({
+          where: {
+            user_id_name: {
+              user_id: userId,
+              name: t.name,
+            },
+          },
+          create: {
+            user_id: userId,
+            name: t.name,
+            is_ignored: Boolean(t.is_ignored),
+            show_first: Boolean(t.show_first),
+          },
+          update: {
+            is_ignored: Boolean(t.is_ignored),
+            show_first: Boolean(t.show_first),
+          },
+        });
+      }
+    }
+
+    res.status(200).json({ success: true });
+  } catch (err: any) {
+    console.error('Bulk tag update error:', err);
+    res.status(500).json({ error: err.message || 'Internal server error' });
+  }
+});
+
+/**
  * PUT /api/trades/tags/:name
  * Updates options (is_ignored, show_first) for a specific tag.
  */
@@ -433,12 +534,37 @@ router.delete('/tags/:name', async (req: Request, res: Response) => {
     const name = req.params.name as string;
     const userId = (req.query.userId as string) || 'dev-user';
 
+    // 1. Delete tag from persistent library
     await prisma.tag.deleteMany({
       where: {
         user_id: userId,
         name: name,
       },
     });
+
+    // 2. Fetch all trades of this user containing this tag
+    const tradesWithTag = await prisma.trade.findMany({
+      where: {
+        user_id: userId,
+        tags: {
+          has: name,
+        },
+      },
+      select: {
+        id: true,
+        tags: true,
+      },
+    });
+
+    // 3. Update trades to filter out the deleted tag
+    for (const trade of tradesWithTag) {
+      await prisma.trade.update({
+        where: { id: trade.id },
+        data: {
+          tags: trade.tags.filter(t => t !== name),
+        },
+      });
+    }
 
     res.status(200).json({ success: true });
   } catch (err: any) {

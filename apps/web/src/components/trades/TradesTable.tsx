@@ -218,14 +218,16 @@ export default function TradesTable({
     return ['همه نمادها', ...Array.from(symbols)];
   }, [trades]);
 
-  const [allTags, setAllTags] = useState<TagObject[]>(DEFAULT_SYSTEM_TAGS);
+  const [allTags, setAllTags] = useState<TagObject[]>([]);
 
   // Fetch custom persistent tags from database on mount
   useEffect(() => {
     const fetchCustomTags = async () => {
       try {
         const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://127.0.0.1:3000';
-        const res = await fetch(`${baseUrl}/api/trades/tags`);
+        const res = await fetch(`${baseUrl}/api/trades/tags?t=${Date.now()}`, {
+          cache: 'no-store',
+        });
         if (res.ok) {
           const customTags = await res.json();
           if (Array.isArray(customTags)) {
@@ -276,38 +278,30 @@ export default function TradesTable({
     }
   };
 
-  const handleUpdateTagOptions = async (tagName: string, options: { is_ignored?: boolean; show_first?: boolean }) => {
+  const handleSaveTagConfigurations = async (tagsList: TagObject[], deletedNames: string[]) => {
     try {
       const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://127.0.0.1:3000';
-      const res = await fetch(`${baseUrl}/api/trades/tags/${encodeURIComponent(tagName)}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(options),
-      });
-      if (res.ok) {
-        setAllTags(prev => prev.map(t => t.name === tagName ? { ...t, ...options } : t));
-      }
-    } catch (err) {
-      console.error('Failed to update tag options:', err);
-    }
-  };
-
-  const handleDeleteTagFromLibrary = async (tagName: string) => {
-    try {
-      const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://127.0.0.1:3000';
-      const res = await fetch(`${baseUrl}/api/trades/tags/${encodeURIComponent(tagName)}`, {
-        method: 'DELETE',
-      });
-      if (res.ok) {
-        setAllTags(prev => prev.filter(t => t.name !== tagName));
-        // Also remove this tag from all local trades state
+      
+      // Update local state for trades if there are deletions
+      if (deletedNames.length > 0) {
         setTrades(prev => prev.map(t => ({
           ...t,
-          tags: t.tags.filter(tag => tag !== tagName)
+          tags: t.tags ? t.tags.filter(tag => !deletedNames.includes(tag)) : []
         })));
       }
+
+      // Send bulk save request to backend
+      const res = await fetch(`${baseUrl}/api/trades/tags/bulk`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tags: tagsList, deletes: deletedNames }),
+      });
+
+      if (!res.ok) {
+        throw new Error('Failed to bulk save tags');
+      }
     } catch (err) {
-      console.error('Failed to delete tag from library:', err);
+      console.error('Failed to save tag configurations:', err);
     }
   };
 
@@ -878,8 +872,7 @@ export default function TradesTable({
           setAllTags={setAllTags}
           allEmotions={allEmotions}
           onAddCustomTag={handleAddCustomTag}
-          onUpdateTagOptions={handleUpdateTagOptions}
-          onDeleteTagFromLibrary={handleDeleteTagFromLibrary}
+          onSaveTagConfigurations={handleSaveTagConfigurations}
           setAllEmotions={setAllEmotions}
           isUploading={isUploading}
           setLightboxUrl={setLightboxUrl}

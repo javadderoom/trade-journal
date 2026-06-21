@@ -29,8 +29,7 @@ interface DetailPanelProps {
   usdToToman: number;
   accounts?: any[];
   onAddCustomTag?: (newTag: string) => void;
-  onUpdateTagOptions?: (tagName: string, options: { is_ignored?: boolean; show_first?: boolean }) => Promise<void>;
-  onDeleteTagFromLibrary?: (tagName: string) => Promise<void>;
+  onSaveTagConfigurations?: (tags: TagObject[], deletes: string[]) => Promise<void>;
 }
 
 export default function DetailPanel({
@@ -51,13 +50,43 @@ export default function DetailPanel({
   usdToToman,
   accounts = [],
   onAddCustomTag,
-  onUpdateTagOptions,
-  onDeleteTagFromLibrary,
+  onSaveTagConfigurations,
 }: DetailPanelProps) {
   const [activeTab, setActiveTab] = useState<'stats' | 'journal'>('stats');
   const [isAddingTag, setIsAddingTag] = useState(false);
   const [isAddingEmotion, setIsAddingEmotion] = useState(false);
   const [isConfiguringTags, setIsConfiguringTags] = useState(false);
+  const [deletedTagDrafts, setDeletedTagDrafts] = useState<string[]>([]);
+
+  // Keep ref of state to save on unmount/drawer closure if needed
+  const configStateRef = React.useRef({ allTags, deletedTagDrafts, isConfiguringTags });
+  React.useEffect(() => {
+    configStateRef.current = { allTags, deletedTagDrafts, isConfiguringTags };
+  }, [allTags, deletedTagDrafts, isConfiguringTags]);
+
+  const saveCallbackRef = React.useRef(onSaveTagConfigurations);
+  React.useEffect(() => {
+    saveCallbackRef.current = onSaveTagConfigurations;
+  }, [onSaveTagConfigurations]);
+
+  React.useEffect(() => {
+    return () => {
+      const { allTags: finalTags, deletedTagDrafts: finalDeletes, isConfiguringTags: wasConfiguring } = configStateRef.current;
+      if (wasConfiguring && saveCallbackRef.current) {
+        saveCallbackRef.current(finalTags, finalDeletes);
+      }
+    };
+  }, []);
+
+  const handleToggleConfigMode = async () => {
+    if (isConfiguringTags) {
+      if (onSaveTagConfigurations) {
+        await onSaveTagConfigurations(allTags, deletedTagDrafts);
+      }
+      setDeletedTagDrafts([]);
+    }
+    setIsConfiguringTags(!isConfiguringTags);
+  };
 
   const formatCurrency = (val: number) => {
     return formatPersianCurrency(val);
@@ -266,7 +295,7 @@ export default function DetailPanel({
                 <label style={{ marginBottom: 0 }}>برچسب‌های معامله</label>
                 <button
                   type="button"
-                  onClick={() => setIsConfiguringTags(!isConfiguringTags)}
+                  onClick={handleToggleConfigMode}
                   style={{
                     background: 'transparent',
                     border: 'none',
@@ -297,7 +326,9 @@ export default function DetailPanel({
                         {/* Ignore toggle */}
                         <button
                           type="button"
-                          onClick={() => onUpdateTagOptions?.(tag.name, { is_ignored: !tag.is_ignored })}
+                          onClick={() => {
+                            setAllTags(prev => prev.map(t => t.name === tag.name ? { ...t, is_ignored: !t.is_ignored } : t));
+                          }}
                           style={{
                             background: tag.is_ignored ? 'rgba(255, 180, 171, 0.15)' : 'transparent',
                             border: '1px solid ' + (tag.is_ignored ? '#ffb4ab' : 'rgba(255,255,255,0.15)'),
@@ -320,7 +351,9 @@ export default function DetailPanel({
                         {/* Show first toggle */}
                         <button
                           type="button"
-                          onClick={() => onUpdateTagOptions?.(tag.name, { show_first: !tag.show_first })}
+                          onClick={() => {
+                            setAllTags(prev => prev.map(t => t.name === tag.name ? { ...t, show_first: !t.show_first } : t));
+                          }}
                           style={{
                             background: tag.show_first ? 'rgba(97, 249, 177, 0.15)' : 'transparent',
                             border: '1px solid ' + (tag.show_first ? '#61f9b1' : 'rgba(255,255,255,0.15)'),
@@ -343,7 +376,13 @@ export default function DetailPanel({
                         {/* Delete tag */}
                         <button
                           type="button"
-                          onClick={() => onDeleteTagFromLibrary?.(tag.name)}
+                          onClick={() => {
+                            setDeletedTagDrafts(prev => [...prev, tag.name]);
+                            setAllTags(prev => prev.filter(t => t.name !== tag.name));
+                            if (activeTrade.tags?.includes(tag.name)) {
+                              updateActiveTradeField('tags', activeTrade.tags.filter(t => t !== tag.name));
+                            }
+                          }}
                           style={{
                             background: 'transparent',
                             border: 'none',

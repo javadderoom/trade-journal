@@ -184,7 +184,7 @@ interface TradeState {
 }
 
 export const useTradeStore = create<TradeState>((set, get) => ({
-  trades: MOCK_TRADES,
+  trades: [],
   loading: false,
   error: null,
 

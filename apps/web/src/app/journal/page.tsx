@@ -41,7 +41,7 @@ export default function JournalPage() {
     fetchTrades,
   } = useTradeStore();
 
-  const [ignoredTags, setIgnoredTags] = useState<Set<string>>(new Set(['فرصت از دست رفته', 'Missed', 'ignore', 'Ignore', 'نادیده گرفتن']));
+  const [ignoredTags, setIgnoredTags] = useState<Set<string>>(new Set<string>());
 
   // Load trades and accounts if empty
   useEffect(() => {
@@ -52,16 +52,13 @@ export default function JournalPage() {
     const fetchCustomTags = async () => {
       try {
         const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://127.0.0.1:3000';
-        const res = await fetch(`${baseUrl}/api/trades/tags`);
+        const res = await fetch(`${baseUrl}/api/trades/tags?t=${Date.now()}`, {
+          cache: 'no-store',
+        });
         if (res.ok) {
           const tags = await res.json();
           if (Array.isArray(tags)) {
             const ignored = new Set<string>();
-            ignored.add('فرصت از دست رفته');
-            ignored.add('Missed');
-            ignored.add('ignore');
-            ignored.add('Ignore');
-            ignored.add('نادیده گرفتن');
             tags.forEach((tag: any) => {
               if (tag.is_ignored) {
                 ignored.add(tag.name);
