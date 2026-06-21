@@ -1,16 +1,16 @@
 # Graph Report - trade-journal  (2026-06-21)
 
 ## Corpus Check
-- 53 files · ~252,248 words
+- 54 files · ~252,201 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 372 nodes · 454 edges · 33 communities (29 shown, 4 thin omitted)
+- 376 nodes · 461 edges · 33 communities (29 shown, 4 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `91299248`
+- Built from commit: `10641711`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -48,8 +48,8 @@
 - [[_COMMUNITY_Community 32|Community 32]]
 
 ## God Nodes (most connected - your core abstractions)
-1. `Design Engineering` - 16 edges
-2. `toPersianDigits()` - 15 edges
+1. `toPersianDigits()` - 16 edges
+2. `Design Engineering` - 16 edges
 3. `compilerOptions` - 15 edges
 4. `معامله‌یار — Persian Trading Journal Platform` - 13 edges
 5. `✅ Done` - 12 edges
@@ -105,8 +105,8 @@ Cohesion: 0.13
 Nodes (14): API Progress — معامله‌یار, Database Schema (`src/prisma/schema.prisma`), ✅ Done, Express Server (`src/server.ts`), File Upload & Screenshots Middleware, High Priority, Low Priority, Medium Priority (+6 more)
 
 ### Community 7 - "Community 7"
-Cohesion: 0.12
-Nodes (32): EMOTION_MAP, JALALI_MONTH_NAMES, JournalPage(), WEEKDAY_NAMES, WEEKDAY_NAMES_CALENDAR, MOCK_TRADES, TradeState, DesktopTableProps (+24 more)
+Cohesion: 0.11
+Nodes (35): EquityChart(), EquityChartProps, Trade, EMOTION_MAP, JALALI_MONTH_NAMES, JournalPage(), WEEKDAY_NAMES, WEEKDAY_NAMES_CALENDAR (+27 more)
 
 ### Community 8 - "Community 8"
 Cohesion: 0.12
@@ -185,7 +185,7 @@ Cohesion: 0.17
 Nodes (11): ImportMT4Modal(), ImportMT4ModalProps, ManualTradeModal(), ManualTradeModalProps, AppState, TradingAccount, useAppStore, useTradeStore (+3 more)
 
 ## Knowledge Gaps
-- **238 isolated node(s):** `name`, `version`, `private`, `dev`, `build` (+233 more)
+- **240 isolated node(s):** `name`, `version`, `private`, `dev`, `build` (+235 more)
   These have ≤1 connection - possible missing edges or undocumented components.
 - **4 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
@@ -193,11 +193,11 @@ Nodes (11): ImportMT4Modal(), ImportMT4ModalProps, ManualTradeModal(), ManualTra
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `Design Engineering` connect `Community 19` to `Community 12`, `Community 22`, `Community 24`, `Community 25`, `Community 26`, `Community 27`, `Community 28`, `Community 29`, `Community 30`, `Community 31`?**
-  _High betweenness centrality (0.027) - this node is a cross-community bridge._
+  _High betweenness centrality (0.026) - this node is a cross-community bridge._
 - **Why does `Component Building Principles` connect `Community 25` to `Community 19`?**
   _High betweenness centrality (0.006) - this node is a cross-community bridge._
 - **What connects `name`, `version`, `private` to the rest of the system?**
-  _238 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _240 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Community 0` be split into smaller, more focused modules?**
   _Cohesion score 0.05714285714285714 - nodes in this community are weakly interconnected._
 - **Should `Community 1` be split into smaller, more focused modules?**

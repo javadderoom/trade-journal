@@ -877,7 +877,7 @@
       "label": "EMOTION_MAP",
       "file_type": "code",
       "source_file": "apps/web/src/app/journal/page.tsx",
-      "source_location": "L12",
+      "source_location": "L13",
       "_origin": "ast",
       "id": "journal_page_emotion_map",
       "community": 7,
@@ -887,7 +887,7 @@
       "label": "WEEKDAY_NAMES",
       "file_type": "code",
       "source_file": "apps/web/src/app/journal/page.tsx",
-      "source_location": "L22",
+      "source_location": "L23",
       "_origin": "ast",
       "id": "journal_page_weekday_names",
       "community": 7,
@@ -897,7 +897,7 @@
       "label": "JALALI_MONTH_NAMES",
       "file_type": "code",
       "source_file": "apps/web/src/app/journal/page.tsx",
-      "source_location": "L23",
+      "source_location": "L24",
       "_origin": "ast",
       "id": "journal_page_jalali_month_names",
       "community": 7,
@@ -907,7 +907,7 @@
       "label": "WEEKDAY_NAMES_CALENDAR",
       "file_type": "code",
       "source_file": "apps/web/src/app/journal/page.tsx",
-      "source_location": "L27",
+      "source_location": "L28",
       "_origin": "ast",
       "id": "journal_page_weekday_names_calendar",
       "community": 7,
@@ -917,7 +917,7 @@
       "label": "JournalPage()",
       "file_type": "code",
       "source_file": "apps/web/src/app/journal/page.tsx",
-      "source_location": "L29",
+      "source_location": "L30",
       "_origin": "ast",
       "id": "journal_page_journalpage",
       "community": 7,
@@ -982,6 +982,46 @@
       "id": "trades_page_tradespage",
       "community": 32,
       "norm_label": "tradespage()"
+    },
+    {
+      "label": "EquityChart.tsx",
+      "file_type": "code",
+      "source_file": "apps/web/src/components/journal/EquityChart.tsx",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "journal_equitychart",
+      "community": 7,
+      "norm_label": "equitychart.tsx"
+    },
+    {
+      "label": "Trade",
+      "file_type": "code",
+      "source_file": "apps/web/src/components/journal/EquityChart.tsx",
+      "source_location": "L7",
+      "_origin": "ast",
+      "id": "journal_equitychart_trade",
+      "community": 7,
+      "norm_label": "trade"
+    },
+    {
+      "label": "EquityChartProps",
+      "file_type": "code",
+      "source_file": "apps/web/src/components/journal/EquityChart.tsx",
+      "source_location": "L14",
+      "_origin": "ast",
+      "id": "journal_equitychart_equitychartprops",
+      "community": 7,
+      "norm_label": "equitychartprops"
+    },
+    {
+      "label": "EquityChart()",
+      "file_type": "code",
+      "source_file": "apps/web/src/components/journal/EquityChart.tsx",
+      "source_location": "L18",
+      "_origin": "ast",
+      "id": "journal_equitychart_equitychart",
+      "community": 7,
+      "norm_label": "equitychart()"
     },
     {
       "label": "BottomNavBar.tsx",
@@ -4674,6 +4714,28 @@
       "target": "exchange_rate_route_get"
     },
     {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/app/journal/page.tsx",
+      "source_location": "L10",
+      "weight": 1.0,
+      "source": "journal_page",
+      "target": "journal_equitychart",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/app/journal/page.tsx",
+      "source_location": "L10",
+      "weight": 1.0,
+      "source": "journal_page",
+      "target": "journal_equitychart_equitychart",
+      "confidence_score": 1.0
+    },
+    {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "apps/web/src/app/journal/page.tsx",
@@ -5148,6 +5210,58 @@
       "weight": 1.0,
       "source": "trades_page_tradespage",
       "target": "store_usetradestore_usetradestore"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/components/journal/EquityChart.tsx",
+      "source_location": "L18",
+      "weight": 1.0,
+      "source": "journal_equitychart",
+      "target": "journal_equitychart_equitychart",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/components/journal/EquityChart.tsx",
+      "source_location": "L14",
+      "weight": 1.0,
+      "source": "journal_equitychart",
+      "target": "journal_equitychart_equitychartprops",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/components/journal/EquityChart.tsx",
+      "source_location": "L7",
+      "weight": 1.0,
+      "source": "journal_equitychart",
+      "target": "journal_equitychart_trade",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/components/journal/EquityChart.tsx",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "journal_equitychart",
+      "target": "utils_farsi",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/components/journal/EquityChart.tsx",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "journal_equitychart",
+      "target": "utils_farsi_topersiandigits",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -8393,5 +8507,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "91299248175f85ed2a7a0ab7ac07d328f324b78b"
+  "built_at_commit": "10641711363ead14710720df6310965c0d205e69"
 }

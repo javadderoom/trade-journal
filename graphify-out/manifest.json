@@ -305,13 +305,18 @@
     "semantic_hash": ""
   },
   "apps/web/src/app/journal/page.tsx": {
-    "mtime": 1782046282.3252501,
-    "ast_hash": "3fff75b4cf850045573880ec8888aa89",
+    "mtime": 1782046602.2444289,
+    "ast_hash": "69f8b490b9eeefa6c463384347874c28",
     "semantic_hash": ""
   },
   "apps/web/public/logo.png": {
     "mtime": 1781994827.5169787,
     "ast_hash": "d517b5a4dd4acb021ea07e3c07b03c3e",
+    "semantic_hash": ""
+  },
+  "apps/web/src/components/journal/EquityChart.tsx": {
+    "mtime": 1782046549.3041391,
+    "ast_hash": "ba053b36ea8b095934c272caee0f6da3",
     "semantic_hash": ""
   }
 }

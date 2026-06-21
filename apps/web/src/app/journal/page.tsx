@@ -7,6 +7,7 @@ import Select from '../../components/ui/Select';
 import { toPersianDigits, formatPersianCurrency, formatToman } from '../../utils/farsi';
 import { getTradingSession, getMainPair, getEmotionEmoji } from '../../utils/tradeHelpers';
 import '../../components/journal/journal.scss';
+import EquityChart from '../../components/journal/EquityChart';
 
 // Emotions helper mapping
 const EMOTION_MAP: { [key: string]: { label: string; emoji: string } } = {
@@ -28,16 +29,6 @@ const WEEKDAY_NAMES_CALENDAR = ['شنبه', 'یکشنبه', 'دوشنبه', 'س�
 
 export default function JournalPage() {
   const [activeTab, setActiveTab] = useState<'overview' | 'patterns' | 'charts'>('overview');
-  const [isMobile, setIsMobile] = useState(false);
-
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
 
   const {
     accounts,
@@ -363,105 +354,6 @@ export default function JournalPage() {
       .filter((t) => t.closeTime !== null && t.closePrice !== null)
       .sort((a, b) => new Date(a.closeTime!).getTime() - new Date(b.closeTime!).getTime());
   }, [trades]);
-
-  const equityPoints = useMemo(() => {
-    const points = [{ index: 0, date: 'شروع', pnl: 0, cumulative: 0 }];
-    let sum = 0;
-    sortedClosedTrades.forEach((t, idx) => {
-      const net = t.profitUsd + (t.commission ?? 0) + (t.swap ?? 0);
-      sum += net;
-      let displayDate = '';
-      try {
-        displayDate = new Intl.DateTimeFormat('fa-IR', { month: 'numeric', day: 'numeric' }).format(new Date(t.closeTime!));
-      } catch {
-        displayDate = String(idx + 1);
-      }
-      points.push({
-        index: idx + 1,
-        date: displayDate,
-        pnl: net,
-        cumulative: sum
-      });
-    });
-    return points;
-  }, [sortedClosedTrades]);
-
-  const equityChartData = useMemo(() => {
-    if (equityPoints.length === 0) return null;
-
-    const width = isMobile ? 500 : 1000;
-    const height = 260;
-    const paddingLeft = 70;
-    const paddingRight = 30;
-    const paddingTop = 30;
-    const paddingBottom = 40;
-
-    const graphWidth = width - paddingLeft - paddingRight;
-    const graphHeight = height - paddingTop - paddingBottom;
-
-    const values = equityPoints.map((p) => p.cumulative);
-    const minVal = Math.min(...values);
-    const maxVal = Math.max(...values);
-
-    const range = maxVal - minVal;
-    const pad = range === 0 ? 100 : range * 0.15;
-    const minY = minVal - pad;
-    const maxY = maxVal + pad;
-
-    const pointsCount = equityPoints.length;
-
-    const svgPoints = equityPoints.map((p, i) => {
-      const x = paddingLeft + (i / (pointsCount - 1 || 1)) * graphWidth;
-      const y = paddingTop + graphHeight - ((p.cumulative - minY) / (maxY - minY || 1)) * graphHeight;
-      return { x, y, val: p.cumulative, label: p.date, index: p.index };
-    });
-
-    const linePath = svgPoints.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x.toFixed(1)} ${p.y.toFixed(1)}`).join(' ');
-    const areaPath = svgPoints.length > 0
-      ? `${linePath} L ${svgPoints[svgPoints.length - 1].x.toFixed(1)} ${(paddingTop + graphHeight).toFixed(1)} L ${svgPoints[0].x.toFixed(1)} ${(paddingTop + graphHeight).toFixed(1)} Z`
-      : '';
-
-    const ticksCount = 4;
-    const yTicks = Array.from({ length: ticksCount + 1 }, (_, i) => {
-      const val = minY + (i / ticksCount) * (maxY - minY);
-      const y = paddingTop + graphHeight - (i / ticksCount) * graphHeight;
-      return { val, y };
-    });
-
-    const xTicksIndices: number[] = [];
-    if (pointsCount > 0) {
-      const step = Math.max(1, Math.floor(pointsCount / 5));
-      for (let i = 0; i < pointsCount; i += step) {
-        xTicksIndices.push(i);
-      }
-      if (xTicksIndices[xTicksIndices.length - 1] !== pointsCount - 1) {
-        xTicksIndices.push(pointsCount - 1);
-      }
-    }
-    const xTicks = xTicksIndices.map(idx => svgPoints[idx]);
-
-    let zeroY = null;
-    if (minY < 0 && maxY > 0) {
-      zeroY = paddingTop + graphHeight - ((0 - minY) / (maxY - minY)) * graphHeight;
-    }
-
-    return {
-      svgPoints,
-      linePath,
-      areaPath,
-      yTicks,
-      xTicks,
-      zeroY,
-      minY,
-      maxY,
-      width,
-      height,
-      paddingLeft,
-      paddingRight,
-      paddingTop,
-      paddingBottom
-    };
-  }, [equityPoints, isMobile]);
 
   const dailyPnlData = useMemo(() => {
     const dailyMap: { [key: string]: number } = {};
@@ -1152,102 +1044,8 @@ export default function JournalPage() {
             </div>
             
             <div className="chart-wrapper">
-              {equityChartData ? (
-                <svg viewBox={`0 0 ${equityChartData.width} ${equityChartData.height}`} width="100%" height="100%" className="svg-chart">
-                  <defs>
-                    <linearGradient id="equity-gradient" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="#61f9b1" stopOpacity="0.3"/>
-                      <stop offset="100%" stopColor="#61f9b1" stopOpacity="0.0"/>
-                    </linearGradient>
-                  </defs>
-                  
-                  {/* Grid Lines */}
-                  {equityChartData.yTicks.map((tick, i) => (
-                    <line 
-                      key={i} 
-                      x1={equityChartData.paddingLeft} 
-                      y1={tick.y} 
-                      x2={equityChartData.width - equityChartData.paddingRight} 
-                      y2={tick.y} 
-                      className="grid-line" 
-                    />
-                  ))}
-                  
-                  {/* Y Axis Labels */}
-                  {equityChartData.yTicks.map((tick, i) => (
-                    <text 
-                      key={i} 
-                      x={equityChartData.paddingLeft - 10} 
-                      y={tick.y + 4} 
-                      className="axis-label axis-label-y"
-                    >
-                      {tick.val >= 0 ? '+' : ''}${toPersianDigits(Math.round(tick.val).toString())}
-                    </text>
-                  ))}
-                  
-                  {/* Zero Baseline */}
-                  {equityChartData.zeroY !== null && (
-                    <line 
-                      x1={equityChartData.paddingLeft} 
-                      y1={equityChartData.zeroY} 
-                      x2={equityChartData.width - equityChartData.paddingRight} 
-                      y2={equityChartData.zeroY} 
-                      className="zero-baseline" 
-                    />
-                  )}
-                  
-                  {/* Area fill under curve */}
-                  {equityChartData.areaPath && (
-                    <path d={equityChartData.areaPath} className="chart-area" />
-                  )}
-                  
-                  {/* Line curve */}
-                  {equityChartData.linePath && (
-                    <path d={equityChartData.linePath} className="chart-line" />
-                  )}
-                  
-                  {/* Dots on points (if <= 50 points to avoid clutter) */}
-                  {equityChartData.svgPoints.length <= 50 && equityChartData.svgPoints.map((pt, i) => (
-                    <circle 
-                      key={i} 
-                      cx={pt.x} 
-                      cy={pt.y} 
-                      r="4" 
-                      className="chart-dot"
-                    >
-                      <title>{`معامله ${toPersianDigits(pt.index)}: ${pt.val >= 0 ? '+' : ''}${toPersianDigits(pt.val.toFixed(2))}$ (${pt.label})`}</title>
-                    </circle>
-                  ))}
-                  
-                  {/* X Axis Labels */}
-                  {equityChartData.xTicks.map((tick, i) => (
-                    <g key={i}>
-                      <line 
-                        x1={tick.x} 
-                        y1={equityChartData.height - equityChartData.paddingBottom} 
-                        x2={tick.x} 
-                        y2={equityChartData.height - equityChartData.paddingBottom + 4} 
-                        className="axis-line" 
-                      />
-                      <text 
-                        x={tick.x} 
-                        y={equityChartData.height - equityChartData.paddingBottom + 16} 
-                        className="axis-label"
-                      >
-                        {toPersianDigits(tick.label)}
-                      </text>
-                    </g>
-                  ))}
-                  
-                  {/* Bottom axis line */}
-                  <line 
-                    x1={equityChartData.paddingLeft} 
-                    y1={equityChartData.height - equityChartData.paddingBottom} 
-                    x2={equityChartData.width - equityChartData.paddingRight} 
-                    y2={equityChartData.height - equityChartData.paddingBottom} 
-                    className="axis-line" 
-                  />
-                </svg>
+              {sortedClosedTrades.length > 0 ? (
+                <EquityChart closedTrades={sortedClosedTrades} />
               ) : (
                 <div style={{ color: '#bbcabe', fontSize: '13px' }}>اطلاعات کافی برای ترسیم وجود ندارد.</div>
               )}
