@@ -20,8 +20,8 @@
     "semantic_hash": ""
   },
   "apps/api/src/routes/tradeSync.ts": {
-    "mtime": 1782050476.9162378,
-    "ast_hash": "3e4c8ff24e2d553711a4076a468435d0",
+    "mtime": 1782051708.554927,
+    "ast_hash": "15403cc5e3a5d7612c15f97838dcb06a",
     "semantic_hash": ""
   },
   "apps/api/src/server.ts": {
@@ -115,8 +115,8 @@
     "semantic_hash": ""
   },
   "apps/web/PROGRESS.md": {
-    "mtime": 1782049326.1060147,
-    "ast_hash": "c1add296ebedc9bc69b838c02ced8083",
+    "mtime": 1782051027.8990123,
+    "ast_hash": "a71dad9f06116e542d0bf45b1a0652d6",
     "semantic_hash": ""
   },
   "apps/web/ui_sample/DESIGN.md": {
@@ -205,8 +205,8 @@
     "semantic_hash": ""
   },
   "apps/web/src/utils/tradeHelpers.ts": {
-    "mtime": 1782050689.3439648,
-    "ast_hash": "6b7c9a01b719f1e4d26495d35bb2f350",
+    "mtime": 1782051920.193004,
+    "ast_hash": "e448cb1f687827308a8ddaf93ddcafba",
     "semantic_hash": ""
   },
   "apps/web/src/components/restored_scss_chunks.json": {
@@ -250,13 +250,13 @@
     "semantic_hash": ""
   },
   "apps/web/src/components/trades/DesktopTable.tsx": {
-    "mtime": 1782050914.378886,
-    "ast_hash": "66445ebd1536425dbf5ec702f464f010",
+    "mtime": 1782051828.3783648,
+    "ast_hash": "978f3fa3f4629bf68de19d59dc810d87",
     "semantic_hash": ""
   },
   "apps/web/src/components/trades/DetailPanel.tsx": {
-    "mtime": 1782050520.8489285,
-    "ast_hash": "d4383379f15188f07a85ba6fa7488aae",
+    "mtime": 1782051953.6959977,
+    "ast_hash": "851a2da2d4c3b2802622ea0cf5bd4c1b",
     "semantic_hash": ""
   },
   "apps/web/src/components/trades/FilterBar.tsx": {
@@ -265,8 +265,8 @@
     "semantic_hash": ""
   },
   "apps/web/src/components/trades/MobileCardsList.tsx": {
-    "mtime": 1782050933.33247,
-    "ast_hash": "b0e93978ac6210e7561ad6b5378c0859",
+    "mtime": 1782051852.61519,
+    "ast_hash": "5ea0794476eaaf028e2846367e01f7f8",
     "semantic_hash": ""
   },
   "apps/web/src/components/trades/SummaryBar.tsx": {
@@ -280,8 +280,8 @@
     "semantic_hash": ""
   },
   "apps/web/src/components/trades/TradesTable.tsx": {
-    "mtime": 1782050715.4220817,
-    "ast_hash": "9af8455c704f1ee44985e08c2fae0c8f",
+    "mtime": 1782051980.1328926,
+    "ast_hash": "8bed1abfb044f40380a0c730bf14a941",
     "semantic_hash": ""
   },
   "apps/web/src/components/ui/ConfirmModal.tsx": {
@@ -305,8 +305,8 @@
     "semantic_hash": ""
   },
   "apps/web/src/app/journal/page.tsx": {
-    "mtime": 1782050948.6920588,
-    "ast_hash": "eae3ddbdba07c01bd3c8607b6f573640",
+    "mtime": 1782051904.0706134,
+    "ast_hash": "7e5de65f2be311829fb2603f7b587fd4",
     "semantic_hash": ""
   },
   "apps/web/public/logo.png": {

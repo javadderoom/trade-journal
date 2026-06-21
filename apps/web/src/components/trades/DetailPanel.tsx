@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Trade } from './TradesTable';
+import { Trade, TagObject } from './TradesTable';
 import TradeChart from './TradeChart';
 import { toPersianDigits, formatPersianCurrency, formatToman } from '../../utils/farsi';
 import {
@@ -14,8 +14,8 @@ import {
 interface DetailPanelProps {
   activeTrade: Trade;
   setActiveTradeId: (id: string | null) => void;
-  allTags: string[];
-  setAllTags: React.Dispatch<React.SetStateAction<string[]>>;
+  allTags: TagObject[];
+  setAllTags: React.Dispatch<React.SetStateAction<TagObject[]>>;
   allEmotions: { value: string; label: string }[];
   setAllEmotions: React.Dispatch<React.SetStateAction<{ value: string; label: string }[]>>;
   isUploading: boolean;
@@ -29,6 +29,8 @@ interface DetailPanelProps {
   usdToToman: number;
   accounts?: any[];
   onAddCustomTag?: (newTag: string) => void;
+  onUpdateTagOptions?: (tagName: string, options: { is_ignored?: boolean; show_first?: boolean }) => Promise<void>;
+  onDeleteTagFromLibrary?: (tagName: string) => Promise<void>;
 }
 
 export default function DetailPanel({
@@ -49,10 +51,13 @@ export default function DetailPanel({
   usdToToman,
   accounts = [],
   onAddCustomTag,
+  onUpdateTagOptions,
+  onDeleteTagFromLibrary,
 }: DetailPanelProps) {
   const [activeTab, setActiveTab] = useState<'stats' | 'journal'>('stats');
   const [isAddingTag, setIsAddingTag] = useState(false);
   const [isAddingEmotion, setIsAddingEmotion] = useState(false);
+  const [isConfiguringTags, setIsConfiguringTags] = useState(false);
 
   const formatCurrency = (val: number) => {
     return formatPersianCurrency(val);
@@ -257,79 +262,194 @@ export default function DetailPanel({
           <>
             {/* Strategy & Emotions / Tags */}
             <div className="form-group">
-              <label>برچسب‌های معامله</label>
-              <div className="tags-container">
-                {[...allTags]
-                  .sort((a, b) => {
-                    const aSelected = activeTrade.tags?.includes(a) ? 1 : 0;
-                    const bSelected = activeTrade.tags?.includes(b) ? 1 : 0;
-                    return bSelected - aSelected;
-                  })
-                  .map(tag => {
-                    const isSelected = activeTrade.tags && activeTrade.tags.includes(tag);
-                    return (
-                      <span
-                        key={tag}
-                        className={`tag ${isSelected ? 'selected' : ''}`}
-                        onClick={() => {
-                          const currentTags = activeTrade.tags || [];
-                          const newTags = isSelected
-                            ? currentTags.filter(t => t !== tag)
-                            : [...currentTags, tag];
-                          updateActiveTradeField('tags', newTags);
-                        }}
-                      >
-                        {tag}
-                      </span>
-                    );
-                  })}
-                {isAddingTag ? (
-                  <input
-                    type="text"
-                    autoFocus
-                    placeholder="برچسب..."
-                    onBlur={() => setIsAddingTag(false)}
-                    onKeyDown={e => {
-                      if (e.key === 'Enter') {
-                        e.preventDefault();
-                        const val = e.currentTarget.value.trim();
-                        if (val) {
-                          const currentTags = activeTrade.tags || [];
-                          if (!currentTags.includes(val)) {
-                            updateActiveTradeField('tags', [...currentTags, val]);
-                          }
-                          setAllTags(prev => prev.includes(val) ? prev : [...prev, val]);
-                          onAddCustomTag?.(val);
-                        }
-                        setIsAddingTag(false);
-                      } else if (e.key === 'Escape') {
-                        setIsAddingTag(false);
-                      }
-                    }}
-                    style={{
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      padding: '4px 12px',
-                      backgroundColor: 'rgba(97, 249, 177, 0.05)',
-                      color: '#fff',
-                      borderRadius: '9999px',
-                      fontSize: '12px',
-                      border: '1px dashed rgba(97, 249, 177, 0.5)',
-                      outline: 'none',
-                      width: '100px',
-                      fontFamily: 'Vazirmatn'
-                    }}
-                  />
-                ) : (
-                  <span
-                    className="add-tag-btn"
-                    onClick={() => setIsAddingTag(true)}
-                  >
-                    <span className="material-symbols-outlined btn-icon" style={{ fontSize: '14px' }}>add</span>
-                    افزودن برچسب
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                <label style={{ marginBottom: 0 }}>برچسب‌های معامله</label>
+                <button
+                  type="button"
+                  onClick={() => setIsConfiguringTags(!isConfiguringTags)}
+                  style={{
+                    background: 'transparent',
+                    border: 'none',
+                    color: isConfiguringTags ? '#61f9b1' : '#8898aa',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '4px',
+                    fontSize: '12px',
+                    fontFamily: 'Vazirmatn',
+                    outline: 'none',
+                  }}
+                >
+                  <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>
+                    {isConfiguringTags ? 'check' : 'settings'}
                   </span>
-                )}
+                  {isConfiguringTags ? 'تأیید تنظیمات' : 'مدیریت ویژگی‌ها'}
+                </button>
               </div>
+
+              {isConfiguringTags ? (
+                /* Management List View */
+                <div className="tags-management-list" style={{ display: 'flex', flexDirection: 'column', gap: '8px', background: 'rgba(255,255,255,0.02)', padding: '10px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                  {allTags.map(tag => (
+                    <div key={tag.name} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '4px 0', borderBottom: '1px solid rgba(255,255,255,0.03)' }}>
+                      <span style={{ fontSize: '13px', fontWeight: '600', color: '#fff' }}>{tag.name}</span>
+                      <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                        {/* Ignore toggle */}
+                        <button
+                          type="button"
+                          onClick={() => onUpdateTagOptions?.(tag.name, { is_ignored: !tag.is_ignored })}
+                          style={{
+                            background: tag.is_ignored ? 'rgba(255, 180, 171, 0.15)' : 'transparent',
+                            border: '1px solid ' + (tag.is_ignored ? '#ffb4ab' : 'rgba(255,255,255,0.15)'),
+                            borderRadius: '4px',
+                            color: tag.is_ignored ? '#ffb4ab' : '#8898aa',
+                            padding: '2px 6px',
+                            fontSize: '11px',
+                            cursor: 'pointer',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '2px',
+                            fontFamily: 'Vazirmatn',
+                          }}
+                          title="نادیده گرفتن از آمار"
+                        >
+                          <span className="material-symbols-outlined" style={{ fontSize: '12px' }}>block</span>
+                          نادیده
+                        </button>
+
+                        {/* Show first toggle */}
+                        <button
+                          type="button"
+                          onClick={() => onUpdateTagOptions?.(tag.name, { show_first: !tag.show_first })}
+                          style={{
+                            background: tag.show_first ? 'rgba(97, 249, 177, 0.15)' : 'transparent',
+                            border: '1px solid ' + (tag.show_first ? '#61f9b1' : 'rgba(255,255,255,0.15)'),
+                            borderRadius: '4px',
+                            color: tag.show_first ? '#61f9b1' : '#8898aa',
+                            padding: '2px 6px',
+                            fontSize: '11px',
+                            cursor: 'pointer',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '2px',
+                            fontFamily: 'Vazirmatn',
+                          }}
+                          title="نمایش در ابتدای لیست"
+                        >
+                          <span className="material-symbols-outlined" style={{ fontSize: '12px' }}>star</span>
+                          مهم
+                        </button>
+
+                        {/* Delete tag */}
+                        <button
+                          type="button"
+                          onClick={() => onDeleteTagFromLibrary?.(tag.name)}
+                          style={{
+                            background: 'transparent',
+                            border: 'none',
+                            color: '#ffb4ab',
+                            cursor: 'pointer',
+                            padding: '2px',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                          }}
+                          title="حذف برچسب از کل کتابخانه"
+                        >
+                          <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>delete</span>
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                /* Default Selection Pool View */
+                <div className="tags-container">
+                  {[...allTags]
+                    .sort((a, b) => {
+                      if (a.show_first && !b.show_first) return -1;
+                      if (!a.show_first && b.show_first) return 1;
+                      const aSelected = activeTrade.tags?.includes(a.name) ? 1 : 0;
+                      const bSelected = activeTrade.tags?.includes(b.name) ? 1 : 0;
+                      if (aSelected !== bSelected) return bSelected - aSelected;
+                      return a.name.localeCompare(b.name, 'fa');
+                    })
+                    .map(tag => {
+                      const isSelected = activeTrade.tags && activeTrade.tags.includes(tag.name);
+                      return (
+                        <span
+                          key={tag.name}
+                          className={`tag ${isSelected ? 'selected' : ''}`}
+                          style={{
+                            border: tag.show_first ? '1px dashed #61f9b1' : undefined,
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '4px'
+                          }}
+                          onClick={() => {
+                            const currentTags = activeTrade.tags || [];
+                            const newTags = isSelected
+                              ? currentTags.filter(t => t !== tag.name)
+                              : [...currentTags, tag.name];
+                            updateActiveTradeField('tags', newTags);
+                          }}
+                        >
+                          {tag.show_first && (
+                            <span className="material-symbols-outlined" style={{ fontSize: '10px', color: '#61f9b1' }}>star</span>
+                          )}
+                          {tag.name}
+                          {tag.is_ignored && (
+                            <span className="material-symbols-outlined" style={{ fontSize: '10px', color: '#ffb4ab' }} title="نادیده گرفته شده از آمار">block</span>
+                          )}
+                        </span>
+                      );
+                    })}
+                  {isAddingTag ? (
+                    <input
+                      type="text"
+                      autoFocus
+                      placeholder="برچسب..."
+                      onBlur={() => setIsAddingTag(false)}
+                      onKeyDown={e => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault();
+                          const val = e.currentTarget.value.trim();
+                          if (val) {
+                            const currentTags = activeTrade.tags || [];
+                            if (!currentTags.includes(val)) {
+                              updateActiveTradeField('tags', [...currentTags, val]);
+                            }
+                            onAddCustomTag?.(val);
+                          }
+                          setIsAddingTag(false);
+                        } else if (e.key === 'Escape') {
+                          setIsAddingTag(false);
+                        }
+                      }}
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        padding: '4px 12px',
+                        backgroundColor: 'rgba(97, 249, 177, 0.05)',
+                        color: '#fff',
+                        borderRadius: '9999px',
+                        fontSize: '12px',
+                        border: '1px dashed rgba(97, 249, 177, 0.5)',
+                        outline: 'none',
+                        width: '100px',
+                        fontFamily: 'Vazirmatn'
+                      }}
+                    />
+                  ) : (
+                    <span
+                      className="add-tag-btn"
+                      onClick={() => setIsAddingTag(true)}
+                    >
+                      <span className="material-symbols-outlined btn-icon" style={{ fontSize: '14px' }}>add</span>
+                      افزودن برچسب
+                    </span>
+                  )}
+                </div>
+              )}
             </div>
 
             <div className="form-group">

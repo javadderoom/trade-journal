@@ -7,8 +7,7 @@ import {
   getEmotionEmoji,
   getEmotionLabel,
   formatDate,
-  getTradingSession,
-  isTradeIgnored
+  getTradingSession
 } from '../../utils/tradeHelpers';
 
 interface DesktopTableProps {
@@ -22,6 +21,7 @@ interface DesktopTableProps {
   usdToToman: number;
   allEmotions: { value: string; label: string }[];
   accounts?: any[];
+  ignoredTags: Set<string>;
 }
 
 export default function DesktopTable({
@@ -35,6 +35,7 @@ export default function DesktopTable({
   usdToToman,
   allEmotions,
   accounts = [],
+  ignoredTags,
 }: DesktopTableProps) {
   const formatCurrency = (val: number) => {
     return formatPersianCurrency(val);
@@ -76,7 +77,7 @@ export default function DesktopTable({
               const isActive = trade.id === activeTradeId;
 
               // P&L color logic
-              const isMissed = isTradeIgnored(trade.tags);
+              const isMissed = trade.tags?.some(tag => ignoredTags.has(tag));
               let profitClass = 'profit-zero';
               if (trade.profitUsd > 0) profitClass = 'profit-positive';
               else if (trade.profitUsd < 0) profitClass = 'profit-negative';

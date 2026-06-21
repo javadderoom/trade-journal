@@ -5,7 +5,7 @@ import { useAppStore } from '../../store/useAppStore';
 import { useTradeStore } from '../../store/useTradeStore';
 import Select from '../../components/ui/Select';
 import { toPersianDigits, formatPersianCurrency, formatToman } from '../../utils/farsi';
-import { getTradingSession, getMainPair, getEmotionEmoji, isTradeIgnored } from '../../utils/tradeHelpers';
+import { getTradingSession, getMainPair, getEmotionEmoji } from '../../utils/tradeHelpers';
 import '../../components/journal/journal.scss';
 import EquityChart from '../../components/journal/EquityChart';
 import WeekdayPnlChart from '../../components/journal/WeekdayPnlChart';
@@ -41,14 +41,45 @@ export default function JournalPage() {
     fetchTrades,
   } = useTradeStore();
 
+  const [ignoredTags, setIgnoredTags] = useState<Set<string>>(new Set(['فرصت از دست رفته', 'Missed', 'ignore', 'Ignore', 'نادیده گرفتن']));
+
   // Load trades and accounts if empty
   useEffect(() => {
     fetchTrades(false, selectedAccountId);
   }, [selectedAccountId]);
 
+  useEffect(() => {
+    const fetchCustomTags = async () => {
+      try {
+        const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://127.0.0.1:3000';
+        const res = await fetch(`${baseUrl}/api/trades/tags`);
+        if (res.ok) {
+          const tags = await res.json();
+          if (Array.isArray(tags)) {
+            const ignored = new Set<string>();
+            ignored.add('فرصت از دست رفته');
+            ignored.add('Missed');
+            ignored.add('ignore');
+            ignored.add('Ignore');
+            ignored.add('نادیده گرفتن');
+            tags.forEach((tag: any) => {
+              if (tag.is_ignored) {
+                ignored.add(tag.name);
+              }
+            });
+            setIgnoredTags(ignored);
+          }
+        }
+      } catch (err) {
+        console.error('Failed to fetch tags options in journal:', err);
+      }
+    };
+    fetchCustomTags();
+  }, []);
+
   // Compute Statistics (Tier 1 & Tier 2)
   const stats = useMemo(() => {
-    const closedTrades = trades.filter((t) => t.closeTime !== null && t.closePrice !== null && !isTradeIgnored(t.tags));
+    const closedTrades = trades.filter((t) => t.closeTime !== null && t.closePrice !== null && !t.tags?.some(tag => ignoredTags.has(tag)));
     const totalCount = closedTrades.length;
 
     if (totalCount === 0) {
@@ -349,9 +380,9 @@ export default function JournalPage() {
 
   const sortedClosedTrades = useMemo(() => {
     return [...trades]
-      .filter((t) => t.closeTime !== null && t.closePrice !== null && !isTradeIgnored(t.tags))
+      .filter((t) => t.closeTime !== null && t.closePrice !== null && !t.tags?.some(tag => ignoredTags.has(tag)))
       .sort((a, b) => new Date(a.closeTime!).getTime() - new Date(b.closeTime!).getTime());
-  }, [trades]);
+  }, [trades, ignoredTags]);
 
 
 

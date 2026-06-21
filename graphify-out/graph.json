@@ -307,7 +307,7 @@
       "label": "uploadDir",
       "file_type": "code",
       "source_file": "apps/api/src/routes/tradeSync.ts",
-      "source_location": "L441",
+      "source_location": "L476",
       "_origin": "ast",
       "id": "routes_tradesync_uploaddir",
       "community": 1,
@@ -317,7 +317,7 @@
       "label": "storage",
       "file_type": "code",
       "source_file": "apps/api/src/routes/tradeSync.ts",
-      "source_location": "L446",
+      "source_location": "L481",
       "_origin": "ast",
       "id": "routes_tradesync_storage",
       "community": 1,
@@ -327,7 +327,7 @@
       "label": "upload",
       "file_type": "code",
       "source_file": "apps/api/src/routes/tradeSync.ts",
-      "source_location": "L457",
+      "source_location": "L492",
       "_origin": "ast",
       "id": "routes_tradesync_upload",
       "community": 1,
@@ -337,7 +337,7 @@
       "label": "uploadMemory",
       "file_type": "code",
       "source_file": "apps/api/src/routes/tradeSync.ts",
-      "source_location": "L566",
+      "source_location": "L601",
       "_origin": "ast",
       "id": "routes_tradesync_uploadmemory",
       "community": 1,
@@ -347,7 +347,7 @@
       "label": "parseMT4Date()",
       "file_type": "code",
       "source_file": "apps/api/src/routes/tradeSync.ts",
-      "source_location": "L568",
+      "source_location": "L603",
       "_origin": "ast",
       "id": "routes_tradesync_parsemt4date",
       "community": 1,
@@ -357,7 +357,7 @@
       "label": "findHeaderMapping()",
       "file_type": "code",
       "source_file": "apps/api/src/routes/tradeSync.ts",
-      "source_location": "L596",
+      "source_location": "L631",
       "_origin": "ast",
       "id": "routes_tradesync_findheadermapping",
       "community": 1,
@@ -960,7 +960,7 @@
       "source_location": "L12",
       "_origin": "ast",
       "id": "trades_page_tradespage",
-      "community": 32,
+      "community": 7,
       "norm_label": "tradespage()"
     },
     {
@@ -1227,7 +1227,7 @@
       "label": "DesktopTableProps",
       "file_type": "code",
       "source_file": "apps/web/src/components/trades/DesktopTable.tsx",
-      "source_location": "L14",
+      "source_location": "L13",
       "_origin": "ast",
       "id": "trades_desktoptable_desktoptableprops",
       "community": 7,
@@ -1267,7 +1267,7 @@
       "label": "DetailPanel()",
       "file_type": "code",
       "source_file": "apps/web/src/components/trades/DetailPanel.tsx",
-      "source_location": "L34",
+      "source_location": "L36",
       "_origin": "ast",
       "id": "trades_detailpanel_detailpanel",
       "community": 7,
@@ -1317,7 +1317,7 @@
       "label": "MobileCardsListProps",
       "file_type": "code",
       "source_file": "apps/web/src/components/trades/MobileCardsList.tsx",
-      "source_location": "L14",
+      "source_location": "L13",
       "_origin": "ast",
       "id": "trades_mobilecardslist_mobilecardslistprops",
       "community": 7,
@@ -1370,7 +1370,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "trades_tradechart",
-      "community": 12,
+      "community": 7,
       "norm_label": "tradechart.tsx"
     },
     {
@@ -1380,7 +1380,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "trades_tradechart_candlestickdata",
-      "community": 12,
+      "community": 7,
       "norm_label": "candlestickdata"
     },
     {
@@ -1390,7 +1390,7 @@
       "source_location": "L14",
       "_origin": "ast",
       "id": "trades_tradechart_tradechartprops",
-      "community": 12,
+      "community": 7,
       "norm_label": "tradechartprops"
     },
     {
@@ -1400,7 +1400,7 @@
       "source_location": "L25",
       "_origin": "ast",
       "id": "trades_tradechart_tradechart",
-      "community": 12,
+      "community": 7,
       "norm_label": "tradechart()"
     },
     {
@@ -1434,20 +1434,30 @@
       "norm_label": "tradestableprops"
     },
     {
-      "label": "SYSTEM_TAGS",
+      "label": "TagObject",
       "file_type": "code",
       "source_file": "apps/web/src/components/trades/TradesTable.tsx",
       "source_location": "L54",
       "_origin": "ast",
-      "id": "trades_tradestable_system_tags",
+      "id": "trades_tradestable_tagobject",
       "community": 7,
-      "norm_label": "system_tags"
+      "norm_label": "tagobject"
+    },
+    {
+      "label": "DEFAULT_SYSTEM_TAGS",
+      "file_type": "code",
+      "source_file": "apps/web/src/components/trades/TradesTable.tsx",
+      "source_location": "L61",
+      "_origin": "ast",
+      "id": "trades_tradestable_default_system_tags",
+      "community": 7,
+      "norm_label": "default_system_tags"
     },
     {
       "label": "DEFAULT_EMOTIONS",
       "file_type": "code",
       "source_file": "apps/web/src/components/trades/TradesTable.tsx",
-      "source_location": "L56",
+      "source_location": "L69",
       "_origin": "ast",
       "id": "trades_tradestable_default_emotions",
       "community": 7,
@@ -1457,7 +1467,7 @@
       "label": "getJalaliDisplayDate()",
       "file_type": "code",
       "source_file": "apps/web/src/components/trades/TradesTable.tsx",
-      "source_location": "L64",
+      "source_location": "L77",
       "_origin": "ast",
       "id": "trades_tradestable_getjalalidisplaydate",
       "community": 7,
@@ -1467,7 +1477,7 @@
       "label": "getLocalDateStr()",
       "file_type": "code",
       "source_file": "apps/web/src/components/trades/TradesTable.tsx",
-      "source_location": "L80",
+      "source_location": "L93",
       "_origin": "ast",
       "id": "trades_tradestable_getlocaldatestr",
       "community": 7,
@@ -1477,7 +1487,7 @@
       "label": "TradesTable()",
       "file_type": "code",
       "source_file": "apps/web/src/components/trades/TradesTable.tsx",
-      "source_location": "L98",
+      "source_location": "L111",
       "_origin": "ast",
       "id": "trades_tradestable_tradestable",
       "community": 7,
@@ -1590,7 +1600,7 @@
       "source_location": "L34",
       "_origin": "ast",
       "id": "store_useappstore_useappstore",
-      "community": 32,
+      "community": 7,
       "norm_label": "useappstore"
     },
     {
@@ -1630,7 +1640,7 @@
       "source_location": "L186",
       "_origin": "ast",
       "id": "store_usetradestore_usetradestore",
-      "community": 32,
+      "community": 7,
       "norm_label": "usetradestore"
     },
     {
@@ -1762,16 +1772,6 @@
       "id": "utils_tradehelpers_getsymbolfilteroptions",
       "community": 20,
       "norm_label": "getsymbolfilteroptions()"
-    },
-    {
-      "label": "isTradeIgnored()",
-      "file_type": "code",
-      "source_file": "apps/web/src/utils/tradeHelpers.ts",
-      "source_location": "L187",
-      "_origin": "ast",
-      "id": "utils_tradehelpers_istradeignored",
-      "community": 7,
-      "norm_label": "istradeignored()"
     },
     {
       "label": "tsconfig.json",
@@ -2250,7 +2250,7 @@
       "source_location": "L18",
       "_origin": "ast",
       "id": "emil_design_eng_skill_core_philosophy",
-      "community": 19,
+      "community": 31,
       "norm_label": "core philosophy"
     },
     {
@@ -2260,7 +2260,7 @@
       "source_location": "L20",
       "_origin": "ast",
       "id": "emil_design_eng_skill_taste_is_trained_not_innate",
-      "community": 19,
+      "community": 31,
       "norm_label": "taste is trained, not innate"
     },
     {
@@ -2270,7 +2270,7 @@
       "source_location": "L26",
       "_origin": "ast",
       "id": "emil_design_eng_skill_unseen_details_compound",
-      "community": 19,
+      "community": 31,
       "norm_label": "unseen details compound"
     },
     {
@@ -2280,7 +2280,7 @@
       "source_location": "L34",
       "_origin": "ast",
       "id": "emil_design_eng_skill_beauty_is_leverage",
-      "community": 19,
+      "community": 31,
       "norm_label": "beauty is leverage"
     },
     {
@@ -2300,7 +2300,7 @@
       "source_location": "L62",
       "_origin": "ast",
       "id": "emil_design_eng_skill_the_animation_decision_framework",
-      "community": 19,
+      "community": 12,
       "norm_label": "the animation decision framework"
     },
     {
@@ -2310,7 +2310,7 @@
       "source_location": "L66",
       "_origin": "ast",
       "id": "emil_design_eng_skill_1_should_this_animate_at_all",
-      "community": 19,
+      "community": 12,
       "norm_label": "1. should this animate at all?"
     },
     {
@@ -2320,7 +2320,7 @@
       "source_location": "L81",
       "_origin": "ast",
       "id": "emil_design_eng_skill_2_what_is_the_purpose",
-      "community": 19,
+      "community": 12,
       "norm_label": "2. what is the purpose?"
     },
     {
@@ -2330,7 +2330,7 @@
       "source_location": "L95",
       "_origin": "ast",
       "id": "emil_design_eng_skill_3_what_easing_should_it_use",
-      "community": 19,
+      "community": 12,
       "norm_label": "3. what easing should it use?"
     },
     {
@@ -2340,7 +2340,7 @@
       "source_location": "L125",
       "_origin": "ast",
       "id": "emil_design_eng_skill_4_how_fast_should_it_be",
-      "community": 19,
+      "community": 12,
       "norm_label": "4. how fast should it be?"
     },
     {
@@ -2350,7 +2350,7 @@
       "source_location": "L137",
       "_origin": "ast",
       "id": "emil_design_eng_skill_perceived_performance",
-      "community": 19,
+      "community": 12,
       "norm_label": "perceived performance"
     },
     {
@@ -2360,7 +2360,7 @@
       "source_location": "L147",
       "_origin": "ast",
       "id": "emil_design_eng_skill_spring_animations",
-      "community": 19,
+      "community": 30,
       "norm_label": "spring animations"
     },
     {
@@ -2370,7 +2370,7 @@
       "source_location": "L151",
       "_origin": "ast",
       "id": "emil_design_eng_skill_when_to_use_springs",
-      "community": 19,
+      "community": 30,
       "norm_label": "when to use springs"
     },
     {
@@ -2380,7 +2380,7 @@
       "source_location": "L158",
       "_origin": "ast",
       "id": "emil_design_eng_skill_spring_based_mouse_interactions",
-      "community": 19,
+      "community": 30,
       "norm_label": "spring-based mouse interactions"
     },
     {
@@ -2390,7 +2390,7 @@
       "source_location": "L177",
       "_origin": "ast",
       "id": "emil_design_eng_skill_spring_configuration",
-      "community": 19,
+      "community": 30,
       "norm_label": "spring configuration"
     },
     {
@@ -2400,7 +2400,7 @@
       "source_location": "L193",
       "_origin": "ast",
       "id": "emil_design_eng_skill_interruptibility_advantage",
-      "community": 19,
+      "community": 30,
       "norm_label": "interruptibility advantage"
     },
     {
@@ -2490,7 +2490,7 @@
       "source_location": "L351",
       "_origin": "ast",
       "id": "emil_design_eng_skill_css_transform_mastery",
-      "community": 19,
+      "community": 28,
       "norm_label": "css transform mastery"
     },
     {
@@ -2500,7 +2500,7 @@
       "source_location": "L353",
       "_origin": "ast",
       "id": "emil_design_eng_skill_translatey_with_percentages",
-      "community": 19,
+      "community": 28,
       "norm_label": "translatey with percentages"
     },
     {
@@ -2510,7 +2510,7 @@
       "source_location": "L371",
       "_origin": "ast",
       "id": "emil_design_eng_skill_scale_scales_children_too",
-      "community": 19,
+      "community": 28,
       "norm_label": "scale() scales children too"
     },
     {
@@ -2520,7 +2520,7 @@
       "source_location": "L375",
       "_origin": "ast",
       "id": "emil_design_eng_skill_3d_transforms_for_depth",
-      "community": 19,
+      "community": 28,
       "norm_label": "3d transforms for depth"
     },
     {
@@ -2530,7 +2530,7 @@
       "source_location": "L394",
       "_origin": "ast",
       "id": "emil_design_eng_skill_transform_origin",
-      "community": 19,
+      "community": 28,
       "norm_label": "transform-origin"
     },
     {
@@ -2600,7 +2600,7 @@
       "source_location": "L444",
       "_origin": "ast",
       "id": "emil_design_eng_skill_gesture_and_drag_interactions",
-      "community": 19,
+      "community": 27,
       "norm_label": "gesture and drag interactions"
     },
     {
@@ -2610,7 +2610,7 @@
       "source_location": "L446",
       "_origin": "ast",
       "id": "emil_design_eng_skill_momentum_based_dismissal",
-      "community": 19,
+      "community": 27,
       "norm_label": "momentum-based dismissal"
     },
     {
@@ -2620,7 +2620,7 @@
       "source_location": "L459",
       "_origin": "ast",
       "id": "emil_design_eng_skill_damping_at_boundaries",
-      "community": 19,
+      "community": 27,
       "norm_label": "damping at boundaries"
     },
     {
@@ -2630,7 +2630,7 @@
       "source_location": "L463",
       "_origin": "ast",
       "id": "emil_design_eng_skill_pointer_capture_for_drag",
-      "community": 19,
+      "community": 27,
       "norm_label": "pointer capture for drag"
     },
     {
@@ -2640,7 +2640,7 @@
       "source_location": "L467",
       "_origin": "ast",
       "id": "emil_design_eng_skill_multi_touch_protection",
-      "community": 19,
+      "community": 27,
       "norm_label": "multi-touch protection"
     },
     {
@@ -2650,7 +2650,7 @@
       "source_location": "L478",
       "_origin": "ast",
       "id": "emil_design_eng_skill_friction_instead_of_hard_stops",
-      "community": 19,
+      "community": 27,
       "norm_label": "friction instead of hard stops"
     },
     {
@@ -2750,7 +2750,7 @@
       "source_location": "L562",
       "_origin": "ast",
       "id": "emil_design_eng_skill_the_sonner_principles_building_loved_components",
-      "community": 19,
+      "community": 29,
       "norm_label": "the sonner principles (building loved components)"
     },
     {
@@ -2760,7 +2760,7 @@
       "source_location": "L578",
       "_origin": "ast",
       "id": "emil_design_eng_skill_cohesion_matters",
-      "community": 19,
+      "community": 29,
       "norm_label": "cohesion matters"
     },
     {
@@ -2770,7 +2770,7 @@
       "source_location": "L584",
       "_origin": "ast",
       "id": "emil_design_eng_skill_the_opacity_height_combination",
-      "community": 19,
+      "community": 29,
       "norm_label": "the opacity + height combination"
     },
     {
@@ -2780,7 +2780,7 @@
       "source_location": "L588",
       "_origin": "ast",
       "id": "emil_design_eng_skill_review_your_work_the_next_day",
-      "community": 19,
+      "community": 29,
       "norm_label": "review your work the next day"
     },
     {
@@ -2790,7 +2790,7 @@
       "source_location": "L592",
       "_origin": "ast",
       "id": "emil_design_eng_skill_asymmetric_enter_exit_timing",
-      "community": 19,
+      "community": 29,
       "norm_label": "asymmetric enter/exit timing"
     },
     {
@@ -2810,7 +2810,7 @@
       "source_location": "L642",
       "_origin": "ast",
       "id": "emil_design_eng_skill_debugging_animations",
-      "community": 19,
+      "community": 33,
       "norm_label": "debugging animations"
     },
     {
@@ -2820,7 +2820,7 @@
       "source_location": "L644",
       "_origin": "ast",
       "id": "emil_design_eng_skill_slow_motion_testing",
-      "community": 19,
+      "community": 33,
       "norm_label": "slow motion testing"
     },
     {
@@ -2830,7 +2830,7 @@
       "source_location": "L655",
       "_origin": "ast",
       "id": "emil_design_eng_skill_frame_by_frame_inspection",
-      "community": 19,
+      "community": 33,
       "norm_label": "frame-by-frame inspection"
     },
     {
@@ -2840,7 +2840,7 @@
       "source_location": "L659",
       "_origin": "ast",
       "id": "emil_design_eng_skill_test_on_real_devices",
-      "community": 19,
+      "community": 33,
       "norm_label": "test on real devices"
     },
     {
@@ -3344,10 +3344,20 @@
       "norm_label": "main and sub-pair grouping filter"
     },
     {
-      "label": "Select Component (`src/components/Select.tsx` + `select.scss`)",
+      "label": "Persistent Tag Library & Trade Ignoring System",
       "file_type": "document",
       "source_file": "apps/web/PROGRESS.md",
       "source_location": "L87",
+      "_origin": "ast",
+      "id": "web_progress_persistent_tag_library_trade_ignoring_system",
+      "community": 5,
+      "norm_label": "persistent tag library & trade ignoring system"
+    },
+    {
+      "label": "Select Component (`src/components/Select.tsx` + `select.scss`)",
+      "file_type": "document",
+      "source_file": "apps/web/PROGRESS.md",
+      "source_location": "L93",
       "_origin": "ast",
       "id": "web_progress_select_component_src_components_select_tsx_select_scss",
       "community": 5,
@@ -3357,7 +3367,7 @@
       "label": "Utilities (`src/utils/farsi.ts`, `src/utils/tradeHelpers.ts`)",
       "file_type": "document",
       "source_file": "apps/web/PROGRESS.md",
-      "source_location": "L95",
+      "source_location": "L101",
       "_origin": "ast",
       "id": "web_progress_utilities_src_utils_farsi_ts_src_utils_tradehelpers_ts",
       "community": 5,
@@ -3367,7 +3377,7 @@
       "label": "Dashboard & Analytics (Journal Page - Overview & Charts Tabs)",
       "file_type": "document",
       "source_file": "apps/web/PROGRESS.md",
-      "source_location": "L103",
+      "source_location": "L109",
       "_origin": "ast",
       "id": "web_progress_dashboard_analytics_journal_page_overview_charts_tabs",
       "community": 5,
@@ -3377,7 +3387,7 @@
       "label": "\u274c Not Done (Next Steps)",
       "file_type": "document",
       "source_file": "apps/web/PROGRESS.md",
-      "source_location": "L112",
+      "source_location": "L118",
       "_origin": "ast",
       "id": "web_progress_not_done_next_steps",
       "community": 5,
@@ -3387,7 +3397,7 @@
       "label": "High Priority",
       "file_type": "document",
       "source_file": "apps/web/PROGRESS.md",
-      "source_location": "L114",
+      "source_location": "L120",
       "_origin": "ast",
       "id": "web_progress_high_priority",
       "community": 5,
@@ -3397,7 +3407,7 @@
       "label": "Medium Priority",
       "file_type": "document",
       "source_file": "apps/web/PROGRESS.md",
-      "source_location": "L118",
+      "source_location": "L123",
       "_origin": "ast",
       "id": "web_progress_medium_priority",
       "community": 5,
@@ -3407,7 +3417,7 @@
       "label": "Low Priority",
       "file_type": "document",
       "source_file": "apps/web/PROGRESS.md",
-      "source_location": "L125",
+      "source_location": "L130",
       "_origin": "ast",
       "id": "web_progress_low_priority",
       "community": 5,
@@ -5072,17 +5082,6 @@
       "target": "utils_tradehelpers_gettradingsession"
     },
     {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "apps/web/src/app/journal/page.tsx",
-      "source_location": "L8",
-      "weight": 1.0,
-      "source": "journal_page",
-      "target": "utils_tradehelpers_istradeignored",
-      "confidence_score": 1.0
-    },
-    {
       "relation": "calls",
       "context": "call",
       "confidence": "EXTRACTED",
@@ -5764,17 +5763,6 @@
       "target": "utils_tradehelpers_gettradingsession"
     },
     {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "apps/web/src/components/trades/DesktopTable.tsx",
-      "source_location": "L6",
-      "weight": 1.0,
-      "source": "trades_desktoptable",
-      "target": "utils_tradehelpers_istradeignored",
-      "confidence_score": 1.0
-    },
-    {
       "relation": "references",
       "context": "field",
       "confidence": "EXTRACTED",
@@ -5837,6 +5825,17 @@
       "confidence_score": 1.0,
       "source": "trades_detailpanel",
       "target": "trades_tradestable"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/components/trades/DetailPanel.tsx",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "trades_detailpanel",
+      "target": "trades_tradestable_tagobject",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
@@ -5947,6 +5946,17 @@
       "confidence_score": 1.0,
       "source": "trades_detailpanel",
       "target": "utils_tradehelpers_gettradingsession"
+    },
+    {
+      "relation": "references",
+      "context": "generic_arg",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/components/trades/DetailPanel.tsx",
+      "source_location": "L18",
+      "weight": 1.0,
+      "source": "trades_detailpanel_detailpanelprops",
+      "target": "trades_tradestable_tagobject",
+      "confidence_score": 1.0
     },
     {
       "relation": "references",
@@ -6220,17 +6230,6 @@
       "target": "utils_tradehelpers_gettradingsession"
     },
     {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "apps/web/src/components/trades/MobileCardsList.tsx",
-      "source_location": "L6",
-      "weight": 1.0,
-      "source": "trades_mobilecardslist",
-      "target": "utils_tradehelpers_istradeignored",
-      "confidence_score": 1.0
-    },
-    {
       "relation": "references",
       "context": "field",
       "confidence": "EXTRACTED",
@@ -6415,6 +6414,16 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "apps/web/src/components/trades/TradesTable.tsx",
+      "source_location": "L61",
+      "weight": 1.0,
+      "source": "trades_tradestable",
+      "target": "trades_tradestable_default_system_tags",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/src/components/trades/TradesTable.tsx",
       "source_location": "L81",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -6437,9 +6446,9 @@
       "source_file": "apps/web/src/components/trades/TradesTable.tsx",
       "source_location": "L54",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "trades_tradestable",
-      "target": "trades_tradestable_system_tags"
+      "target": "trades_tradestable_tagobject",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -6536,17 +6545,6 @@
       "confidence_score": 1.0,
       "source": "trades_tradestable",
       "target": "utils_tradehelpers_getmainpair"
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "apps/web/src/components/trades/TradesTable.tsx",
-      "source_location": "L11",
-      "weight": 1.0,
-      "source": "trades_tradestable",
-      "target": "utils_tradehelpers_istradeignored",
-      "confidence_score": 1.0
     },
     {
       "relation": "imports",
@@ -6878,16 +6876,6 @@
       "confidence_score": 1.0,
       "source": "utils_tradehelpers",
       "target": "utils_tradehelpers_gettradingsession"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "apps/web/src/utils/tradeHelpers.ts",
-      "source_location": "L187",
-      "weight": 1.0,
-      "source": "utils_tradehelpers",
-      "target": "utils_tradehelpers_istradeignored",
-      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -8353,6 +8341,16 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "apps/web/PROGRESS.md",
+      "source_location": "L87",
+      "weight": 1.0,
+      "source": "web_progress_done",
+      "target": "web_progress_persistent_tag_library_trade_ignoring_system",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/PROGRESS.md",
       "source_location": "L78",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -8901,5 +8899,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "d9270874f7c868feea88ae8c1e46ae683f515275"
+  "built_at_commit": "580dc849e6143d3e5228ecebfd9ee840999b4e8b"
 }

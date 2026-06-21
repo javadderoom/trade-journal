@@ -8,7 +8,7 @@ import FilterBar from './FilterBar';
 import DesktopTable from './DesktopTable';
 import MobileCardsList from './MobileCardsList';
 import DetailPanel from './DetailPanel';
-import { getMainPair, isTradeIgnored } from '../../utils/tradeHelpers';
+import { getMainPair } from '../../utils/tradeHelpers';
 
 export interface Trade {
   id: string;
@@ -51,7 +51,20 @@ interface TradesTableProps {
   onAccountIdChange?: (val: string) => void;
 }
 
-const SYSTEM_TAGS = ['فرصت از دست رفته', 'Missed', 'ignore', 'Ignore', 'نادیده گرفتن'];
+export interface TagObject {
+  id?: string;
+  name: string;
+  is_ignored: boolean;
+  show_first: boolean;
+}
+
+const DEFAULT_SYSTEM_TAGS: TagObject[] = [
+  { name: 'فرصت از دست رفته', is_ignored: true, show_first: false },
+  { name: 'Missed', is_ignored: true, show_first: false },
+  { name: 'ignore', is_ignored: true, show_first: false },
+  { name: 'Ignore', is_ignored: true, show_first: false },
+  { name: 'نادیده گرفتن', is_ignored: true, show_first: false },
+];
 
 const DEFAULT_EMOTIONS = [
   { value: 'CONFIDENT', label: 'با اطمینان' },
@@ -205,7 +218,7 @@ export default function TradesTable({
     return ['همه نمادها', ...Array.from(symbols)];
   }, [trades]);
 
-  const [allTags, setAllTags] = useState<string[]>(SYSTEM_TAGS);
+  const [allTags, setAllTags] = useState<TagObject[]>(DEFAULT_SYSTEM_TAGS);
 
   // Fetch custom persistent tags from database on mount
   useEffect(() => {
@@ -217,8 +230,16 @@ export default function TradesTable({
           const customTags = await res.json();
           if (Array.isArray(customTags)) {
             setAllTags(prev => {
-              const set = new Set([...prev, ...customTags]);
-              return Array.from(set);
+              const map = new Map<string, TagObject>();
+              prev.forEach(t => map.set(t.name, t));
+              customTags.forEach((t: TagObject) => {
+                map.set(t.name, {
+                  name: t.name,
+                  is_ignored: Boolean(t.is_ignored),
+                  show_first: Boolean(t.show_first),
+                });
+              });
+              return Array.from(map.values());
             });
           }
         }
@@ -232,13 +253,61 @@ export default function TradesTable({
   const handleAddCustomTag = async (newTag: string) => {
     try {
       const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://127.0.0.1:3000';
-      await fetch(`${baseUrl}/api/trades/tags`, {
+      const res = await fetch(`${baseUrl}/api/trades/tags`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: newTag }),
+        body: JSON.stringify({ name: newTag, is_ignored: false, show_first: false }),
       });
+      if (res.ok) {
+        const persisted = await res.json();
+        setAllTags(prev => {
+          const map = new Map<string, TagObject>();
+          prev.forEach(t => map.set(t.name, t));
+          map.set(newTag, {
+            name: newTag,
+            is_ignored: Boolean(persisted.is_ignored),
+            show_first: Boolean(persisted.show_first),
+          });
+          return Array.from(map.values());
+        });
+      }
     } catch (err) {
       console.error('Failed to persist custom tag:', err);
+    }
+  };
+
+  const handleUpdateTagOptions = async (tagName: string, options: { is_ignored?: boolean; show_first?: boolean }) => {
+    try {
+      const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://127.0.0.1:3000';
+      const res = await fetch(`${baseUrl}/api/trades/tags/${encodeURIComponent(tagName)}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(options),
+      });
+      if (res.ok) {
+        setAllTags(prev => prev.map(t => t.name === tagName ? { ...t, ...options } : t));
+      }
+    } catch (err) {
+      console.error('Failed to update tag options:', err);
+    }
+  };
+
+  const handleDeleteTagFromLibrary = async (tagName: string) => {
+    try {
+      const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://127.0.0.1:3000';
+      const res = await fetch(`${baseUrl}/api/trades/tags/${encodeURIComponent(tagName)}`, {
+        method: 'DELETE',
+      });
+      if (res.ok) {
+        setAllTags(prev => prev.filter(t => t.name !== tagName));
+        // Also remove this tag from all local trades state
+        setTrades(prev => prev.map(t => ({
+          ...t,
+          tags: t.tags.filter(tag => tag !== tagName)
+        })));
+      }
+    } catch (err) {
+      console.error('Failed to delete tag from library:', err);
     }
   };
 
@@ -246,13 +315,18 @@ export default function TradesTable({
   useEffect(() => {
     if (trades.length === 0) return;
     setAllTags(prev => {
-      const set = new Set(prev);
+      const map = new Map<string, TagObject>();
+      prev.forEach(t => map.set(t.name, t));
       trades.forEach(t => {
         if (t.tags && Array.isArray(t.tags)) {
-          t.tags.forEach(tag => { if (tag) set.add(tag); });
+          t.tags.forEach(tag => {
+            if (tag && !map.has(tag)) {
+              map.set(tag, { name: tag, is_ignored: false, show_first: false });
+            }
+          });
         }
       });
-      return Array.from(set);
+      return Array.from(map.values());
     });
   }, [trades]);
 
@@ -275,6 +349,14 @@ export default function TradesTable({
   const activeTrade = useMemo(() => {
     return trades.find(t => t.id === activeTradeId) || null;
   }, [trades, activeTradeId]);
+
+  const ignoredTagsSet = useMemo(() => {
+    const set = new Set<string>();
+    allTags.forEach(t => {
+      if (t.is_ignored) set.add(t.name);
+    });
+    return set;
+  }, [allTags]);
 
   // Filtered trades
   const filteredTrades = useMemo(() => {
@@ -310,25 +392,25 @@ export default function TradesTable({
           return false;
         }
       }
-      const isMissed = isTradeIgnored(trade.tags);
+      const isMissed = trade.tags?.some(tag => ignoredTagsSet.has(tag));
       if (selectedStatus === 'OPEN' && (isMissed || trade.closeTime !== null)) return false;
       if (selectedStatus === 'CLOSED' && (isMissed || trade.closeTime === null)) return false;
       if (selectedStatus === 'MISSED' && !isMissed) return false;
       return true;
     });
-  }, [trades, selectedSymbol, selectedDirection, searchQuery, selectedStatus, filterDatesArray, selectedTimezone]);
+  }, [trades, selectedSymbol, selectedDirection, searchQuery, selectedStatus, filterDatesArray, selectedTimezone, ignoredTagsSet]);
 
   // Summary Metrics
   const summary = useMemo(() => {
     const activeTrades = filteredTrades.filter(
-      t => !isTradeIgnored(t.tags)
+      t => !t.tags?.some(tag => ignoredTagsSet.has(tag))
     );
     const count = activeTrades.length;
     const wins = activeTrades.filter(t => t.profitUsd > 0).length;
     const winRate = count > 0 ? Math.round((wins / count) * 100) : 0;
     const totalProfit = activeTrades.reduce((sum, t) => sum + t.profitUsd, 0);
     return { count, winRate, totalProfit };
-  }, [filteredTrades]);
+  }, [filteredTrades, ignoredTagsSet]);
 
   // Paginated trades
   const paginatedTrades = useMemo(() => {
@@ -734,6 +816,7 @@ export default function TradesTable({
             usdToToman={usdToToman}
             allEmotions={allEmotions}
             accounts={accounts}
+            ignoredTags={ignoredTagsSet}
           />
         </div>
 
@@ -751,6 +834,7 @@ export default function TradesTable({
           currentPage={currentPage}
           setCurrentPage={setCurrentPage}
           itemsPerPage={itemsPerPage}
+          ignoredTags={ignoredTagsSet}
         />
 
         {/* 6. Pagination */}
@@ -794,6 +878,8 @@ export default function TradesTable({
           setAllTags={setAllTags}
           allEmotions={allEmotions}
           onAddCustomTag={handleAddCustomTag}
+          onUpdateTagOptions={handleUpdateTagOptions}
+          onDeleteTagFromLibrary={handleDeleteTagFromLibrary}
           setAllEmotions={setAllEmotions}
           isUploading={isUploading}
           setLightboxUrl={setLightboxUrl}

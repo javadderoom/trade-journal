@@ -339,7 +339,7 @@ router.get('/tags', async (req: Request, res: Response) => {
       where: { user_id: userId },
       orderBy: { name: 'asc' },
     });
-    res.status(200).json(tags.map(t => t.name));
+    res.status(200).json(tags);
   } catch (err: any) {
     console.error('Fetch tags error:', err);
     res.status(500).json({ error: err.message || 'Internal server error' });
@@ -352,7 +352,7 @@ router.get('/tags', async (req: Request, res: Response) => {
  */
 router.post('/tags', async (req: Request, res: Response) => {
   try {
-    const { name } = req.body;
+    const { name, is_ignored, show_first } = req.body;
     const userId = req.body.userId || 'dev-user';
 
     if (!name || typeof name !== 'string' || !name.trim()) {
@@ -372,13 +372,48 @@ router.post('/tags', async (req: Request, res: Response) => {
       create: {
         user_id: userId,
         name: cleanName,
+        is_ignored: is_ignored !== undefined ? Boolean(is_ignored) : false,
+        show_first: show_first !== undefined ? Boolean(show_first) : false,
       },
-      update: {},
+      update: {
+        is_ignored: is_ignored !== undefined ? Boolean(is_ignored) : undefined,
+        show_first: show_first !== undefined ? Boolean(show_first) : undefined,
+      },
     });
 
     res.status(201).json(tag);
   } catch (err: any) {
     console.error('Create tag error:', err);
+    res.status(500).json({ error: err.message || 'Internal server error' });
+  }
+});
+
+/**
+ * PUT /api/trades/tags/:name
+ * Updates options (is_ignored, show_first) for a specific tag.
+ */
+router.put('/tags/:name', async (req: Request, res: Response) => {
+  try {
+    const name = req.params.name as string;
+    const { is_ignored, show_first } = req.body;
+    const userId = req.body.userId || 'dev-user';
+
+    const updated = await prisma.tag.update({
+      where: {
+        user_id_name: {
+          user_id: userId,
+          name: name,
+        },
+      },
+      data: {
+        is_ignored: is_ignored !== undefined ? Boolean(is_ignored) : undefined,
+        show_first: show_first !== undefined ? Boolean(show_first) : undefined,
+      },
+    });
+
+    res.status(200).json(updated);
+  } catch (err: any) {
+    console.error('Update tag error:', err);
     res.status(500).json({ error: err.message || 'Internal server error' });
   }
 });

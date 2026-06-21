@@ -1,16 +1,16 @@
 # Graph Report - trade-journal  (2026-06-21)
 
 ## Corpus Check
-- 56 files · ~254,447 words
+- 56 files · ~255,408 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 389 nodes · 486 edges · 28 communities (24 shown, 4 thin omitted)
+- 390 nodes · 485 edges · 34 communities (30 shown, 4 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `d9270874`
+- Built from commit: `580dc849`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -40,13 +40,19 @@
 - [[_COMMUNITY_Community 24|Community 24]]
 - [[_COMMUNITY_Community 25|Community 25]]
 - [[_COMMUNITY_Community 26|Community 26]]
+- [[_COMMUNITY_Community 27|Community 27]]
+- [[_COMMUNITY_Community 28|Community 28]]
+- [[_COMMUNITY_Community 29|Community 29]]
+- [[_COMMUNITY_Community 30|Community 30]]
+- [[_COMMUNITY_Community 31|Community 31]]
 - [[_COMMUNITY_Community 32|Community 32]]
+- [[_COMMUNITY_Community 33|Community 33]]
 
 ## God Nodes (most connected - your core abstractions)
 1. `toPersianDigits()` - 21 edges
 2. `Design Engineering` - 16 edges
 3. `compilerOptions` - 15 edges
-4. `✅ Done` - 13 edges
+4. `✅ Done` - 14 edges
 5. `معامله‌یار — Persian Trading Journal Platform` - 13 edges
 6. `Trade` - 10 edges
 7. `formatToman()` - 10 edges
@@ -57,19 +63,19 @@
 ## Surprising Connections (you probably didn't know these)
 - `TradingCalendar()` --calls--> `toPersianDigits()`  [EXTRACTED]
   apps/web/src/components/journal/TradingCalendar.tsx → apps/web/src/utils/farsi.ts
-- `JournalPage()` --calls--> `useAppStore`  [EXTRACTED]
-  apps/web/src/app/journal/page.tsx → apps/web/src/store/useAppStore.ts
-- `JournalPage()` --calls--> `useTradeStore`  [EXTRACTED]
-  apps/web/src/app/journal/page.tsx → apps/web/src/store/useTradeStore.ts
 - `WeekdayPnlChart()` --calls--> `toPersianDigits()`  [EXTRACTED]
   apps/web/src/components/journal/WeekdayPnlChart.tsx → apps/web/src/utils/farsi.ts
 - `DesktopTableProps` --references--> `Trade`  [EXTRACTED]
   apps/web/src/components/trades/DesktopTable.tsx → apps/web/src/components/trades/TradesTable.tsx
+- `MobileCardsListProps` --references--> `Trade`  [EXTRACTED]
+  apps/web/src/components/trades/MobileCardsList.tsx → apps/web/src/components/trades/TradesTable.tsx
+- `TradeState` --references--> `Trade`  [EXTRACTED]
+  apps/web/src/store/useTradeStore.ts → apps/web/src/components/trades/TradesTable.tsx
 
 ## Import Cycles
 - None detected.
 
-## Communities (28 total, 4 thin omitted)
+## Communities (34 total, 4 thin omitted)
 
 ### Community 0 - "Community 0"
 Cohesion: 0.06
@@ -92,16 +98,16 @@ Cohesion: 0.11
 Nodes (17): compilerOptions, allowJs, esModuleInterop, incremental, isolatedModules, jsx, lib, module (+9 more)
 
 ### Community 5 - "Community 5"
-Cohesion: 0.10
-Nodes (20): API Integration in `page.tsx`, App Layout (`src/app/layout.tsx`), Dashboard & Analytics (Journal Page - Overview & Charts Tabs), Design System (`src/app/variables.scss`, `src/app/globals.scss`), ✅ Done, Exchange Rate API Route (`src/app/api/exchange-rate/route.ts`), High Priority, Import MT4/MT5 statement Modal (`src/components/ImportMT4Modal.tsx`) (+12 more)
+Cohesion: 0.09
+Nodes (21): API Integration in `page.tsx`, App Layout (`src/app/layout.tsx`), Dashboard & Analytics (Journal Page - Overview & Charts Tabs), Design System (`src/app/variables.scss`, `src/app/globals.scss`), ✅ Done, Exchange Rate API Route (`src/app/api/exchange-rate/route.ts`), High Priority, Import MT4/MT5 statement Modal (`src/components/ImportMT4Modal.tsx`) (+13 more)
 
 ### Community 6 - "Community 6"
 Cohesion: 0.13
 Nodes (14): API Progress — معامله‌یار, Database Schema (`src/prisma/schema.prisma`), ✅ Done, Express Server (`src/server.ts`), File Upload & Screenshots Middleware, High Priority, Low Priority, Medium Priority (+6 more)
 
 ### Community 7 - "Community 7"
-Cohesion: 0.11
-Nodes (35): EquityChart(), EquityChartProps, Trade, EMOTION_MAP, JournalPage(), WEEKDAY_NAMES, Trade, WeekdayPnlChart() (+27 more)
+Cohesion: 0.09
+Nodes (41): EquityChart(), EquityChartProps, Trade, EMOTION_MAP, JournalPage(), WEEKDAY_NAMES, Trade, WeekdayPnlChart() (+33 more)
 
 ### Community 8 - "Community 8"
 Cohesion: 0.12
@@ -120,16 +126,16 @@ Cohesion: 0.25
 Nodes (7): compilerOptions, esModuleInterop, module, moduleResolution, skipLibCheck, strict, target
 
 ### Community 12 - "Community 12"
-Cohesion: 0.50
-Nodes (3): CandlestickData, TradeChart(), TradeChartProps
+Cohesion: 0.33
+Nodes (6): 1. Should this animate at all?, 2. What is the purpose?, 3. What easing should it use?, 4. How fast should it be?, Perceived performance, The Animation Decision Framework
 
 ### Community 13 - "Community 13"
 Cohesion: 0.29
 Nodes (6): File, How it works, JSON payload format, MT5 Expert Advisor — Trade Sync, Notes, Setup
 
 ### Community 19 - "Community 19"
-Cohesion: 0.05
-Nodes (43): 1. Should this animate at all?, 2. What is the purpose?, 3. What easing should it use?, 3D transforms for depth, 4. How fast should it be?, Accessibility, Asymmetric enter/exit timing, Beauty is leverage (+35 more)
+Cohesion: 0.22
+Nodes (8): Accessibility, Design Engineering, Initial Response, prefers-reduced-motion, Review Checklist, Review Format (Required), Stagger Animations, Touch device hover states
 
 ### Community 20 - "Community 20"
 Cohesion: 0.32
@@ -155,24 +161,48 @@ Nodes (8): Animate enter states with @starting-style, Buttons must feel responsi
 Cohesion: 0.33
 Nodes (6): clip-path for Animation, Comparison sliders, Hold-to-delete pattern, Image reveals on scroll, Tabs with perfect color transitions, The inset shape
 
+### Community 27 - "Community 27"
+Cohesion: 0.33
+Nodes (6): Damping at boundaries, Friction instead of hard stops, Gesture and Drag Interactions, Momentum-based dismissal, Multi-touch protection, Pointer capture for drag
+
+### Community 28 - "Community 28"
+Cohesion: 0.40
+Nodes (5): 3D transforms for depth, CSS Transform Mastery, scale() scales children too, transform-origin, translateY with percentages
+
+### Community 29 - "Community 29"
+Cohesion: 0.40
+Nodes (5): Asymmetric enter/exit timing, Cohesion matters, Review your work the next day, The opacity + height combination, The Sonner Principles (Building Loved Components)
+
+### Community 30 - "Community 30"
+Cohesion: 0.40
+Nodes (5): Interruptibility advantage, Spring Animations, Spring-based mouse interactions, Spring configuration, When to use springs
+
+### Community 31 - "Community 31"
+Cohesion: 0.50
+Nodes (4): Beauty is leverage, Core Philosophy, Taste is trained, not innate, Unseen details compound
+
 ### Community 32 - "Community 32"
-Cohesion: 0.17
-Nodes (11): ImportMT4Modal(), ImportMT4ModalProps, ManualTradeModal(), ManualTradeModalProps, AppState, TradingAccount, useAppStore, useTradeStore (+3 more)
+Cohesion: 0.19
+Nodes (8): ImportMT4Modal(), ImportMT4ModalProps, ManualTradeModal(), ManualTradeModalProps, AppState, TradingAccount, ConfirmModal(), ConfirmModalProps
+
+### Community 33 - "Community 33"
+Cohesion: 0.50
+Nodes (4): Debugging Animations, Frame-by-frame inspection, Slow motion testing, Test on real devices
 
 ## Knowledge Gaps
-- **245 isolated node(s):** `name`, `version`, `private`, `dev`, `build` (+240 more)
+- **246 isolated node(s):** `name`, `version`, `private`, `dev`, `build` (+241 more)
   These have ≤1 connection - possible missing edges or undocumented components.
 - **4 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `Design Engineering` connect `Community 19` to `Community 25`, `Community 26`, `Community 22`?**
+- **Why does `Design Engineering` connect `Community 19` to `Community 33`, `Community 12`, `Community 22`, `Community 25`, `Community 26`, `Community 27`, `Community 28`, `Community 29`, `Community 30`, `Community 31`?**
   _High betweenness centrality (0.024) - this node is a cross-community bridge._
 - **Why does `toPersianDigits()` connect `Community 7` to `Community 24`?**
   _High betweenness centrality (0.008) - this node is a cross-community bridge._
 - **What connects `name`, `version`, `private` to the rest of the system?**
-  _245 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _246 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Community 0` be split into smaller, more focused modules?**
   _Cohesion score 0.05714285714285714 - nodes in this community are weakly interconnected._
 - **Should `Community 1` be split into smaller, more focused modules?**

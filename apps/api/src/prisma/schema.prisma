@@ -110,6 +110,8 @@ model Tag {
   user_id    String
   user       User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
   name       String
+  is_ignored Boolean  @default(false)
+  show_first Boolean  @default(false)
   created_at DateTime @default(now())
 
   @@unique([user_id, name])

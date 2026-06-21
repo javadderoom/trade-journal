@@ -7,8 +7,7 @@ import {
   getEmotionEmoji,
   getEmotionLabel,
   formatDate,
-  getTradingSession,
-  isTradeIgnored
+  getTradingSession
 } from '../../utils/tradeHelpers';
 
 interface MobileCardsListProps {
@@ -24,6 +23,7 @@ interface MobileCardsListProps {
   currentPage: number;
   setCurrentPage: React.Dispatch<React.SetStateAction<number>>;
   itemsPerPage: number;
+  ignoredTags: Set<string>;
 }
 
 export default function MobileCardsList({
@@ -39,6 +39,7 @@ export default function MobileCardsList({
   currentPage,
   setCurrentPage,
   itemsPerPage,
+  ignoredTags,
 }: MobileCardsListProps) {
   const formatCurrency = (val: number) => {
     return formatPersianCurrency(val);
@@ -107,7 +108,7 @@ export default function MobileCardsList({
           const isBuy = trade.direction === 'BUY';
           const isClosed = trade.closeTime !== null;
           const isActive = trade.id === activeTradeId;
-          const isMissed = isTradeIgnored(trade.tags);
+          const isMissed = trade.tags?.some(tag => ignoredTags.has(tag));
 
           let profitClass = 'profit-zero';
           if (trade.profitUsd > 0) profitClass = 'profit-positive';
