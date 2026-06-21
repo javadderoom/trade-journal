@@ -610,6 +610,9 @@
               align-items: center;
               gap: 2px;
               font-family: $font-primary;
+              background-color: rgba($primary, 0.08);
+              color: $primary;
+              border: 1px solid rgba($primary, 0.15);
 
               &.emotion-confident {
                 background-color: rgba($primary, 0.12);
@@ -2755,6 +2758,9 @@ input[type="checkbox"] {
           font-weight: 500;
           white-space: nowrap;
           font-family: $font-primary;
+          background-color: rgba($primary, 0.08);
+          color: $primary;
+          border: 1px solid rgba($primary, 0.15);
 
          &.emotion-confident {
            background-color: rgba($primary, 0.12);

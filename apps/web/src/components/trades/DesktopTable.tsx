@@ -19,7 +19,7 @@ interface DesktopTableProps {
   handleSelectRow: (e: React.ChangeEvent<HTMLInputElement>, id: string) => void;
   selectedTimezone: string;
   usdToToman: number;
-  allEmotions: { value: string; label: string }[];
+  allEmotions: { value: string; label: string; emoji?: string }[];
   accounts?: any[];
   ignoredTags: Set<string>;
 }
@@ -126,7 +126,7 @@ export default function DesktopTable({
                         <div className="symbol-metadata">
                           {trade.emotion && (
                             <span className={`emotion-mini-badge emotion-${trade.emotion.toLowerCase()}`} title={`احساس: ${getEmotionLabel(trade.emotion, allEmotions)}`}>
-                              {getEmotionEmoji(trade.emotion)} {getEmotionLabel(trade.emotion, allEmotions)}
+                              {getEmotionEmoji(trade.emotion, allEmotions)} {getEmotionLabel(trade.emotion, allEmotions)}
                             </span>
                           )}
                           {trade.tags && trade.tags.slice(0, 2).map(tag => (

@@ -67,11 +67,11 @@ const DEFAULT_SYSTEM_TAGS: TagObject[] = [
 ];
 
 const DEFAULT_EMOTIONS = [
-  { value: 'CONFIDENT', label: 'با اطمینان' },
-  { value: 'NEUTRAL', label: 'آرام/خنثی' },
-  { value: 'ANXIOUS', label: 'مضطرب' },
-  { value: 'FOMO', label: 'FOMO' },
-  { value: 'REVENGE', label: 'انتقام' },
+  { value: 'CONFIDENT', label: 'با اطمینان', emoji: '😌' },
+  { value: 'NEUTRAL', label: 'آرام/خنثی', emoji: '😐' },
+  { value: 'ANXIOUS', label: 'مضطرب', emoji: '😰' },
+  { value: 'FOMO', label: 'FOMO', emoji: '🎯' },
+  { value: 'REVENGE', label: 'انتقام', emoji: '😡' },
 ];
 
 const getJalaliDisplayDate = (gregorianDateStr: string) => {
@@ -191,7 +191,7 @@ export default function TradesTable({
   const [selectedDirection, setSelectedDirection] = useState('همه جهت‌ها');
   const [selectedStatus, setSelectedStatus] = useState<'ALL' | 'OPEN' | 'CLOSED' | 'MISSED'>('ALL');
   const [isAdvancedFiltersOpen, setIsAdvancedFiltersOpen] = useState(false);
-  const [allEmotions, setAllEmotions] = useState<{ value: string; label: string }[]>(DEFAULT_EMOTIONS);
+  const [allEmotions, setAllEmotions] = useState<{ value: string; label: string; emoji?: string }[]>(DEFAULT_EMOTIONS);
   const [selectedTimezone, setSelectedTimezone] = useState('Asia/Tehran');
 
   // USD → Toman exchange rate
@@ -305,6 +305,56 @@ export default function TradesTable({
     }
   };
 
+  // Fetch custom persistent emotions from database on mount
+  useEffect(() => {
+    const fetchCustomEmotions = async () => {
+      try {
+        const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://127.0.0.1:3000';
+        const res = await fetch(`${baseUrl}/api/trades/emotions?t=${Date.now()}`, {
+          cache: 'no-store',
+        });
+        if (res.ok) {
+          const customEmotions = await res.json();
+          if (Array.isArray(customEmotions)) {
+            if (customEmotions.length > 0) {
+              setAllEmotions(customEmotions);
+            }
+          }
+        }
+      } catch (err) {
+        console.error('Failed to fetch custom emotions:', err);
+      }
+    };
+    fetchCustomEmotions();
+  }, []);
+
+  const handleSaveEmotionConfigurations = async (emotionsList: { value: string; label: string; emoji: string }[], deletedValues: string[]) => {
+    try {
+      const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://127.0.0.1:3000';
+
+      // Update local state for trades if there are deletions
+      if (deletedValues.length > 0) {
+        setTrades(prev => prev.map(t => ({
+          ...t,
+          emotion: t.emotion && deletedValues.includes(t.emotion) ? null : t.emotion
+        })));
+      }
+
+      // Send bulk save request to backend
+      const res = await fetch(`${baseUrl}/api/trades/emotions/bulk`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ emotions: emotionsList, deletes: deletedValues }),
+      });
+
+      if (!res.ok) {
+        throw new Error('Failed to bulk save emotions');
+      }
+    } catch (err) {
+      console.error('Failed to save emotion configurations:', err);
+    }
+  };
+
   // Seed allTags from trades
   useEffect(() => {
     if (trades.length === 0) return;
@@ -333,7 +383,7 @@ export default function TradesTable({
       trades.forEach(t => {
         if (t.emotion && !existingValues.has(t.emotion)) {
           existingValues.add(t.emotion);
-          updated.push({ value: t.emotion, label: t.emotion });
+          updated.push({ value: t.emotion, label: t.emotion, emoji: '💭' });
         }
       });
       return updated;
@@ -873,6 +923,7 @@ export default function TradesTable({
           allEmotions={allEmotions}
           onAddCustomTag={handleAddCustomTag}
           onSaveTagConfigurations={handleSaveTagConfigurations}
+          onSaveEmotionConfigurations={handleSaveEmotionConfigurations}
           setAllEmotions={setAllEmotions}
           isUploading={isUploading}
           setLightboxUrl={setLightboxUrl}

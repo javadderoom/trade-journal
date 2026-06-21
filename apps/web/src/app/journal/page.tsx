@@ -42,6 +42,7 @@ export default function JournalPage() {
   } = useTradeStore();
 
   const [ignoredTags, setIgnoredTags] = useState<Set<string>>(new Set<string>());
+  const [customEmotions, setCustomEmotions] = useState<{ value: string; label: string; emoji?: string }[]>([]);
 
   // Load trades and accounts if empty
   useEffect(() => {
@@ -72,6 +73,26 @@ export default function JournalPage() {
       }
     };
     fetchCustomTags();
+  }, []);
+
+  useEffect(() => {
+    const fetchCustomEmotions = async () => {
+      try {
+        const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://127.0.0.1:3000';
+        const res = await fetch(`${baseUrl}/api/trades/emotions?t=${Date.now()}`, {
+          cache: 'no-store',
+        });
+        if (res.ok) {
+          const data = await res.json();
+          if (Array.isArray(data)) {
+            setCustomEmotions(data);
+          }
+        }
+      } catch (err) {
+        console.error('Failed to fetch emotions in journal:', err);
+      }
+    };
+    fetchCustomEmotions();
   }, []);
 
   // Compute Statistics (Tier 1 & Tier 2)
@@ -314,14 +335,17 @@ export default function JournalPage() {
     }).sort((a, b) => a.dayIndex - b.dayIndex);
 
     // Format Emotion lists
-    const emotionsList = Object.keys(emotionsGroup).map((key) => ({
-      name: key,
-      label: EMOTION_MAP[key]?.label || key,
-      emoji: EMOTION_MAP[key]?.emoji || '💭',
-      ...emotionsGroup[key],
-      winRate: (emotionsGroup[key].wins / emotionsGroup[key].total) * 100,
-      avgPnl: emotionsGroup[key].pnl / emotionsGroup[key].total,
-    })).sort((a, b) => b.pnl - a.pnl);
+    const emotionsList = Object.keys(emotionsGroup).map((key) => {
+      const foundCustom = customEmotions.find(e => e.value === key);
+      return {
+        name: key,
+        label: foundCustom?.label || EMOTION_MAP[key]?.label || key,
+        emoji: foundCustom?.emoji || EMOTION_MAP[key]?.emoji || '💭',
+        ...emotionsGroup[key],
+        winRate: (emotionsGroup[key].wins / emotionsGroup[key].total) * 100,
+        avgPnl: emotionsGroup[key].pnl / emotionsGroup[key].total,
+      };
+    }).sort((a, b) => b.pnl - a.pnl);
 
     // Format Hourly Heatmap & find max limits for opacity scaling
     const maxProfitHour = Math.max(...hoursPnl.map((h) => h.pnl), 1);

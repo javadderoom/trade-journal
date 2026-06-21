@@ -19,7 +19,7 @@ interface MobileCardsListProps {
   handleSelectRow: (e: React.ChangeEvent<HTMLInputElement>, id: string) => void;
   selectedTimezone: string;
   usdToToman: number;
-  allEmotions: { value: string; label: string }[];
+  allEmotions: { value: string; label: string; emoji?: string }[];
   currentPage: number;
   setCurrentPage: React.Dispatch<React.SetStateAction<number>>;
   itemsPerPage: number;
@@ -207,7 +207,7 @@ export default function MobileCardsList({
                 <div className="card-tags-row">
                   {trade.emotion && (
                     <span className={`emotion-mini-badge emotion-${trade.emotion.toLowerCase()}`} title={`احساس: ${getEmotionLabel(trade.emotion, allEmotions)}`}>
-                      {getEmotionEmoji(trade.emotion)} {getEmotionLabel(trade.emotion, allEmotions)}
+                      {getEmotionEmoji(trade.emotion, allEmotions)} {getEmotionLabel(trade.emotion, allEmotions)}
                     </span>
                   )}
                   {trade.tags && trade.tags.map(tag => (

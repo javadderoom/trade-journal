@@ -1,6 +1,11 @@
 import { toPersianDigits } from './farsi';
 
-export const getEmotionEmoji = (emotion: string | null): string => {
+export const getEmotionEmoji = (emotion: string | null, emotionsList?: { value: string; label: string; emoji?: string }[]): string => {
+  if (!emotion) return '💭';
+  if (emotionsList) {
+    const found = emotionsList.find(e => e.value === emotion);
+    if (found && found.emoji) return found.emoji;
+  }
   switch (emotion) {
     case 'CONFIDENT': return '😌';
     case 'NEUTRAL': return '😐';
@@ -11,10 +16,13 @@ export const getEmotionEmoji = (emotion: string | null): string => {
   }
 };
 
-export const getEmotionLabel = (emotion: string | null, emotionsList: { value: string; label: string }[]): string => {
+export const getEmotionLabel = (emotion: string | null, emotionsList?: { value: string; label: string; emoji?: string }[]): string => {
   if (!emotion) return '';
-  const found = emotionsList.find(e => e.value === emotion);
-  return found ? found.label : emotion;
+  if (emotionsList) {
+    const found = emotionsList.find(e => e.value === emotion);
+    return found ? found.label : emotion;
+  }
+  return emotion;
 };
 
 export const formatDate = (dateStr: string, timezone: string): { date: string; day: string } => {

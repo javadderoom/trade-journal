@@ -16,8 +16,8 @@ interface DetailPanelProps {
   setActiveTradeId: (id: string | null) => void;
   allTags: TagObject[];
   setAllTags: React.Dispatch<React.SetStateAction<TagObject[]>>;
-  allEmotions: { value: string; label: string }[];
-  setAllEmotions: React.Dispatch<React.SetStateAction<{ value: string; label: string }[]>>;
+  allEmotions: { value: string; label: string; emoji?: string }[];
+  setAllEmotions: React.Dispatch<React.SetStateAction<{ value: string; label: string; emoji?: string }[]>>;
   isUploading: boolean;
   setLightboxUrl: (url: string | null) => void;
   updateActiveTradeField: (key: keyof Trade, value: any) => void;
@@ -30,6 +30,7 @@ interface DetailPanelProps {
   accounts?: any[];
   onAddCustomTag?: (newTag: string) => void;
   onSaveTagConfigurations?: (tags: TagObject[], deletes: string[]) => Promise<void>;
+  onSaveEmotionConfigurations?: (emotions: { value: string; label: string; emoji: string }[], deletes: string[]) => Promise<void>;
 }
 
 export default function DetailPanel({
@@ -51,12 +52,15 @@ export default function DetailPanel({
   accounts = [],
   onAddCustomTag,
   onSaveTagConfigurations,
+  onSaveEmotionConfigurations,
 }: DetailPanelProps) {
   const [activeTab, setActiveTab] = useState<'stats' | 'journal'>('stats');
   const [isAddingTag, setIsAddingTag] = useState(false);
   const [isAddingEmotion, setIsAddingEmotion] = useState(false);
   const [isConfiguringTags, setIsConfiguringTags] = useState(false);
+  const [isConfiguringEmotions, setIsConfiguringEmotions] = useState(false);
   const [deletedTagDrafts, setDeletedTagDrafts] = useState<string[]>([]);
+  const [deletedEmotionDrafts, setDeletedEmotionDrafts] = useState<string[]>([]);
 
   // Keep ref of state to save on unmount/drawer closure if needed
   const configStateRef = React.useRef({ allTags, deletedTagDrafts, isConfiguringTags });
@@ -87,6 +91,66 @@ export default function DetailPanel({
     }
     setIsConfiguringTags(!isConfiguringTags);
   };
+
+  const configEmotionsStateRef = React.useRef({ allEmotions, deletedEmotionDrafts, isConfiguringEmotions });
+  React.useEffect(() => {
+    configEmotionsStateRef.current = { allEmotions, deletedEmotionDrafts, isConfiguringEmotions };
+  }, [allEmotions, deletedEmotionDrafts, isConfiguringEmotions]);
+
+  const saveEmotionsCallbackRef = React.useRef(onSaveEmotionConfigurations);
+  React.useEffect(() => {
+    saveEmotionsCallbackRef.current = onSaveEmotionConfigurations;
+  }, [onSaveEmotionConfigurations]);
+
+  React.useEffect(() => {
+    return () => {
+      const { allEmotions: finalEmotions, deletedEmotionDrafts: finalDeletes, isConfiguringEmotions: wasConfiguring } = configEmotionsStateRef.current;
+      if (wasConfiguring && saveEmotionsCallbackRef.current) {
+        const mapped = finalEmotions.map(e => ({
+          value: e.value,
+          label: e.label,
+          emoji: e.emoji || '💭'
+        }));
+        saveEmotionsCallbackRef.current(mapped, finalDeletes);
+      }
+    };
+  }, []);
+
+  const handleToggleEmotionsConfigMode = async () => {
+    if (isConfiguringEmotions) {
+      if (onSaveEmotionConfigurations) {
+        const mapped = allEmotions.map(e => ({
+          value: e.value,
+          label: e.label,
+          emoji: e.emoji || '💭'
+        }));
+        await onSaveEmotionConfigurations(mapped, deletedEmotionDrafts);
+      }
+      setDeletedEmotionDrafts([]);
+    }
+    setIsConfiguringEmotions(!isConfiguringEmotions);
+  };
+
+  const handleUpdateEmotionEmoji = (value: string, newEmoji: string) => {
+    setAllEmotions(prev =>
+      prev.map(e => (e.value === value ? { ...e, emoji: newEmoji } : e))
+    );
+  };
+
+  const handleUpdateEmotionLabel = (value: string, newLabel: string) => {
+    setAllEmotions(prev =>
+      prev.map(e => (e.value === value ? { ...e, label: newLabel } : e))
+    );
+  };
+
+  const handleDeleteEmotion = (value: string) => {
+    setDeletedEmotionDrafts(prev => [...prev, value]);
+    setAllEmotions(prev => prev.filter(e => e.value !== value));
+    if (activeTrade.emotion === value) {
+      updateActiveTradeField('emotion', null);
+    }
+  };
+
 
   const formatCurrency = (val: number) => {
     return formatPersianCurrency(val);
@@ -492,74 +556,185 @@ export default function DetailPanel({
             </div>
 
             <div className="form-group">
-              <label>برچسب‌های احساسی</label>
-              <div className="tags-container">
-                {[...allEmotions]
-                  .sort((a, b) => {
-                    const aSelected = activeTrade.emotion === a.value ? 1 : 0;
-                    const bSelected = activeTrade.emotion === b.value ? 1 : 0;
-                    return bSelected - aSelected;
-                  })
-                  .map(({ value, label }) => {
-                    const isSelected = activeTrade.emotion === value;
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                <label style={{ marginBottom: 0 }}>برچسب‌های احساسی</label>
+                <button
+                  type="button"
+                  onClick={handleToggleEmotionsConfigMode}
+                  style={{
+                    background: 'transparent',
+                    border: 'none',
+                    color: isConfiguringEmotions ? '#61f9b1' : '#8898aa',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '4px',
+                    fontSize: '12px',
+                    fontFamily: 'Vazirmatn',
+                    outline: 'none',
+                  }}
+                >
+                  <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>
+                    {isConfiguringEmotions ? 'check' : 'settings'}
+                  </span>
+                  {isConfiguringEmotions ? 'تأیید تنظیمات' : 'مدیریت ویژگی‌ها'}
+                </button>
+              </div>
+
+              {isConfiguringEmotions ? (
+                /* Emotions Management List View */
+                <div className="emotions-management-list" style={{ display: 'flex', flexDirection: 'column', gap: '8px', background: 'rgba(255,255,255,0.02)', padding: '10px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                  {allEmotions.map(emotion => {
+                    const displayEmoji = emotion.emoji || getEmotionEmoji(emotion.value, allEmotions);
                     return (
-                      <span
-                        key={value}
-                        className={`tag${isSelected ? ' selected' : ''}`}
-                        onClick={() =>
-                          updateActiveTradeField('emotion', isSelected ? null : value)
-                        }
-                      >
-                        {label}
-                      </span>
+                      <div key={emotion.value} style={{ display: 'flex', gap: '8px', alignItems: 'center', padding: '4px 0', borderBottom: '1px solid rgba(255,255,255,0.03)' }}>
+                        {/* Emoji Input */}
+                        <input
+                          type="text"
+                          value={displayEmoji}
+                          onChange={(e) => handleUpdateEmotionEmoji(emotion.value, e.target.value)}
+                          maxLength={4}
+                          style={{
+                            width: '40px',
+                            height: '32px',
+                            textAlign: 'center',
+                            backgroundColor: 'rgba(255,255,255,0.05)',
+                            border: '1px solid rgba(255,255,255,0.1)',
+                            borderRadius: '4px',
+                            color: '#fff',
+                            fontSize: '16px',
+                            outline: 'none',
+                            fontFamily: 'Segoe UI Emoji, Apple Color Emoji, Vazirmatn'
+                          }}
+                          title="اموجی"
+                        />
+                        {/* Label Input */}
+                        <input
+                          type="text"
+                          value={emotion.label}
+                          onChange={(e) => handleUpdateEmotionLabel(emotion.value, e.target.value)}
+                          style={{
+                            flex: 1,
+                            height: '32px',
+                            padding: '0 8px',
+                            backgroundColor: 'rgba(255,255,255,0.05)',
+                            border: '1px solid rgba(255,255,255,0.1)',
+                            borderRadius: '4px',
+                            color: '#fff',
+                            fontSize: '13px',
+                            outline: 'none',
+                            fontFamily: 'Vazirmatn'
+                          }}
+                          placeholder="نام احساس..."
+                        />
+                        {/* Delete Emotion */}
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteEmotion(emotion.value)}
+                          style={{
+                            background: 'transparent',
+                            border: 'none',
+                            color: '#ffb4ab',
+                            cursor: 'pointer',
+                            padding: '6px',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            outline: 'none',
+                          }}
+                          title="حذف احساس از کل کتابخانه"
+                        >
+                          <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>delete</span>
+                        </button>
+                      </div>
                     );
                   })}
-                {isAddingEmotion ? (
-                  <input
-                    type="text"
-                    autoFocus
-                    placeholder="احساس..."
-                    onBlur={() => setIsAddingEmotion(false)}
-                    onKeyDown={e => {
-                      if (e.key === 'Enter') {
-                        e.preventDefault();
-                        const val = e.currentTarget.value.trim();
-                        if (val) {
-                          updateActiveTradeField('emotion', val);
-                          setAllEmotions(prev => {
-                            if (prev.some(e => e.value === val)) return prev;
-                            return [...prev, { value: val, label: val }];
-                          });
+                </div>
+              ) : (
+                /* Default Selection Pool View */
+                <div className="tags-container">
+                  {[...allEmotions]
+                    .sort((a, b) => {
+                      const aSelected = activeTrade.emotion === a.value ? 1 : 0;
+                      const bSelected = activeTrade.emotion === b.value ? 1 : 0;
+                      return bSelected - aSelected;
+                    })
+                    .map(({ value, label, emoji }) => {
+                      const isSelected = activeTrade.emotion === value;
+                      const displayEmoji = emoji || getEmotionEmoji(value, allEmotions);
+                      return (
+                        <span
+                          key={value}
+                          className={`tag${isSelected ? ' selected' : ''}`}
+                          onClick={() =>
+                            updateActiveTradeField('emotion', isSelected ? null : value)
+                          }
+                          style={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '4px'
+                          }}
+                        >
+                          <span>{displayEmoji}</span>
+                          <span>{label}</span>
+                        </span>
+                      );
+                    })}
+                  {isAddingEmotion ? (
+                    <input
+                      type="text"
+                      autoFocus
+                      placeholder="احساس..."
+                      onBlur={() => setIsAddingEmotion(false)}
+                      onKeyDown={e => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault();
+                          const val = e.currentTarget.value.trim();
+                          if (val) {
+                            const match = val.match(/^(\p{Emoji_Presentation}|\p{Emoji}\uFE0F)\s*(.*)$/u);
+                            let emojiVal = '💭';
+                            let labelVal = val;
+                            if (match) {
+                              emojiVal = match[1];
+                              labelVal = match[2].trim() || val;
+                            }
+                            const valueKey = labelVal.toUpperCase();
+
+                            updateActiveTradeField('emotion', valueKey);
+                            setAllEmotions(prev => {
+                              if (prev.some(e => e.value === valueKey)) return prev;
+                              return [...prev, { value: valueKey, label: labelVal, emoji: emojiVal }];
+                            });
+                          }
+                          setIsAddingEmotion(false);
+                        } else if (e.key === 'Escape') {
+                          setIsAddingEmotion(false);
                         }
-                        setIsAddingEmotion(false);
-                      } else if (e.key === 'Escape') {
-                        setIsAddingEmotion(false);
-                      }
-                    }}
-                    style={{
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      padding: '4px 12px',
-                      backgroundColor: 'rgba(97, 249, 177, 0.05)',
-                      color: '#fff',
-                      borderRadius: '9999px',
-                      fontSize: '12px',
-                      border: '1px dashed rgba(97, 249, 177, 0.5)',
-                      outline: 'none',
-                      width: '100px',
-                      fontFamily: 'Vazirmatn'
-                    }}
-                  />
-                ) : (
-                  <span
-                    className="add-tag-btn"
-                    onClick={() => setIsAddingEmotion(true)}
-                  >
-                    <span className="material-symbols-outlined btn-icon" style={{ fontSize: '14px' }}>add</span>
-                    افزودن احساس
-                  </span>
-                )}
-              </div>
+                      }}
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        padding: '4px 12px',
+                        backgroundColor: 'rgba(97, 249, 177, 0.05)',
+                        color: '#fff',
+                        borderRadius: '9999px',
+                        fontSize: '12px',
+                        border: '1px dashed rgba(97, 249, 177, 0.5)',
+                        outline: 'none',
+                        width: '100px',
+                        fontFamily: 'Vazirmatn'
+                      }}
+                    />
+                  ) : (
+                    <span
+                      className="add-tag-btn"
+                      onClick={() => setIsAddingEmotion(true)}
+                    >
+                      <span className="material-symbols-outlined btn-icon" style={{ fontSize: '14px' }}>add</span>
+                      افزودن احساس
+                    </span>
+                  )}
+                </div>
+              )}
             </div>
 
             {/* Notes Area */}

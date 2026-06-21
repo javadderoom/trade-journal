@@ -24,6 +24,7 @@ model User {
   trades         Trade[]
   importJobs     ImportJob[]
   tags           Tag[]
+  emotions       Emotion[]
 }
 
 model Account {
@@ -115,6 +116,18 @@ model Tag {
   created_at DateTime @default(now())
 
   @@unique([user_id, name])
+}
+
+model Emotion {
+  id         String   @id @default(uuid())
+  user_id    String
+  user       User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  value      String   // Stored value string (e.g. "CONFIDENT", "REVENGE")
+  label      String   // Display label in Persian (e.g. "با اطمینان")
+  emoji      String   @default("💭")
+  created_at DateTime @default(now())
+
+  @@unique([user_id, value])
 }
 
 // --- Enums ---
