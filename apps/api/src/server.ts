@@ -7,6 +7,7 @@ import { prisma } from './services/tradeSync';
 import tradeSyncRouter from './routes/tradeSync';
 import authRouter from './routes/auth';
 import accountTokensRouter from './routes/accountTokens';
+import journalRouter from './routes/journal';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -38,6 +39,7 @@ app.use((req, res, next) => {
 app.use('/api/auth', authRouter);
 app.use('/api', accountTokensRouter);
 app.use('/api/trades', tradeSyncRouter);
+app.use('/api/journal', journalRouter);
 
 // Health check
 app.get('/api/health', (_req, res) => {

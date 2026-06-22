@@ -210,8 +210,8 @@
     "semantic_hash": ""
   },
   "apps/web/src/components/layout/SideNavBar.tsx": {
-    "mtime": 1782132423.2711978,
-    "ast_hash": "147c339fe4f173a39c18a7e6c3f3c4c4",
+    "mtime": 1782135279.0601244,
+    "ast_hash": "0ed237ed6e34440b8a0993975f3d8701",
     "semantic_hash": ""
   },
   "apps/web/src/components/modals/ImportMT4Modal.tsx": {

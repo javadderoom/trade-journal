@@ -3,7 +3,6 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import Image from 'next/image';
 import { useAuthStore } from '../../lib/auth';
 
 export default function SideNavBar() {
@@ -16,7 +15,7 @@ export default function SideNavBar() {
     { href: '/trades', label: 'معاملات', icon: 'analytics', fillIcon: true },
 
     { href: '/analytics', label: 'گزارش عملکرد', icon: 'bar_chart' },
-    { href: '/strategies', label: 'استراتژی‌ها', icon: 'query_stats' },
+    { href: '/journal', label: 'ژورنال', icon: 'sticky_note_2' },
     { href: '/settings', label: 'تنظیمات', icon: 'settings' },
   ];
 
@@ -26,13 +25,12 @@ export default function SideNavBar() {
         {/* Header */}
         <div className="sidenav-header">
           <div className="logo-box">
-            <Image
-              src="/logo.png"
+            <img
+              src="/logo.png?v=2"
               alt="معامله‌یار"
               width={40}
               height={40}
               className="logo-img"
-              priority
             />
           </div>
           <div className="title-group">

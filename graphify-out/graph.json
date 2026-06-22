@@ -1517,7 +1517,7 @@
       "label": "SideNavBar()",
       "file_type": "code",
       "source_file": "apps/web/src/components/layout/SideNavBar.tsx",
-      "source_location": "L9",
+      "source_location": "L8",
       "_origin": "ast",
       "id": "layout_sidenavbar_sidenavbar",
       "community": 14,
@@ -10953,5 +10953,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "ad4a62d6104aaa3830f27fa92a99650cfabdd30f"
+  "built_at_commit": "ee066887f8a6019c256ca3a1a8e18f204b9c5514"
 }
