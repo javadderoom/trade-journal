@@ -1,6 +1,5 @@
 import "./globals.scss";
-import SideNavBar from "../components/layout/SideNavBar";
-import BottomNavBar from "../components/layout/BottomNavBar";
+import AppLayout from "../components/layout/AppLayout";
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -16,11 +15,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
       </head>
       <body suppressHydrationWarning>
-        <div className="app-container">
-          <SideNavBar />
-          <div className="main-content-wrapper">{children}</div>
-          <BottomNavBar />
-        </div>
+        <AppLayout>{children}</AppLayout>
       </body>
     </html>
   );

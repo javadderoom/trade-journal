@@ -2,17 +2,20 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import Image from 'next/image';
+import { useAuthStore } from '../../lib/auth';
 
 export default function SideNavBar() {
   const pathname = usePathname();
+  const router = useRouter();
+  const logout = useAuthStore(state => state.logout);
 
   const navItems = [
     { href: '/dashboard', label: 'داشبورد', icon: 'dashboard' },
     { href: '/trades', label: 'معاملات', icon: 'analytics', fillIcon: true },
 
-    { href: '/journal', label: 'ژورنال', icon: 'menu_book' },
+    { href: '/analytics', label: 'گزارش عملکرد', icon: 'bar_chart' },
     { href: '/strategies', label: 'استراتژی‌ها', icon: 'query_stats' },
     { href: '/settings', label: 'تنظیمات', icon: 'settings' },
   ];
@@ -69,10 +72,27 @@ export default function SideNavBar() {
 
         {/* Footer Link */}
         <div className="sidenav-footer">
-          <Link href="/logout" className="logout-link">
+          <button
+            onClick={async () => {
+              await logout();
+              router.push('/login');
+            }}
+            className="logout-link"
+            style={{
+              background: 'none',
+              border: 'none',
+              width: '100%',
+              display: 'flex',
+              alignItems: 'center',
+              cursor: 'pointer',
+              color: 'inherit',
+              padding: 0,
+              fontFamily: 'inherit',
+            }}
+          >
             <span className="material-symbols-outlined icon">logout</span>
-            <span className="label">خروج</span>
-          </Link>
+            <span className="label" style={{ marginRight: '12px' }}>خروج</span>
+          </button>
         </div>
       </div>
     </nav>

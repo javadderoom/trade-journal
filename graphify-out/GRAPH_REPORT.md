@@ -1,16 +1,16 @@
-# Graph Report - trade-journal  (2026-06-21)
+# Graph Report - trade-journal  (2026-06-22)
 
 ## Corpus Check
-- 56 files · ~257,087 words
+- 67 files · ~264,555 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 390 nodes · 485 edges · 34 communities (30 shown, 4 thin omitted)
+- 465 nodes · 609 edges · 37 communities (31 shown, 6 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `8dc5a508`
+- Built from commit: `ad4a62d6`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -47,6 +47,9 @@
 - [[_COMMUNITY_Community 31|Community 31]]
 - [[_COMMUNITY_Community 32|Community 32]]
 - [[_COMMUNITY_Community 33|Community 33]]
+- [[_COMMUNITY_Community 34|Community 34]]
+- [[_COMMUNITY_Community 35|Community 35]]
+- [[_COMMUNITY_Community 36|Community 36]]
 
 ## God Nodes (most connected - your core abstractions)
 1. `toPersianDigits()` - 21 edges
@@ -54,44 +57,44 @@
 3. `compilerOptions` - 15 edges
 4. `✅ Done` - 14 edges
 5. `معامله‌یار — Persian Trading Journal Platform` - 13 edges
-6. `Trade` - 10 edges
-7. `formatToman()` - 10 edges
-8. `معامله‌یار — Run Commands` - 10 edges
-9. `5. Feature Breakdown — V1` - 9 edges
-10. `Component Building Principles` - 8 edges
+6. `useAuthStore` - 12 edges
+7. `Trade` - 10 edges
+8. `formatToman()` - 10 edges
+9. `معامله‌یار — Run Commands` - 10 edges
+10. `Auth Implementation Guide` - 10 edges
 
 ## Surprising Connections (you probably didn't know these)
+- `LoginPage()` --calls--> `useAuthStore`  [EXTRACTED]
+  apps/web/src/app/(auth)/login/page.tsx → apps/web/src/lib/auth.ts
+- `RegisterPage()` --calls--> `useAuthStore`  [EXTRACTED]
+  apps/web/src/app/(auth)/register/page.tsx → apps/web/src/lib/auth.ts
+- `SettingsPage()` --calls--> `useAuthStore`  [EXTRACTED]
+  apps/web/src/app/settings/page.tsx → apps/web/src/lib/auth.ts
 - `TradingCalendar()` --calls--> `toPersianDigits()`  [EXTRACTED]
   apps/web/src/components/journal/TradingCalendar.tsx → apps/web/src/utils/farsi.ts
 - `WeekdayPnlChart()` --calls--> `toPersianDigits()`  [EXTRACTED]
   apps/web/src/components/journal/WeekdayPnlChart.tsx → apps/web/src/utils/farsi.ts
-- `DesktopTableProps` --references--> `Trade`  [EXTRACTED]
-  apps/web/src/components/trades/DesktopTable.tsx → apps/web/src/components/trades/TradesTable.tsx
-- `MobileCardsListProps` --references--> `Trade`  [EXTRACTED]
-  apps/web/src/components/trades/MobileCardsList.tsx → apps/web/src/components/trades/TradesTable.tsx
-- `TradeState` --references--> `Trade`  [EXTRACTED]
-  apps/web/src/store/useTradeStore.ts → apps/web/src/components/trades/TradesTable.tsx
 
 ## Import Cycles
 - None detected.
 
-## Communities (34 total, 4 thin omitted)
+## Communities (37 total, 6 thin omitted)
 
 ### Community 0 - "Community 0"
 Cohesion: 0.06
 Nodes (34): 10. Key Risks & Mitigations, 11. Suggested Next Steps, 1. Project Overview, 2. System Architecture Overview, 3.1 Frontend, 3.2 Backend, 3.3 Database — PostgreSQL Schema (core tables), 3.4 Infrastructure (+26 more)
 
 ### Community 1 - "Community 1"
-Cohesion: 0.09
-Nodes (23): router, storage, upload, uploadDir, uploadMemory, detectFormat(), ParsedTrade, parseMT4CSV() (+15 more)
+Cohesion: 0.11
+Nodes (20): authenticate(), authenticateAccountToken(), AuthRequest, router, router, router, storage, upload (+12 more)
 
 ### Community 2 - "Community 2"
-Cohesion: 0.08
-Nodes (25): dependencies, csv-parser, depd, express, multer, node-html-parser, pg, prisma (+17 more)
+Cohesion: 0.06
+Nodes (34): dependencies, bcryptjs, cookie-parser, csv-parser, depd, express, jsonwebtoken, multer (+26 more)
 
 ### Community 3 - "Community 3"
 Cohesion: 0.11
-Nodes (17): dependencies, lightweight-charts, next, react, react-dom, sass, zustand, devDependencies (+9 more)
+Nodes (18): dependencies, axios, lightweight-charts, next, react, react-dom, sass, zustand (+10 more)
 
 ### Community 4 - "Community 4"
 Cohesion: 0.11
@@ -106,8 +109,8 @@ Cohesion: 0.13
 Nodes (14): API Progress — معامله‌یار, Database Schema (`src/prisma/schema.prisma`), ✅ Done, Express Server (`src/server.ts`), File Upload & Screenshots Middleware, High Priority, Low Priority, Medium Priority (+6 more)
 
 ### Community 7 - "Community 7"
-Cohesion: 0.09
-Nodes (41): EquityChart(), EquityChartProps, Trade, EMOTION_MAP, JournalPage(), WEEKDAY_NAMES, Trade, WeekdayPnlChart() (+33 more)
+Cohesion: 0.06
+Nodes (56): EMOTION_MAP, JournalPage(), WEEKDAY_NAMES, EquityChart(), EquityChartProps, Trade, JALALI_MONTH_NAMES, Trade (+48 more)
 
 ### Community 8 - "Community 8"
 Cohesion: 0.12
@@ -133,6 +136,10 @@ Nodes (6): 1. Should this animate at all?, 2. What is the purpose?, 3. What easi
 Cohesion: 0.29
 Nodes (6): File, How it works, JSON payload format, MT5 Expert Advisor — Trade Sync, Notes, Setup
 
+### Community 14 - "Community 14"
+Cohesion: 0.19
+Nodes (11): AppLayout(), BottomNavBar(), SideNavBar(), AuthState, useAuthStore, User, LoginPage(), RegisterPage() (+3 more)
+
 ### Community 19 - "Community 19"
 Cohesion: 0.22
 Nodes (8): Accessibility, Design Engineering, Initial Response, prefers-reduced-motion, Review Checklist, Review Format (Required), Stagger Animations, Touch device hover states
@@ -148,10 +155,6 @@ Nodes (6): compilerOptions, outDir, rootDir, types, extends, include
 ### Community 22 - "Community 22"
 Cohesion: 0.33
 Nodes (6): CSS animations beat JS under load, CSS variables are inheritable, Framer Motion hardware acceleration caveat, Only animate transform and opacity, Performance Rules, Use WAAPI for programmatic CSS animations
-
-### Community 24 - "Community 24"
-Cohesion: 0.29
-Nodes (5): JALALI_MONTH_NAMES, Trade, TradingCalendar(), TradingCalendarProps, WEEKDAY_NAMES_CALENDAR
 
 ### Community 25 - "Community 25"
 Cohesion: 0.25
@@ -182,32 +185,36 @@ Cohesion: 0.50
 Nodes (4): Beauty is leverage, Core Philosophy, Taste is trained, not innate, Unseen details compound
 
 ### Community 32 - "Community 32"
-Cohesion: 0.19
-Nodes (8): ImportMT4Modal(), ImportMT4ModalProps, ManualTradeModal(), ManualTradeModalProps, AppState, TradingAccount, ConfirmModal(), ConfirmModalProps
+Cohesion: 0.10
+Nodes (20): 1. Prisma Schema, 2. Install Dependencies, 3. Environment Variables, 4.1 Token utilities — `src/lib/tokens.ts`, 4.2 Auth middleware — `src/middleware/auth.ts`, 4.3 Validation schemas — `src/validators/auth.ts`, 4.4 Auth routes — `src/routes/auth.ts`, 4.5 Register the router — `src/index.ts` (+12 more)
 
 ### Community 33 - "Community 33"
 Cohesion: 0.50
 Nodes (4): Debugging Animations, Frame-by-frame inspection, Slow motion testing, Test on real devices
 
+### Community 34 - "Community 34"
+Cohesion: 0.20
+Nodes (12): detectFormat(), ParsedTrade, parseMT4CSV(), parseMT4HTML(), parseMT5CSV(), parseTrades(), RawTrade, ImportSource (+4 more)
+
 ## Knowledge Gaps
-- **246 isolated node(s):** `name`, `version`, `private`, `dev`, `build` (+241 more)
+- **283 isolated node(s):** `name`, `version`, `private`, `dev`, `build` (+278 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **4 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **6 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `Design Engineering` connect `Community 19` to `Community 33`, `Community 12`, `Community 22`, `Community 25`, `Community 26`, `Community 27`, `Community 28`, `Community 29`, `Community 30`, `Community 31`?**
-  _High betweenness centrality (0.024) - this node is a cross-community bridge._
-- **Why does `toPersianDigits()` connect `Community 7` to `Community 24`?**
-  _High betweenness centrality (0.008) - this node is a cross-community bridge._
+  _High betweenness centrality (0.017) - this node is a cross-community bridge._
+- **Why does `useAuthStore` connect `Community 14` to `Community 7`?**
+  _High betweenness centrality (0.007) - this node is a cross-community bridge._
 - **What connects `name`, `version`, `private` to the rest of the system?**
-  _246 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _283 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Community 0` be split into smaller, more focused modules?**
   _Cohesion score 0.05714285714285714 - nodes in this community are weakly interconnected._
 - **Should `Community 1` be split into smaller, more focused modules?**
-  _Cohesion score 0.09247311827956989 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.10984848484848485 - nodes in this community are weakly interconnected._
 - **Should `Community 2` be split into smaller, more focused modules?**
-  _Cohesion score 0.07692307692307693 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.05714285714285714 - nodes in this community are weakly interconnected._
 - **Should `Community 3` be split into smaller, more focused modules?**
-  _Cohesion score 0.1111111111111111 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.10526315789473684 - nodes in this community are weakly interconnected._

@@ -12,8 +12,8 @@ generator client {
 
 model User {
   id             String         @id @default(uuid())
-  email          String?        @unique
-  phone          String?
+  email          String         @unique
+  phone          String         @unique
   password_hash  String
   name           String?
   plan           Plan           @default(FREE)
@@ -25,18 +25,42 @@ model User {
   importJobs     ImportJob[]
   tags           Tag[]
   emotions       Emotion[]
+  refresh_tokens RefreshToken[]
 }
 
 model Account {
-  id             String      @id @default(uuid())
+  id             String         @id @default(uuid())
   user_id        String
-  user           User        @relation(fields: [user_id], references: [id])
+  user           User           @relation(fields: [user_id], references: [id])
   broker_name    String?
   account_number String?
-  currency       String      @default("USD")
-  created_at     DateTime    @default(now())
+  currency       String         @default("USD")
+  created_at     DateTime       @default(now())
   trades         Trade[]
   importJobs     ImportJob[]
+  account_tokens AccountToken[]
+}
+
+model RefreshToken {
+  id         String   @id @default(uuid())
+  token      String   @unique
+  user_id    String
+  user       User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  expires_at DateTime
+  created_at DateTime @default(now())
+
+  @@index([user_id])
+}
+
+model AccountToken {
+  id         String   @id @default(uuid())
+  account_id String
+  account    Account  @relation(fields: [account_id], references: [id], onDelete: Cascade)
+  token      String   @unique
+  name       String?
+  created_at DateTime @default(now())
+
+  @@index([account_id])
 }
 
 model Trade {

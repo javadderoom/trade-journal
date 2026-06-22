@@ -3,6 +3,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useAppStore } from '../../store/useAppStore';
 import { useTradeStore } from '../../store/useTradeStore';
+import { api } from '../../lib/api';
 import Select from '../../components/ui/Select';
 import { toPersianDigits, formatPersianCurrency, formatToman } from '../../utils/farsi';
 import { getTradingSession, getMainPair, getEmotionEmoji } from '../../utils/tradeHelpers';
@@ -52,21 +53,16 @@ export default function JournalPage() {
   useEffect(() => {
     const fetchCustomTags = async () => {
       try {
-        const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://127.0.0.1:3000';
-        const res = await fetch(`${baseUrl}/api/trades/tags?t=${Date.now()}`, {
-          cache: 'no-store',
-        });
-        if (res.ok) {
-          const tags = await res.json();
-          if (Array.isArray(tags)) {
-            const ignored = new Set<string>();
-            tags.forEach((tag: any) => {
-              if (tag.is_ignored) {
-                ignored.add(tag.name);
-              }
-            });
-            setIgnoredTags(ignored);
-          }
+        const res = await api.get(`/api/trades/tags?t=${Date.now()}`);
+        const tags = res.data;
+        if (Array.isArray(tags)) {
+          const ignored = new Set<string>();
+          tags.forEach((tag: any) => {
+            if (tag.is_ignored) {
+              ignored.add(tag.name);
+            }
+          });
+          setIgnoredTags(ignored);
         }
       } catch (err) {
         console.error('Failed to fetch tags options in journal:', err);
@@ -78,15 +74,10 @@ export default function JournalPage() {
   useEffect(() => {
     const fetchCustomEmotions = async () => {
       try {
-        const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://127.0.0.1:3000';
-        const res = await fetch(`${baseUrl}/api/trades/emotions?t=${Date.now()}`, {
-          cache: 'no-store',
-        });
-        if (res.ok) {
-          const data = await res.json();
-          if (Array.isArray(data)) {
-            setCustomEmotions(data);
-          }
+        const res = await api.get(`/api/trades/emotions?t=${Date.now()}`);
+        const data = res.data;
+        if (Array.isArray(data)) {
+          setCustomEmotions(data);
         }
       } catch (err) {
         console.error('Failed to fetch emotions in journal:', err);
@@ -494,7 +485,7 @@ export default function JournalPage() {
   if (loading) {
     return (
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', backgroundColor: '#111319', color: '#61f9b1' }}>
-        <div style={{ fontSize: '20px', fontFamily: 'Vazirmatn' }}>در حال بارگذاری تحلیل ژورنال...</div>
+        <div style={{ fontSize: '20px', fontFamily: 'Vazirmatn' }}>در حال بارگذاری گزارش عملکرد...</div>
       </div>
     );
   }
@@ -503,7 +494,7 @@ export default function JournalPage() {
     <div className="journal-container">
       {/* Header */}
       <header className="journal-header">
-        <h1>تحلیل ژورنال معاملاتی</h1>
+        <h1>گزارش عملکرد معاملات</h1>
         <div className="header-actions">
           <Select
             options={accountOptions}

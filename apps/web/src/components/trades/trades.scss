@@ -1,3 +1,4 @@
+@use 'sass:color';
 @use '../../app/variables' as *;
 
 .trades-workspace {
@@ -2912,7 +2913,7 @@ input[type="checkbox"] {
     outline: none;
 
     &:hover {
-      background-color: lighten($primary, 5%);
+      background-color: color.adjust($primary, $lightness: 5%);
       transform: scale(1.05);
     }
 
@@ -2983,7 +2984,7 @@ input[type="checkbox"] {
 
         &:hover {
           background-color: $surface-variant;
-          color: lighten($primary, 5%);
+          color: color.adjust($primary, $lightness: 5%);
           transform: scale(1.05);
         }
       }

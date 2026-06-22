@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { Trade } from '../components/trades/TradesTable';
+import { api } from '../lib/api';
 
 export const MOCK_TRADES: Trade[] = [
   {
@@ -197,17 +198,9 @@ export const useTradeStore = create<TradeState>((set, get) => ({
       }
       set({ error: null });
 
-      const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://127.0.0.1:3000';
-      const res = await fetch(`${baseUrl}/api/trades?limit=200&offset=0&accountId=${accountId}&t=${Date.now()}`, {
-        cache: 'no-store',
-      });
+      const res = await api.get(`/api/trades?limit=200&offset=0&accountId=${accountId}&t=${Date.now()}`);
       
-      if (!res.ok) {
-        throw new Error(`Failed to load: ${res.status}`);
-      }
-
-      const data = await res.json();
-      const apiItems = Array.isArray(data.items) ? data.items : [];
+      const apiItems = Array.isArray(res.data?.items) ? res.data.items : [];
 
       if (apiItems.length > 0) {
         // Map API records into the full Trade type
@@ -282,20 +275,15 @@ export const useTradeStore = create<TradeState>((set, get) => ({
       const tradeId = updatedTrade.id;
       if (tradeId.startsWith('mock-')) return true; // mock local only
 
-      const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://127.0.0.1:3000';
-      const res = await fetch(`${baseUrl}/api/trades/${tradeId}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          notes: updatedTrade.notes,
-          emotion: updatedTrade.emotion,
-          stopLoss: updatedTrade.stopLoss,
-          takeProfit: updatedTrade.takeProfit,
-          tags: updatedTrade.tags,
-        }),
+      const res = await api.put(`/api/trades/${tradeId}`, {
+        notes: updatedTrade.notes,
+        emotion: updatedTrade.emotion,
+        stopLoss: updatedTrade.stopLoss,
+        takeProfit: updatedTrade.takeProfit,
+        tags: updatedTrade.tags,
       });
 
-      return res.ok;
+      return res.status >= 200 && res.status < 300;
     } catch (err) {
       console.error('Failed to update trade on backend:', err);
       return true; // Return true so frontend local change persists
@@ -306,12 +294,9 @@ export const useTradeStore = create<TradeState>((set, get) => ({
     try {
       if (tradeId.startsWith('mock-')) return true; // local mock only
 
-      const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://127.0.0.1:3000';
-      const res = await fetch(`${baseUrl}/api/trades/${tradeId}`, {
-        method: 'DELETE',
-      });
+      const res = await api.delete(`/api/trades/${tradeId}`);
 
-      return res.ok;
+      return res.status >= 200 && res.status < 300;
     } catch (err) {
       console.error('Failed to delete trade on backend:', err);
       return true;
@@ -323,14 +308,9 @@ export const useTradeStore = create<TradeState>((set, get) => ({
       const realIds = tradeIds.filter(id => !id.startsWith('mock-'));
       if (realIds.length === 0) return true; // local mock only
 
-      const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://127.0.0.1:3000';
-      const res = await fetch(`${baseUrl}/api/trades/bulk-delete`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ids: realIds }),
-      });
+      const res = await api.post(`/api/trades/bulk-delete`, { ids: realIds });
 
-      return res.ok;
+      return res.status >= 200 && res.status < 300;
     } catch (err) {
       console.error('Failed to delete multiple trades on backend:', err);
       return true;

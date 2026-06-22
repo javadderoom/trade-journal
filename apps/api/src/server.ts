@@ -1,21 +1,33 @@
 import 'dotenv/config';
 import express from 'express';
 import path from 'node:path';
+import cookieParser from 'cookie-parser';
+import cron from 'node-cron';
+import { prisma } from './services/tradeSync';
 import tradeSyncRouter from './routes/tradeSync';
+import authRouter from './routes/auth';
+import accountTokensRouter from './routes/accountTokens';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Middleware
 app.use(express.json({ limit: '10mb' }));
+app.use(cookieParser());
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
-// CORS — allow MT5 EA and web app
-app.use((_req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+// CORS — allow credentials and dynamically match request origin
+app.use((req, res, next) => {
+  const origin = req.headers.origin;
+  if (origin) {
+    res.header('Access-Control-Allow-Origin', origin);
+  } else {
+    res.header('Access-Control-Allow-Origin', '*');
+  }
+  res.header('Access-Control-Allow-Credentials', 'true');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, x-api-token');
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  if (_req.method === 'OPTIONS') {
+  if (req.method === 'OPTIONS') {
     res.sendStatus(204);
     return;
   }
@@ -23,11 +35,25 @@ app.use((_req, res, next) => {
 });
 
 // Routes
+app.use('/api/auth', authRouter);
+app.use('/api', accountTokensRouter);
 app.use('/api/trades', tradeSyncRouter);
 
 // Health check
 app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
+// Cron job: Daily clean up expired refresh tokens at 03:00 AM
+cron.schedule('0 3 * * *', async () => {
+  try {
+    const deleted = await prisma.refreshToken.deleteMany({
+      where: { expires_at: { lt: new Date() } },
+    });
+    console.log(`[Cron] Cleared ${deleted.count} expired refresh tokens.`);
+  } catch (err) {
+    console.error('[Cron] Failed to clean up expired refresh tokens:', err);
+  }
 });
 
 // Start server

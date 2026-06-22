@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { api } from '../../lib/api';
 
 interface ManualTradeModalProps {
   isOpen: boolean;
@@ -96,25 +97,14 @@ export default function ManualTradeModal({ isOpen, onClose, onSuccess }: ManualT
         swap: swap ? parseFloat(swap) : 0,
       };
 
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || 'http://127.0.0.1:3000'}/api/trades`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(payload),
-      });
+      const res = await api.post('/api/trades', payload);
 
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || 'خطا در ثبت معامله');
-      }
-
-      const newTrade = await res.json();
+      const newTrade = res.data;
       onSuccess(newTrade);
       resetForm();
       onClose();
     } catch (err: any) {
-      setErrorMsg(err.message || 'خطا در اتصال به سرور');
+      setErrorMsg(err.response?.data?.error || err.message || 'خطا در اتصال به سرور');
     } finally {
       setIsSubmitting(false);
     }

@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import { toPersianDigits } from '../../utils/farsi';
+import { api } from '../../lib/api';
 import ConfirmModal from '../ui/ConfirmModal';
 import SummaryBar from './SummaryBar';
 import FilterBar from './FilterBar';
@@ -224,26 +225,21 @@ export default function TradesTable({
   useEffect(() => {
     const fetchCustomTags = async () => {
       try {
-        const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://127.0.0.1:3000';
-        const res = await fetch(`${baseUrl}/api/trades/tags?t=${Date.now()}`, {
-          cache: 'no-store',
-        });
-        if (res.ok) {
-          const customTags = await res.json();
-          if (Array.isArray(customTags)) {
-            setAllTags(prev => {
-              const map = new Map<string, TagObject>();
-              prev.forEach(t => map.set(t.name, t));
-              customTags.forEach((t: TagObject) => {
-                map.set(t.name, {
-                  name: t.name,
-                  is_ignored: Boolean(t.is_ignored),
-                  show_first: Boolean(t.show_first),
-                });
+        const res = await api.get(`/api/trades/tags?t=${Date.now()}`);
+        const customTags = res.data;
+        if (Array.isArray(customTags)) {
+          setAllTags(prev => {
+            const map = new Map<string, TagObject>();
+            prev.forEach(t => map.set(t.name, t));
+            customTags.forEach((t: TagObject) => {
+              map.set(t.name, {
+                name: t.name,
+                is_ignored: Boolean(t.is_ignored),
+                show_first: Boolean(t.show_first),
               });
-              return Array.from(map.values());
             });
-          }
+            return Array.from(map.values());
+          });
         }
       } catch (err) {
         console.error('Failed to fetch custom tags:', err);
@@ -254,25 +250,18 @@ export default function TradesTable({
 
   const handleAddCustomTag = async (newTag: string) => {
     try {
-      const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://127.0.0.1:3000';
-      const res = await fetch(`${baseUrl}/api/trades/tags`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: newTag, is_ignored: false, show_first: false }),
-      });
-      if (res.ok) {
-        const persisted = await res.json();
-        setAllTags(prev => {
-          const map = new Map<string, TagObject>();
-          prev.forEach(t => map.set(t.name, t));
-          map.set(newTag, {
-            name: newTag,
-            is_ignored: Boolean(persisted.is_ignored),
-            show_first: Boolean(persisted.show_first),
-          });
-          return Array.from(map.values());
+      const res = await api.post('/api/trades/tags', { name: newTag, is_ignored: false, show_first: false });
+      const persisted = res.data;
+      setAllTags(prev => {
+        const map = new Map<string, TagObject>();
+        prev.forEach(t => map.set(t.name, t));
+        map.set(newTag, {
+          name: newTag,
+          is_ignored: Boolean(persisted.is_ignored),
+          show_first: Boolean(persisted.show_first),
         });
-      }
+        return Array.from(map.values());
+      });
     } catch (err) {
       console.error('Failed to persist custom tag:', err);
     }
@@ -280,8 +269,6 @@ export default function TradesTable({
 
   const handleSaveTagConfigurations = async (tagsList: TagObject[], deletedNames: string[]) => {
     try {
-      const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://127.0.0.1:3000';
-      
       // Update local state for trades if there are deletions
       if (deletedNames.length > 0) {
         setTrades(prev => prev.map(t => ({
@@ -291,15 +278,7 @@ export default function TradesTable({
       }
 
       // Send bulk save request to backend
-      const res = await fetch(`${baseUrl}/api/trades/tags/bulk`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ tags: tagsList, deletes: deletedNames }),
-      });
-
-      if (!res.ok) {
-        throw new Error('Failed to bulk save tags');
-      }
+      await api.post('/api/trades/tags/bulk', { tags: tagsList, deletes: deletedNames });
     } catch (err) {
       console.error('Failed to save tag configurations:', err);
     }
@@ -309,16 +288,11 @@ export default function TradesTable({
   useEffect(() => {
     const fetchCustomEmotions = async () => {
       try {
-        const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://127.0.0.1:3000';
-        const res = await fetch(`${baseUrl}/api/trades/emotions?t=${Date.now()}`, {
-          cache: 'no-store',
-        });
-        if (res.ok) {
-          const customEmotions = await res.json();
-          if (Array.isArray(customEmotions)) {
-            if (customEmotions.length > 0) {
-              setAllEmotions(customEmotions);
-            }
+        const res = await api.get(`/api/trades/emotions?t=${Date.now()}`);
+        const customEmotions = res.data;
+        if (Array.isArray(customEmotions)) {
+          if (customEmotions.length > 0) {
+            setAllEmotions(customEmotions);
           }
         }
       } catch (err) {
@@ -330,8 +304,6 @@ export default function TradesTable({
 
   const handleSaveEmotionConfigurations = async (emotionsList: { value: string; label: string; emoji: string }[], deletedValues: string[]) => {
     try {
-      const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://127.0.0.1:3000';
-
       // Update local state for trades if there are deletions
       if (deletedValues.length > 0) {
         setTrades(prev => prev.map(t => ({
@@ -341,15 +313,7 @@ export default function TradesTable({
       }
 
       // Send bulk save request to backend
-      const res = await fetch(`${baseUrl}/api/trades/emotions/bulk`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ emotions: emotionsList, deletes: deletedValues }),
-      });
-
-      if (!res.ok) {
-        throw new Error('Failed to bulk save emotions');
-      }
+      await api.post('/api/trades/emotions/bulk', { emotions: emotionsList, deletes: deletedValues });
     } catch (err) {
       console.error('Failed to save emotion configurations:', err);
     }
@@ -571,17 +535,8 @@ export default function TradesTable({
       const formData = new FormData();
       formData.append('screenshot', file);
 
-      const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://127.0.0.1:3000';
-      const res = await fetch(`${baseUrl}/api/trades/${activeTrade.id}/screenshots`, {
-        method: 'POST',
-        body: formData,
-      });
-
-      if (!res.ok) {
-        throw new Error('Upload failed');
-      }
-
-      const data = await res.json();
+      const res = await api.post(`/api/trades/${activeTrade.id}/screenshots`, formData);
+      const data = res.data;
       if (data?.screenshots) {
         updateActiveTradeField('screenshots', data.screenshots);
       }
@@ -603,18 +558,10 @@ export default function TradesTable({
       'confirm',
       async () => {
         try {
-          const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://127.0.0.1:3000';
-          const res = await fetch(`${baseUrl}/api/trades/${activeTrade.id}/screenshots`, {
-            method: 'DELETE',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ url }),
+          const res = await api.delete(`/api/trades/${activeTrade.id}/screenshots`, {
+            data: { url }
           });
-
-          if (!res.ok) {
-            throw new Error('Deletion failed');
-          }
-
-          const data = await res.json();
+          const data = res.data;
           if (data?.screenshots) {
             updateActiveTradeField('screenshots', data.screenshots);
           }

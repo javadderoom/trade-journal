@@ -7,6 +7,7 @@ import { useTradeStore } from '../../store/useTradeStore';
 import ManualTradeModal from '../../components/modals/ManualTradeModal';
 import ImportMT4Modal from '../../components/modals/ImportMT4Modal';
 import ConfirmModal from '../../components/ui/ConfirmModal';
+import { api } from '../../lib/api';
 
 // Premium high-fidelity mock trades matching code.html
 export default function TradesPage() {
@@ -64,12 +65,8 @@ export default function TradesPage() {
 
   const fetchAccounts = async () => {
     try {
-      const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://127.0.0.1:3000';
-      const res = await fetch(`${baseUrl}/api/trades/accounts`);
-      if (res.ok) {
-        const data = await res.json();
-        setAccounts(data);
-      }
+      const res = await api.get('/api/trades/accounts');
+      setAccounts(res.data);
     } catch (err) {
       console.error('Failed to fetch accounts:', err);
     }

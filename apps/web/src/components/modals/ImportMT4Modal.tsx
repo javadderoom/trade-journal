@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useRef } from 'react';
+import { api } from '../../lib/api';
 
 interface ImportMT4ModalProps {
   isOpen: boolean;
@@ -72,24 +73,15 @@ export default function ImportMT4Modal({ isOpen, onClose, onSuccess }: ImportMT4
     formData.append('accountId', 'dev-account');
 
     try {
-      const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://127.0.0.1:3000';
-      const res = await fetch(`${baseUrl}/api/trades/import-mt4`, {
-        method: 'POST',
-        body: formData,
-      });
+      const res = await api.post('/api/trades/import-mt4', formData);
 
-      if (!res.ok) {
-        const errData = await res.json();
-        throw new Error(errData.error || 'خطا در پردازش فایل گزارش متاتریدر.');
-      }
-
-      const result = await res.json();
+      const result = res.data;
       onSuccess(result);
       setFile(null);
       onClose();
     } catch (err: any) {
       console.error('Failed to import MT4 statement:', err);
-      setErrorMsg(err.message || 'خطا در ارتباط با سرور. لطفا دوباره تلاش کنید.');
+      setErrorMsg(err.response?.data?.error || err.message || 'خطا در ارتباط با سرور. لطفا دوباره تلاش کنید.');
     } finally {
       setIsSubmitting(false);
     }

@@ -20,30 +20,12 @@ export async function syncTradesFromEA(
 ): Promise<SyncResult> {
   const result: SyncResult = { created: 0, updated: 0, skipped: 0, errors: [] };
 
-  // Auto-create user if not exists (development mode)
-  let user = await prisma.user.findUnique({ where: { id: userId } });
-  if (!user) {
-    user = await prisma.user.create({
-      data: {
-        id: userId,
-        password_hash: 'dev-hash',
-        name: userId,
-      },
-    });
-  }
-
-  // Auto-create account if not exists (development mode)
-  let account = await prisma.account.findFirst({
+  // Verify account exists
+  const account = await prisma.account.findFirst({
     where: { id: accountId, user_id: userId },
   });
   if (!account) {
-    account = await prisma.account.create({
-      data: {
-        id: accountId,
-        user_id: userId,
-        broker_name: 'MT5',
-      },
-    });
+    throw new Error(`حساب معاملاتی با شناسه ${accountId} یافت نشد.`);
   }
 
   for (const trade of trades) {

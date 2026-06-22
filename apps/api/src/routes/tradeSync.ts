@@ -1,10 +1,11 @@
-import { Router, Request, Response } from 'express';
+import { Router, Response } from 'express';
 import { getTradesForAccount, syncTradesFromEA, prisma } from '../services/tradeSync';
 import multer from 'multer';
 import path from 'node:path';
 import fs from 'node:fs';
 import crypto from 'node:crypto';
 import { parse as parseHtml } from 'node-html-parser';
+import { authenticate, authenticateAccountToken, AuthRequest } from '../middleware/auth';
 
 const router = Router();
 
@@ -15,21 +16,9 @@ const router = Router();
  * Body: { userId: string, accountId: string, trades: EATrade[] }
  * Or:   EATrade[] (defaults to first user/account for development)
  */
-router.get('/accounts', async (req: Request, res: Response) => {
+router.get('/accounts', authenticate, async (req: AuthRequest, res: Response) => {
   try {
-    const userId = (req.query.userId as string) || 'dev-user';
-
-    // Auto-create dev-user if not exists (development mode)
-    let user = await prisma.user.findUnique({ where: { id: userId } });
-    if (!user) {
-      user = await prisma.user.create({
-        data: {
-          id: userId,
-          password_hash: 'dev-hash',
-          name: userId,
-        },
-      });
-    }
+    const userId = req.user!.userId;
 
     // Auto-create default account if no accounts exist
     let accounts = await prisma.account.findMany({
@@ -39,7 +28,6 @@ router.get('/accounts', async (req: Request, res: Response) => {
     if (accounts.length === 0) {
       const defaultAccount = await prisma.account.create({
         data: {
-          id: 'dev-account',
           user_id: userId,
           broker_name: 'MT5 پیش‌فرض',
           account_number: '123456',
@@ -55,13 +43,21 @@ router.get('/accounts', async (req: Request, res: Response) => {
   }
 });
 
-router.get('/', async (req: Request, res: Response) => {
+router.get('/', authenticate, async (req: AuthRequest, res: Response) => {
   try {
     const body = req.query as any;
 
-    // Development defaults (no auth in this repo yet)
-    const userId = (body.userId as string | undefined) || 'dev-user';
+    const userId = req.user!.userId;
     const accountId = (body.accountId as string | undefined) || 'all';
+
+    if (accountId !== 'all') {
+      const account = await prisma.account.findFirst({
+        where: { id: accountId, user_id: userId }
+      });
+      if (!account) {
+        return res.status(403).json({ error: 'شما به این حساب دسترسی ندارید' });
+      }
+    }
 
     const limitRaw = body.limit as string | undefined;
     const offsetRaw = body.offset as string | undefined;
@@ -90,7 +86,7 @@ router.get('/', async (req: Request, res: Response) => {
  * Body: { userId: string, accountId: string, trades: EATrade[] }
  * Or:   EATrade[] (defaults to first user/account for development)
  */
-router.post('/sync', async (req: Request, res: Response) => {
+router.post('/sync', authenticateAccountToken, async (req: AuthRequest, res: Response) => {
   try {
     /**
      * Supported request payloads:
@@ -106,13 +102,13 @@ router.post('/sync', async (req: Request, res: Response) => {
     if (!Array.isArray(trades) || trades.length === 0) {
       res.status(400).json({
         error: 'trades array is required and must not be empty',
-        hint: 'Send either an array payload (EA) or { userId, accountId, trades } (web/API).',
+        hint: 'Send either an array payload (EA) or { trades } (web/API).',
       });
       return;
     }
 
-    const targetUserId = Array.isArray(body) ? 'dev-user' : (body?.userId || 'dev-user');
-    const targetAccountId = Array.isArray(body) ? 'dev-account' : (body?.accountId || 'dev-account');
+    const targetUserId = req.account!.user_id;
+    const targetAccountId = req.account!.id;
 
     const result = await syncTradesFromEA(targetUserId, targetAccountId, trades);
 
@@ -130,7 +126,7 @@ router.post('/sync', async (req: Request, res: Response) => {
  * POST /api/trades
  * Manually logs a new trade.
  */
-router.post('/', async (req: Request, res: Response) => {
+router.post('/', authenticate, async (req: AuthRequest, res: Response) => {
   try {
     const {
       symbol,
@@ -145,11 +141,22 @@ router.post('/', async (req: Request, res: Response) => {
       profitUsd,
       commission,
       swap,
+      accountId,
     } = req.body;
 
-    // Development defaults (no auth in this repo yet)
-    const userId = req.body.userId || 'dev-user';
-    const accountId = req.body.accountId || 'dev-account';
+    const userId = req.user!.userId;
+    if (!accountId) {
+      res.status(400).json({ error: 'انتخاب حساب معاملاتی الزامی است' });
+      return;
+    }
+
+    const account = await prisma.account.findFirst({
+      where: { id: accountId, user_id: userId }
+    });
+    if (!account) {
+      res.status(403).json({ error: 'شما به این حساب دسترسی ندارید' });
+      return;
+    }
 
     // 1. Validation
     if (!symbol || !direction || !lotSize || !openPrice || !openTime) {
@@ -247,18 +254,29 @@ router.post('/', async (req: Request, res: Response) => {
  * PUT /api/trades/:id
  * Updates trade notes, emotion, setup, stop_loss, and take_profit.
  */
-router.put('/:id', async (req: Request, res: Response) => {
+router.put('/:id', authenticate, async (req: AuthRequest, res: Response) => {
   try {
     const id = req.params.id as string;
+    const userId = req.user!.userId;
     const { notes, emotion, stopLoss, takeProfit, tags, accountId } = req.body;
 
-    const existing = await prisma.trade.findUnique({
-      where: { id },
+    const existing = await prisma.trade.findFirst({
+      where: { id, user_id: userId },
     });
 
     if (!existing) {
       res.status(404).json({ error: 'Trade not found' });
       return;
+    }
+
+    if (accountId) {
+      const account = await prisma.account.findFirst({
+        where: { id: accountId, user_id: userId }
+      });
+      if (!account) {
+        res.status(403).json({ error: 'شما به این حساب دسترسی ندارید' });
+        return;
+      }
     }
 
     // Recalculate r_multiple when stop_loss is modified
@@ -304,9 +322,10 @@ router.put('/:id', async (req: Request, res: Response) => {
  * POST /api/trades/bulk-delete
  * Deletes multiple trades by their IDs.
  */
-router.post('/bulk-delete', async (req: Request, res: Response) => {
+router.post('/bulk-delete', authenticate, async (req: AuthRequest, res: Response) => {
   try {
     const { ids } = req.body;
+    const userId = req.user!.userId;
 
     if (!Array.isArray(ids) || ids.length === 0) {
       res.status(400).json({ error: 'IDs array is required and must not be empty' });
@@ -318,6 +337,7 @@ router.post('/bulk-delete', async (req: Request, res: Response) => {
         id: {
           in: ids,
         },
+        user_id: userId,
       },
     });
 
@@ -332,9 +352,9 @@ router.post('/bulk-delete', async (req: Request, res: Response) => {
  * GET /api/trades/tags
  * Fetches all persistent user-specific tags from database.
  */
-router.get('/tags', async (req: Request, res: Response) => {
+router.get('/tags', authenticate, async (req: AuthRequest, res: Response) => {
   try {
-    const userId = (req.query.userId as string) || 'dev-user';
+    const userId = req.user!.userId;
     
     let tags = await prisma.tag.findMany({
       where: { user_id: userId },
@@ -377,10 +397,10 @@ router.get('/tags', async (req: Request, res: Response) => {
  * POST /api/trades/tags
  * Creates/persists a custom tag in the user's library.
  */
-router.post('/tags', async (req: Request, res: Response) => {
+router.post('/tags', authenticate, async (req: AuthRequest, res: Response) => {
   try {
     const { name, is_ignored, show_first } = req.body;
-    const userId = req.body.userId || 'dev-user';
+    const userId = req.user!.userId;
 
     if (!name || typeof name !== 'string' || !name.trim()) {
       res.status(400).json({ error: 'Tag name is required' });
@@ -419,10 +439,10 @@ router.post('/tags', async (req: Request, res: Response) => {
  * POST /api/trades/tags/bulk
  * Bulk updates tag configurations and handles deletions.
  */
-router.post('/tags/bulk', async (req: Request, res: Response) => {
+router.post('/tags/bulk', authenticate, async (req: AuthRequest, res: Response) => {
   try {
     const { tags, deletes } = req.body;
-    const userId = req.body.userId || 'dev-user';
+    const userId = req.user!.userId;
 
     // 1. Handle deletes
     if (Array.isArray(deletes) && deletes.length > 0) {
@@ -493,11 +513,11 @@ router.post('/tags/bulk', async (req: Request, res: Response) => {
  * PUT /api/trades/tags/:name
  * Updates options (is_ignored, show_first) for a specific tag.
  */
-router.put('/tags/:name', async (req: Request, res: Response) => {
+router.put('/tags/:name', authenticate, async (req: AuthRequest, res: Response) => {
   try {
     const name = req.params.name as string;
     const { is_ignored, show_first } = req.body;
-    const userId = req.body.userId || 'dev-user';
+    const userId = req.user!.userId;
 
     const updated = await prisma.tag.upsert({
       where: {
@@ -529,10 +549,10 @@ router.put('/tags/:name', async (req: Request, res: Response) => {
  * DELETE /api/trades/tags/:name
  * Deletes a tag from the user's persistent library.
  */
-router.delete('/tags/:name', async (req: Request, res: Response) => {
+router.delete('/tags/:name', authenticate, async (req: AuthRequest, res: Response) => {
   try {
     const name = req.params.name as string;
-    const userId = (req.query.userId as string) || 'dev-user';
+    const userId = req.user!.userId;
 
     // 1. Delete tag from persistent library
     await prisma.tag.deleteMany({
@@ -577,9 +597,9 @@ router.delete('/tags/:name', async (req: Request, res: Response) => {
  * GET /api/trades/emotions
  * Fetches all persistent user-specific emotions from database.
  */
-router.get('/emotions', async (req: Request, res: Response) => {
+router.get('/emotions', authenticate, async (req: AuthRequest, res: Response) => {
   try {
-    const userId = (req.query.userId as string) || 'dev-user';
+    const userId = req.user!.userId;
 
     let emotions = await prisma.emotion.findMany({
       where: { user_id: userId },
@@ -622,10 +642,10 @@ router.get('/emotions', async (req: Request, res: Response) => {
  * POST /api/trades/emotions/bulk
  * Bulk updates/upserts emotion options and handles deletions.
  */
-router.post('/emotions/bulk', async (req: Request, res: Response) => {
+router.post('/emotions/bulk', authenticate, async (req: AuthRequest, res: Response) => {
   try {
     const { emotions, deletes } = req.body;
-    const userId = req.body.userId || 'dev-user';
+    const userId = req.user!.userId;
 
     // 1. Handle deletes
     if (Array.isArray(deletes) && deletes.length > 0) {
@@ -687,12 +707,13 @@ router.post('/emotions/bulk', async (req: Request, res: Response) => {
  * DELETE /api/trades/:id
  * Deletes a trade by ID.
  */
-router.delete('/:id', async (req: Request, res: Response) => {
+router.delete('/:id', authenticate, async (req: AuthRequest, res: Response) => {
   try {
     const id = req.params.id as string;
+    const userId = req.user!.userId;
 
-    const existing = await prisma.trade.findUnique({
-      where: { id },
+    const existing = await prisma.trade.findFirst({
+      where: { id, user_id: userId },
     });
 
     if (!existing) {
@@ -747,17 +768,18 @@ const upload = multer({
  * POST /api/trades/:id/screenshots
  * Uploads a screenshot for a trade and appends its URL to the screenshots list.
  */
-router.post('/:id/screenshots', upload.single('screenshot'), async (req: Request, res: Response) => {
+router.post('/:id/screenshots', authenticate, upload.single('screenshot'), async (req: AuthRequest, res: Response) => {
   try {
     const id = req.params.id as string;
+    const userId = req.user!.userId;
 
     if (!req.file) {
       res.status(400).json({ error: 'No file uploaded' });
       return;
     }
 
-    const trade = await prisma.trade.findUnique({
-      where: { id },
+    const trade = await prisma.trade.findFirst({
+      where: { id, user_id: userId },
     });
 
     if (!trade) {
@@ -790,17 +812,18 @@ router.post('/:id/screenshots', upload.single('screenshot'), async (req: Request
  * DELETE /api/trades/:id/screenshots
  * Deletes a screenshot for a trade from disk and DB.
  */
-router.delete('/:id/screenshots', async (req: Request, res: Response) => {
+router.delete('/:id/screenshots', authenticate, async (req: AuthRequest, res: Response) => {
   try {
     const id = req.params.id as string;
+    const userId = req.user!.userId;
     const { url } = req.body;
     if (!url) {
       res.status(400).json({ error: 'Screenshot URL is required' });
       return;
     }
 
-    const trade = await prisma.trade.findUnique({
-      where: { id },
+    const trade = await prisma.trade.findFirst({
+      where: { id, user_id: userId },
     });
 
     if (!trade) {
@@ -942,15 +965,29 @@ function findHeaderMapping(cells: string[]): Record<string, number> | null {
  * POST /api/trades/import-mt4
  * Uploads and parses an MT4/MT5 detailed HTML statement, importing closed trades into the database.
  */
-router.post('/import-mt4', uploadMemory.single('file'), async (req: Request, res: Response) => {
+router.post('/import-mt4', authenticate, uploadMemory.single('file'), async (req: AuthRequest, res: Response) => {
   try {
     if (!req.file) {
       res.status(400).json({ error: 'No file uploaded' });
       return;
     }
 
-    const userId = (req.body.userId as string | undefined) || 'dev-user';
-    const accountId = (req.body.accountId as string | undefined) || 'dev-account';
+    const userId = req.user!.userId;
+    const accountId = req.body.accountId as string | undefined;
+
+    if (!accountId) {
+      res.status(400).json({ error: 'Account ID is required' });
+      return;
+    }
+
+    // Verify account belongs to user
+    const account = await prisma.account.findFirst({
+      where: { id: accountId, user_id: userId }
+    });
+    if (!account) {
+      res.status(403).json({ error: 'شما به این حساب دسترسی ندارید' });
+      return;
+    }
 
     // Decode file buffer with dynamic UTF-16LE / UTF-8 detection
     let htmlContent = '';

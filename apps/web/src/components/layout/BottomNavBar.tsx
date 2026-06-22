@@ -8,7 +8,7 @@ export default function BottomNavBar() {
   const pathname = usePathname();
 
   const isTradesActive = pathname === '/trades' || pathname.startsWith('/trades');
-  const isJournalActive = pathname === '/journal';
+  const isAnalyticsActive = pathname === '/analytics';
   const isDashboardActive = pathname === '/dashboard' || pathname === '/';
   const isStrategiesActive = pathname === '/strategies';
   const isSettingsActive = pathname === '/settings';
@@ -25,14 +25,14 @@ export default function BottomNavBar() {
         <span className="label">معاملات</span>
       </Link>
 
-      {/* 2. Journal */}
-      <Link href="/journal" className={`bottom-nav-item ${isJournalActive ? 'active' : ''}`}>
+      {/* 2. Analytics */}
+      <Link href="/analytics" className={`bottom-nav-item ${isAnalyticsActive ? 'active' : ''}`}>
         <div className="bottom-nav-icon-wrapper">
-          <span className="material-symbols-outlined icon" style={isJournalActive ? { fontVariationSettings: "'FILL' 1" } : undefined}>
-            menu_book
+          <span className="material-symbols-outlined icon" style={isAnalyticsActive ? { fontVariationSettings: "'FILL' 1" } : undefined}>
+            bar_chart
           </span>
         </div>
-        <span className="label">ژورنال</span>
+        <span className="label">گزارش عملکرد</span>
       </Link>
 
       {/* 3. Dashboard (Raised Middle Button) */}
