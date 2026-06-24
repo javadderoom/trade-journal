@@ -28,80 +28,112 @@ export async function syncTradesFromEA(
     throw new Error(`حساب معاملاتی با شناسه ${accountId} یافت نشد.`);
   }
 
-  for (const trade of trades) {
-    try {
-      // Skip trades without a valid ticket
-      if (!trade.ticket || trade.ticket <= 0) {
-        result.skipped++;
-        continue;
-      }
+  // 1. Extract all ticket IDs for batch fetching
+  const tickets = trades
+    .map(t => t.ticket)
+    .filter((t): t is number => typeof t === 'number' && t > 0);
 
-      const existing = await prisma.trade.findUnique({
+  // 2. Fetch all existing trades matching the incoming tickets in a single DB query
+  const existingTrades = tickets.length > 0
+    ? await prisma.trade.findMany({
         where: {
-          account_id_ticket: {
-            account_id: accountId,
-            ticket: trade.ticket,
-          },
+          account_id: accountId,
+          ticket: { in: tickets },
         },
-      });
+      })
+    : [];
 
-      if (!existing) {
-        // ── CREATE: new trade ──
-        await prisma.trade.create({
-          data: {
-            account_id: accountId,
-            user_id: userId,
-            symbol: trade.symbol,
-            direction: trade.direction as any,
-            open_time: new Date(trade.openTime),
-            close_time: trade.closeTime ? new Date(trade.closeTime) : null,
-            open_price: trade.openPrice,
-            close_price: trade.closePrice ?? null,
-            lot_size: trade.lotSize,
-            stop_loss: trade.stopLoss ?? null,
-            take_profit: trade.takeProfit ?? null,
-            profit_usd: trade.profitUsd,
-            commission: trade.commission,
-            swap: trade.swap,
-            pips: trade.pips ?? 0,
-            r_multiple: trade.rMultiple,
-            ticket: trade.ticket,
-            import_source: (trade.closeTime ? 'MT5_EA' : 'MT5_EA') as any,
-            chart_data: trade.chartData ? trade.chartData : undefined,
-          },
-        });
-        result.created++;
-      } else if (existing.close_time === null) {
-        // ── UPDATE: trade is currently open in DB ──
-        // Either refreshing live data (still open) or finalizing (now closed)
-        await prisma.trade.update({
-          where: { id: existing.id },
-          data: {
-            stop_loss: trade.stopLoss ?? null,
-            take_profit: trade.takeProfit ?? null,
-            profit_usd: trade.profitUsd,
-            commission: trade.commission,
-            swap: trade.swap,
-            pips: trade.pips ?? 0,
-            r_multiple: trade.rMultiple,
-            chart_data: trade.chartData ? trade.chartData : undefined,
-            // Fill close data only if the trade is now closed
-            ...(trade.closeTime
-              ? {
-                  close_time: new Date(trade.closeTime),
-                  close_price: trade.closePrice ?? null,
-                }
-              : {}),
-          },
-        });
-        result.updated++;
-      } else {
-        // ── SKIP: trade already closed in DB — final record ──
-        result.skipped++;
-      }
-    } catch (err: any) {
-      result.errors.push(`Ticket ${trade.ticket}: ${err.message}`);
+  // Map existing trades by ticket ID for O(1) lookup
+  const existingMap = new Map<number, typeof existingTrades[0]>();
+  for (const t of existingTrades) {
+    if (t.ticket !== null) {
+      existingMap.set(t.ticket, t);
     }
+  }
+
+  // Define operations array to execute in chunked parallel batches
+  const operations: (() => Promise<void>)[] = [];
+
+  for (const trade of trades) {
+    // Skip trades without a valid ticket
+    if (!trade.ticket || trade.ticket <= 0) {
+      result.skipped++;
+      continue;
+    }
+
+    const existing = existingMap.get(trade.ticket);
+
+    if (!existing) {
+      // Prepare CREATE operation
+      operations.push(async () => {
+        try {
+          await prisma.trade.create({
+            data: {
+              account_id: accountId,
+              user_id: userId,
+              symbol: trade.symbol,
+              direction: trade.direction as any,
+              open_time: new Date(trade.openTime),
+              close_time: trade.closeTime ? new Date(trade.closeTime) : null,
+              open_price: trade.openPrice,
+              close_price: trade.closePrice ?? null,
+              lot_size: trade.lotSize,
+              stop_loss: trade.stopLoss ?? null,
+              take_profit: trade.takeProfit ?? null,
+              profit_usd: trade.profitUsd,
+              commission: trade.commission,
+              swap: trade.swap,
+              pips: trade.pips ?? 0,
+              r_multiple: trade.rMultiple,
+              ticket: trade.ticket,
+              import_source: 'MT5_EA',
+              chart_data: trade.chartData ? trade.chartData : undefined,
+            },
+          });
+          result.created++;
+        } catch (err: any) {
+          result.errors.push(`Ticket ${trade.ticket} [Create]: ${err.message}`);
+        }
+      });
+    } else if (existing.close_time === null) {
+      // Prepare UPDATE operation for active (open) trades
+      operations.push(async () => {
+        try {
+          await prisma.trade.update({
+            where: { id: existing.id },
+            data: {
+              stop_loss: trade.stopLoss ?? null,
+              take_profit: trade.takeProfit ?? null,
+              profit_usd: trade.profitUsd,
+              commission: trade.commission,
+              swap: trade.swap,
+              pips: trade.pips ?? 0,
+              r_multiple: trade.rMultiple,
+              chart_data: trade.chartData ? trade.chartData : undefined,
+              ...(trade.closeTime
+                ? {
+                    close_time: new Date(trade.closeTime),
+                    close_price: trade.closePrice ?? null,
+                  }
+                : {}),
+            },
+          });
+          result.updated++;
+        } catch (err: any) {
+          result.errors.push(`Ticket ${trade.ticket} [Update]: ${err.message}`);
+        }
+      });
+    } else {
+      // Skipped closed trades (finalized in DB already)
+      result.skipped++;
+    }
+  }
+
+  // 3. Process database operations in parallel chunks (concurrency limit = 25)
+  const chunkSize = 25;
+  for (let i = 0; i < operations.length; i += chunkSize) {
+    const chunk = operations.slice(i, i + chunkSize);
+    await Promise.all(chunk.map(op => op()));
   }
 
   return result;

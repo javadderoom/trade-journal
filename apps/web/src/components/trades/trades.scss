@@ -2021,6 +2021,66 @@ input[type="checkbox"] {
 .import-mt4-modal {
   width: 500px;
 
+  .import-steps {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+
+  .import-step {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 12px;
+    border: 1px solid $outline-variant;
+    border-radius: 8px;
+    background-color: rgba($surface-container-high, 0.55);
+    color: $on-surface-variant;
+    font-family: $font-primary;
+
+    span {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: rgba($on-surface-variant, 0.12);
+      color: $on-surface-variant;
+      font-size: 12px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    p {
+      margin: 0;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    &.active {
+      border-color: rgba($primary, 0.7);
+      background-color: rgba($primary, 0.08);
+      color: $on-surface;
+
+      span {
+        background-color: $primary;
+        color: #0b1410;
+      }
+    }
+
+    &.complete:not(.active) {
+      border-color: rgba($primary, 0.35);
+      color: $primary;
+
+      span {
+        background-color: rgba($primary, 0.18);
+        color: $primary;
+      }
+    }
+  }
+
   .import-description {
     font-size: 14px;
     line-height: 22px;
@@ -2158,6 +2218,82 @@ input[type="checkbox"] {
           font-size: 18px;
         }
       }
+    }
+  }
+
+  .import-account-step {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .import-account-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .import-account-option {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border: 1px solid $outline-variant;
+    border-radius: 8px;
+    padding: 12px 14px;
+    background-color: rgba($surface-container-high, 0.55);
+    color: $on-surface;
+    cursor: pointer;
+    text-align: right;
+    font-family: $font-primary;
+    transition: border-color 0.2s ease, background-color 0.2s ease, transform 0.2s ease;
+
+    &:hover:not(:disabled) {
+      border-color: rgba($primary, 0.55);
+      background-color: rgba($primary, 0.06);
+      transform: translateY(-1px);
+    }
+
+    &.selected {
+      border-color: $primary;
+      background-color: rgba($primary, 0.1);
+    }
+
+    &:disabled {
+      cursor: not-allowed;
+      opacity: 0.65;
+    }
+
+    .material-symbols-outlined {
+      color: $primary;
+      font-size: 24px;
+      flex-shrink: 0;
+    }
+
+    .account-option-main {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .account-option-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: $on-surface;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .account-option-subtitle {
+      font-size: 12px;
+      color: $on-surface-variant;
+    }
+
+    .selected-icon {
+      color: $primary;
+      margin-right: auto;
     }
   }
 }

@@ -74,6 +74,7 @@ export default function TradesPage() {
 
   useEffect(() => {
     fetchAccounts();
+
     // Fetch live USD→Toman rate (cached 6h server-side, safe within 120/month quota)
     fetch('/api/exchange-rate')
       .then(r => r.json())
@@ -85,13 +86,17 @@ export default function TradesPage() {
       .catch(() => { /* keep default 90,000 */ });
   }, []);
 
+  const handleImportMT4 = async () => {
+    if (accounts.length === 0) {
+      await fetchAccounts();
+    }
+    setImportMT4ModalOpen(true);
+  };
+
   useEffect(() => {
     fetchTrades(false, selectedAccountId);
   }, [selectedAccountId]);
 
-  const handleImportMT4 = () => {
-    setImportMT4ModalOpen(true);
-  };
 
   const handleImportSuccess = async (result: any) => {
     setDialogConfig({
@@ -101,7 +106,7 @@ export default function TradesPage() {
       type: 'success',
       confirmLabel: 'باشه',
     });
-    await fetchTrades(true);
+    await fetchTrades(true, selectedAccountId);
   };
 
   const handleAddManualTrade = () => {
@@ -155,6 +160,7 @@ export default function TradesPage() {
         isOpen={isImportMT4ModalOpen}
         onClose={() => setImportMT4ModalOpen(false)}
         onSuccess={handleImportSuccess}
+        accounts={accounts}
       />
       <ConfirmModal
         isOpen={dialogConfig.isOpen}

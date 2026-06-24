@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Trade } from './TradesTable';
 import { toPersianDigits, formatPersianCurrency, formatToman } from '../../utils/farsi';
 import {
@@ -45,6 +45,19 @@ export default function MobileCardsList({
     return formatPersianCurrency(val);
   };
 
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const mq = window.matchMedia('(max-width: 768px)');
+    const update = () => setIsMobile(mq.matches);
+
+    update();
+    mq.addEventListener?.('change', update);
+    return () => mq.removeEventListener?.('change', update);
+  }, []);
+
   const displayedTrades = React.useMemo(() => {
     return filteredTrades.slice(0, currentPage * itemsPerPage);
   }, [filteredTrades, currentPage, itemsPerPage]);
@@ -54,11 +67,14 @@ export default function MobileCardsList({
   const observerRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
+    // Ensure infinite scroll logic runs only for mobile.
+    // On desktop, pagination and this shared `currentPage` state must not conflict.
+    if (!isMobile) return;
     if (!hasMore) return;
 
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting) {
+        if (entries[0]?.isIntersecting) {
           setCurrentPage((prev) => prev + 1);
         }
       },
@@ -66,16 +82,13 @@ export default function MobileCardsList({
     );
 
     const currentRef = observerRef.current;
-    if (currentRef) {
-      observer.observe(currentRef);
-    }
+    if (currentRef) observer.observe(currentRef);
 
     return () => {
-      if (currentRef) {
-        observer.unobserve(currentRef);
-      }
+      if (currentRef) observer.unobserve(currentRef);
+      observer.disconnect();
     };
-  }, [hasMore, setCurrentPage]);
+  }, [isMobile, hasMore, setCurrentPage]);
 
   const handleMobileSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.checked) {
@@ -228,7 +241,7 @@ export default function MobileCardsList({
       </div>
 
       {/* Infinite Scroll observer element */}
-      {hasMore && (
+      {hasMore && isMobile && (
         <div
           ref={observerRef}
           className="infinite-scroll-trigger"

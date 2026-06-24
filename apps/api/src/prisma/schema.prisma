@@ -93,6 +93,8 @@ model Trade {
   created_at    DateTime     @default(now())
 
   @@unique([account_id, ticket])
+  @@index([user_id])
+  @@index([account_id])
 }
 
 model JournalEntry {

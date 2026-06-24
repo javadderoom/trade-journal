@@ -68,14 +68,20 @@ async function parseMT4HTML(fileBuffer: Buffer): Promise<ParsedTrade[]> {
 
 // Parse MT4 CSV
 function parseMT4CSV(csvData: string): ParsedTrade[] {
-  const lines = csvData.split('\n');
-  return lines.slice(1).map(line => {
-    const [ticket, time, type, size, symbol, price, sl, tp, closeTime, closePrice, commission, swap, profit] = line.split('\t');
+  const lines = csvData.split(/\r?\n/).filter(line => line.trim() !== '');
+  return lines.slice(1).flatMap(line => {
+    const parts = line.split('\t');
+    if (parts.length < 13) return [];
+    const [ticket, time, type, size, symbol, price, sl, tp, closeTime, closePrice, commission, swap, profit] = parts;
 
-    return {
-      ticket: parseInt(ticket?.trim() || '0'),
-      symbol: symbol?.trim() || '',
-      direction: (type?.trim() as 'BUY' | 'SELL') || 'BUY',
+    const parsedSymbol = symbol?.trim();
+    const direction = type?.trim();
+    if (!parsedSymbol || !direction) return [];
+
+    return [{
+      ticket: parseInt(ticket?.trim() || '0', 10),
+      symbol: parsedSymbol,
+      direction: direction as 'BUY' | 'SELL',
       openTime: time?.trim() || '',
       openPrice: parseFloat(price?.trim() || '0'),
       closeTime: closeTime?.trim() || '',
@@ -83,25 +89,31 @@ function parseMT4CSV(csvData: string): ParsedTrade[] {
       lotSize: parseFloat(size?.trim() || '0'),
       stopLoss: parseFloat(sl?.trim() || '0'),
       takeProfit: parseFloat(tp?.trim() || '0'),
-      profitUsd: parseFloat(profit?.trim().replace(/\,/g, '')) || 0,
+      profitUsd: parseFloat(profit?.trim().replace(/,/g, '')) || 0,
       commission: parseFloat(commission?.trim() || '0'),
       swap: parseFloat(swap?.trim() || '0'),
       rMultiple: 0,
       importSource: 'MT4_CSV' as const
-    };
-  }).filter(trade => trade.symbol && trade.direction);
+    }];
+  });
 }
 
 // Parse MT5 CSV
 function parseMT5CSV(csvData: string): ParsedTrade[] {
-  const lines = csvData.split('\n');
-  return lines.slice(1).map(line => {
-    const [position, symbol, action, volume, openTime, openPrice, sl, tp, closeTime, closePrice, commission, swap, profit] = line.split(',');
+  const lines = csvData.split(/\r?\n/).filter(line => line.trim() !== '');
+  return lines.slice(1).flatMap(line => {
+    const parts = line.split(',');
+    if (parts.length < 13) return [];
+    const [position, symbol, action, volume, openTime, openPrice, sl, tp, closeTime, closePrice, commission, swap, profit] = parts;
 
-    return {
-      ticket: parseInt(position?.trim() || '0'),
-      symbol: symbol?.trim() || '',
-      direction: (action?.trim() as 'BUY' | 'SELL') || 'BUY',
+    const parsedSymbol = symbol?.trim();
+    const direction = action?.trim();
+    if (!parsedSymbol || !direction) return [];
+
+    return [{
+      ticket: parseInt(position?.trim() || '0', 10),
+      symbol: parsedSymbol,
+      direction: direction as 'BUY' | 'SELL',
       openTime: openTime?.trim() || '',
       openPrice: parseFloat(openPrice?.trim() || '0'),
       closeTime: closeTime?.trim() || '',
@@ -109,13 +121,13 @@ function parseMT5CSV(csvData: string): ParsedTrade[] {
       lotSize: parseFloat(volume?.trim() || '0'),
       stopLoss: parseFloat(sl?.trim() || '0'),
       takeProfit: parseFloat(tp?.trim() || '0'),
-      profitUsd: parseFloat(profit?.trim().replace(/\,/g, '')) || 0,
+      profitUsd: parseFloat(profit?.trim().replace(/,/g, '')) || 0,
       commission: parseFloat(commission?.trim() || '0'),
       swap: parseFloat(swap?.trim() || '0'),
       rMultiple: 0,
       importSource: 'MT5_CSV' as const
-    };
-  }).filter(trade => trade.symbol && trade.direction);
+    }];
+  });
 }
 
 // Main parse function

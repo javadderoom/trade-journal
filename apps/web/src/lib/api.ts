@@ -6,9 +6,8 @@ const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3000';
 export const api = axios.create({
   baseURL: API_URL,
   withCredentials: true,
-  headers: {
-    'Content-Type': 'application/json',
-  },
+  // Do not force Content-Type globally.
+  // For FormData (multer), Axios must send multipart/form-data automatically.
 });
 
 // Request interceptor to attach access token
