@@ -506,25 +506,21 @@ export default function JournalPage() {
       </header>
 
       {/* Tabs */}
-      <div className="journal-tabs">
-        <button
-          className={`journal-tab-btn ${activeTab === 'overview' ? 'active' : ''}`}
-          onClick={() => setActiveTab('overview')}
-        >
-          خلاصه عملکرد (Overview)
-        </button>
-        <button
-          className={`journal-tab-btn ${activeTab === 'patterns' ? 'active' : ''}`}
-          onClick={() => setActiveTab('patterns')}
-        >
-          شناسایی الگوها (Patterns)
-        </button>
-        <button
-          className={`journal-tab-btn ${activeTab === 'charts' ? 'active' : ''}`}
-          onClick={() => setActiveTab('charts')}
-        >
-          نمودارها و ریسک (Charts & Risk)
-        </button>
+      <div className="journal-tab-bar">
+        {([
+          { key: 'overview' as const, label: 'خلاصه عملکرد', icon: 'analytics' },
+          { key: 'patterns' as const, label: 'شناسایی الگوها', icon: 'hub' },
+          { key: 'charts' as const, label: 'نمودارها و ریسک', icon: 'candlestick_chart' },
+        ]).map((tab) => (
+          <button
+            key={tab.key}
+            className={`journal-tab-btn ${activeTab === tab.key ? 'active' : ''}`}
+            onClick={() => setActiveTab(tab.key)}
+          >
+            <span className="material-symbols-outlined">{tab.icon}</span>
+            <span>{tab.label}</span>
+          </button>
+        ))}
       </div>
 
       {stats.totalCount === 0 ? (

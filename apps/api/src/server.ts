@@ -8,6 +8,8 @@ import tradeSyncRouter from './routes/tradeSync';
 import authRouter from './routes/auth';
 import accountTokensRouter from './routes/accountTokens';
 import journalRouter from './routes/journal';
+import dashboardRouter from './routes/dashboard';
+import settingsRouter from './routes/settings';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -40,6 +42,8 @@ app.use('/api/auth', authRouter);
 app.use('/api', accountTokensRouter);
 app.use('/api/trades', tradeSyncRouter);
 app.use('/api/journal', journalRouter);
+app.use('/api/dashboard', dashboardRouter);
+app.use('/api/settings', settingsRouter);
 
 // Health check
 app.get('/api/health', (_req, res) => {

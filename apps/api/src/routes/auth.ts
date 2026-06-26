@@ -74,6 +74,7 @@ router.post('/register', async (req: Request, res: Response) => {
         expires_at: new Date(
           Date.now() + REFRESH_TOKEN_EXPIRES_DAYS * 24 * 60 * 60 * 1000
         ),
+        user_agent: req.headers['user-agent'] || null,
       },
     });
 
@@ -123,6 +124,7 @@ router.post('/login', async (req: Request, res: Response) => {
         expires_at: new Date(
           Date.now() + REFRESH_TOKEN_EXPIRES_DAYS * 24 * 60 * 60 * 1000
         ),
+        user_agent: req.headers['user-agent'] || null,
       },
     });
 
@@ -142,7 +144,6 @@ router.post('/login', async (req: Request, res: Response) => {
 router.post('/refresh', async (req: Request, res: Response) => {
   try {
     const token = req.cookies?.refreshToken;
-    console.log("token => ", token);
     if (!token) {
       return res.status(401).json({ error: 'توکن بازیابی یافت نشد' });
     }
@@ -172,6 +173,7 @@ router.post('/refresh', async (req: Request, res: Response) => {
         expires_at: new Date(
           Date.now() + REFRESH_TOKEN_EXPIRES_DAYS * 24 * 60 * 60 * 1000
         ),
+        user_agent: req.headers['user-agent'] || stored.user_agent || null,
       },
     });
 

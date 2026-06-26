@@ -1,302 +1,724 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuthStore } from '../../lib/auth';
 import { api } from '../../lib/api';
+import { toPersianDigits } from '../../utils/farsi';
 import './settings.scss';
 
-interface Account {
-  id: string;
-  broker_name: string;
-  account_number: string | null;
-}
+type Tab = 'profile' | 'accounts' | 'subscription' | 'security';
 
-interface AccountToken {
+interface ProfileData {
   id: string;
   name: string;
-  created_at: string;
-  token_preview: string;
+  email: string;
+  phone: string;
+  plan: string;
+  display_currency: string;
+  avatar_url: string | null;
 }
 
+interface BrokerAccount {
+  id: string;
+  broker_name: string | null;
+  account_number: string | null;
+  currency: string;
+  created_at: string;
+  trade_count: number;
+  last_import: string | null;
+}
+
+interface Session {
+  id: string;
+  user_agent: string;
+  created_at: string;
+  last_used_at: string;
+  is_current: boolean;
+}
+
+interface Toast {
+  message: string;
+  type: 'success' | 'error';
+}
+
+const BROKER_PRESETS = [
+  'Amarkets', 'LiteFinance', 'Errante', 'Alpari', 'RoboForex', 'HFM', 'IC Markets', 'Pepperstone',
+];
+
 export default function SettingsPage() {
-  const { user } = useAuthStore();
-  const [activeTab, setActiveTab] = useState<'profile' | 'tokens'>('tokens');
-  
-  // Accounts state
-  const [accounts, setAccounts] = useState<Account[]>([]);
-  const [selectedAccountId, setSelectedAccountId] = useState<string>('');
-  
-  // Tokens state
-  const [tokens, setTokens] = useState<AccountToken[]>([]);
-  const [newTokenName, setNewTokenName] = useState('');
-  const [generatedToken, setGeneratedToken] = useState<string | null>(null);
-  const [copied, setCopied] = useState(false);
-  
-  // Loading & error states
-  const [loadingAccounts, setLoadingAccounts] = useState(false);
-  const [loadingTokens, setLoadingTokens] = useState(false);
-  const [actionLoading, setActionLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const { user, logout } = useAuthStore();
 
-  // Fetch accounts on mount
-  useEffect(() => {
-    const fetchAccounts = async () => {
-      setLoadingAccounts(true);
-      setError(null);
-      try {
-        const res = await api.get('/api/trades/accounts');
-        setAccounts(res.data);
-        if (res.data.length > 0) {
-          setSelectedAccountId(res.data[0].id);
-        }
-      } catch (err: any) {
-        console.error('Failed to fetch accounts:', err);
-        setError('خطا در دریافت لیست حساب‌های معاملاتی');
-      } finally {
-        setLoadingAccounts(false);
-      }
-    };
+  const [activeTab, setActiveTab] = useState<Tab>((searchParams.get('tab') as Tab) || 'profile');
+  const [toast, setToast] = useState<Toast | null>(null);
 
-    fetchAccounts();
-  }, []);
+  const showToast = (message: string, type: 'success' | 'error' = 'success') => {
+    setToast({ message, type });
+    setTimeout(() => setToast(null), 3000);
+  };
 
-  // Fetch tokens for selected account
-  const fetchTokens = useCallback(async (accountId: string) => {
-    if (!accountId) return;
-    setLoadingTokens(true);
-    setError(null);
+  const switchTab = (tab: Tab) => {
+    setActiveTab(tab);
+    router.push(`/settings?tab=${tab}`, { scroll: false });
+  };
+
+  // ─── Profile state ───────────────────────────────────────────────────────
+  const [profile, setProfile] = useState<ProfileData | null>(null);
+  const [profileForm, setProfileForm] = useState({ name: '', phone: '', displayCurrency: 'USD' });
+  const [profileDirty, setProfileDirty] = useState(false);
+  const [avatarUploading, setAvatarUploading] = useState(false);
+
+  // ─── Accounts state ──────────────────────────────────────────────────────
+  const [accounts, setAccounts] = useState<BrokerAccount[]>([]);
+  const [showAddAccount, setShowAddAccount] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [newAccount, setNewAccount] = useState({
+    broker_name: '',
+    account_number: '',
+    currency: 'USD',
+  });
+  const [editAccount, setEditAccount] = useState({ broker_name: '', account_number: '', currency: 'USD' });
+
+  // ─── Subscription state ──────────────────────────────────────────────────
+  const [subscription, setSubscription] = useState<any>(null);
+
+  // ─── Security state ──────────────────────────────────────────────────────
+  const [passwordForm, setPasswordForm] = useState({ currentPassword: '', newPassword: '', confirmPassword: '' });
+  const [showPasswords, setShowPasswords] = useState({ current: false, new: false, confirm: false });
+  const [sessions, setSessions] = useState<Session[]>([]);
+  const [showDeleteAccount, setShowDeleteAccount] = useState(false);
+  const [deleteConfirmEmail, setDeleteConfirmEmail] = useState('');
+
+  // ─── Fetch profile ────────────────────────────────────────────────────────
+  const fetchProfile = useCallback(async () => {
     try {
-      const res = await api.get(`/api/accounts/${accountId}/tokens`);
-      setTokens(res.data);
-    } catch (err: any) {
-      console.error('Failed to fetch tokens:', err);
-      setError('خطا در دریافت توکن‌های این حساب');
-    } finally {
-      setLoadingTokens(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (selectedAccountId) {
-      fetchTokens(selectedAccountId);
-      setGeneratedToken(null); // Clear any previously generated token
-    }
-  }, [selectedAccountId, fetchTokens]);
-
-  const handleGenerateToken = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!selectedAccountId) return;
-    
-    setActionLoading(true);
-    setError(null);
-    setGeneratedToken(null);
-    setCopied(false);
-
-    try {
-      const res = await api.post(`/api/accounts/${selectedAccountId}/tokens`, {
-        name: newTokenName.trim() || undefined
+      const res = await api.get('/api/settings/profile');
+      setProfile(res.data.user);
+      setProfileForm({
+        name: res.data.user.name || '',
+        phone: res.data.user.phone || '',
+        displayCurrency: res.data.user.display_currency || 'USD',
       });
-      setGeneratedToken(res.data.token);
-      setNewTokenName('');
-      // Refresh the token list
-      await fetchTokens(selectedAccountId);
+    } catch (err) {
+      console.error('Failed to fetch profile:', err);
+    }
+  }, []);
+
+  useEffect(() => { fetchProfile(); }, [fetchProfile]);
+
+  // ─── Fetch accounts ──────────────────────────────────────────────────────
+  const fetchAccounts = useCallback(async () => {
+    try {
+      const res = await api.get('/api/settings/accounts');
+      setAccounts(res.data.accounts);
+    } catch (err) {
+      console.error('Failed to fetch accounts:', err);
+    }
+  }, []);
+
+  useEffect(() => { fetchAccounts(); }, [fetchAccounts]);
+
+  // ─── Fetch subscription ───────────────────────────────────────────────────
+  const fetchSubscription = useCallback(async () => {
+    try {
+      const res = await api.get('/api/settings/subscription');
+      setSubscription(res.data);
+    } catch (err) {
+      console.error('Failed to fetch subscription:', err);
+    }
+  }, []);
+
+  useEffect(() => { fetchSubscription(); }, [fetchSubscription]);
+
+  // ─── Fetch sessions ──────────────────────────────────────────────────────
+  const fetchSessions = useCallback(async () => {
+    try {
+      const res = await api.get('/api/settings/sessions');
+      setSessions(res.data.sessions);
+    } catch (err) {
+      console.error('Failed to fetch sessions:', err);
+    }
+  }, []);
+
+  useEffect(() => { fetchSessions(); }, [fetchSessions]);
+
+  // ─── Handlers ──────────────────────────────────────────────────────────────
+  const handleProfileSave = async () => {
+    try {
+      await api.put('/api/settings/profile', {
+        name: profileForm.name,
+        phone: profileForm.phone,
+        displayCurrency: profileForm.displayCurrency,
+      });
+      setProfileDirty(false);
+      showToast('پروفایل با موفقیت ذخیره شد');
+      fetchProfile();
     } catch (err: any) {
-      console.error('Failed to generate token:', err);
-      setError(err.response?.data?.error || 'خطا در ایجاد توکن جدید');
-    } finally {
-      setActionLoading(false);
+      showToast(err.response?.data?.error || 'خطا در ذخیره تغییرات', 'error');
     }
   };
 
-  const handleDeleteToken = async (tokenId: string) => {
-    if (!selectedAccountId || !window.confirm('آیا از حذف این توکن اطمینان دارید؟ برنامه‌هایی که از این توکن استفاده می‌کنند دیگر کار نخواهند کرد.')) {
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      setAvatarUploading(true);
+      const formData = new FormData();
+      formData.append('avatar', file);
+      const res = await api.post('/api/settings/avatar', formData);
+      if (profile) setProfile({ ...profile, avatar_url: res.data.avatar_url });
+      showToast('عکس پروفایل تغییر کرد');
+    } catch (err: any) {
+      showToast(err.response?.data?.error || 'خطا در بارگذاری تصویر', 'error');
+    } finally {
+      setAvatarUploading(false);
+      e.target.value = '';
+    }
+  };
+
+  const handleCreateAccount = async () => {
+    try {
+      await api.post('/api/settings/accounts', newAccount);
+      setShowAddAccount(false);
+      setNewAccount({ broker_name: '', account_number: '', currency: 'USD' });
+      fetchAccounts();
+      showToast('حساب جدید ایجاد شد');
+    } catch (err: any) {
+      showToast(err.response?.data?.error || 'خطا در ایجاد حساب', 'error');
+    }
+  };
+
+  const handleUpdateAccount = async (id: string) => {
+    try {
+      await api.put(`/api/settings/accounts/${id}`, editAccount);
+      setEditingId(null);
+      fetchAccounts();
+      showToast('حساب ویرایش شد');
+    } catch (err: any) {
+      showToast(err.response?.data?.error || 'خطا در ویرایش', 'error');
+    }
+  };
+
+  const handleDeleteAccount = async (id: string, tradeCount: number) => {
+    if (!confirm(`با حذف این حساب، تمام ${toPersianDigits(tradeCount)} معامله مرتبط با آن نیز حذف می‌شوند. آیا مطمئن هستید؟`)) return;
+    try {
+      await api.delete(`/api/settings/accounts/${id}`);
+      fetchAccounts();
+      showToast('حساب حذف شد');
+    } catch (err: any) {
+      showToast(err.response?.data?.error || 'خطا در حذف', 'error');
+    }
+  };
+
+  const handlePasswordChange = async () => {
+    if (passwordForm.newPassword !== passwordForm.confirmPassword) {
+      showToast('رمز جدید و تکرار آن یکسان نیست', 'error');
       return;
     }
-
-    setActionLoading(true);
-    setError(null);
-
     try {
-      await api.delete(`/api/accounts/${selectedAccountId}/tokens/${tokenId}`);
-      // Refresh token list
-      await fetchTokens(selectedAccountId);
+      await api.put('/api/settings/password', {
+        currentPassword: passwordForm.currentPassword,
+        newPassword: passwordForm.newPassword,
+      });
+      setPasswordForm({ currentPassword: '', newPassword: '', confirmPassword: '' });
+      showToast('رمز عبور با موفقیت تغییر کرد');
+      fetchSessions();
     } catch (err: any) {
-      console.error('Failed to delete token:', err);
-      setError(err.response?.data?.error || 'خطا در حذف توکن دسترسی');
-    } finally {
-      setActionLoading(false);
+      showToast(err.response?.data?.error || 'خطا در تغییر رمز', 'error');
     }
   };
 
-  const copyToClipboard = () => {
-    if (!generatedToken) return;
-    navigator.clipboard.writeText(generatedToken);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+  const handleRevokeSession = async (id: string) => {
+    try {
+      await api.delete(`/api/settings/sessions/${id}`);
+      fetchSessions();
+      showToast('نشست بسته شد');
+    } catch (err: any) {
+      showToast(err.response?.data?.error || 'خطا', 'error');
+    }
   };
 
+  const handleRevokeAllSessions = async () => {
+    try {
+      await api.delete('/api/settings/sessions');
+      fetchSessions();
+      showToast('همه نشست‌ها بسته شدند');
+    } catch (err: any) {
+      showToast(err.response?.data?.error || 'خطا', 'error');
+    }
+  };
+
+  const handleDeleteUserAccount = async () => {
+    try {
+      await api.delete('/api/settings/account', { data: { confirmEmail: deleteConfirmEmail } });
+      await logout();
+      router.push('/login');
+    } catch (err: any) {
+      showToast(err.response?.data?.error || 'خطا در حذف حساب', 'error');
+    }
+  };
+
+  // ─── Password strength ────────────────────────────────────────────────────
+  const passwordStrength = () => {
+    const p = passwordForm.newPassword;
+    if (!p) return { label: '', class: '' };
+    let score = 0;
+    if (p.length >= 6) score++;
+    if (p.length >= 10) score++;
+    if (/[A-Z]/.test(p)) score++;
+    if (/[0-9]/.test(p)) score++;
+    if (/[^A-Za-z0-9]/.test(p)) score++;
+    if (score <= 1) return { label: 'ضعیف', class: 'weak' };
+    if (score <= 3) return { label: 'متوسط', class: 'medium' };
+    return { label: 'قوی', class: 'strong' };
+  };
+
+  const initials = (profile?.name || user?.name || '?').charAt(0);
+
   return (
-    <div className="settings-container">
-      <div className="settings-header">
-        <h1>تنظیمات سیستم</h1>
-        <p>تنظیمات حساب کاربری و مدیریت توکن‌های اتصال به متاتریدر</p>
+    <div className="settings-page">
+      {/* ─── Toast ─── */}
+      {toast && (
+        <div className={`settings-toast ${toast.type}`}>
+          <span className="material-symbols-outlined">
+            {toast.type === 'success' ? 'check_circle' : 'error'}
+          </span>
+          <span>{toast.message}</span>
+        </div>
+      )}
+
+      {/* ─── Header ─── */}
+      <header className="settings-header">
+        <h1>تنظیمات</h1>
+      </header>
+
+      {/* ─── Tab Bar ─── */}
+      <div className="settings-tab-bar">
+        {([
+          { key: 'profile', label: 'پروفایل', icon: 'person' },
+          { key: 'accounts', label: 'حساب‌های بروکر', icon: 'account_balance' },
+          { key: 'subscription', label: 'اشتراک', icon: 'card_membership' },
+          { key: 'security', label: 'امنیت', icon: 'shield' },
+        ] as const).map((tab) => (
+          <button
+            key={tab.key}
+            className={`settings-tab-btn ${activeTab === tab.key ? 'active' : ''}`}
+            onClick={() => switchTab(tab.key)}
+          >
+            <span className="material-symbols-outlined">{tab.icon}</span>
+            <span>{tab.label}</span>
+          </button>
+        ))}
       </div>
 
-      <div className="settings-layout">
-        <aside className="settings-tabs">
-          <button
-            className={`tab-btn ${activeTab === 'tokens' ? 'active' : ''}`}
-            onClick={() => setActiveTab('tokens')}
-          >
-            <span className="material-symbols-outlined icon">key</span>
-            <span>توکن‌های اتصال (API)</span>
-          </button>
-          <button
-            className={`tab-btn ${activeTab === 'profile' ? 'active' : ''}`}
-            onClick={() => setActiveTab('profile')}
-          >
-            <span className="material-symbols-outlined icon">person</span>
-            <span>اطلاعات پروفایل</span>
-          </button>
-        </aside>
-
-        <main className="settings-content">
-          {error && (
-            <div className="error-alert" style={{
-              background: 'rgba(239, 68, 68, 0.1)',
-              border: '1px solid rgba(239, 68, 68, 0.3)',
-              color: '#ef4444',
-              padding: '12px',
-              borderRadius: '8px',
-              marginBottom: '1.5rem',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-              fontSize: '0.9rem'
-            }}>
-              <span className="material-symbols-outlined">error</span>
-              <span>{error}</span>
+      {/* ─── Tab Content ─── */}
+      <div className="settings-tab-content">
+        {/* ═════ PROFILE TAB ═════ */}
+        {activeTab === 'profile' && profile && (
+          <section className="settings-section">
+            {/* Avatar */}
+            <div className="profile-avatar-row">
+              <div className="avatar-circle">
+                {profile.avatar_url ? (
+                  <img src={profile.avatar_url} alt="avatar" />
+                ) : (
+                  <span className="avatar-initials">{initials}</span>
+                )}
+              </div>
+              <label className="avatar-upload-btn">
+                <span className="material-symbols-outlined">photo_camera</span>
+                تغییر عکس
+                <input type="file" accept="image/jpeg,image/png" onChange={handleAvatarUpload} hidden disabled={avatarUploading} />
+              </label>
             </div>
-          )}
 
-          {activeTab === 'profile' && user && (
-            <section className="profile-section">
-              <h3>مشخصات کاربر</h3>
-              <div className="info-grid">
-                <div className="info-field">
-                  <label>نام و نام خانوادگی</label>
-                  <div className="value">{user.name}</div>
-                </div>
-                <div className="info-field">
-                  <label>آدرس ایمیل</label>
-                  <div className="value" style={{ direction: 'ltr', textAlign: 'right' }}>{user.email}</div>
-                </div>
-                <div className="info-field">
-                  <label>نوع اشتراک</label>
-                  <div className="value">{user.plan === 'FREE' ? 'رایگان' : 'حرفه‌ای'}</div>
+            {/* Form */}
+            <div className="settings-form-grid">
+              <div className="form-field">
+                <label>نام کامل</label>
+                <input
+                  type="text"
+                  value={profileForm.name}
+                  onChange={(e) => { setProfileForm({ ...profileForm, name: e.target.value }); setProfileDirty(true); }}
+                  placeholder="نام و نام خانوادگی"
+                />
+              </div>
+
+              <div className="form-field">
+                <label>ایمیل</label>
+                <div className="readonly-field">
+                  <span style={{ direction: 'ltr' }}>{profile.email}</span>
+                  <span className="material-symbols-outlined verified-icon">verified</span>
                 </div>
               </div>
-            </section>
-          )}
 
-          {activeTab === 'tokens' && (
-            <section className="tokens-section">
-              <h3>مدیریت توکن‌های اتصال</h3>
-              <p style={{ fontSize: '0.85rem', color: '#94a3b8', margin: 0 }}>
-                برای اتصال اندیکاتور یا اکسپرت متاتریدر ۵ به ژورنال معامله‌یار، باید برای هر حساب معاملاتی یک توکن اتصال مجزا بسازید و آن را در بخش تنظیمات اکسپرت قرار دهید.
-              </p>
+              <div className="form-field">
+                <label>شماره موبایل</label>
+                <input
+                  type="text"
+                  value={profileForm.phone}
+                  onChange={(e) => { setProfileForm({ ...profileForm, phone: e.target.value }); setProfileDirty(true); }}
+                  placeholder="09XXXXXXXXX"
+                  style={{ direction: 'ltr', textAlign: 'right' }}
+                />
+              </div>
 
-              {loadingAccounts ? (
-                <div style={{ textAlign: 'center', padding: '2rem' }}>در حال دریافت لیست حساب‌های معاملاتی...</div>
-              ) : accounts.length === 0 ? (
-                <div style={{ textAlign: 'center', padding: '2rem', color: '#94a3b8' }}>
-                  هیچ حساب معاملاتی یافت نشد. برای ساخت حساب معاملاتی جدید ابتدا یک معامله دستی یا آنلاین ثبت کنید.
-                </div>
-              ) : (
-                <>
-                  <div className="accounts-selector">
-                    <label htmlFor="account-select">انتخاب حساب معاملاتی:</label>
-                    <select
-                      id="account-select"
-                      value={selectedAccountId}
-                      onChange={(e) => setSelectedAccountId(e.target.value)}
+              <div className="form-field">
+                <label>ارز نمایش</label>
+                <div className="toggle-group">
+                  {(['USD', 'TOMAN', 'BOTH'] as const).map((curr) => (
+                    <button
+                      key={curr}
+                      className={`toggle-btn ${profileForm.displayCurrency === curr ? 'active' : ''}`}
+                      onClick={() => { setProfileForm({ ...profileForm, displayCurrency: curr }); setProfileDirty(true); }}
                     >
-                      {accounts.map((acc) => (
-                        <option key={acc.id} value={acc.id}>
-                          {acc.broker_name} {acc.account_number ? `(${acc.account_number})` : ''}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
+                      {curr === 'USD' ? 'دلار' : curr === 'TOMAN' ? 'تومان' : 'هر دو'}
+                    </button>
+                  ))}
+                </div>
+              </div>
 
-                  <div className="generate-token-box">
-                    <h4>ایجاد توکن اتصال جدید</h4>
-                    <form className="generate-form" onSubmit={handleGenerateToken}>
-                      <input
-                        type="text"
-                        placeholder="نام توکن (مانند: اکسپرت خانه یا لپ‌تاپ)"
-                        value={newTokenName}
-                        onChange={(e) => setNewTokenName(e.target.value)}
-                        disabled={actionLoading}
-                      />
-                      <button type="submit" disabled={actionLoading}>
-                        {actionLoading ? 'در حال ایجاد...' : 'ساخت توکن جدید'}
-                      </button>
-                    </form>
-                  </div>
+              <div className="form-field">
+                <label>زبان</label>
+                <div className="readonly-field">
+                  <span>فارسی</span>
+                </div>
+              </div>
+            </div>
 
-                  {generatedToken && (
-                    <div className="new-token-alert">
-                      <div className="alert-header">
-                        <span className="material-symbols-outlined">check_circle</span>
-                        <span>توکن با موفقیت ایجاد شد!</span>
+            <button className="settings-save-btn" onClick={handleProfileSave} disabled={!profileDirty}>
+              ذخیره تغییرات
+            </button>
+          </section>
+        )}
+
+        {/* ═════ ACCOUNTS TAB ═════ */}
+        {activeTab === 'accounts' && (
+          <section className="settings-section">
+            {/* Plan limit banner */}
+            {subscription && subscription.plan === 'FREE' && accounts.length >= 1 && (
+              <div className="plan-limit-banner">
+                <span className="material-symbols-outlined">lock</span>
+                <span>برای افزودن حساب بیشتر، اشتراکت رو ارتقا بده</span>
+                <button onClick={() => switchTab('subscription')}>ارتقا به استاندارد</button>
+              </div>
+            )}
+
+            {/* Account cards */}
+            {accounts.map((acc) => (
+              <div key={acc.id} className="broker-card">
+                {editingId === acc.id ? (
+                  // ─── Edit mode ───
+                  <div className="broker-edit-form">
+                    <div className="settings-form-grid">
+                      <div className="form-field">
+                        <label>نام بروکر</label>
+                        <input
+                          type="text"
+                          value={editAccount.broker_name}
+                          onChange={(e) => setEditAccount({ ...editAccount, broker_name: e.target.value })}
+                        />
                       </div>
-                      <div className="alert-warning">
-                        <span className="material-symbols-outlined" style={{ fontSize: '1.1rem' }}>warning</span>
-                        <span>توجه: این توکن فقط یک‌بار نمایش داده می‌شود. لطفاً آن را کپی کرده و در محلی امن ذخیره کنید.</span>
+                      <div className="form-field">
+                        <label>شماره حساب</label>
+                        <input
+                          type="text"
+                          value={editAccount.account_number}
+                          onChange={(e) => setEditAccount({ ...editAccount, account_number: e.target.value })}
+                          style={{ direction: 'ltr', textAlign: 'right' }}
+                        />
                       </div>
-                      <div className="token-display">
-                        <button className="copy-btn" onClick={copyToClipboard}>
-                          {copied ? 'کپی شد!' : 'کپی توکن'}
-                        </button>
-                        <span>{generatedToken}</span>
+                      <div className="form-field">
+                        <label>ارز حساب</label>
+                        <div className="toggle-group">
+                          {['USD', 'EUR', 'GBP'].map((c) => (
+                            <button
+                              key={c}
+                              className={`toggle-btn ${editAccount.currency === c ? 'active' : ''}`}
+                              onClick={() => setEditAccount({ ...editAccount, currency: c })}
+                            >{c}</button>
+                          ))}
+                        </div>
                       </div>
                     </div>
-                  )}
+                    <div className="broker-edit-actions">
+                      <button className="settings-save-btn" onClick={() => handleUpdateAccount(acc.id)}>ذخیره</button>
+                      <button className="settings-cancel-btn" onClick={() => setEditingId(null)}>انصراف</button>
+                    </div>
+                  </div>
+                ) : (
+                  // ─── View mode ───
+                  <>
+                    <div className="broker-card-header">
+                      <div className="broker-avatar">{(acc.broker_name || '?').charAt(0)}</div>
+                      <div className="broker-info">
+                        <h4>{acc.broker_name || 'نامشخص'}</h4>
+                        <span>حساب شماره: {acc.account_number ? `#${acc.account_number}` : 'نامشخص'}</span>
+                        <span>ارز: {acc.currency}</span>
+                        <span>{toPersianDigits(acc.trade_count)} معامله</span>
+                      </div>
+                    </div>
+                    <div className="broker-card-actions">
+                      <button className="broker-action-btn" onClick={() => router.push('/trades')}>واردات جدید</button>
+                      <button className="broker-action-btn" onClick={() => {
+                        setEditingId(acc.id);
+                        setEditAccount({
+                          broker_name: acc.broker_name || '',
+                          account_number: acc.account_number || '',
+                          currency: acc.currency,
+                        });
+                      }}>ویرایش</button>
+                      <button className="broker-action-btn danger" onClick={() => handleDeleteAccount(acc.id, acc.trade_count)}>حذف</button>
+                    </div>
+                  </>
+                )}
+              </div>
+            ))}
 
-                  <div className="tokens-list-box">
-                    <h4>توکن‌های فعال برای این حساب</h4>
-                    {loadingTokens ? (
-                      <div style={{ textRendering: 'optimizeSpeed', color: '#94a3b8', fontSize: '0.85rem' }}>در حال بارگذاری توکن‌ها...</div>
-                    ) : tokens.length === 0 ? (
-                      <div className="empty-tokens">هیچ توکن فعالی برای این حساب معاملاتی ثبت نشده است.</div>
+            {/* Add new account */}
+            {showAddAccount ? (
+              <div className="broker-card add-mode">
+                <div className="settings-form-grid">
+                  <div className="form-field">
+                    <label>نام بروکر</label>
+                    <input
+                      type="text"
+                      list="broker-presets"
+                      value={newAccount.broker_name}
+                      onChange={(e) => setNewAccount({ ...newAccount, broker_name: e.target.value })}
+                      placeholder="انتخاب یا تایپ نام بروکر"
+                    />
+                    <datalist id="broker-presets">
+                      {BROKER_PRESETS.map((b) => <option key={b} value={b} />)}
+                    </datalist>
+                  </div>
+                  <div className="form-field">
+                    <label>شماره حساب</label>
+                    <input
+                      type="text"
+                      value={newAccount.account_number}
+                      onChange={(e) => setNewAccount({ ...newAccount, account_number: e.target.value })}
+                      placeholder="شماره حساب بروکر"
+                      style={{ direction: 'ltr', textAlign: 'right' }}
+                    />
+                  </div>
+                  <div className="form-field">
+                    <label>ارز حساب</label>
+                    <div className="toggle-group">
+                      {['USD', 'EUR', 'GBP'].map((c) => (
+                        <button
+                          key={c}
+                          className={`toggle-btn ${newAccount.currency === c ? 'active' : ''}`}
+                          onClick={() => setNewAccount({ ...newAccount, currency: c })}
+                        >{c}</button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+                <div className="broker-edit-actions">
+                  <button className="settings-save-btn" onClick={handleCreateAccount}>ذخیره حساب</button>
+                  <button className="settings-cancel-btn" onClick={() => setShowAddAccount(false)}>انصراف</button>
+                </div>
+              </div>
+            ) : (
+              <button className="add-account-card" onClick={() => setShowAddAccount(true)}>
+                <span className="material-symbols-outlined">add</span>
+                <span>افزودن حساب بروکر جدید</span>
+              </button>
+            )}
+          </section>
+        )}
+
+        {/* ═════ SUBSCRIPTION TAB ═════ */}
+        {activeTab === 'subscription' && subscription && (
+          <section className="settings-section">
+            {/* Current plan */}
+            <div className="subscription-current-card">
+              <div className="plan-info">
+                <span className="plan-label">پلن فعلی:</span>
+                <span className="plan-badge">{subscription.plan === 'FREE' ? 'رایگان' : subscription.plan === 'STANDARD' ? 'استاندارد' : 'حرفه‌ای'}</span>
+              </div>
+              {subscription.subscription && (
+                <div className="plan-details">
+                  <span>تمدید خودکار: {new Date(subscription.subscription.end_date).toLocaleDateString('fa-IR')}</span>
+                </div>
+              )}
+              {subscription.plan !== 'PRO' && (
+                <button className="upgrade-btn" onClick={() => showToast('درگاه پرداخت به زودی فعال می‌شود')}>
+                  {subscription.plan === 'FREE' ? 'ارتقا به استاندارد' : 'ارتقا به حرفه‌ای'}
+                </button>
+              )}
+              {subscription.plan === 'PRO' && (
+                <div className="best-plan-badge">بهترین پلن رو داری 🎉</div>
+              )}
+            </div>
+
+            {/* Plan comparison table */}
+            <div className="plan-comparison-table">
+              <table>
+                <thead>
+                  <tr>
+                    <th>امکانات</th>
+                    <th className={subscription.plan === 'FREE' ? 'current-col' : ''}>رایگان</th>
+                    <th className={subscription.plan === 'STANDARD' ? 'current-col' : ''}>استاندارد</th>
+                    <th className={subscription.plan === 'PRO' ? 'current-col' : ''}>حرفه‌ای</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>معاملات</td>
+                    <td>۵۰/ماه</td><td>نامحدود</td><td>نامحدود</td>
+                  </tr>
+                  <tr>
+                    <td>حساب بروکر</td>
+                    <td>۱</td><td>۳</td><td>نامحدود</td>
+                  </tr>
+                  <tr>
+                    <td>واردات MT4/MT5</td>
+                    <td>✗</td><td>✓</td><td>✓</td>
+                  </tr>
+                  <tr>
+                    <td>گزارش عملکرد</td>
+                    <td>محدود</td><td>کامل</td><td>کامل</td>
+                  </tr>
+                  <tr>
+                    <td>قیمت ماهانه</td>
+                    <td>رایگان</td>
+                    <td>۱۵۰٬۰۰۰ ت</td>
+                    <td>۳۵۰٬۰۰۰ ت</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+        )}
+
+        {/* ═════ SECURITY TAB ═════ */}
+        {activeTab === 'security' && (
+          <section className="settings-section">
+            {/* Change password */}
+            <div className="security-card">
+              <h3>تغییر رمز عبور</h3>
+              <div className="password-fields">
+                <div className="form-field">
+                  <label>فعلی</label>
+                  <div className="password-input-wrap">
+                    <input
+                      type={showPasswords.current ? 'text' : 'password'}
+                      value={passwordForm.currentPassword}
+                      onChange={(e) => setPasswordForm({ ...passwordForm, currentPassword: e.target.value })}
+                      placeholder="••••••••"
+                      style={{ direction: 'ltr' }}
+                    />
+                    <button type="button" onClick={() => setShowPasswords({ ...showPasswords, current: !showPasswords.current })}>
+                      <span className="material-symbols-outlined">{showPasswords.current ? 'visibility_off' : 'visibility'}</span>
+                    </button>
+                  </div>
+                </div>
+                <div className="form-field">
+                  <label>جدید</label>
+                  <div className="password-input-wrap">
+                    <input
+                      type={showPasswords.new ? 'text' : 'password'}
+                      value={passwordForm.newPassword}
+                      onChange={(e) => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
+                      placeholder="••••••••"
+                      style={{ direction: 'ltr' }}
+                    />
+                    <button type="button" onClick={() => setShowPasswords({ ...showPasswords, new: !showPasswords.new })}>
+                      <span className="material-symbols-outlined">{showPasswords.new ? 'visibility_off' : 'visibility'}</span>
+                    </button>
+                  </div>
+                  {passwordForm.newPassword && (
+                    <div className={`password-strength ${passwordStrength().class}`}>
+                      <div className="strength-bar"><div className="strength-fill" /></div>
+                      <span>{passwordStrength().label}</span>
+                    </div>
+                  )}
+                </div>
+                <div className="form-field">
+                  <label>تکرار</label>
+                  <div className="password-input-wrap">
+                    <input
+                      type={showPasswords.confirm ? 'text' : 'password'}
+                      value={passwordForm.confirmPassword}
+                      onChange={(e) => setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })}
+                      placeholder="••••••••"
+                      style={{ direction: 'ltr' }}
+                    />
+                    <button type="button" onClick={() => setShowPasswords({ ...showPasswords, confirm: !showPasswords.confirm })}>
+                      <span className="material-symbols-outlined">{showPasswords.confirm ? 'visibility_off' : 'visibility'}</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <button className="settings-save-btn" onClick={handlePasswordChange} disabled={!passwordForm.currentPassword || !passwordForm.newPassword}>
+                تغییر رمز عبور
+              </button>
+            </div>
+
+            {/* Active sessions */}
+            <div className="security-card">
+              <div className="sessions-header">
+                <h3>نشست‌های فعال</h3>
+                {sessions.filter(s => !s.is_current).length > 0 && (
+                  <button className="revoke-all-btn" onClick={handleRevokeAllSessions}>خروج از تمام دستگاه‌ها</button>
+                )}
+              </div>
+              <div className="sessions-list">
+                {sessions.map((s) => (
+                  <div key={s.id} className="session-item">
+                    <div className="session-info">
+                      <span className="material-symbols-outlined session-icon">devices</span>
+                      <div>
+                        <span className="session-device">{s.user_agent}</span>
+                        <span className="session-time">آخرین فعالیت: {new Date(s.last_used_at).toLocaleDateString('fa-IR')}</span>
+                      </div>
+                    </div>
+                    {s.is_current ? (
+                      <span className="current-session-badge">این دستگاه</span>
                     ) : (
-                      tokens.map((token) => (
-                        <div className="token-item" key={token.id}>
-                          <div className="token-info">
-                            <span className="token-name">{token.name}</span>
-                            <div className="token-meta">
-                              <span>تاریخ ایجاد: {new Date(token.created_at).toLocaleDateString('fa-IR')}</span>
-                              <span>پیش‌نمایش: <span className="code">{token.token_preview}</span></span>
-                            </div>
-                          </div>
-                          <button
-                            className="delete-btn"
-                            onClick={() => handleDeleteToken(token.id)}
-                            disabled={actionLoading}
-                            title="حذف توکن"
-                          >
-                            <span className="material-symbols-outlined">delete</span>
-                          </button>
-                        </div>
-                      ))
+                      <button className="revoke-session-btn" onClick={() => handleRevokeSession(s.id)}>
+                        خروج از این دستگاه
+                      </button>
                     )}
                   </div>
-                </>
+                ))}
+              </div>
+            </div>
+
+            {/* Danger zone */}
+            <div className="danger-zone">
+              <div className="danger-header">
+                <span className="material-symbols-outlined">warning</span>
+                <h3>حذف حساب کاربری</h3>
+              </div>
+              <p>با حذف حساب، تمام معاملات، ژورنال‌ها و داده‌هایت به صورت دائمی حذف می‌شوند و قابل بازیابی نیستند.</p>
+              {showDeleteAccount ? (
+                <div className="delete-confirm-form">
+                  <p>برای تایید، ایمیل خود را وارد کنید:</p>
+                  <input
+                    type="text"
+                    value={deleteConfirmEmail}
+                    onChange={(e) => setDeleteConfirmEmail(e.target.value)}
+                    placeholder={profile?.email || 'ایمیل'}
+                    style={{ direction: 'ltr', textAlign: 'right' }}
+                  />
+                  <div className="delete-actions">
+                    <button className="danger-confirm-btn" onClick={handleDeleteUserAccount} disabled={deleteConfirmEmail !== profile?.email}>
+                      بله، حسابم را حذف کن
+                    </button>
+                    <button className="settings-cancel-btn" onClick={() => { setShowDeleteAccount(false); setDeleteConfirmEmail(''); }}>انصراف</button>
+                  </div>
+                </div>
+              ) : (
+                <button className="danger-outline-btn" onClick={() => setShowDeleteAccount(true)}>حذف حساب کاربری</button>
               )}
-            </section>
-          )}
-        </main>
+            </div>
+          </section>
+        )}
       </div>
     </div>
   );

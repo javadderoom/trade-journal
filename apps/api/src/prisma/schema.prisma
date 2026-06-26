@@ -11,21 +11,24 @@ generator client {
 }
 
 model User {
-  id             String         @id @default(uuid())
-  email          String         @unique
-  phone          String         @unique
-  password_hash  String
-  name           String?
-  plan           Plan           @default(FREE)
-  created_at     DateTime       @default(now())
-  accounts       Account[]
-  journalEntries JournalEntry[]
-  subscriptions  Subscription[]
-  trades         Trade[]
-  importJobs     ImportJob[]
-  tags           Tag[]
-  emotions       Emotion[]
-  refresh_tokens RefreshToken[]
+  id               String           @id @default(uuid())
+  email            String           @unique
+  phone            String           @unique
+  password_hash    String
+  name             String?
+  plan             Plan             @default(FREE)
+  created_at       DateTime         @default(now())
+  display_currency DisplayCurrency  @default(USD)
+  avatar_url       String?
+  deleted_at       DateTime?
+  accounts         Account[]
+  journalEntries   JournalEntry[]
+  subscriptions    Subscription[]
+  trades           Trade[]
+  importJobs       ImportJob[]
+  tags             Tag[]
+  emotions         Emotion[]
+  refresh_tokens   RefreshToken[]
 }
 
 model Account {
@@ -48,6 +51,8 @@ model RefreshToken {
   user       User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
   expires_at DateTime
   created_at DateTime @default(now())
+  user_agent String?
+  last_used_at DateTime @default(now())
 
   @@index([user_id])
 }
@@ -197,4 +202,10 @@ enum SubscriptionStatus {
   ACTIVE
   EXPIRED
   CANCELLED
+}
+
+enum DisplayCurrency {
+  USD
+  TOMAN
+  BOTH
 }

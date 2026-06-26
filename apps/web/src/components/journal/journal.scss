@@ -474,13 +474,11 @@
 
 // ─── Step 2: Patterns Switcher & Analytics Styles ───────────────────────────
 
-.journal-tabs {
+.journal-tab-bar {
   display: flex;
-  gap: 8px;
-  margin-bottom: 28px;
+  gap: 4px;
   border-bottom: 1px solid rgba($outline-variant, 0.2);
-  padding-bottom: 8px;
-  width: 100%;
+  margin-bottom: 24px;
   overflow-x: auto;
   white-space: nowrap;
   -webkit-overflow-scrolling: touch;
@@ -490,36 +488,41 @@
   }
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
 
-  .journal-tab-btn {
-    flex-shrink: 0;
-    background: transparent;
-    border: none;
-    outline: none;
-    color: $on-surface-variant;
-    padding: 8px 20px;
-    font-size: 14px;
-    font-weight: 500;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.2s cubic-bezier(0.23, 1, 0.32, 1);
-    font-family: inherit;
+.journal-tab-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: $on-surface-variant;
+  cursor: pointer;
+  font-size: 14px;
+  font-family: inherit;
+  white-space: nowrap;
+  transition: color 0.2s, border-color 0.2s;
+  flex-shrink: 0;
 
-    &:hover {
-      color: $on-surface;
-      background-color: rgba($surface-variant, 0.4);
-    }
+  .material-symbols-outlined {
+    font-size: 20px;
+  }
 
-    &.active {
-      color: $primary;
-      background-color: rgba($primary, 0.08);
-      font-weight: 700;
-    }
+  &:hover {
+    color: $on-surface;
+  }
 
-    @media (max-width: 640px) {
-      padding: 8px 12px;
-      font-size: 13px;
-    }
+  &.active {
+    color: $primary;
+    border-bottom-color: $primary;
+    font-weight: 600;
+  }
+
+  @media (max-width: 640px) {
+    padding: 8px 12px;
+    font-size: 13px;
   }
 }
 

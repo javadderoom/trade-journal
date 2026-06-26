@@ -42,3 +42,5 @@ next-env.d.ts
 # Graphify cache
 /graphify-out/cache/
 
+.codex/auth.json
+.codex/config.toml

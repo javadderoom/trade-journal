@@ -1,0 +1,27 @@
+import re
+
+p = r'g:\Code\trade-journal\apps\api\src\routes\auth.ts'
+with open(p, 'r', encoding='utf-8') as f:
+    c = f.read()
+
+# Remove debug console.log
+c = c.replace('    console.log("token => ", token);\n', '')
+
+# Remove the unnecessary update-before-delete block
+old_block = """    // Update last_used_at on the existing token before rotation
+    await prisma.refreshToken.update({
+      where: { token },
+      data: {
+        last_used_at: new Date(),
+        user_agent: req.headers['user-agent'] || stored.user_agent,
+      },
+    });
+
+    // Rotate refresh token"""
+
+c = c.replace(old_block, '    // Rotate refresh token')
+
+with open(p, 'w', encoding='utf-8') as f:
+    f.write(c)
+
+print('done')
