@@ -75,16 +75,19 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   }, [initialize]);
 
   const isAuthPage = pathname ? (pathname.startsWith('/login') || pathname.startsWith('/register')) : false;
+  const isLandingPage = pathname === '/';
 
   useEffect(() => {
     if (!isInitialized || !pathname) return;
 
-    if (!user && !isAuthPage) {
+    if (!user && !isAuthPage && !isLandingPage) {
       router.replace('/login');
     } else if (user && isAuthPage) {
       router.replace('/dashboard');
     }
-  }, [user, isInitialized, isAuthPage, pathname, router]);
+    // Logged-in users on the landing page are redirected to /dashboard by the
+    // LandingPage component itself.
+  }, [user, isInitialized, isAuthPage, isLandingPage, pathname, router]);
 
   if (!isInitialized || !pathname) {
     return (
@@ -119,13 +122,18 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   }
 
   // Prevent flash of protected page content while redirecting to login
-  if (!user && !isAuthPage) {
+  if (!user && !isAuthPage && !isLandingPage) {
     return null;
   }
 
   // Prevent flash of auth page content while redirecting to home
   if (user && isAuthPage) {
     return null;
+  }
+
+  // Public pages (landing) render full-bleed, no app chrome
+  if (isLandingPage) {
+    return <>{children}</>;
   }
 
   if (isAuthPage) {

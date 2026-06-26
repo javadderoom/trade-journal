@@ -5,7 +5,7 @@ export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   const protectedPaths = ['/trades', '/analytics', '/dashboard', '/settings', '/strategies'];
-  const isProtected = protectedPaths.some(path => pathname.startsWith(path) || pathname === '/');
+  const isProtected = protectedPaths.some(path => pathname.startsWith(path));
 
   const authPaths = ['/login', '/register'];
   const isAuthPage = authPaths.some(path => pathname.startsWith(path));

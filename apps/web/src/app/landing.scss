@@ -1,0 +1,1019 @@
+// Landing page styles — معامله‌یار
+// Spec A "Trader's Terminal" + borrowings from Spec C (stats, comparison, persistent CTA) and B (single problem statement, balanced headlines)
+// Theme: locked dark. Accent: locked emerald (#3DDC97). Shape system: cards 14px, buttons 10px, pills full.
+
+$land-bg: #0b0f19;
+$land-surface: #141824;
+$land-surface-2: #181c27;
+$land-elevated: #1e2535;
+$land-accent: #3ddc97;
+$land-accent-hover: #4de9a8;
+$land-danger: #ff5370;
+$land-gold: #f5c542;
+$land-text: #f0f2f5;
+$land-muted: #8892a6;
+$land-muted-2: #5e6779;
+$land-border: #1e2535;
+$land-border-soft: rgba(255, 255, 255, 0.06);
+
+$radius-card: 14px;
+$radius-btn: 10px;
+$radius-pill: 999px;
+$ease: cubic-bezier(0.16, 1, 0.3, 1);
+$maxw: 1200px;
+
+.landing {
+  background: $land-bg;
+  color: $land-text;
+  font-family: 'Vazirmatn', sans-serif;
+  overflow-x: hidden;
+}
+
+// ─── Buttons (color + shape lock) ──────────────────────────────────────────────
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: $land-accent;
+  color: #04231a;
+  font-weight: 700;
+  border: none;
+  border-radius: $radius-btn;
+  padding: 10px 18px;
+  font-size: 0.92rem;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.2s $ease, transform 0.15s $ease, box-shadow 0.2s $ease;
+  white-space: nowrap;
+
+  .material-symbols-outlined { font-size: 18px; }
+
+  &:hover { background: $land-accent-hover; }
+  &:active { transform: translateY(1px); }
+
+  &.muted {
+    background: $land-elevated;
+    color: $land-text;
+    border: 1px solid $land-border;
+    &:hover { border-color: $land-accent; color: $land-accent; }
+  }
+
+  &.lg { padding: 14px 28px; font-size: 1rem; }
+
+  &.full { width: 100%; }
+
+  &.glow {
+    box-shadow: 0 0 0 0 rgba(61, 220, 151, 0.5);
+    animation: cta-pulse 2.6s $ease infinite;
+  }
+}
+
+.btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  color: $land-text;
+  font-weight: 600;
+  border: 1px solid $land-border;
+  border-radius: $radius-btn;
+  padding: 9px 16px;
+  font-size: 0.9rem;
+  font-family: inherit;
+  cursor: pointer;
+  transition: border-color 0.2s $ease, color 0.2s $ease;
+  white-space: nowrap;
+
+  &:hover { border-color: $land-accent; color: $land-accent; }
+  &.lg { padding: 13px 26px; font-size: 1rem; }
+}
+
+@keyframes cta-pulse {
+  0% { box-shadow: 0 0 0 0 rgba(61, 220, 151, 0.4); }
+  70% { box-shadow: 0 0 0 14px rgba(61, 220, 151, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(61, 220, 151, 0); }
+}
+
+// ─── Navigation ────────────────────────────────────────────────────────────────
+.landing-nav {
+  position: fixed;
+  top: 0;
+  inset-inline: 0;
+  z-index: 100;
+  height: 68px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 clamp(20px, 5vw, 56px);
+  background: transparent;
+  transition: background 0.3s $ease, border-color 0.3s $ease, backdrop-filter 0.3s $ease;
+  border-bottom: 1px solid transparent;
+
+  &.scrolled {
+    background: rgba(11, 15, 25, 0.82);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-bottom: 1px solid $land-border-soft;
+  }
+}
+
+.landing-logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  color: $land-text;
+
+  .logo-mark {
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 9px;
+    background: linear-gradient(135deg, rgba(61, 220, 151, 0.22), rgba(61, 220, 151, 0.06));
+    border: 1px solid rgba(61, 220, 151, 0.3);
+    color: $land-accent;
+    .material-symbols-outlined { font-size: 20px; }
+  }
+  .logo-text { font-weight: 700; font-size: 1.05rem; }
+}
+
+.landing-nav-links {
+  display: flex;
+  gap: 28px;
+  a {
+    color: $land-muted;
+    text-decoration: none;
+    font-size: 0.92rem;
+    font-weight: 500;
+    transition: color 0.2s $ease;
+    &:hover { color: $land-text; }
+  }
+}
+
+.landing-nav-cta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.landing-nav-burger {
+  display: none;
+  background: $land-surface;
+  border: 1px solid $land-border;
+  color: $land-text;
+  border-radius: $radius-btn;
+  width: 40px;
+  height: 40px;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  .material-symbols-outlined { font-size: 22px; }
+}
+
+.landing-mobile-menu {
+  display: none;
+}
+
+// ─── Hero ──────────────────────────────────────────────────────────────────────
+.landing-hero {
+  position: relative;
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  padding: 96px clamp(20px, 5vw, 56px) 64px;
+  overflow: hidden;
+}
+
+.hero-grid-bg,
+.hero-glow {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.hero-grid-bg {
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: radial-gradient(ellipse 80% 60% at 50% 40%, #000 30%, transparent 75%);
+  -webkit-mask-image: radial-gradient(ellipse 80% 60% at 50% 40%, #000 30%, transparent 75%);
+}
+
+.hero-glow {
+  background: radial-gradient(circle at 70% 35%, rgba(61, 220, 151, 0.12), transparent 55%);
+}
+
+.hero-inner {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: $maxw;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1.05fr 0.95fr;
+  gap: 48px;
+  align-items: center;
+}
+
+.hero-copy {
+  .hero-title {
+    font-size: clamp(2rem, 4.6vw, 3.4rem);
+    font-weight: 800;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    margin: 0 0 18px;
+    color: $land-text;
+    text-wrap: balance;
+  }
+  .hero-sub {
+    font-size: 1.08rem;
+    line-height: 1.8;
+    color: $land-muted;
+    margin: 0 0 28px;
+    max-width: 46ch;
+    text-wrap: pretty;
+  }
+  .hero-ctas {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 14px;
+  }
+  .hero-micro {
+    font-size: 0.84rem;
+    color: $land-muted-2;
+    margin: 0 0 22px;
+  }
+  .hero-trust {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 18px;
+    span {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.84rem;
+      color: $land-muted;
+      .material-symbols-outlined { font-size: 16px; color: $land-accent; }
+    }
+  }
+}
+
+// ─── Dashboard mockup (real component preview) ─────────────────────────────────
+.hero-mockup { perspective: 1400px; }
+
+.mockup {
+  background: $land-surface;
+  border: 1px solid $land-border;
+  border-radius: $radius-card;
+  overflow: hidden;
+  box-shadow: 0 40px 90px -30px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.02);
+  transform: rotateY(-6deg) rotateX(2deg);
+  transition: transform 0.5s $ease;
+
+  &:hover { transform: rotateY(-3deg) rotateX(1deg); }
+}
+
+.mockup-bar {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 11px 14px;
+  background: $land-surface-2;
+  border-bottom: 1px solid $land-border-soft;
+  .mockup-dot {
+    width: 10px; height: 10px; border-radius: 50%;
+    background: #2a3040;
+    &:nth-child(1) { background: #ff5f57; }
+    &:nth-child(2) { background: #febc2e; }
+    &:nth-child(3) { background: #28c840; }
+  }
+  .mockup-url {
+    margin-inline-start: 10px;
+    font-size: 0.74rem;
+    color: $land-muted-2;
+  }
+}
+
+.mockup-body { padding: 18px; }
+
+.mockup-kpis {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 16px;
+  .mk-kpi {
+    background: $land-surface-2;
+    border: 1px solid $land-border-soft;
+    border-radius: 10px;
+    padding: 10px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .mk-label { font-size: 0.7rem; color: $land-muted; }
+  .mk-val {
+    font-size: 1rem;
+    font-weight: 700;
+    font-feature-settings: 'tnum';
+    &.pos { color: $land-accent; }
+  }
+}
+
+.mockup-chart {
+  background: $land-surface-2;
+  border: 1px solid $land-border-soft;
+  border-radius: 10px;
+  padding: 14px;
+  margin-bottom: 14px;
+  height: 120px;
+}
+
+.mockup-rows { display: flex; flex-direction: column; gap: 8px; }
+.mk-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  background: $land-surface-2;
+  border: 1px solid $land-border-soft;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  .mk-badge {
+    width: 24px; height: 24px;
+    border-radius: 6px;
+    display: grid; place-items: center;
+    font-weight: 700; font-size: 0.72rem;
+    &.buy { background: rgba(61, 220, 151, 0.16); color: $land-accent; }
+    &.sell { background: rgba(255, 83, 112, 0.16); color: $land-danger; }
+  }
+  .mk-sym { font-weight: 600; flex: 1; }
+  .mk-pnl { font-weight: 700; font-feature-settings: 'tnum';
+    &.pos { color: $land-accent; }
+    &.neg { color: $land-danger; }
+  }
+}
+
+// ─── Stats bar (from Spec C) ───────────────────────────────────────────────────
+.landing-stats {
+  max-width: $maxw;
+  margin: 0 auto;
+  padding: 48px clamp(20px, 5vw, 56px);
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  border-block: 1px solid $land-border-soft;
+
+  .stat {
+    text-align: center;
+    position: relative;
+    &:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      inset-inline-end: 0;
+      top: 20%;
+      height: 60%;
+      width: 1px;
+      background: $land-border-soft;
+    }
+  }
+  .stat-value {
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 800;
+    color: $land-accent;
+    line-height: 1;
+    font-feature-settings: 'tnum';
+    .compact-suffix { font-size: 0.6em; opacity: 0.85; }
+  }
+  .stat-label {
+    font-size: 0.86rem;
+    color: $land-muted;
+    margin-top: 8px;
+  }
+}
+
+// ─── Problem statement (from Spec B) ───────────────────────────────────────────
+.landing-problem {
+  max-width: $maxw;
+  margin: 0 auto;
+  padding: 80px clamp(20px, 5vw, 56px);
+  text-align: center;
+
+  .problem-headline {
+    font-size: clamp(1.5rem, 3vw, 2.1rem);
+    font-weight: 700;
+    line-height: 1.5;
+    color: $land-text;
+    margin: 0 auto 48px;
+    max-width: 22ch;
+    text-wrap: balance;
+  }
+}
+
+.pain-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  text-align: right;
+}
+
+.pain-card {
+  background: $land-surface;
+  border: 1px solid $land-border;
+  border-inline-start: 3px solid rgba(255, 83, 112, 0.6);
+  border-radius: $radius-card;
+  padding: 24px;
+  transition: border-color 0.2s $ease, transform 0.2s $ease;
+  &:hover { transform: translateY(-2px); border-color: rgba(255, 83, 112, 0.4); }
+
+  .pain-icon {
+    font-size: 26px;
+    color: $land-danger;
+    opacity: 0.85;
+  }
+  h3 { font-size: 1.02rem; font-weight: 600; margin: 12px 0 8px; color: $land-text; }
+  p { font-size: 0.9rem; line-height: 1.7; color: $land-muted; margin: 0; }
+}
+
+// ─── Section heads ─────────────────────────────────────────────────────────────
+.section-head {
+  text-align: center;
+  max-width: 640px;
+  margin: 0 auto 40px;
+  h2 {
+    font-size: clamp(1.5rem, 3vw, 2.1rem);
+    font-weight: 700;
+    line-height: 1.3;
+    margin: 0;
+    color: $land-text;
+    text-wrap: balance;
+  }
+  .section-sub {
+    font-size: 1rem;
+    color: $land-muted;
+    margin: 12px 0 0;
+    line-height: 1.7;
+  }
+}
+
+// ─── How it works ──────────────────────────────────────────────────────────────
+.landing-how {
+  max-width: $maxw;
+  margin: 0 auto;
+  padding: 64px clamp(20px, 5vw, 56px);
+}
+
+.steps {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+.step {
+  position: relative;
+  background: $land-surface;
+  border: 1px solid $land-border;
+  border-radius: $radius-card;
+  padding: 28px 24px;
+  text-align: center;
+  transition: border-color 0.2s $ease;
+  &:hover { border-color: rgba(61, 220, 151, 0.35); }
+
+  .step-num {
+    position: absolute;
+    top: 16px;
+    inset-inline-start: 18px;
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: rgba(61, 220, 151, 0.12);
+    line-height: 1;
+    font-feature-settings: 'tnum';
+  }
+  .step-icon {
+    font-size: 32px;
+    color: $land-accent;
+    background: rgba(61, 220, 151, 0.1);
+    width: 56px; height: 56px;
+    border-radius: 14px;
+    display: grid; place-items: center;
+    margin: 0 auto 16px;
+  }
+  h3 { font-size: 1.1rem; font-weight: 700; margin: 0 0 8px; color: $land-text; }
+  p { font-size: 0.9rem; line-height: 1.7; color: $land-muted; margin: 0; }
+
+  .step-line {
+    display: none; // shown on desktop via media query below
+  }
+}
+
+// ─── Bento feature grid (Spec A core) ──────────────────────────────────────────
+.landing-bento {
+  max-width: $maxw;
+  margin: 0 auto;
+  padding: 64px clamp(20px, 5vw, 56px);
+}
+
+.bento-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-auto-rows: 1fr;
+  gap: 16px;
+}
+
+.bento-cell {
+  background: $land-surface;
+  border: 1px solid $land-border;
+  border-radius: $radius-card;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: border-color 0.25s $ease, transform 0.25s $ease;
+  &:hover { border-color: rgba(61, 220, 151, 0.35); transform: translateY(-3px); }
+  &.wide { grid-column: span 2; }
+
+  .bento-preview {
+    background: $land-surface-2;
+    border-bottom: 1px solid $land-border-soft;
+    padding: 20px;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 150px;
+  }
+  .bento-info {
+    padding: 18px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    .material-symbols-outlined { font-size: 22px; color: $land-accent; margin-bottom: 4px; }
+    h3 { font-size: 1rem; font-weight: 600; margin: 0; color: $land-text; }
+    p { font-size: 0.84rem; line-height: 1.6; color: $land-muted; margin: 0; }
+  }
+}
+
+// Bento previews
+.mini-chart {
+  width: 100%;
+  height: 80px;
+  display: block;
+  .mini-line {
+    fill: none;
+    stroke: $land-accent;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-dasharray: 400;
+    stroke-dashoffset: 400;
+    animation: draw-line 2s $ease forwards;
+  }
+  .mini-dot { fill: $land-accent; }
+}
+
+.mini-calendar {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+  width: 100%;
+  .cal-cell {
+    aspect-ratio: 1;
+    border-radius: 3px;
+    background: $land-accent;
+  }
+}
+
+.mini-emotion {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  .emo-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: $land-surface;
+    border: 1px solid $land-border-soft;
+    border-radius: 8px;
+    padding: 8px 12px;
+  }
+  .emo-emoji { font-size: 1.1rem; }
+  .emo-label { font-size: 0.84rem; color: $land-text; flex: 1; }
+  .emo-val {
+    font-size: 0.84rem; font-weight: 700; font-feature-settings: 'tnum';
+    &.pos { color: $land-accent; }
+    &.neg { color: $land-danger; }
+  }
+}
+
+.mini-edge {
+  width: 100%;
+  background: $land-surface;
+  border-inline-start: 3px solid $land-accent;
+  border-radius: 10px;
+  padding: 16px 18px;
+  .edge-label { font-size: 0.72rem; color: $land-muted; margin-bottom: 8px; }
+  .edge-sentence {
+    font-size: 1rem; line-height: 1.7; color: $land-text; font-weight: 600;
+    b { color: $land-accent; font-weight: 700; }
+  }
+  .edge-meta { font-size: 0.72rem; color: $land-muted-2; margin-top: 8px; }
+}
+
+.mini-import {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  .imp-card {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: $land-surface;
+    border: 1px solid $land-border-soft;
+    border-radius: 8px;
+    padding: 10px 12px;
+  }
+  .imp-icon { font-size: 22px; color: $land-muted; }
+  .imp-info { display: flex; flex-direction: column; }
+  .imp-name { font-size: 0.82rem; color: $land-text; }
+  .imp-status { font-size: 0.7rem; color: $land-accent; }
+  .imp-progress {
+    height: 5px;
+    background: $land-surface;
+    border-radius: 999px;
+    overflow: hidden;
+  }
+  .imp-bar {
+    display: block;
+    height: 100%;
+    width: 70%;
+    background: $land-accent;
+    border-radius: 999px;
+    animation: imp-load 1.6s $ease infinite;
+  }
+  .imp-result {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.8rem;
+    color: $land-accent;
+    .material-symbols-outlined { font-size: 16px; }
+  }
+}
+
+@keyframes draw-line { to { stroke-dashoffset: 0; } }
+@keyframes imp-load { 0% { width: 20%; } 50% { width: 90%; } 100% { width: 20%; } }
+
+// ─── Comparison table (from Spec C) ────────────────────────────────────────────
+.landing-compare {
+  max-width: $maxw;
+  margin: 0 auto;
+  padding: 64px clamp(20px, 5vw, 56px);
+}
+
+.compare-table-wrap {
+  background: $land-surface;
+  border: 1px solid $land-border;
+  border-radius: $radius-card;
+  overflow: hidden;
+}
+
+.compare-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.92rem;
+
+  th, td {
+    padding: 16px 18px;
+    text-align: center;
+    border-bottom: 1px solid $land-border-soft;
+    &:last-child { border-inline-start: 0; }
+  }
+  th {
+    background: $land-surface-2;
+    color: $land-muted;
+    font-weight: 600;
+    font-size: 0.86rem;
+    &:first-child { text-align: start; }
+  }
+  td {
+    color: $land-muted;
+    &:first-child { text-align: start; color: $land-text; font-weight: 500; }
+  }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover { background: rgba(255, 255, 255, 0.015); }
+
+  .us-col {
+    background: rgba(61, 220, 151, 0.06);
+    color: $land-text;
+    font-weight: 600;
+  }
+
+  .cell {
+    font-size: 20px;
+    vertical-align: middle;
+    &.yes { color: $land-accent; }
+    &.no { color: $land-muted-2; opacity: 0.5; }
+    &.manual { font-size: 0.82rem; color: $land-gold; font-weight: 600; }
+    &.dash { color: $land-muted-2; }
+  }
+}
+
+// ─── Pricing ───────────────────────────────────────────────────────────────────
+.landing-pricing {
+  max-width: $maxw;
+  margin: 0 auto;
+  padding: 64px clamp(20px, 5vw, 56px);
+}
+
+.pricing-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+  align-items: stretch;
+}
+
+.price-card {
+  position: relative;
+  background: $land-surface;
+  border: 1px solid $land-border;
+  border-radius: $radius-card;
+  padding: 28px 24px;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.25s $ease, border-color 0.25s $ease;
+
+  &.featured {
+    border-color: $land-accent;
+    transform: scale(1.03);
+    box-shadow: 0 20px 50px -20px rgba(61, 220, 151, 0.3);
+  }
+
+  .price-badge {
+    position: absolute;
+    top: -12px;
+    inset-inline: 0;
+    margin-inline: auto;
+    width: fit-content;
+    background: $land-accent;
+    color: #04231a;
+    font-size: 0.74rem;
+    font-weight: 700;
+    padding: 4px 14px;
+    border-radius: $radius-pill;
+  }
+  .price-name { font-size: 1.1rem; font-weight: 700; margin: 0 0 8px; color: $land-text; }
+  .price-amount {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    margin-bottom: 4px;
+    .price-num {
+      font-size: 2rem; font-weight: 800; color: $land-text;
+      font-feature-settings: 'tnum';
+    }
+    .price-unit { font-size: 0.8rem; color: $land-muted; }
+  }
+  .price-note { font-size: 0.82rem; color: $land-accent; margin: 0 0 20px; }
+  .price-features {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    flex: 1;
+    li {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.88rem;
+      color: $land-muted;
+      .material-symbols-outlined { font-size: 18px; color: $land-accent; }
+    }
+  }
+  .btn-primary { width: 100%; }
+}
+
+// ─── FAQ ───────────────────────────────────────────────────────────────────────
+.landing-faq {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 64px clamp(20px, 5vw, 56px);
+}
+
+.faq-list { display: flex; flex-direction: column; gap: 10px; }
+
+.faq-item {
+  background: $land-surface;
+  border: 1px solid $land-border;
+  border-radius: $radius-card;
+  overflow: hidden;
+  transition: border-color 0.2s $ease;
+  &.open { border-color: rgba(61, 220, 151, 0.3); }
+}
+
+.faq-q {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: none;
+  border: none;
+  color: $land-text;
+  font-family: inherit;
+  font-size: 0.96rem;
+  font-weight: 600;
+  text-align: start;
+  padding: 18px 20px;
+  cursor: pointer;
+  .chevron { color: $land-muted; transition: transform 0.2s $ease; font-size: 22px; }
+}
+
+.faq-a {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s $ease;
+  p { margin: 0; padding: 0 20px 18px; font-size: 0.9rem; line-height: 1.8; color: $land-muted; }
+}
+
+.faq-item.open .faq-a { max-height: 200px; }
+
+// ─── Final CTA ─────────────────────────────────────────────────────────────────
+.landing-final-cta {
+  position: relative;
+  max-width: $maxw;
+  margin: 32px auto 0;
+  padding: 80px clamp(20px, 5vw, 56px);
+  text-align: center;
+  overflow: hidden;
+
+  .final-glow {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 50% 50%, rgba(61, 220, 151, 0.14), transparent 60%);
+    pointer-events: none;
+  }
+  h2 {
+    position: relative;
+    font-size: clamp(1.6rem, 3.4vw, 2.4rem);
+    font-weight: 700;
+    margin: 0 0 12px;
+    color: $land-text;
+    text-wrap: balance;
+  }
+  p { position: relative; font-size: 1rem; color: $land-muted; margin: 0 0 28px; }
+  .btn-primary { position: relative; }
+}
+
+// ─── Footer ────────────────────────────────────────────────────────────────────
+.landing-footer {
+  border-top: 1px solid $land-border-soft;
+  padding: 48px clamp(20px, 5vw, 56px) 24px;
+}
+
+.footer-inner {
+  max-width: $maxw;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 1fr;
+  gap: 32px;
+  align-items: start;
+
+  .footer-brand {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    .logo-mark {
+      display: grid; place-items: center;
+      width: 34px; height: 34px;
+      border-radius: 9px;
+      background: linear-gradient(135deg, rgba(61, 220, 151, 0.22), rgba(61, 220, 151, 0.06));
+      border: 1px solid rgba(61, 220, 151, 0.3);
+      color: $land-accent;
+      .material-symbols-outlined { font-size: 20px; }
+    }
+    .logo-text { font-weight: 700; font-size: 1.05rem; color: $land-text; }
+  }
+  .footer-tag { font-size: 0.86rem; color: $land-muted; line-height: 1.7; margin: 12px 0 0; max-width: 32ch; }
+}
+
+.footer-links {
+  display: contents;
+  div {
+    h4 { font-size: 0.8rem; color: $land-muted-2; margin: 0 0 12px; font-weight: 600; }
+    a {
+      display: block;
+      font-size: 0.88rem;
+      color: $land-muted;
+      text-decoration: none;
+      padding: 4px 0;
+      transition: color 0.2s $ease;
+      &:hover { color: $land-accent; }
+    }
+  }
+}
+
+.footer-bottom {
+  max-width: $maxw;
+  margin: 32px auto 0;
+  padding-top: 20px;
+  border-top: 1px solid $land-border-soft;
+  text-align: center;
+  font-size: 0.8rem;
+  color: $land-muted-2;
+}
+
+// ─── Floating mobile CTA (from Spec C) ─────────────────────────────────────────
+.landing-fab {
+  display: none;
+  position: fixed;
+  bottom: 20px;
+  inset-inline-end: 20px;
+  z-index: 90;
+  align-items: center;
+  gap: 6px;
+  background: $land-accent;
+  color: #04231a;
+  font-weight: 700;
+  font-family: inherit;
+  font-size: 0.9rem;
+  border: none;
+  border-radius: $radius-pill;
+  padding: 12px 20px;
+  cursor: pointer;
+  box-shadow: 0 12px 30px -8px rgba(61, 220, 151, 0.5);
+  .material-symbols-outlined { font-size: 18px; }
+}
+
+// ─── Responsive ────────────────────────────────────────────────────────────────
+@media (max-width: 1024px) {
+  .hero-inner { grid-template-columns: 1fr; gap: 40px; }
+  .hero-mockup { max-width: 520px; }
+  .bento-grid { grid-template-columns: repeat(2, 1fr); }
+  .bento-cell.wide { grid-column: span 2; }
+  .pricing-grid { grid-template-columns: 1fr; max-width: 420px; margin: 0 auto; }
+  .price-card.featured { transform: none; }
+  .footer-inner { grid-template-columns: 1fr 1fr; }
+}
+
+@media (max-width: 768px) {
+  .landing-nav-links { display: none; }
+  .landing-nav-cta { display: none; }
+  .landing-nav-burger { display: inline-flex; }
+
+  .landing-mobile-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    position: absolute;
+    top: 68px;
+    inset-inline: 12px;
+    background: $land-surface;
+    border: 1px solid $land-border;
+    border-radius: $radius-card;
+    padding: 12px;
+    box-shadow: 0 20px 50px -20px rgba(0, 0, 0, 0.6);
+    a {
+      padding: 12px 14px;
+      color: $land-text;
+      text-decoration: none;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      &:hover { background: $land-elevated; }
+    }
+  }
+
+  .landing-hero { padding-top: 84px; min-height: auto; }
+  .landing-stats { grid-template-columns: 1fr; gap: 28px; padding: 36px 20px;
+    .stat::after { display: none !important; }
+  }
+  .pain-row { grid-template-columns: 1fr; }
+  .steps { grid-template-columns: 1fr; }
+  .bento-grid { grid-template-columns: 1fr; }
+  .bento-cell.wide { grid-column: span 1; }
+
+  .compare-table-wrap { overflow-x: auto; }
+  .compare-table { min-width: 480px; }
+
+  .footer-inner { grid-template-columns: 1fr; gap: 24px; }
+  .landing-fab { display: inline-flex; }
+}
+
+// ─── Reduced motion ────────────────────────────────────────────────────────────
+@media (prefers-reduced-motion: reduce) {
+  .btn-primary.glow { animation: none; }
+  .mini-chart .mini-line { stroke-dashoffset: 0; animation: none; }
+  .mini-import .imp-bar { animation: none; }
+  .mockup { transform: none; }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
