@@ -10,6 +10,7 @@ import accountTokensRouter from './routes/accountTokens';
 import journalRouter from './routes/journal';
 import dashboardRouter from './routes/dashboard';
 import settingsRouter from './routes/settings';
+import paymentsRouter from './routes/payments';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -44,6 +45,7 @@ app.use('/api/trades', tradeSyncRouter);
 app.use('/api/journal', journalRouter);
 app.use('/api/dashboard', dashboardRouter);
 app.use('/api/settings', settingsRouter);
+app.use('/api/payments', paymentsRouter);
 
 // Health check
 app.get('/api/health', (_req, res) => {

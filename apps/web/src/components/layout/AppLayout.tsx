@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React, { useEffect } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
@@ -109,7 +109,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             borderRadius: '50%',
             animation: 'spin 1s linear infinite'
           }}></div>
-          <span style={{ fontSize: '0.9rem', color: '#94A3B8' }}>Ø¯Ø± Ø­Ø§Ù„ Ø¨Ø§Ø±Ú¯Ø°Ø§Ø±ÛŒ Ù…Ø¹Ø§Ù…Ù„Ù‡â€ŒÛŒØ§Ø±...</span>
+          <span style={{ fontSize: '0.9rem', color: '#94A3B8' }}>در حال بارگذاری تریدکاو...</span>
           <style>{`
             @keyframes spin {
               0% { transform: rotate(0deg); }

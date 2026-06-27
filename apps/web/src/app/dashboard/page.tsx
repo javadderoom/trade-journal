@@ -7,6 +7,7 @@ import { useAuthStore } from '../../lib/auth';
 import { useAppStore } from '../../store/useAppStore';
 import { toPersianDigits, formatPersianCurrency, formatToman } from '../../utils/farsi';
 import Select from '../../components/ui/Select';
+import Link from 'next/link';
 import './dashboard.scss';
 
 // ─── Types matching the /api/dashboard/summary response ────────────────────────
@@ -56,6 +57,20 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [edgeRefreshSpin, setEdgeRefreshSpin] = useState(false);
+  const [subStatus, setSubStatus] = useState<any>(null);
+
+  const fetchSubStatus = async () => {
+    try {
+      const res = await api.get('/api/payments/status');
+      setSubStatus(res.data);
+    } catch (err) {
+      console.error('Failed to fetch subscription status:', err);
+    }
+  };
+
+  useEffect(() => {
+    fetchSubStatus();
+  }, []);
 
   // Fetch accounts list if not already loaded
   useEffect(() => {
@@ -160,6 +175,34 @@ export default function DashboardPage() {
 
   return (
     <main className="dashboard-page">
+      {subStatus?.plan === 'FREE' && subStatus?.usage?.monthlyTrades >= 40 && (
+        <div style={{
+          backgroundColor: '#ffb300',
+          color: '#111319',
+          padding: '12px 20px',
+          textAlign: 'center',
+          fontWeight: 'bold',
+          fontFamily: 'Vazirmatn',
+          fontSize: '0.9rem',
+          borderRadius: '8px',
+          marginBottom: '20px',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          gap: '10px'
+        }}>
+          <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>warning</span>
+          <span>
+            {subStatus.usage.monthlyTrades >= 50
+              ? 'سقف ثبت ۵۰ معامله در ماه برای پلن رایگان به پایان رسیده است. برای ثبت معامله جدید یا واردات فایل، لطفاً اشتراک خود را ارتقا دهید.'
+              : `شما ${subStatus.usage.monthlyTrades} معامله از سقف ۵۰ معامله مجاز در ماه برای پلن رایگان را ثبت کرده‌اید. برای ثبت معامله بیشتر، لطفاً اشتراک خود را ارتقا دهید.`
+            }
+          </span>
+          <Link href="/settings?tab=subscription" style={{ color: '#111319', textDecoration: 'underline', marginRight: '15px' }}>
+            ارتقای اشتراک
+          </Link>
+        </div>
+      )}
       {/* ─── Top Bar ─── */}
       <div className="dash-topbar">
         <div className="dash-greeting">

@@ -7,6 +7,7 @@ import path from 'node:path';
 import fs from 'node:fs';
 import crypto from 'node:crypto';
 import { DisplayCurrency, Plan } from '@prisma/client';
+import { checkAccountLimit } from '../middleware/checkPlanLimits';
 
 const router = Router();
 
@@ -204,24 +205,13 @@ router.get('/accounts', authenticate, async (req: AuthRequest, res: Response) =>
 /**
  * POST /api/settings/accounts
  */
-router.post('/accounts', authenticate, async (req: AuthRequest, res: Response) => {
+router.post('/accounts', authenticate, checkAccountLimit, async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user!.userId;
     const { broker_name, account_number, currency, description } = req.body;
 
     if (!broker_name) {
       return res.status(400).json({ error: 'نام بروکر الزامی است' });
-    }
-
-    // Check plan limits
-    const user = await prisma.user.findUnique({ where: { id: userId } });
-    const currentCount = await prisma.account.count({ where: { user_id: userId } });
-    const limit = PLAN_ACCOUNT_LIMITS[user!.plan];
-    if (limit !== null && currentCount >= limit) {
-      return res.status(403).json({
-        error: `سقف حساب‌های مجاز برای پلن شما (${limit} حساب) تکمیل شده است`,
-        limit,
-      });
     }
 
     const account = await prisma.account.create({

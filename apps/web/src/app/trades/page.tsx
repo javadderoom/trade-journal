@@ -8,11 +8,21 @@ import ManualTradeModal from '../../components/modals/ManualTradeModal';
 import ImportMT4Modal from '../../components/modals/ImportMT4Modal';
 import ConfirmModal from '../../components/ui/ConfirmModal';
 import { api } from '../../lib/api';
+import Link from 'next/link';
 
-// Premium high-fidelity mock trades matching code.html
 export default function TradesPage() {
   const [autoOpenTradeId, setAutoOpenTradeId] = useState<string | null>(null);
   const [dateFilter, setDateFilter] = useState<string | null>(null);
+  const [subStatus, setSubStatus] = useState<any>(null);
+
+  const fetchSubStatus = async () => {
+    try {
+      const res = await api.get('/api/payments/status');
+      setSubStatus(res.data);
+    } catch (err) {
+      console.error('Failed to fetch subscription status:', err);
+    }
+  };
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -97,6 +107,9 @@ export default function TradesPage() {
     fetchTrades(false, selectedAccountId);
   }, [selectedAccountId]);
 
+  useEffect(() => {
+    fetchSubStatus();
+  }, [trades]);
 
   const handleImportSuccess = async (result: any) => {
     setDialogConfig({
@@ -107,6 +120,7 @@ export default function TradesPage() {
       confirmLabel: 'باشه',
     });
     await fetchTrades(true, selectedAccountId);
+    fetchSubStatus();
   };
 
   const handleAddManualTrade = () => {
@@ -116,6 +130,7 @@ export default function TradesPage() {
   const handleManualTradeSuccess = async (newTrade: any) => {
     // 1. Re-fetch trades from database
     await fetchTrades(true);
+    fetchSubStatus();
     // 2. Set newly created trade to open in sidebar automatically
     if (newTrade && newTrade.id) {
       setAutoOpenTradeId(newTrade.id);
@@ -136,6 +151,32 @@ export default function TradesPage() {
 
   return (
     <main style={{ minHeight: '100vh', backgroundColor: '#111319' }}>
+      {subStatus?.plan === 'FREE' && subStatus?.usage?.monthlyTrades >= 40 && (
+        <div style={{
+          backgroundColor: '#ffb300',
+          color: '#111319',
+          padding: '12px 20px',
+          textAlign: 'center',
+          fontWeight: 'bold',
+          fontFamily: 'Vazirmatn',
+          fontSize: '0.9rem',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          gap: '10px'
+        }}>
+          <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>warning</span>
+          <span>
+            {subStatus.usage.monthlyTrades >= 50
+              ? 'سقف ثبت ۵۰ معامله در ماه برای پلن رایگان به پایان رسیده است. برای ثبت معامله جدید یا واردات فایل، لطفاً اشتراک خود را ارتقا دهید.'
+              : `شما ${subStatus.usage.monthlyTrades} معامله از سقف ۵۰ معامله مجاز در ماه برای پلن رایگان را ثبت کرده‌اید. برای ثبت معامله بیشتر، لطفاً اشتراک خود را ارتقا دهید.`
+            }
+          </span>
+          <Link href="/settings?tab=subscription" style={{ color: '#111319', textDecoration: 'underline', marginRight: '15px' }}>
+            ارتقای اشتراک
+          </Link>
+        </div>
+      )}
       <TradesTable
         initialTrades={trades}
         initialUsdToToman={usdToToman}

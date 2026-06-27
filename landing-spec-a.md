@@ -1,5 +1,5 @@
 # Landing Page Spec A — "The Trader's Terminal"
-## معامله‌یار | Design Direction: Dark · Technical · Professional
+## تریدکاو | Design Direction: Dark · Technical · Professional
 
 ---
 

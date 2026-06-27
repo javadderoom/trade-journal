@@ -6,6 +6,7 @@ import fs from 'node:fs';
 import crypto from 'node:crypto';
 import { parse as parseHtml } from 'node-html-parser';
 import { authenticate, authenticateAccountToken, AuthRequest } from '../middleware/auth';
+import { checkTradeLimit, checkImportPermission, checkSyncPermission } from '../middleware/checkPlanLimits';
 
 const router = Router();
 
@@ -86,7 +87,7 @@ router.get('/', authenticate, async (req: AuthRequest, res: Response) => {
  * Body: { userId: string, accountId: string, trades: EATrade[] }
  * Or:   EATrade[] (defaults to first user/account for development)
  */
-router.post('/sync', authenticateAccountToken, async (req: AuthRequest, res: Response) => {
+router.post('/sync', authenticateAccountToken, checkSyncPermission, async (req: AuthRequest, res: Response) => {
   try {
     /**
      * Supported request payloads:
@@ -126,7 +127,7 @@ router.post('/sync', authenticateAccountToken, async (req: AuthRequest, res: Res
  * POST /api/trades
  * Manually logs a new trade.
  */
-router.post('/', authenticate, async (req: AuthRequest, res: Response) => {
+router.post('/', authenticate, checkTradeLimit, async (req: AuthRequest, res: Response) => {
   try {
     const {
       symbol,
@@ -965,7 +966,7 @@ function findHeaderMapping(cells: string[]): Record<string, number> | null {
  * POST /api/trades/import-mt4
  * Uploads and parses an MT4/MT5 detailed HTML statement, importing closed trades into the database.
  */
-router.post('/import-mt4', authenticate, uploadMemory.single('file'), async (req: AuthRequest, res: Response) => {
+router.post('/import-mt4', authenticate, checkImportPermission, uploadMemory.single('file'), async (req: AuthRequest, res: Response) => {
   try {
     if (!req.file) {
       res.status(400).json({ error: 'No file uploaded' });

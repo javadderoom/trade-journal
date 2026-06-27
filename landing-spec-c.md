@@ -1,5 +1,5 @@
 # Landing Page Spec C — "The Conversion Machine"
-## معامله‌یار | Design Direction: Dark · Punchy · Conversion-Optimized
+## تریدکاو | Design Direction: Dark · Punchy · Conversion-Optimized
 
 ---
 

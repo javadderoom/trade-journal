@@ -42,7 +42,7 @@ Continue
 
 ### Planner Response
 
-To set up a robust CI/CD pipeline for **معامله‌یار (Mo'amele-yar)**, we need to accommodate its monorepo structure ([package.json](file:///g:/Code/trade-journal/package.json)) consisting of Next.js ([apps/web](file:///g:/Code/trade-journal/apps/web)) and Express ([apps/api](file:///g:/Code/trade-journal/apps/api)), deploying to a VPS like Hetzner Cloud behind Arvan Cloud CDN.
+To set up a robust CI/CD pipeline for **تریدکاو (Mo'amele-yar)**, we need to accommodate its monorepo structure ([package.json](file:///g:/Code/trade-journal/package.json)) consisting of Next.js ([apps/web](file:///g:/Code/trade-journal/apps/web)) and Express ([apps/api](file:///g:/Code/trade-journal/apps/api)), deploying to a VPS like Hetzner Cloud behind Arvan Cloud CDN.
 
 Here are the two primary deployment workflows.
 

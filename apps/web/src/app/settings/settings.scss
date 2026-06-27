@@ -534,3 +534,124 @@ $set-gold: #f5c542;
     .settings-tab-btn { padding: 8px 12px; font-size: 0.82rem; .material-symbols-outlined { font-size: 18px; } }
   }
 }
+
+// Pricing Packages & Upgrade Checkout Styling
+.pricing-section-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 10px 0 0;
+  color: $set-text;
+}
+
+.pricing-plans-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-bottom: 20px;
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.plan-upgrade-card {
+  background: $set-surface;
+  border: 1px solid $set-border;
+  border-radius: 12px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  position: relative;
+  transition: border-color 0.2s;
+  
+  &.featured {
+    border-color: rgba($set-accent, 0.4);
+    box-shadow: 0 4px 20px rgba($set-accent, 0.05);
+  }
+
+  .plan-upgrade-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    .plan-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: $set-text;
+    }
+    .plan-badge-tag {
+      padding: 2px 8px;
+      background: rgba($set-accent, 0.1);
+      color: $set-accent;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: bold;
+    }
+  }
+
+  .plan-upgrade-desc {
+    font-size: 0.82rem;
+    color: $set-muted;
+    line-height: 1.5;
+  }
+
+  .plan-upgrade-periods {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin: 10px 0;
+  }
+
+  .period-checkout-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: $set-bg;
+    padding: 10px 14px;
+    border-radius: 8px;
+    border: 1px solid $set-border;
+    transition: border-color 0.2s;
+
+    &:hover {
+      border-color: rgba($set-accent, 0.3);
+    }
+
+    .period-name {
+      font-size: 0.82rem;
+      color: $set-text;
+      font-weight: 500;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      .period-discount {
+        font-size: 0.7rem;
+        color: #ffb300;
+        font-weight: normal;
+      }
+    }
+
+    .period-price-btn {
+      padding: 6px 14px;
+      background: rgba($set-accent, 0.1);
+      color: $set-accent;
+      border: 1px solid rgba($set-accent, 0.2);
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.2s;
+
+      &:hover {
+        background: $set-accent;
+        color: #0f1117;
+        border-color: $set-accent;
+      }
+
+      &:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+      }
+    }
+  }
+}
+

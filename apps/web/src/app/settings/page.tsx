@@ -69,6 +69,7 @@ export default function SettingsPage() {
   const [profileForm, setProfileForm] = useState({ name: '', phone: '', displayCurrency: 'USD' });
   const [profileDirty, setProfileDirty] = useState(false);
   const [avatarUploading, setAvatarUploading] = useState(false);
+  const [checkoutLoading, setCheckoutLoading] = useState(false);
 
   // ─── Accounts state ──────────────────────────────────────────────────────
   const [accounts, setAccounts] = useState<BrokerAccount[]>([]);
@@ -209,6 +210,26 @@ export default function SettingsPage() {
       showToast('حساب حذف شد');
     } catch (err: any) {
       showToast(err.response?.data?.error || 'خطا در حذف', 'error');
+    }
+  };
+
+  const handleCheckout = async (targetPlan: string, period: string) => {
+    setCheckoutLoading(true);
+    try {
+      const res = await api.post('/api/payments/checkout', {
+        plan: targetPlan,
+        period,
+      });
+      if (res.data.redirectUrl) {
+        window.location.href = res.data.redirectUrl;
+      } else {
+        showToast('خطا در دریافت لینک درگاه پرداخت', 'error');
+      }
+    } catch (err: any) {
+      console.error('Checkout error:', err);
+      showToast(err.response?.data?.error || 'خطا در اتصال به درگاه پرداخت', 'error');
+    } finally {
+      setCheckoutLoading(false);
     }
   };
 
@@ -542,18 +563,113 @@ export default function SettingsPage() {
               </div>
               {subscription.subscription && (
                 <div className="plan-details">
-                  <span>تمدید خودکار: {new Date(subscription.subscription.end_date).toLocaleDateString('fa-IR')}</span>
+                  <span>تاریخ انقضای پلن: {new Date(subscription.subscription.end_date).toLocaleDateString('fa-IR')}</span>
                 </div>
               )}
-              {subscription.plan !== 'PRO' && (
-                <button className="upgrade-btn" onClick={() => showToast('درگاه پرداخت به زودی فعال می‌شود')}>
-                  {subscription.plan === 'FREE' ? 'ارتقا به استاندارد' : 'ارتقا به حرفه‌ای'}
-                </button>
-              )}
-              {subscription.plan === 'PRO' && (
-                <div className="best-plan-badge">بهترین پلن رو داری 🎉</div>
-              )}
             </div>
+
+            {/* Pricing Packages Selection */}
+            {subscription.plan !== 'PRO' && (
+              <>
+                <h3 className="pricing-section-title">ارتقای اشتراک</h3>
+                <div className="pricing-plans-grid">
+                  {/* Standard Plan Upgrade Card */}
+                  {subscription.plan === 'FREE' && (
+                    <div className="plan-upgrade-card featured">
+                      <div className="plan-upgrade-header">
+                        <span className="plan-title">پلن استاندارد</span>
+                        <span className="plan-badge-tag">محبوب‌ترین</span>
+                      </div>
+                      <p className="plan-upgrade-desc">دسترسی به ۳ حساب معاملاتی، واردات نامحدود فایل‌های MT4/MT5 و همگام‌سازی EA.</p>
+                      <div className="plan-upgrade-periods">
+                        <div className="period-checkout-row">
+                          <span className="period-name">۱ ماهه</span>
+                          <button 
+                            className="period-price-btn" 
+                            disabled={checkoutLoading}
+                            onClick={() => handleCheckout('STANDARD', 'monthly')}
+                          >
+                            ۱۵۰٬۰۰۰ تومان
+                          </button>
+                        </div>
+                        <div className="period-checkout-row">
+                          <span className="period-name">
+                            ۴ ماهه
+                            <span className="period-discount">۱۶٪ تخفیف</span>
+                          </span>
+                          <button 
+                            className="period-price-btn" 
+                            disabled={checkoutLoading}
+                            onClick={() => handleCheckout('STANDARD', '4-month')}
+                          >
+                            ۵۰۰٬۰۰۰ تومان
+                          </button>
+                        </div>
+                        <div className="period-checkout-row">
+                          <span className="period-name">
+                            سالانه
+                            <span className="period-discount">۲۰٪ تخفیف</span>
+                          </span>
+                          <button 
+                            className="period-price-btn" 
+                            disabled={checkoutLoading}
+                            onClick={() => handleCheckout('STANDARD', 'annual')}
+                          >
+                            ۱٬۴۴۰٬۰۰۰ تومان
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Pro Plan Upgrade Card */}
+                  <div className="plan-upgrade-card">
+                    <div className="plan-upgrade-header">
+                      <span className="plan-title">پلن حرفه‌ای</span>
+                    </div>
+                    <p className="plan-upgrade-desc">دسترسی به حساب‌های نامحدود، گزارش عملکرد کامل و دسترسی مستقیم به API (بزودی).</p>
+                    <div className="plan-upgrade-periods">
+                      <div className="period-checkout-row">
+                        <span className="period-name">۱ ماهه</span>
+                        <button 
+                          className="period-price-btn" 
+                          disabled={checkoutLoading}
+                          onClick={() => handleCheckout('PRO', 'monthly')}
+                        >
+                          ۳۵۰٬۰۰۰ تومان
+                        </button>
+                      </div>
+                      <div className="period-checkout-row">
+                        <span className="period-name">
+                          ۴ ماهه
+                          <span className="period-discount">۱۴٪ تخفیف</span>
+                        </span>
+                        <button 
+                          className="period-price-btn" 
+                          disabled={checkoutLoading}
+                          onClick={() => handleCheckout('PRO', '4-month')}
+                        >
+                          ۱٬۲۰۰٬۰۰۰ تومان
+                        </button>
+                      </div>
+                      <div className="period-checkout-row">
+                        <span className="period-name">
+                          سالانه
+                          <span className="period-discount">۲۰٪ تخفیف</span>
+                        </span>
+                        <button 
+                          className="period-price-btn" 
+                          disabled={checkoutLoading}
+                          onClick={() => handleCheckout('PRO', 'annual')}
+                        >
+                          ۳٬۳۶۰٬۰۰۰ تومان
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </>
+            )}
 
             {/* Plan comparison table */}
             <div className="plan-comparison-table">
@@ -588,6 +704,18 @@ export default function SettingsPage() {
                     <td>رایگان</td>
                     <td>۱۵۰٬۰۰۰ ت</td>
                     <td>۳۵۰٬۰۰۰ ت</td>
+                  </tr>
+                  <tr>
+                    <td>قیمت ۴ ماهه</td>
+                    <td>-</td>
+                    <td>۵۰۰٬۰۰۰ ت</td>
+                    <td>۱٬۲۰۰٬۰۰۰ ت</td>
+                  </tr>
+                  <tr>
+                    <td>قیمت سالانه</td>
+                    <td>-</td>
+                    <td>۱٬۴۴۰٬۰۰۰ ت</td>
+                    <td>۳٬۳۶۰٬۰۰۰ ت</td>
                   </tr>
                 </tbody>
               </table>

@@ -1,5 +1,5 @@
 # Landing Page Spec B — "The Editorial Journal"
-## معامله‌یار | Design Direction: Light · Editorial · Storytelling
+## تریدکاو | Design Direction: Light · Editorial · Storytelling
 
 ---
 
