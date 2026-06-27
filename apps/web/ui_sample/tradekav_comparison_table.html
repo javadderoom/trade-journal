@@ -1,0 +1,168 @@
+<style>
+.tbl { width: 100%; border-collapse: collapse; table-layout: fixed; font-size: 13px; }
+.tbl th, .tbl td { padding: 11px 14px; border-bottom: 0.5px solid var(--border); text-align: right; vertical-align: middle; }
+.tbl th { font-weight: 500; font-size: 12px; color: var(--text-muted); background: var(--surface-1); }
+.tbl td:first-child { color: var(--text-secondary); font-size: 12px; width: 34%; }
+.tbl tr:last-child td { border-bottom: none; }
+.tbl tr:hover td { background: var(--surface-1); }
+.col-head { text-align: center !important; }
+.col-cell { text-align: center !important; }
+.check { color: #1D9E75; font-size: 17px; }
+.cross { color: #E24B4A; font-size: 17px; }
+.partial { color: #BA7517; font-size: 14px; font-weight: 500; }
+.badge-tk { display: inline-block; background: #0F6E56; color: #9FE1CB; font-size: 11px; padding: 2px 8px; border-radius: 20px; }
+.badge-n  { display: inline-block; background: var(--surface-1); color: var(--text-secondary); font-size: 11px; padding: 2px 8px; border-radius: 20px; border: 0.5px solid var(--border); }
+.badge-x  { display: inline-block; background: var(--surface-1); color: var(--text-secondary); font-size: 11px; padding: 2px 8px; border-radius: 20px; border: 0.5px solid var(--border); }
+.head-tk { background: #0F6E56 !important; color: #9FE1CB !important; }
+.head-icon { font-size: 18px; display: block; margin-bottom: 4px; }
+.section-label td { background: var(--surface-0) !important; color: var(--text-muted) !important; font-size: 11px; letter-spacing: 0.06em; padding: 8px 14px 4px; border-bottom: 0.5px solid var(--border); font-weight: 500; }
+</style>
+
+<h2 class="sr-only">مقایسه ابزارهای ژورنال معاملاتی: اکسل، Notion و تریدکاو</h2>
+
+<div style="border: 0.5px solid var(--border); border-radius: 12px; overflow: hidden;">
+<table class="tbl">
+  <colgroup>
+    <col style="width:34%">
+    <col style="width:22%">
+    <col style="width:22%">
+    <col style="width:22%">
+  </colgroup>
+  <thead>
+    <tr>
+      <th></th>
+      <th class="col-head" style="color: var(--text-secondary);">
+        <i class="ti ti-table" aria-hidden="true" style="display:block; margin-bottom:4px; font-size:18px;"></i>
+        اکسل
+      </th>
+      <th class="col-head" style="color: var(--text-secondary);">
+        <i class="ti ti-layout" aria-hidden="true" style="display:block; margin-bottom:4px; font-size:18px;"></i>
+        Notion
+      </th>
+      <th class="col-head head-tk">
+        <i class="ti ti-chart-line" aria-hidden="true" style="display:block; margin-bottom:4px; font-size:18px;"></i>
+        تریدکاو
+      </th>
+    </tr>
+  </thead>
+  <tbody>
+
+    <tr class="section-label"><td colspan="4">ورود داده</td></tr>
+
+    <tr>
+      <td>واردات MT4 / MT5</td>
+      <td class="col-cell"><span class="partial">دستی</span></td>
+      <td class="col-cell"><span class="partial">دستی</span></td>
+      <td class="col-cell"><span class="check">✓</span></td>
+    </tr>
+    <tr>
+      <td>ثبت دستی معامله</td>
+      <td class="col-cell"><span class="check">✓</span></td>
+      <td class="col-cell"><span class="check">✓</span></td>
+      <td class="col-cell"><span class="check">✓</span></td>
+    </tr>
+    <tr>
+      <td>تگ احساسات</td>
+      <td class="col-cell"><span class="cross">✗</span></td>
+      <td class="col-cell"><span class="partial">محدود</span></td>
+      <td class="col-cell"><span class="check">✓</span></td>
+    </tr>
+    <tr>
+      <td>تگ استراتژی</td>
+      <td class="col-cell"><span class="partial">دستی</span></td>
+      <td class="col-cell"><span class="partial">دستی</span></td>
+      <td class="col-cell"><span class="check">✓</span></td>
+    </tr>
+
+    <tr class="section-label"><td colspan="4">تحلیل عملکرد</td></tr>
+
+    <tr>
+      <td>نرخ موفقیت</td>
+      <td class="col-cell"><span class="partial">فرمول</span></td>
+      <td class="col-cell"><span class="cross">✗</span></td>
+      <td class="col-cell"><span class="check">✓</span></td>
+    </tr>
+    <tr>
+      <td>ضریب سود</td>
+      <td class="col-cell"><span class="partial">فرمول</span></td>
+      <td class="col-cell"><span class="cross">✗</span></td>
+      <td class="col-cell"><span class="check">✓</span></td>
+    </tr>
+    <tr>
+      <td>منحنی سرمایه</td>
+      <td class="col-cell"><span class="partial">نمودار دستی</span></td>
+      <td class="col-cell"><span class="cross">✗</span></td>
+      <td class="col-cell"><span class="check">✓</span></td>
+    </tr>
+    <tr>
+      <td>تحلیل بر اساس سشن</td>
+      <td class="col-cell"><span class="cross">✗</span></td>
+      <td class="col-cell"><span class="cross">✗</span></td>
+      <td class="col-cell"><span class="check">✓</span></td>
+    </tr>
+    <tr>
+      <td>تحلیل احساسات</td>
+      <td class="col-cell"><span class="cross">✗</span></td>
+      <td class="col-cell"><span class="cross">✗</span></td>
+      <td class="col-cell"><span class="check">✓</span></td>
+    </tr>
+    <tr>
+      <td>هیتمپ عملکرد ساعتی</td>
+      <td class="col-cell"><span class="cross">✗</span></td>
+      <td class="col-cell"><span class="cross">✗</span></td>
+      <td class="col-cell"><span class="check">✓</span></td>
+    </tr>
+
+    <tr class="section-label"><td colspan="4">ژورنال و تجربه</td></tr>
+
+    <tr>
+      <td>ژورنال روزانه</td>
+      <td class="col-cell"><span class="cross">✗</span></td>
+      <td class="col-cell"><span class="check">✓</span></td>
+      <td class="col-cell"><span class="check">✓</span></td>
+    </tr>
+    <tr>
+      <td>تقویم جلالی</td>
+      <td class="col-cell"><span class="cross">✗</span></td>
+      <td class="col-cell"><span class="cross">✗</span></td>
+      <td class="col-cell"><span class="check">✓</span></td>
+    </tr>
+    <tr>
+      <td>رابط کاربری فارسی</td>
+      <td class="col-cell"><span class="cross">✗</span></td>
+      <td class="col-cell"><span class="cross">✗</span></td>
+      <td class="col-cell"><span class="check">✓</span></td>
+    </tr>
+    <tr>
+      <td>پشتیبانی ICT / SMC</td>
+      <td class="col-cell"><span class="cross">✗</span></td>
+      <td class="col-cell"><span class="cross">✗</span></td>
+      <td class="col-cell"><span class="check">✓</span></td>
+    </tr>
+
+    <tr class="section-label"><td colspan="4">عملی</td></tr>
+
+    <tr>
+      <td>پرداخت ایرانی</td>
+      <td class="col-cell"><span class="check">✓</span></td>
+      <td class="col-cell"><span class="cross">✗</span></td>
+      <td class="col-cell"><span class="check">✓</span></td>
+    </tr>
+    <tr>
+      <td>نیاز به دانش فنی</td>
+      <td class="col-cell"><span class="partial">زیاد</span></td>
+      <td class="col-cell"><span class="partial">متوسط</span></td>
+      <td class="col-cell"><span class="check">صفر</span></td>
+    </tr>
+    <tr>
+      <td>هزینه ماهانه</td>
+      <td class="col-cell" style="color: var(--text-secondary); font-size:12px;">رایگان*</td>
+      <td class="col-cell" style="color: var(--text-secondary); font-size:12px;">~$۱۶</td>
+      <td class="col-cell" style="color: #1D9E75; font-size:12px;">۱۹۹ هزار ت</td>
+    </tr>
+
+  </tbody>
+</table>
+</div>
+
+<p style="color: var(--text-muted); font-size: 11px; margin: 8px 14px 0; text-align: right;">* اکسل رایگان است اما زمان راه‌اندازی و نگهداری هزینه واقعی دارد</p>

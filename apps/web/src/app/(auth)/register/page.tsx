@@ -52,7 +52,7 @@ export default function RegisterPage() {
           <div className="auth-logo">
             <span className="material-symbols-outlined">person_add</span>
           </div>
-          <h2>ثبت نام در معامله‌یار</h2>
+          <h2>ثبت نام در تریدکاو</h2>
           <p>به جمع معامله‌گران بپیوندید و معاملات خود را مدیریت کنید</p>
         </div>
 

@@ -42,7 +42,7 @@ export default function LoginPage() {
           <div className="auth-logo">
             <span className="material-symbols-outlined">analytics</span>
           </div>
-          <h2>ورود به معامله‌یار</h2>
+          <h2>ورود به تریدکاو</h2>
           <p>ژورنال تخصصی و هوشمند تحلیل معاملات</p>
         </div>
 

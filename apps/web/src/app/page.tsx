@@ -8,8 +8,9 @@ import './landing.scss';
 
 // ─── Data (Persian copy + plan values matching settings page) ──────────────────
 const NAV_LINKS = [
-  { href: '#features', label: 'امکانات' },
+
   { href: '#how', label: 'روش کار' },
+  { href: '#features', label: 'امکانات' },
   { href: '#pricing', label: 'قیمت' },
   { href: '#faq', label: 'سوالات' },
 ];
@@ -33,22 +34,55 @@ const STEPS = [
 ];
 
 const BENTO = [
-  { id: 'import', icon: 'upload_file', title: 'واردات یک‌کلیکی MT4/MT5', body: 'فایل اکسپرت یا HTML رو آپلود کن، همه چیز خودکار پردازش می‌شه.', span: 'wide', preview: 'import' },
+  { id: 'import', icon: 'upload_file', title: 'بررسی خودکار MT4/MT5', body: 'فایل اکسپرت یا HTML رو آپلود کن، همه چیز خودکار پردازش می‌شه.', span: 'wide', preview: 'import' },
   { id: 'equity', icon: 'show_chart', title: 'منحنی سرمایه', body: 'نمودار سود تجمعی و میزان افت سرمایه.', span: 'sm', preview: 'equity' },
-  { id: 'calendar', icon: 'calendar_month', title: 'تقویم معاملاتی جلالی', body: 'نمای روزانه سود و زیان به‌صورت نقشه حرارتی.', span: 'sm', preview: 'calendar' },
+  { id: 'calendar', icon: 'calendar_month', title: 'تقویم معاملاتی ', body: 'نمای روزانه سود و زیان به‌صورت نقشه حرارتی.', span: 'sm', preview: 'calendar' },
   { id: 'emotion', icon: 'mood', title: 'ردیابی هیجانات', body: 'رابطه میان حال درونی و نتیجه معامله.', span: 'sm', preview: 'emotion' },
-  { id: 'edge', icon: 'insights', title: 'کشف لبه معاملاتی', body: 'سیستم هوشمند که قوی‌ترین سشن، استراتژی یا روز هفته‌ات رو پیدا می‌کنه.', span: 'wide', preview: 'edge' },
+  { id: 'edge', icon: 'insights', title: 'کشف برتری معاملاتی', body: 'سیستم هوشمند که قوی‌ترین سشن، استراتژی یا روز هفته‌ات رو پیدا می‌کنه.', span: 'sm', preview: 'edge' },
 ];
 
-type Cell = 'yes' | 'no' | 'manual' | 'none';
+type CellType = 'check' | 'cross' | 'partial' | string;
 
-const COMPARISON_ROWS: { feature: string; excel: Cell; none: Cell; us: Cell }[] = [
-  { feature: 'واردات خودکار MT4/MT5', excel: 'no', none: 'no', us: 'yes' },
-  { feature: 'تحلیل آماری', excel: 'manual', none: 'no', us: 'yes' },
-  { feature: 'تقویم جلالی', excel: 'no', none: 'no', us: 'yes' },
-  { feature: 'ردیابی هیجانات', excel: 'no', none: 'no', us: 'yes' },
-  { feature: 'کشف لبه معاملاتی', excel: 'no', none: 'no', us: 'yes' },
-  { feature: 'پرداخت تومانی', excel: 'none', none: 'none', us: 'yes' },
+interface CompareRow {
+  type: 'row';
+  feature: string;
+  excel: CellType;
+  notion: CellType;
+  tradekav: CellType;
+}
+
+interface CompareSection {
+  type: 'section';
+  label: string;
+}
+
+type CompareItem = CompareRow | CompareSection;
+
+const COMPARISON_DATA: CompareItem[] = [
+  { type: 'section', label: 'ورود داده' },
+  { type: 'row', feature: 'ورود از MT4 / MT5', excel: 'دستی', notion: 'دستی', tradekav: 'check' },
+  { type: 'row', feature: 'ثبت دستی معامله', excel: 'check', notion: 'check', tradekav: 'check' },
+  { type: 'row', feature: 'تگ احساسات', excel: 'دستی', notion: 'محدود', tradekav: 'check' },
+  { type: 'row', feature: 'تگ محدود', excel: 'دستی', notion: 'محدود', tradekav: 'check' },
+
+  // { type: 'section', label: 'تحلیل عملکرد' },
+  // { type: 'row', feature: 'نرخ موفقیت', excel: 'فرمول', notion: 'فرمول', tradekav: 'check' },
+  // { type: 'row', feature: 'ضریب سود', excel: 'فرمول', notion: 'فرمول', tradekav: 'check' },
+  // { type: 'row', feature: 'منحنی سرمایه', excel: 'نمودار دستی', notion: 'فرمول', tradekav: 'check' },
+  // { type: 'row', feature: 'تحلیل بر اساس سشن', excel: 'cross', notion: 'cross', tradekav: 'check' },
+  // { type: 'row', feature: 'تحلیل احساسات', excel: 'cross', notion: 'cross', tradekav: 'check' },
+  // { type: 'row', feature: 'هیتمپ عملکرد ساعتی', excel: 'cross', notion: 'cross', tradekav: 'check' },
+
+  { type: 'section', label: 'ژورنال و تجربه' },
+  { type: 'row', feature: 'ژورنال روزانه', excel: 'cross', notion: 'check', tradekav: 'check' },
+  { type: 'row', feature: 'تقویم جلالی', excel: 'cross', notion: 'cross', tradekav: 'check' },
+  { type: 'row', feature: 'رابط کاربری فارسی', excel: 'cross', notion: 'cross', tradekav: 'check' },
+
+
+  { type: 'section', label: 'هزینه و نحوه استفاده' },
+  { type: 'row', feature: 'پرداخت ریالی', excel: 'رایگان', notion: 'cross', tradekav: 'check' },
+  { type: 'row', feature: 'نیاز به دانش فنی', excel: 'زیاد', notion: 'متوسط', tradekav: 'صفر' },
+  { type: 'row', feature: 'هزینه ماهانه', excel: 'رایگان*', notion: '~$۱۶', tradekav: '۱۹۹ هزار ت' },
 ];
 
 const PLANS = [
@@ -82,10 +116,10 @@ const PLANS = [
 ];
 
 const FAQS = [
-  { q: 'آیا برای شروع به کارت بانکی نیاز دارم؟', a: 'خیر. ثبت‌نام و استفاده از پلن رایگان کاملاً بدون کارت بانکیه و در کمتر از ۳۰ ثانیه آماده‌ست.' },
+  { q: 'آیا برای شروع باید هزینه کنم؟', a: 'خیر. ثبت‌نام و استفاده از پلن رایگان کاملاً بدون هزینه‌ است و در کمتر از ۳۰ ثانیه آماده‌ست.' },
   { q: 'با کدام بروکرها و پلتفرم‌ها کار می‌کنه؟', a: 'هر بروکری که از MetaTrader 4 یا 5 پشتیبانی کنه. فایل HTML اکسپرت رو وارد کن یا از اکسپرت EA برای همگام‌سازی زنده استفاده کن.' },
   { q: 'پرداخت چطور انجام می‌شه؟', a: 'پرداخت به تومان و از درگاه‌های ایرانی انجام می‌شه. بدون نیاز به ارز خارجی یا کارت بین‌المللی.' },
-  { q: 'آیا می‌تونم هر زمان اشتراکم رو لغو کنم؟', a: 'بله، هر زمان و بدون قفل. در بخش تنظیمات با یک کلیک لغو کن، دسترسی تا پایان دوره باقی می‌مونه.' },
+  // { q: 'آیا می‌تونم هر زمان اشتراکم رو لغو کنم؟', a: 'بله، هر زمان و بدون قفل. در بخش تنظیمات با یک کلیک لغو کن، دسترسی تا پایان دوره باقی می‌مونه.' },
   { q: 'داده‌های من امن هستند؟', a: 'همه داده‌ها روی سرور امن ذخیره می‌شن و فقط با توکن اختصاصی خودت قابل دسترسیه.' },
 ];
 
@@ -115,19 +149,42 @@ export default function LandingPage() {
   const goRegister = () => router.push('/register');
   const goLogin = () => router.push('/login');
 
+  const handleScroll = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    e.preventDefault();
+    if (href === '#top') {
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth',
+      });
+      setMobileMenuOpen(false);
+      return;
+    }
+    const targetId = href.replace('#', '');
+    const element = document.getElementById(targetId);
+    if (element) {
+      const navHeight = 68; // height of fixed nav
+      const elementPosition = element.getBoundingClientRect().top;
+      const offsetPosition = elementPosition + window.scrollY - navHeight;
+
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: 'smooth',
+      });
+    }
+    setMobileMenuOpen(false);
+  };
+
   return (
     <div className="landing">
       {/* ─── Nav ─── */}
       <nav className={`landing-nav ${navScrolled ? 'scrolled' : ''}`}>
-        <a className="landing-logo" href="#top" aria-label="معامله‌یار">
-          <span className="logo-mark" aria-hidden="true">
-            <span className="material-symbols-outlined">candlestick_chart</span>
-          </span>
-          <span className="logo-text">معامله‌یار</span>
+        <a className="landing-logo" href="#top" aria-label="تریدکاو" onClick={(e) => handleScroll(e, '#top')}>
+          <img src="/logo.png" alt="تریدکاو" className="logo-img-landing" style={{ height: '34px', width: 'auto', objectFit: 'contain' }} />
+          <span className="logo-text">تریدکاو</span>
         </a>
         <div className="landing-nav-links">
           {NAV_LINKS.map((l) => (
-            <a key={l.href} href={l.href}>{l.label}</a>
+            <a key={l.href} href={l.href} onClick={(e) => handleScroll(e, l.href)}>{l.label}</a>
           ))}
         </div>
         <div className="landing-nav-cta">
@@ -144,7 +201,7 @@ export default function LandingPage() {
         {mobileMenuOpen && (
           <div className="landing-mobile-menu">
             {NAV_LINKS.map((l) => (
-              <a key={l.href} href={l.href} onClick={() => setMobileMenuOpen(false)}>{l.label}</a>
+              <a key={l.href} href={l.href} onClick={(e) => handleScroll(e, l.href)}>{l.label}</a>
             ))}
             <button className="btn-primary full" onClick={() => { setMobileMenuOpen(false); goRegister(); }}>
               ثبت‌نام رایگان
@@ -160,8 +217,8 @@ export default function LandingPage() {
         <div className="hero-inner">
           <div className="hero-copy">
             <h1 className="hero-title">
-              ژورنال هوشمند <br />
-              معاملات فارکس
+              ژورنال هوشمند
+              ترید
             </h1>
             <p className="hero-sub">
               معاملاتت رو وارد کن، الگوها رو پیدا کن، سودت رو بیشتر کن. همه‌چیز به فارسی، با تقویم جلالی و پرداخت تومانی.
@@ -173,11 +230,11 @@ export default function LandingPage() {
               </button>
               <button className="btn-ghost lg" onClick={goLogin}>ورود</button>
             </div>
-            <p className="hero-micro">ثبت‌نام در ۳۰ ثانیه، بدون کارت بانکی</p>
+            {/* <p className="hero-micro">ثبت‌نام در ۳۰ ثانیه، بدون کارت بانکی</p> */}
             <div className="hero-trust">
               <span><span className="material-symbols-outlined">check_circle</span> MT4 / MT5</span>
-              <span><span className="material-symbols-outlined">check_circle</span> تقویم جلالی</span>
-              <span><span className="material-symbols-outlined">check_circle</span> پرداخت تومانی</span>
+              <span><span className="material-symbols-outlined">check_circle</span> ورود دستی </span>
+              {/* <span><span className="material-symbols-outlined">check_circle</span> پرداخت تومانی</span> */}
             </div>
           </div>
           <div className="hero-mockup" aria-hidden="true">
@@ -187,7 +244,7 @@ export default function LandingPage() {
       </header>
 
       {/* ─── Stats Bar (from Spec C) ─── */}
-      <section className="landing-stats" aria-label="آمار معامله‌یار">
+      {/* <section className="landing-stats" aria-label="آمار تریدکاو">
         {STATS.map((s, i) => (
           <div className="stat" key={i}>
             <div className="stat-value">
@@ -197,11 +254,11 @@ export default function LandingPage() {
             <div className="stat-label">{s.label}</div>
           </div>
         ))}
-      </section>
+      </section> */}
 
       {/* ─── Problem statement (from Spec B: one bold sentence on dark) ─── */}
       <section className="landing-problem">
-        <p className="problem-headline">معامله‌گر ایرانی، بدون ژورنال، با چشم بسته معامله می‌کنه.</p>
+        <p className="problem-headline">اکثر تریدرا، بدون ژورنال، با چشم بسته معامله می‌کنه.</p>
         <div className="pain-row">
           {PAIN_POINTS.map((p, i) => (
             <div className="pain-card" key={i}>
@@ -235,7 +292,7 @@ export default function LandingPage() {
       <section className="landing-bento" id="features">
         <div className="section-head">
           <h2>ابزارهایی که معامله‌گر حرفه‌ای نیاز داره</h2>
-          <p className="section-sub">هر امکان، همون‌طور که توی اپ کار می‌کنه، همین‌جا نمایش داده می‌شه.</p>
+          <p className="section-sub">هرچیزی که برای تبدیل شدن به یک معامله‌گر حرفه‌ای نیاز داری</p>
         </div>
         <div className="bento-grid">
           {BENTO.map((cell) => (
@@ -254,30 +311,55 @@ export default function LandingPage() {
       {/* ─── Comparison table (from Spec C) ─── */}
       <section className="landing-compare">
         <div className="section-head">
-          <h2>معامله‌یار در برابر بقیه</h2>
+          <h2>تریدکاو در برابر بقیه</h2>
         </div>
         <div className="compare-table-wrap">
           <table className="compare-table">
+            <colgroup>
+              <col style={{ width: '34%' }} />
+              <col style={{ width: '22%' }} />
+              <col style={{ width: '22%' }} />
+              <col style={{ width: '22%' }} />
+            </colgroup>
             <thead>
               <tr>
-                <th>امکان</th>
-                <th>اکسل</th>
-                <th>بدون ژورنال</th>
-                <th className="us-col">معامله‌یار</th>
+                <th></th>
+                <th className="col-head">
+                  <span className="material-symbols-outlined head-icon">grid_on</span>
+                  اکسل
+                </th>
+                <th className="col-head">
+                  <span className="material-symbols-outlined head-icon">assignment</span>
+                  Notion
+                </th>
+                <th className="col-head us-col">
+                  <span className="material-symbols-outlined head-icon">trending_up</span>
+                  تریدکاو
+                </th>
               </tr>
             </thead>
             <tbody>
-              {COMPARISON_ROWS.map((r, i) => (
-                <tr key={i}>
-                  <td className="feature-name">{r.feature}</td>
-                  <td>{renderCell(r.excel)}</td>
-                  <td>{renderCell(r.none)}</td>
-                  <td className="us-col">{renderCell(r.us)}</td>
-                </tr>
-              ))}
+              {COMPARISON_DATA.map((item, idx) => {
+                if (item.type === 'section') {
+                  return (
+                    <tr key={idx} className="section-label">
+                      <td colSpan={4}>{item.label}</td>
+                    </tr>
+                  );
+                }
+                return (
+                  <tr key={idx}>
+                    <td className="feature-name">{item.feature}</td>
+                    <td>{renderCompareCell(item.excel)}</td>
+                    <td>{renderCompareCell(item.notion)}</td>
+                    <td className="us-col">{renderCompareCell(item.tradekav, true)}</td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
+        <p className="compare-note-hint">* اکسل رایگان است اما زمان راه‌اندازی و نگهداری هزینه واقعی دارد</p>
       </section>
 
       {/* ─── Pricing ─── */}
@@ -316,7 +398,7 @@ export default function LandingPage() {
       </section>
 
       {/* ─── FAQ ─── */}
-      <section className="landing-faq" id="faq">
+      {/* <section className="landing-faq" id="faq">
         <div className="section-head">
           <h2>سوالات رایج</h2>
         </div>
@@ -334,13 +416,13 @@ export default function LandingPage() {
             );
           })}
         </div>
-      </section>
+      </section> */}
 
       {/* ─── Final CTA ─── */}
       <section className="landing-final-cta">
         <div className="final-glow" aria-hidden="true" />
-        <h2>آماده کشف لبه معاملاتی خودت هستی؟</h2>
-        <p>رایگان، بدون کارت بانکی، بدون محدودیت زمانی.</p>
+        <h2>آماده کشف برتری معاملاتی خودت هستی؟</h2>
+        <p>رایگان، بدون محدودیت زمانی.</p>
         <button className="btn-primary lg glow" onClick={goRegister}>
           همین الان شروع کن
           <span className="material-symbols-outlined">arrow_back</span>
@@ -351,18 +433,16 @@ export default function LandingPage() {
       <footer className="landing-footer">
         <div className="footer-inner">
           <div className="footer-brand">
-            <span className="logo-mark" aria-hidden="true">
-              <span className="material-symbols-outlined">candlestick_chart</span>
-            </span>
-            <span className="logo-text">معامله‌یار</span>
+            <img src="/logo.png" alt="تریدکاو" className="logo-img-landing" style={{ height: '34px', width: 'auto', objectFit: 'contain' }} />
+            <span className="logo-text">تریدکاو</span>
           </div>
           <p className="footer-tag">ژورنال معاملاتی هوشمند فارسی، ساخته‌شده برای معامله‌گران ایرانی.</p>
           <div className="footer-links">
             <div>
               <h4>محصول</h4>
-              <a href="#features">امکانات</a>
-              <a href="#pricing">قیمت</a>
-              <a href="#how">روش کار</a>
+              <a href="#features" onClick={(e) => handleScroll(e, '#features')}>امکانات</a>
+              <a href="#pricing" onClick={(e) => handleScroll(e, '#pricing')}>قیمت</a>
+              <a href="#how" onClick={(e) => handleScroll(e, '#how')}>روش کار</a>
             </div>
             <div>
               <h4>حساب کاربری</h4>
@@ -372,7 +452,7 @@ export default function LandingPage() {
           </div>
         </div>
         <div className="footer-bottom">
-          <span>© {toPersianDigits(1405)} معامله‌یار. تمامی حقوق محفوظ است.</span>
+          <span>© {toPersianDigits(1405)} تریدکاو. تمامی حقوق محفوظ است.</span>
         </div>
       </footer>
 
@@ -386,11 +466,20 @@ export default function LandingPage() {
 }
 
 // ─── Helpers ────────────────────────────────────────────────────────────────────
-function renderCell(v: 'yes' | 'no' | 'manual' | 'none') {
-  if (v === 'yes') return <span className="material-symbols-outlined cell yes">check_circle</span>;
-  if (v === 'manual') return <span className="cell manual">دستی</span>;
-  if (v === 'none') return <span className="cell dash">-</span>;
-  return <span className="material-symbols-outlined cell no">cancel</span>;
+function renderCompareCell(v: CellType, isTradekav = false) {
+  if (v === 'check') {
+    return <span className="material-symbols-outlined cell-check">check_circle</span>;
+  }
+  if (v === 'cross') {
+    return <span className="material-symbols-outlined cell-cross">cancel</span>;
+  }
+  if (v === 'دستی' || v === 'محدود' || v === 'متوسط' || v === 'فرمول' || v === 'نمودار دستی' || v === 'زیاد' || v === 'نیاز به پیاده سازی') {
+    return <span className="cell-partial">{v}</span>;
+  }
+  if (v === 'صفر') {
+    return <span className="cell-zero">{v}</span>;
+  }
+  return <span className={`cell-text ${isTradekav ? 'us-col-text' : ''}`}>{v}</span>;
 }
 
 function renderPreview(kind: string) {
@@ -451,7 +540,7 @@ function DashboardMockup() {
         <span className="mockup-dot" />
         <span className="mockup-dot" />
         <span className="mockup-dot" />
-        <span className="mockup-url">معامله‌یار / داشبورد</span>
+        <span className="mockup-url">تریدکاو / داشبورد</span>
       </div>
       <div className="mockup-body">
         <div className="mockup-kpis">
@@ -473,18 +562,35 @@ function DashboardMockup() {
 
 // ─── Mini previews for bento cells ─────────────────────────────────────────────
 function EquityMini() {
-  // smooth-ish ascending path with a dip
+  // realistic trading equity curve with grids, pullbacks, consolidation, and breakouts
   return (
-    <svg className="mini-chart" viewBox="0 0 100 40" preserveAspectRatio="none" role="img" aria-label="منحنی سرمایه">
+    <svg className="mini-chart" viewBox="0 0 200 100" preserveAspectRatio="none" role="img" aria-label="منحنی سرمایه">
       <defs>
         <linearGradient id="eq-fill" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="rgba(61,220,151,0.35)" />
+          <stop offset="0%" stopColor="rgba(61,220,151,0.3)" />
           <stop offset="100%" stopColor="rgba(61,220,151,0)" />
         </linearGradient>
       </defs>
-      <path className="mini-line" d="M0,30 L15,26 L28,32 L42,22 L55,18 L70,24 L84,10 L100,6" />
-      <path d="M0,30 L15,26 L28,32 L42,22 L55,18 L70,24 L84,10 L100,6 L100,40 L0,40 Z" fill="url(#eq-fill)" />
-      <circle cx="100" cy="6" r="2.5" className="mini-dot" />
+      {/* Grid Lines */}
+      <g stroke="rgba(255,255,255,0.03)" strokeWidth="1" strokeDasharray="3 3">
+        <line x1="0" y1="20" x2="200" y2="20" />
+        <line x1="0" y1="40" x2="200" y2="40" />
+        <line x1="0" y1="60" x2="200" y2="60" />
+        <line x1="0" y1="80" x2="200" y2="80" />
+        <line x1="40" y1="0" x2="40" y2="100" />
+        <line x1="80" y1="0" x2="80" y2="100" />
+        <line x1="120" y1="0" x2="120" y2="100" />
+        <line x1="160" y1="0" x2="160" y2="100" />
+      </g>
+      {/* Glow path under the main line */}
+      <path className="mini-line-glow" d="M0,85 L20,75 L35,80 L55,52 L75,54 L95,32 L115,60 L140,38 L160,42 L185,12 L200,8" />
+      {/* Main sharp curve */}
+      <path className="mini-line" d="M0,85 L20,75 L35,80 L55,52 L75,54 L95,32 L115,60 L140,38 L160,42 L185,12 L200,8" />
+      {/* Shaded area under curve */}
+      <path d="M0,85 L20,75 L35,80 L55,52 L75,54 L95,32 L115,60 L140,38 L160,42 L185,12 L200,8 L200,100 L0,100 Z" fill="url(#eq-fill)" />
+      {/* Pulsing endpoint dot */}
+      <circle cx="200" cy="8" r="3" className="mini-dot-pulse" />
+      <circle cx="200" cy="8" r="3" className="mini-dot" />
     </svg>
   );
 }
@@ -531,7 +637,7 @@ function EmotionMini() {
 function EdgeMini() {
   return (
     <div className="mini-edge">
-      <div className="edge-label">لبه معاملاتی شما</div>
+      <div className="edge-label">برتری معاملاتی شما</div>
       <div className="edge-sentence">
         بهترین عملکرد تو در سشن <b>لندن</b> با نرخ موفقیت <b>۷۲٪</b> در ۱۸ معامله.
       </div>
@@ -541,19 +647,89 @@ function EdgeMini() {
 }
 
 function ImportMini() {
+  const [step, setStep] = useState(0); // 0: upload, 1: reading, 2: analyzing, 3: completed, 4: result shown
+  const [progress, setProgress] = useState(0);
+
+  useEffect(() => {
+    let active = true;
+    const timeouts: NodeJS.Timeout[] = [];
+
+    const schedule = (fn: () => void, delay: number) => {
+      if (active) {
+        timeouts.push(setTimeout(fn, delay));
+      }
+    };
+
+    const runLoop = () => {
+      if (!active) return;
+
+      // Step 0: Upload starts
+      setStep(0);
+      setProgress(15);
+
+      // Step 1: Reading file
+      schedule(() => {
+        setStep(1);
+        setProgress(50);
+      }, 1000);
+
+      // Step 2: Analyzing
+      schedule(() => {
+        setStep(2);
+        setProgress(85);
+      }, 2200);
+
+      // Step 3: Success / Finalizing
+      schedule(() => {
+        setStep(3);
+        setProgress(100);
+      }, 3400);
+
+      // Step 4: Finished & holding
+      schedule(() => {
+        setStep(4);
+      }, 3900);
+
+      // Reset loop
+      schedule(() => {
+        setProgress(0);
+        schedule(runLoop, 400);
+      }, 7000);
+    };
+
+    runLoop();
+
+    return () => {
+      active = false;
+      timeouts.forEach(clearTimeout);
+    };
+  }, []);
+
   return (
     <div className="mini-import">
       <div className="imp-card">
-        <span className="material-symbols-outlined imp-icon">description</span>
+        <span className={`material-symbols-outlined imp-icon ${step >= 3 ? 'success' : 'loading'}`}>
+          {step >= 3 ? 'task_alt' : 'description'}
+        </span>
         <div className="imp-info">
           <span className="imp-name">report.htm</span>
-          <span className="imp-status">در حال پردازش</span>
+          <span className={`imp-status ${step >= 3 ? 'success' : ''}`}>
+            {step === 0 && 'آپلود فایل...'}
+            {step === 1 && 'خواندن فایل...'}
+            {step === 2 && 'تحلیل داده‌ها...'}
+            {step >= 3 && 'پردازش موفق'}
+          </span>
         </div>
       </div>
-      <div className="imp-progress"><span className="imp-bar" /></div>
-      <div className="imp-result">
+      <div className="imp-progress">
+        <span
+          className={`imp-bar ${step >= 3 ? 'success' : ''}`}
+          style={{ width: `${progress}%`, transition: 'width 0.4s cubic-bezier(0.4, 0, 0.2, 1)' }}
+        />
+      </div>
+      <div className={`imp-result ${step === 4 ? 'visible' : ''}`}>
         <span className="material-symbols-outlined">check_circle</span>
-        ۱۲ معامله شناسایی شد
+        ۱۲ معامله شناسایی و تحلیل شد
       </div>
     </div>
   );

@@ -27,7 +27,7 @@ export default function SideNavBar() {
           <div className="logo-box">
             <img
               src="/logo.png?v=2"
-              alt="معامله‌یار"
+              alt="تریدکاو"
               width={40}
               height={40}
               className="logo-img"

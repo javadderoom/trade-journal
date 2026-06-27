@@ -329,7 +329,7 @@ $maxw: 1200px;
   border-radius: 10px;
   padding: 14px;
   margin-bottom: 14px;
-  height: 120px;
+  height: 200px;
 }
 
 .mockup-rows { display: flex; flex-direction: column; gap: 8px; }
@@ -557,19 +557,41 @@ $maxw: 1200px;
 // Bento previews
 .mini-chart {
   width: 100%;
-  height: 80px;
+  height: 100%;
   display: block;
+  overflow: visible;
+
+  .mini-line-glow {
+    fill: none;
+    stroke: $land-accent;
+    stroke-width: 5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    opacity: 0.35;
+    filter: blur(4px);
+    stroke-dasharray: 600;
+    stroke-dashoffset: 600;
+    animation: draw-line 2s $ease forwards;
+  }
+
   .mini-line {
     fill: none;
     stroke: $land-accent;
-    stroke-width: 2;
+    stroke-width: 2.5;
     stroke-linecap: round;
     stroke-linejoin: round;
-    stroke-dasharray: 400;
-    stroke-dashoffset: 400;
+    stroke-dasharray: 600;
+    stroke-dashoffset: 600;
     animation: draw-line 2s $ease forwards;
   }
+
   .mini-dot { fill: $land-accent; }
+
+  .mini-dot-pulse {
+    fill: $land-accent;
+    transform-origin: center;
+    animation: pulse-ring 2s infinite ease-out;
+  }
 }
 
 .mini-calendar {
@@ -635,10 +657,31 @@ $maxw: 1200px;
     border-radius: 8px;
     padding: 10px 12px;
   }
-  .imp-icon { font-size: 22px; color: $land-muted; }
+  .imp-icon {
+    font-size: 22px;
+    color: $land-muted;
+    transition: color 0.3s ease, transform 0.3s ease;
+
+    &.loading {
+      animation: imp-pulse 1.4s infinite ease-in-out;
+    }
+    &.success {
+      color: $land-accent;
+      transform: scale(1.1);
+    }
+  }
   .imp-info { display: flex; flex-direction: column; }
   .imp-name { font-size: 0.82rem; color: $land-text; }
-  .imp-status { font-size: 0.7rem; color: $land-accent; }
+  .imp-status {
+    font-size: 0.7rem;
+    color: $land-muted;
+    transition: color 0.3s ease;
+
+    &.success {
+      color: $land-accent;
+      font-weight: 600;
+    }
+  }
   .imp-progress {
     height: 5px;
     background: $land-surface;
@@ -648,10 +691,15 @@ $maxw: 1200px;
   .imp-bar {
     display: block;
     height: 100%;
-    width: 70%;
+    width: 0%;
     background: $land-accent;
     border-radius: 999px;
-    animation: imp-load 1.6s $ease infinite;
+    transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.3s ease;
+
+    &.success {
+      background: $land-accent;
+      box-shadow: 0 0 8px rgba(61, 220, 151, 0.5);
+    }
   }
   .imp-result {
     display: flex;
@@ -659,12 +707,34 @@ $maxw: 1200px;
     gap: 6px;
     font-size: 0.8rem;
     color: $land-accent;
+    opacity: 0;
+    transform: translateY(6px);
+    transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1), transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     .material-symbols-outlined { font-size: 16px; }
+
+    &.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
 }
 
 @keyframes draw-line { to { stroke-dashoffset: 0; } }
-@keyframes imp-load { 0% { width: 20%; } 50% { width: 90%; } 100% { width: 20%; } }
+@keyframes imp-pulse {
+  0% { transform: scale(1); opacity: 0.7; }
+  50% { transform: scale(1.08); opacity: 1; }
+  100% { transform: scale(1); opacity: 0.7; }
+}
+@keyframes pulse-ring {
+  0% {
+    r: 3px;
+    opacity: 1;
+  }
+  100% {
+    r: 10px;
+    opacity: 0;
+  }
+}
 
 // ─── Comparison table (from Spec C) ────────────────────────────────────────────
 .landing-compare {
@@ -706,19 +776,77 @@ $maxw: 1200px;
   tbody tr:hover { background: rgba(255, 255, 255, 0.015); }
 
   .us-col {
-    background: rgba(61, 220, 151, 0.06);
+    background: rgba(61, 220, 151, 0.05);
     color: $land-text;
     font-weight: 600;
   }
 
-  .cell {
-    font-size: 20px;
-    vertical-align: middle;
-    &.yes { color: $land-accent; }
-    &.no { color: $land-muted-2; opacity: 0.5; }
-    &.manual { font-size: 0.82rem; color: $land-gold; font-weight: 600; }
-    &.dash { color: $land-muted-2; }
+  .col-head {
+    text-align: center;
+    vertical-align: bottom;
+    padding-bottom: 20px;
+    .head-icon {
+      display: block;
+      margin: 0 auto 6px;
+      font-size: 20px;
+      color: $land-muted;
+    }
+    &.us-col {
+      background: rgba(61, 220, 151, 0.08) !important;
+      color: $land-accent !important;
+      .head-icon {
+        color: $land-accent;
+      }
+    }
   }
+
+  .section-label td {
+    background: rgba(255, 255, 255, 0.015) !important;
+    color: $land-accent !important;
+    font-size: 0.76rem;
+    font-weight: 700;
+    padding: 10px 18px;
+    text-align: start !important;
+    border-bottom: 1px solid $land-border-soft;
+    letter-spacing: 0.05em;
+  }
+
+  .cell-check {
+    color: $land-accent;
+    font-size: 19px;
+    vertical-align: middle;
+  }
+  .cell-cross {
+    color: $land-danger;
+    font-size: 19px;
+    vertical-align: middle;
+    opacity: 0.7;
+  }
+  .cell-partial {
+    color: $land-gold;
+    font-size: 0.82rem;
+    font-weight: 600;
+  }
+  .cell-zero {
+    color: $land-accent;
+    font-size: 0.82rem;
+    font-weight: 700;
+  }
+  .cell-text {
+    font-size: 0.82rem;
+    color: $land-text;
+  }
+  .us-col-text {
+    font-weight: 700;
+    color: $land-accent;
+  }
+}
+
+.compare-note-hint {
+  color: $land-muted;
+  font-size: 0.75rem;
+  margin: 12px 18px 0;
+  text-align: right;
 }
 
 // ─── Pricing ───────────────────────────────────────────────────────────────────
@@ -743,12 +871,30 @@ $maxw: 1200px;
   padding: 28px 24px;
   display: flex;
   flex-direction: column;
-  transition: transform 0.25s $ease, border-color 0.25s $ease;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), 
+              border-color 0.3s cubic-bezier(0.16, 1, 0.3, 1), 
+              box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+
+  &:hover {
+    transform: translateY(-6px);
+    border-color: rgba(61, 220, 151, 0.35);
+    box-shadow: 0 16px 36px -12px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(61, 220, 151, 0.05);
+
+    .price-features li .material-symbols-outlined {
+      transform: scale(1.15);
+      color: $land-accent-hover;
+    }
+  }
 
   &.featured {
     border-color: $land-accent;
     transform: scale(1.03);
-    box-shadow: 0 20px 50px -20px rgba(61, 220, 151, 0.3);
+    box-shadow: 0 20px 50px -20px rgba(61, 220, 151, 0.25);
+
+    &:hover {
+      transform: scale(1.06) translateY(-6px);
+      box-shadow: 0 24px 60px -15px rgba(61, 220, 151, 0.35);
+    }
   }
 
   .price-badge {
@@ -791,7 +937,11 @@ $maxw: 1200px;
       gap: 8px;
       font-size: 0.88rem;
       color: $land-muted;
-      .material-symbols-outlined { font-size: 18px; color: $land-accent; }
+      .material-symbols-outlined { 
+        font-size: 18px; 
+        color: $land-accent; 
+        transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), color 0.25s ease;
+      }
     }
   }
   .btn-primary { width: 100%; }
