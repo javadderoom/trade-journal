@@ -27,6 +27,31 @@ curl -fsSL https://cdn.coollabs.io/coolify/install.sh | bash
 ```
 Once completed, Coolify will be running at `http://<YOUR_VPS_IP>:8000`. Open this address in your browser, create your admin account, and sign in.
 
+### Configure Docker Registry Mirror (Required for Restricted Networks like Iran)
+
+If your VPS is located in a region where Docker Hub is blocked or throttled (e.g., Iran), you must configure a local registry mirror on your VPS so Docker can pull base images successfully:
+
+1. Open or create the Docker daemon config file:
+   ```bash
+   sudo nano /etc/docker/daemon.json
+   ```
+
+2. Add the following registry mirror configuration:
+   ```json
+   {
+     "registry-mirrors": [
+       "https://docker.ir",
+       "https://docker.arvancloud.ir"
+     ]
+   }
+   ```
+
+3. Reload daemon configurations and restart Docker:
+   ```bash
+   sudo systemctl daemon-reload
+   sudo systemctl restart docker
+   ```
+
 ---
 
 ## 2. DNS Configuration (Prerequisite)

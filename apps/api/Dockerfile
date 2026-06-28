@@ -1,5 +1,5 @@
 # Stage 1: Build
-FROM node:22-alpine AS builder
+FROM node:22.13-alpine AS builder
 WORKDIR /app
 COPY package.json package-lock.json ./
 COPY apps/api/package.json ./apps/api/
@@ -10,7 +10,7 @@ RUN npx prisma generate --schema=apps/api/src/prisma/schema.prisma
 RUN npm run build --workspace=api
 
 # Stage 2: Runner
-FROM node:22-alpine AS runner
+FROM node:22.13-alpine AS runner
 WORKDIR /app
 ENV NODE_ENV=production
 COPY --from=builder /app/package.json /app/package-lock.json ./
