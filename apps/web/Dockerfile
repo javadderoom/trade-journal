@@ -6,6 +6,11 @@ COPY apps/api/package.json ./apps/api/
 COPY apps/web/package.json ./apps/web/
 RUN npm install --include=dev --no-audit --no-fund
 COPY . .
+ARG NEXT_PUBLIC_API_URL
+ARG NEXT_PUBLIC_WEB_URL
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_WEB_URL=$NEXT_PUBLIC_WEB_URL
+
 RUN npm run build --workspace=web
 
 # Stage 2: Runner
