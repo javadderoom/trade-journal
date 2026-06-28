@@ -171,7 +171,7 @@ router.get('/receipts', async (req: AuthRequest, res: Response) => {
 router.post('/receipts/:id/verify', async (req: AuthRequest, res: Response) => {
   try {
     const id = req.params.id as string;
-    const { status } = req.body; // 'APPROVED' or 'REJECTED'
+    const { status, rejectionReason } = req.body; // 'APPROVED' or 'REJECTED'
 
     if (!['APPROVED', 'REJECTED'].includes(status)) {
       return res.status(400).json({ error: 'وضعیت ارسال شده معتبر نیست' });
@@ -194,7 +194,10 @@ router.post('/receipts/:id/verify', async (req: AuthRequest, res: Response) => {
       // 1. Update receipt status
       await tx.manualReceipt.update({
         where: { id },
-        data: { status: status as ReceiptStatus },
+        data: {
+          status: status as ReceiptStatus,
+          rejectionReason: status === 'REJECTED' ? (rejectionReason || 'نامشخص') : null,
+        },
       });
 
       // 2. If approved, activate user subscription

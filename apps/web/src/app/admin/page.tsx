@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAuthStore } from '../../lib/auth';
 import { api } from '../../lib/api';
 import { toPersianDigits } from '../../utils/farsi';
+import { notify } from '../../lib/notify';
 import './admin.scss';
 
 type AdminTab = 'stats' | 'users' | 'receipts' | 'coupons' | 'pricing';
@@ -43,6 +44,7 @@ interface AdminReceipt {
   discountCode: string | null;
   receipt_image: string;
   status: 'PENDING' | 'APPROVED' | 'REJECTED';
+  rejectionReason: string | null;
   created_at: string;
 }
 
@@ -90,6 +92,8 @@ export default function AdminPage() {
 
   // Modal states
   const [selectedReceipt, setSelectedReceipt] = useState<AdminReceipt | null>(null);
+  const [isRejecting, setIsRejecting] = useState(false);
+  const [rejectionInput, setRejectionInput] = useState('');
   const [selectedUserForPlan, setSelectedUserForPlan] = useState<AdminUser | null>(null);
   const [customPlanOverride, setCustomPlanOverride] = useState({
     plan: 'STANDARD',
@@ -153,16 +157,33 @@ export default function AdminPage() {
   }, [activeTab, user, fetchStats, fetchUsers, fetchReceipts, fetchCoupons, fetchPricesSetting]);
 
   // Actions
-  const handleVerifyReceipt = async (id: string, status: 'APPROVED' | 'REJECTED') => {
-    if (!confirm(`آیا از ${status === 'APPROVED' ? 'تایید' : 'رد'} این فیش اطمینان دارید؟`)) return;
+  const handleVerifyReceipt = async (id: string, status: 'APPROVED' | 'REJECTED', inlineReason?: string) => {
+    let rejectionReason = '';
+    if (status === 'REJECTED') {
+      if (!inlineReason || !inlineReason.trim()) {
+        notify.error('وارد کردن علت رد شدن فیش الزامی است');
+        return;
+      }
+      rejectionReason = inlineReason.trim();
+    } else {
+      const ok = await notify.confirm({
+        title: 'تایید فیش',
+        message: 'آیا از تایید این فیش اطمینان دارید؟',
+      });
+      if (!ok) return;
+    }
+
     setLoading(true);
     try {
-      await api.post(`/api/admin/receipts/${id}/verify`, { status });
+      await api.post(`/api/admin/receipts/${id}/verify`, { status, rejectionReason });
       setSelectedReceipt(null);
+      setIsRejecting(false);
+      setRejectionInput('');
       fetchReceipts();
-      fetchStats(); // Update counters
+      fetchStats();
+      notify.success('وضعیت فیش با موفقیت به‌روز شد');
     } catch (err: any) {
-      alert(err.response?.data?.error || 'خطا در اعمال وضعیت فیش');
+      notify.error(err.response?.data?.error || 'خطا در اعمال وضعیت فیش');
     } finally {
       setLoading(false);
     }
@@ -171,7 +192,7 @@ export default function AdminPage() {
   const handleCreateCoupon = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newCoupon.code || !newCoupon.expireDate) {
-      alert('تمامی فیلدها را پر کنید');
+      notify.error('تمامی فیلدها را پر کنید');
       return;
     }
     try {
@@ -184,32 +205,45 @@ export default function AdminPage() {
         isAccountBound: false,
       });
       fetchCoupons();
+      notify.success('کد تخفیف با موفقیت ساخته شد');
     } catch (err: any) {
-      alert(err.response?.data?.error || 'خطا در ساخت کد تخفیف');
+      notify.error(err.response?.data?.error || 'خطا در ساخت کد تخفیف');
     }
   };
 
   const handleDeleteCoupon = async (id: string) => {
-    if (!confirm('آیا از حذف این کد تخفیف اطمینان دارید؟')) return;
+    const ok = await notify.confirm({
+      title: 'حذف کد تخفیف',
+      message: 'آیا از حذف این کد تخفیف اطمینان دارید؟',
+      danger: true,
+    });
+    if (!ok) return;
     try {
       await api.delete(`/api/admin/coupons/${id}`);
       fetchCoupons();
+      notify.success('کد تخفیف با موفقیت حذف شد');
     } catch (err: any) {
-      alert(err.response?.data?.error || 'خطا در حذف کد تخفیف');
+      notify.error(err.response?.data?.error || 'خطا در حذف کد تخفیف');
     }
   };
 
   const handleUpdatePrices = async () => {
     try {
       await api.put('/api/admin/settings/prices', { prices: pricesConfig });
-      alert('تنظیمات قیمت‌گذاری با موفقیت بروز شد.');
+      notify.success('تنظیمات قیمت‌گذاری با موفقیت بروز شد');
     } catch (err: any) {
-      alert(err.response?.data?.error || 'خطا در ذخیره‌سازی قیمت‌ها');
+      notify.error(err.response?.data?.error || 'خطا در ذخیره‌سازی قیمت‌ها');
     }
   };
 
   const handleManualPlanOverride = async () => {
     if (!selectedUserForPlan) return;
+    const ok = await notify.confirm({
+      title: 'تغییر پلن کاربر',
+      message: `آیا از تغییر پلن کاربر "${selectedUserForPlan.name || selectedUserForPlan.email}" به ${customPlanOverride.plan === 'FREE' ? 'رایگان' : customPlanOverride.plan === 'STANDARD' ? 'استاندارد' : 'حرفه‌ای'} اطمینان دارید؟`,
+      confirmLabel: 'تغییر پلن',
+    });
+    if (!ok) return;
     try {
       await api.put(`/api/admin/users/${selectedUserForPlan.id}/plan`, {
         plan: customPlanOverride.plan,
@@ -217,8 +251,9 @@ export default function AdminPage() {
       });
       setSelectedUserForPlan(null);
       fetchUsers();
+      notify.success('پلن کاربر با موفقیت تغییر یافت');
     } catch (err: any) {
-      alert(err.response?.data?.error || 'خطا در تغییر پلن');
+      notify.error(err.response?.data?.error || 'خطا در تغییر پلن');
     }
   };
 
@@ -300,7 +335,7 @@ export default function AdminPage() {
               </div>
             </div>
             <div className="stat-card">
-              <div className="stat-icon-wrap" style={{ color: '#4299e1', background: 'rgba(66, 153, 225, 0.1)' }}>
+              <div className="stat-icon-wrap" style={{ color: '#61f9b1', background: 'rgba(97, 249, 177, 0.1)' }}>
                 <span className="material-symbols-outlined">verified_user</span>
               </div>
               <div className="stat-info">
@@ -617,7 +652,11 @@ export default function AdminPage() {
 
       {/* Selected Receipt Verification Modal Overlay */}
       {selectedReceipt && (
-        <div className="admin-overlay" onClick={() => setSelectedReceipt(null)}>
+        <div className="admin-overlay" onClick={() => {
+          setSelectedReceipt(null);
+          setIsRejecting(false);
+          setRejectionInput('');
+        }}>
           <div className="admin-modal-card" onClick={(e) => e.stopPropagation()}>
             <h4>بررسی فیش واریزی</h4>
             <div style={{ fontSize: '0.85rem', display: 'flex', flexDirection: 'column', gap: '8px', color: '#a0aec0' }}>
@@ -635,7 +674,7 @@ export default function AdminPage() {
               />
             </div>
 
-            {selectedReceipt.status === 'PENDING' && (
+            {selectedReceipt.status === 'PENDING' && !isRejecting && (
               <div className="receipt-modal-actions">
                 <button
                   className="admin-btn"
@@ -647,24 +686,72 @@ export default function AdminPage() {
                 <button
                   className="admin-btn btn-danger"
                   disabled={loading}
-                  onClick={() => handleVerifyReceipt(selectedReceipt.id, 'REJECTED')}
+                  onClick={() => setIsRejecting(true)}
                 >
                   رد فیش
                 </button>
                 <button
                   className="admin-btn btn-secondary"
-                  onClick={() => setSelectedReceipt(null)}
+                  onClick={() => {
+                    setSelectedReceipt(null);
+                    setIsRejecting(false);
+                    setRejectionInput('');
+                  }}
                 >
                   بستن
                 </button>
               </div>
             )}
+
+            {selectedReceipt.status === 'PENDING' && isRejecting && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '10px' }}>
+                <textarea
+                  placeholder="علت رد شدن فیش پرداخت (الزامی)..."
+                  value={rejectionInput}
+                  onChange={(e) => setRejectionInput(e.target.value)}
+                  style={{
+                    background: '#0b0d19',
+                    border: '1px solid rgba(255,255,255,0.1)',
+                    padding: '10px',
+                    color: '#fff',
+                    borderRadius: '6px',
+                    minHeight: '80px',
+                    fontSize: '0.88rem',
+                    fontFamily: 'inherit',
+                    resize: 'vertical'
+                  }}
+                />
+                <div className="receipt-modal-actions">
+                  <button
+                    className="admin-btn btn-danger"
+                    disabled={loading || !rejectionInput.trim()}
+                    onClick={() => handleVerifyReceipt(selectedReceipt.id, 'REJECTED', rejectionInput)}
+                  >
+                    ثبت رد فیش
+                  </button>
+                  <button
+                    className="admin-btn btn-secondary"
+                    onClick={() => {
+                      setIsRejecting(false);
+                      setRejectionInput('');
+                    }}
+                  >
+                    انصراف
+                  </button>
+                </div>
+              </div>
+            )}
+
             {selectedReceipt.status !== 'PENDING' && (
               <div className="receipt-modal-actions">
                 <span className={`badge ${selectedReceipt.status.toLowerCase()}`}>
                   این فیش قبلاً {selectedReceipt.status === 'APPROVED' ? 'تایید' : 'رد'} شده است
                 </span>
-                <button className="admin-btn btn-secondary" onClick={() => setSelectedReceipt(null)}>بستن</button>
+                <button className="admin-btn btn-secondary" onClick={() => {
+                  setSelectedReceipt(null);
+                  setIsRejecting(false);
+                  setRejectionInput('');
+                }}>بستن</button>
               </div>
             )}
           </div>

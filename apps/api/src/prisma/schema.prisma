@@ -195,17 +195,18 @@ model SystemSetting {
 }
 
 model ManualReceipt {
-  id             String        @id @default(uuid())
-  user_id        String
-  user           User          @relation(fields: [user_id], references: [id], onDelete: Cascade)
-  plan           Plan
-  period         String
-  amount         Int
-  discountCode   String?
-  receipt_image  String
-  status         ReceiptStatus @default(PENDING)
-  created_at     DateTime      @default(now())
-  updated_at     DateTime      @updatedAt
+  id              String        @id @default(uuid())
+  user_id         String
+  user            User          @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  plan            Plan
+  period          String
+  amount          Int
+  discountCode    String?
+  receipt_image   String
+  status          ReceiptStatus @default(PENDING)
+  rejectionReason String?
+  created_at      DateTime      @default(now())
+  updated_at      DateTime      @updatedAt
 
   @@index([user_id])
 }

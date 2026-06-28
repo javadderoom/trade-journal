@@ -58,6 +58,7 @@ export default function DashboardPage() {
   const [error, setError] = useState<string | null>(null);
   const [edgeRefreshSpin, setEdgeRefreshSpin] = useState(false);
   const [subStatus, setSubStatus] = useState<any>(null);
+  const [dismissedRejectionId, setDismissedRejectionId] = useState<string | null>(null);
 
   const fetchSubStatus = async () => {
     try {
@@ -175,7 +176,7 @@ export default function DashboardPage() {
 
   return (
     <main className="dashboard-page">
-      {subStatus?.pendingReceipt && (
+      {subStatus?.pendingReceipt && subStatus.pendingReceipt.status === 'PENDING' && (
         <div style={{
           backgroundColor: 'rgba(255, 179, 0, 0.08)',
           border: '1px solid rgba(255, 179, 0, 0.2)',
@@ -195,6 +196,42 @@ export default function DashboardPage() {
             <strong>{subStatus.pendingReceipt.plan === 'STANDARD' ? 'استاندارد' : 'حرفه‌ای'}</strong> (دوره{' '}
             {subStatus.pendingReceipt.period === 'annual' ? 'سالانه' : 'ماهانه'}) ثبت شده و در حال بررسی توسط مدیریت است.
           </span>
+        </div>
+      )}
+
+      {subStatus?.pendingReceipt && subStatus.pendingReceipt.status === 'REJECTED' && dismissedRejectionId !== subStatus.pendingReceipt.id && (
+        <div style={{
+          backgroundColor: 'rgba(255, 83, 112, 0.08)',
+          border: '1px solid rgba(255, 83, 112, 0.2)',
+          color: '#ff5370',
+          padding: '12px 20px',
+          borderRadius: '8px',
+          marginBottom: '20px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '10px',
+          fontSize: '0.9rem',
+          fontFamily: 'Vazirmatn'
+        }}>
+          <span className="material-symbols-outlined">cancel</span>
+          <span style={{ flex: 1 }}>
+            آخرین فیش واریزی شما برای پلن{' '}
+            <strong>{subStatus.pendingReceipt.plan === 'STANDARD' ? 'استاندارد' : 'حرفه‌ای'}</strong>{' '}
+            توسط مدیریت رد شد.
+            {subStatus.pendingReceipt.rejectionReason && (
+              <>
+                <br />
+                <span style={{ color: '#a0aec0' }}>علت رد شدن: </span>
+                <strong style={{ color: '#f8fafc' }}>{subStatus.pendingReceipt.rejectionReason}</strong>
+              </>
+            )}
+          </span>
+          <button
+            onClick={() => setDismissedRejectionId(subStatus.pendingReceipt.id)}
+            style={{ background: 'none', border: 'none', color: '#ff5370', cursor: 'pointer', padding: 0 }}
+          >
+            <span className="material-symbols-outlined">close</span>
+          </button>
         </div>
       )}
 

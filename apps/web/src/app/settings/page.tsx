@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuthStore } from '../../lib/auth';
 import { api } from '../../lib/api';
 import { toPersianDigits } from '../../utils/farsi';
+import { notify } from '../../lib/notify';
 import './settings.scss';
 
 type Tab = 'profile' | 'accounts' | 'subscription' | 'security';
@@ -37,11 +38,6 @@ interface Session {
   is_current: boolean;
 }
 
-interface Toast {
-  message: string;
-  type: 'success' | 'error';
-}
-
 const BROKER_PRESETS = [
   'Amarkets', 'LiteFinance', 'Errante', 'Alpari', 'RoboForex', 'HFM', 'IC Markets', 'Pepperstone',
 ];
@@ -63,12 +59,6 @@ export default function SettingsPage() {
   const { user, logout } = useAuthStore();
 
   const [activeTab, setActiveTab] = useState<Tab>((searchParams.get('tab') as Tab) || 'profile');
-  const [toast, setToast] = useState<Toast | null>(null);
-
-  const showToast = (message: string, type: 'success' | 'error' = 'success') => {
-    setToast({ message, type });
-    setTimeout(() => setToast(null), 3000);
-  };
 
   const switchTab = (tab: Tab) => {
     setActiveTab(tab);
@@ -92,6 +82,8 @@ export default function SettingsPage() {
 
   const standardDiscountPercent = Math.round((1 - activePrices.STANDARD.annual / (activePrices.STANDARD.monthly * 12)) * 100);
   const proDiscountPercent = Math.round((1 - activePrices.PRO.annual / (activePrices.PRO.monthly * 12)) * 100);
+
+  const [dismissedRejectionId, setDismissedRejectionId] = useState<string | null>(null);
 
   // Checkout modal & discount states
   const [checkoutTarget, setCheckoutTarget] = useState<{ plan: string; period: string } | null>(null);
@@ -223,10 +215,10 @@ export default function SettingsPage() {
         displayCurrency: profileForm.displayCurrency,
       });
       setProfileDirty(false);
-      showToast('پروفایل با موفقیت ذخیره شد');
+      notify.success('پروفایل با موفقیت ذخیره شد');
       fetchProfile();
     } catch (err: any) {
-      showToast(err.response?.data?.error || 'خطا در ذخیره تغییرات', 'error');
+      notify.error(err.response?.data?.error || 'خطا در ذخیره تغییرات');
     }
   };
 
@@ -239,9 +231,9 @@ export default function SettingsPage() {
       formData.append('avatar', file);
       const res = await api.post('/api/settings/avatar', formData);
       if (profile) setProfile({ ...profile, avatar_url: res.data.avatar_url });
-      showToast('عکس پروفایل تغییر کرد');
+      notify.success('عکس پروفایل تغییر کرد');
     } catch (err: any) {
-      showToast(err.response?.data?.error || 'خطا در بارگذاری تصویر', 'error');
+      notify.error(err.response?.data?.error || 'خطا در بارگذاری تصویر');
     } finally {
       setAvatarUploading(false);
       e.target.value = '';
@@ -254,9 +246,9 @@ export default function SettingsPage() {
       setShowAddAccount(false);
       setNewAccount({ broker_name: '', account_number: '', currency: 'USD' });
       fetchAccounts();
-      showToast('حساب جدید ایجاد شد');
+      notify.success('حساب جدید ایجاد شد');
     } catch (err: any) {
-      showToast(err.response?.data?.error || 'خطا در ایجاد حساب', 'error');
+      notify.error(err.response?.data?.error || 'خطا در ایجاد حساب');
     }
   };
 
@@ -265,27 +257,33 @@ export default function SettingsPage() {
       await api.put(`/api/settings/accounts/${id}`, editAccount);
       setEditingId(null);
       fetchAccounts();
-      showToast('حساب ویرایش شد');
+      notify.success('حساب ویرایش شد');
     } catch (err: any) {
-      showToast(err.response?.data?.error || 'خطا در ویرایش', 'error');
+      notify.error(err.response?.data?.error || 'خطا در ویرایش');
     }
   };
 
   const handleDeleteAccount = async (id: string, tradeCount: number) => {
-    if (!confirm(`با حذف این حساب، تمام ${toPersianDigits(tradeCount)} معامله مرتبط با آن نیز حذف می‌شوند. آیا مطمئن هستید؟`)) return;
+    const ok = await notify.confirm({
+      title: 'حذف حساب بروکر',
+      message: `با حذف این حساب، تمام ${toPersianDigits(tradeCount)} معامله مرتبط با آن نیز حذف می‌شوند. آیا مطمئن هستید؟`,
+      danger: true,
+      confirmLabel: 'حذف حساب',
+    });
+    if (!ok) return;
     try {
       await api.delete(`/api/settings/accounts/${id}`);
       fetchAccounts();
-      showToast('حساب حذف شد');
+      notify.success('حساب حذف شد');
     } catch (err: any) {
-      showToast(err.response?.data?.error || 'خطا در حذف', 'error');
+      notify.error(err.response?.data?.error || 'خطا در حذف');
     }
   };
 
   const handleSubmitReceipt = async () => {
     if (!checkoutTarget) return;
     if (!receiptFile) {
-      showToast('لطفاً تصویر فیش واریزی را انتخاب کنید', 'error');
+      notify.error('لطفاً تصویر فیش واریزی را انتخاب کنید');
       return;
     }
     setCheckoutLoading(true);
@@ -304,7 +302,7 @@ export default function SettingsPage() {
         },
       });
 
-      showToast(res.data.message || 'فیش با موفقیت ثبت شد');
+      notify.success(res.data.message || 'فیش با موفقیت ثبت شد');
       setCheckoutTarget(null);
       setReceiptFile(null);
       setDiscountCode('');
@@ -312,7 +310,7 @@ export default function SettingsPage() {
       fetchSubscription();
     } catch (err: any) {
       console.error('Submit receipt error:', err);
-      showToast(err.response?.data?.error || 'خطا در ثبت فیش پرداخت', 'error');
+      notify.error(err.response?.data?.error || 'خطا در ثبت فیش پرداخت');
     } finally {
       setCheckoutLoading(false);
     }
@@ -320,7 +318,7 @@ export default function SettingsPage() {
 
   const handlePasswordChange = async () => {
     if (passwordForm.newPassword !== passwordForm.confirmPassword) {
-      showToast('رمز جدید و تکرار آن یکسان نیست', 'error');
+      notify.error('رمز جدید و تکرار آن یکسان نیست');
       return;
     }
     try {
@@ -329,10 +327,10 @@ export default function SettingsPage() {
         newPassword: passwordForm.newPassword,
       });
       setPasswordForm({ currentPassword: '', newPassword: '', confirmPassword: '' });
-      showToast('رمز عبور با موفقیت تغییر کرد');
+      notify.success('رمز عبور با موفقیت تغییر کرد');
       fetchSessions();
     } catch (err: any) {
-      showToast(err.response?.data?.error || 'خطا در تغییر رمز', 'error');
+      notify.error(err.response?.data?.error || 'خطا در تغییر رمز');
     }
   };
 
@@ -340,9 +338,9 @@ export default function SettingsPage() {
     try {
       await api.delete(`/api/settings/sessions/${id}`);
       fetchSessions();
-      showToast('نشست بسته شد');
+      notify.success('نشست بسته شد');
     } catch (err: any) {
-      showToast(err.response?.data?.error || 'خطا', 'error');
+      notify.error(err.response?.data?.error || 'خطا');
     }
   };
 
@@ -350,9 +348,9 @@ export default function SettingsPage() {
     try {
       await api.delete('/api/settings/sessions');
       fetchSessions();
-      showToast('همه نشست‌ها بسته شدند');
+      notify.success('همه نشست‌ها بسته شدند');
     } catch (err: any) {
-      showToast(err.response?.data?.error || 'خطا', 'error');
+      notify.error(err.response?.data?.error || 'خطا');
     }
   };
 
@@ -362,7 +360,7 @@ export default function SettingsPage() {
       await logout();
       router.push('/login');
     } catch (err: any) {
-      showToast(err.response?.data?.error || 'خطا در حذف حساب', 'error');
+      notify.error(err.response?.data?.error || 'خطا در حذف حساب');
     }
   };
 
@@ -385,16 +383,6 @@ export default function SettingsPage() {
 
   return (
     <div className="settings-page">
-      {/* ─── Toast ─── */}
-      {toast && (
-        <div className={`settings-toast ${toast.type}`}>
-          <span className="material-symbols-outlined">
-            {toast.type === 'success' ? 'check_circle' : 'error'}
-          </span>
-          <span>{toast.message}</span>
-        </div>
-      )}
-
       {/* ─── Header ─── */}
       <header className="settings-header">
         <h1>تنظیمات</h1>
@@ -653,7 +641,7 @@ export default function SettingsPage() {
               )}
             </div>
 
-            {subscription.pendingReceipt && (
+            {subscription.pendingReceipt && subscription.pendingReceipt.status === 'PENDING' && (
               <div className="plan-limit-banner" style={{ marginTop: '16px', background: 'rgba(255, 179, 0, 0.08)', border: '1px solid rgba(255, 179, 0, 0.2)', color: '#ffb300', padding: '12px 16px', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <span className="material-symbols-outlined">pending_actions</span>
                 <span style={{ fontSize: '0.85rem' }}>
@@ -661,6 +649,30 @@ export default function SettingsPage() {
                   <strong>{subscription.pendingReceipt.plan === 'STANDARD' ? 'استاندارد' : 'حرفه‌ای'}</strong> (دوره{' '}
                   {subscription.pendingReceipt.period === 'annual' ? 'سالانه' : 'ماهانه'}) ثبت شده و در حال بررسی توسط مدیریت است.
                 </span>
+              </div>
+            )}
+
+            {subscription.pendingReceipt && subscription.pendingReceipt.status === 'REJECTED' && dismissedRejectionId !== subscription.pendingReceipt.id && (
+              <div className="plan-limit-banner" style={{ marginTop: '16px', background: 'rgba(255, 83, 112, 0.08)', border: '1px solid rgba(255, 83, 112, 0.2)', color: '#ff5370', padding: '12px 16px', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <span className="material-symbols-outlined">cancel</span>
+                <span style={{ fontSize: '0.85rem', flex: 1 }}>
+                  آخرین فیش واریزی شما برای پلن{' '}
+                  <strong>{subscription.pendingReceipt.plan === 'STANDARD' ? 'استاندارد' : 'حرفه‌ای'}</strong>{' '}
+                  توسط مدیریت رد شد.
+                  {subscription.pendingReceipt.rejectionReason && (
+                    <>
+                      <br />
+                      <span style={{ color: '#a0aec0' }}>علت رد شدن: </span>
+                      <strong style={{ color: '#f8fafc' }}>{subscription.pendingReceipt.rejectionReason}</strong>
+                    </>
+                  )}
+                </span>
+                <button
+                  onClick={() => setDismissedRejectionId(subscription.pendingReceipt.id)}
+                  style={{ background: 'none', border: 'none', color: '#ff5370', cursor: 'pointer', padding: 0 }}
+                >
+                  <span className="material-symbols-outlined">close</span>
+                </button>
               </div>
             )}
 
@@ -692,7 +704,7 @@ export default function SettingsPage() {
                           <span className="period-name">
                             سالانه
 
-                            <span className="period-discount">۳۳٪ تخفیف</span>
+                            <span className="period-discount">{toPersianDigits(standardDiscountPercent)}% تخفیف</span>
                           </span>
                           <button
                             className="period-price-btn"
@@ -879,8 +891,8 @@ export default function SettingsPage() {
 
                     <div className="receipt-upload-section" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                       <label style={{ fontSize: '0.8rem', color: '#a0aec0', fontWeight: '500' }}>بارگذاری تصویر فیش پرداخت (الزامی)</label>
-                      <input 
-                        type="file" 
+                      <input
+                        type="file"
                         id="receipt-file-input"
                         accept="image/png, image/jpeg, image/jpg"
                         onChange={(e) => {

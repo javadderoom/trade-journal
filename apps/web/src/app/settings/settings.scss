@@ -18,29 +18,6 @@ $set-gold: #f5c542;
   margin: 0 auto;
 }
 
-.settings-toast {
-  position: fixed;
-  bottom: 24px;
-  right: 24px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 12px 20px;
-  border-radius: 10px;
-  font-size: 0.88rem;
-  font-weight: 500;
-  z-index: 1000;
-  animation: toast-slide-in 0.3s ease;
-  &.success { background: rgba($set-accent, 0.15); border: 1px solid rgba($set-accent, 0.3); color: $set-accent; }
-  &.error { background: rgba($set-danger, 0.15); border: 1px solid rgba($set-danger, 0.3); color: $set-danger; }
-  .material-symbols-outlined { font-size: 20px; }
-}
-
-@keyframes toast-slide-in {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
 .settings-header { margin-bottom: 24px; h1 { font-size: 1.5rem; font-weight: 700; margin: 0; color: $set-text; } }
 
 .settings-tab-bar {

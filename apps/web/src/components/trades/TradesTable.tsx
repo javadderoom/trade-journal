@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { toPersianDigits } from '../../utils/farsi';
 import { api } from '../../lib/api';
-import ConfirmModal from '../ui/ConfirmModal';
+import { notify } from '../../lib/notify';
 import SummaryBar from './SummaryBar';
 import FilterBar from './FilterBar';
 import DesktopTable from './DesktopTable';
@@ -135,26 +135,21 @@ export default function TradesTable({
 
   const user = useAuthStore(state => state.user);
 
-  const handleExportData = () => {
+  const handleExportData = async () => {
     const isPro = user?.plan === 'PRO';
     if (!isPro) {
-      showAlertDialog(
-        'قابلیت مخصوص کاربران حرفه‌ای',
-        'خروجی داده فقط برای کاربران حرفه‌ای در دسترس است. برای دسترسی به این قابلیت و امکانات پیشرفته دیگر، لطفاً حساب خود را به حرفه‌ای ارتقا دهید.',
-        'info',
-        () => {
-          window.location.href = '/settings?tab=subscription';
-        },
-        'ارتقای حساب',
-        'بستن'
-      );
+      const ok = await notify.confirm({
+        title: 'قابلیت مخصوص کاربران حرفه‌ای',
+        message: 'خروجی داده فقط برای کاربران حرفه‌ای در دسترس است. برای دسترسی به این قابلیت و امکانات پیشرفته دیگر، لطفاً حساب خود را به حرفه‌ای ارتقا دهید.',
+        confirmLabel: 'ارتقای حساب',
+        cancelLabel: 'بستن',
+      });
+      if (ok) {
+        window.location.href = '/settings?tab=subscription';
+      }
       return;
     }
-    showAlertDialog(
-      'خروجی داده‌ها (بزودی)',
-      'این قابلیت به زودی در نسخه حرفه‌ای فعال خواهد شد.',
-      'success'
-    );
+    notify.info('این قابلیت به زودی در نسخه حرفه‌ای فعال خواهد شد.');
   };
 
   // Sync prop-level initialDateFilter if provided by parent
@@ -168,41 +163,6 @@ export default function TradesTable({
     if (!dateFilter) return [];
     return dateFilter.split(',').map(d => d.trim()).filter(Boolean);
   }, [dateFilter]);
-
-  // Dialog state for custom alerts & confirmations
-  const [dialogConfig, setDialogConfig] = useState<{
-    isOpen: boolean;
-    title: string;
-    message: string;
-    type: 'info' | 'confirm' | 'error' | 'success';
-    confirmLabel?: string;
-    cancelLabel?: string;
-    onConfirm?: () => void;
-  }>({
-    isOpen: false,
-    title: '',
-    message: '',
-    type: 'info',
-  });
-
-  const showAlertDialog = (
-    title: string,
-    message: string,
-    type: 'info' | 'confirm' | 'error' | 'success' = 'info',
-    onConfirm?: () => void,
-    confirmLabel?: string,
-    cancelLabel?: string
-  ) => {
-    setDialogConfig({
-      isOpen: true,
-      title,
-      message,
-      type,
-      confirmLabel,
-      cancelLabel,
-      onConfirm,
-    });
-  };
 
   // Sync prop-level activeTradeId if provided by parent
   useEffect(() => {
@@ -486,69 +446,67 @@ export default function TradesTable({
     if (onUpdateTrade) {
       const success = await onUpdateTrade(activeTrade);
       if (success) {
-        showAlertDialog('ذخیره موفقیت‌آمیز', 'تغییرات با موفقیت ذخیره شد.', 'success');
+        notify.success('تغییرات با موفقیت ذخیره شد.');
       }
     } else {
-      showAlertDialog('ذخیره محلی', 'تغییرات به صورت محلی ذخیره شد.', 'info');
+      notify.info('تغییرات به صورت محلی ذخیره شد.');
     }
   };
 
   const handleDeleteClick = async () => {
     if (!activeTradeId) return;
 
-    showAlertDialog(
-      'تایید حذف معامله',
-      'آیا از حذف این معامله اطمینان دارید؟ این عمل غیرقابل بازگشت است.',
-      'confirm',
-      async () => {
-        let success = true;
-        if (onDeleteTrade) {
-          success = await onDeleteTrade(activeTradeId);
-        }
+    const ok = await notify.confirm({
+      title: 'تایید حذف معامله',
+      message: 'آیا از حذف این معامله اطمینان دارید؟ این عمل غیرقابل بازگشت است.',
+      confirmLabel: 'حذف معامله',
+      danger: true,
+    });
+    if (!ok) return;
 
-        if (success) {
-          setTrades(prev => prev.filter(t => t.id !== activeTradeId));
-          setSelectedTrades(prev => {
-            const next = new Set(prev);
-            next.delete(activeTradeId);
-            return next;
-          });
-          setActiveTradeId(null);
-        }
-      },
-      'حذف معامله',
-      'انصراف'
-    );
+    let success = true;
+    if (onDeleteTrade) {
+      success = await onDeleteTrade(activeTradeId);
+    }
+
+    if (success) {
+      setTrades(prev => prev.filter(t => t.id !== activeTradeId));
+      setSelectedTrades(prev => {
+        const next = new Set(prev);
+        next.delete(activeTradeId);
+        return next;
+      });
+      setActiveTradeId(null);
+    }
   };
 
   const handleDeleteSelected = async () => {
     if (selectedTrades.size === 0) return;
 
-    showAlertDialog(
-      'تایید حذف گروهی',
-      `آیا از حذف ${toPersianDigits(selectedTrades.size)} معامله انتخاب شده اطمینان دارید؟ این عمل غیرقابل بازگشت است.`,
-      'confirm',
-      async () => {
-        let success = true;
-        const idsArray = Array.from(selectedTrades);
-        if (onDeleteMultipleTrades) {
-          success = await onDeleteMultipleTrades(idsArray);
-        } else if (onDeleteTrade) {
-          const results = await Promise.all(idsArray.map(id => onDeleteTrade(id)));
-          success = results.every(res => res === true);
-        }
+    const ok = await notify.confirm({
+      title: 'تایید حذف گروهی',
+      message: `آیا از حذف ${toPersianDigits(selectedTrades.size)} معامله انتخاب شده اطمینان دارید؟ این عمل غیرقابل بازگشت است.`,
+      confirmLabel: 'حذف گروهی',
+      danger: true,
+    });
+    if (!ok) return;
 
-        if (success) {
-          setTrades(prev => prev.filter(t => !selectedTrades.has(t.id)));
-          setSelectedTrades(new Set());
-          if (activeTradeId && selectedTrades.has(activeTradeId)) {
-            setActiveTradeId(null);
-          }
-        }
-      },
-      'حذف گروهی',
-      'انصراف'
-    );
+    let success = true;
+    const idsArray = Array.from(selectedTrades);
+    if (onDeleteMultipleTrades) {
+      success = await onDeleteMultipleTrades(idsArray);
+    } else if (onDeleteTrade) {
+      const results = await Promise.all(idsArray.map(id => onDeleteTrade(id)));
+      success = results.every(res => res === true);
+    }
+
+    if (success) {
+      setTrades(prev => prev.filter(t => !selectedTrades.has(t.id)));
+      setSelectedTrades(new Set());
+      if (activeTradeId && selectedTrades.has(activeTradeId)) {
+        setActiveTradeId(null);
+      }
+    }
   };
 
   const handleScreenshotUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -567,7 +525,7 @@ export default function TradesTable({
       }
     } catch (err) {
       console.error('Failed to upload screenshot:', err);
-      showAlertDialog('خطا در بارگذاری', 'خطا در بارگذاری تصویر. لطفا دوباره تلاش کنید.', 'error');
+      notify.error('خطا در بارگذاری تصویر. لطفا دوباره تلاش کنید.');
     } finally {
       setIsUploading(false);
       e.target.value = '';
@@ -577,27 +535,26 @@ export default function TradesTable({
   const handleDeleteScreenshot = async (url: string) => {
     if (!activeTrade) return;
 
-    showAlertDialog(
-      'تایید حذف تصویر',
-      'آیا از حذف این تصویر اطمینان دارید؟',
-      'confirm',
-      async () => {
-        try {
-          const res = await api.delete(`/api/trades/${activeTrade.id}/screenshots`, {
-            data: { url }
-          });
-          const data = res.data;
-          if (data?.screenshots) {
-            updateActiveTradeField('screenshots', data.screenshots);
-          }
-        } catch (err) {
-          console.error('Failed to delete screenshot:', err);
-          showAlertDialog('خطا در حذف', 'خطا در حذف تصویر. لطفا دوباره تلاش کنید.', 'error');
-        }
-      },
-      'حذف تصویر',
-      'انصراف'
-    );
+    const ok = await notify.confirm({
+      title: 'تایید حذف تصویر',
+      message: 'آیا از حذف این تصویر اطمینان دارید؟',
+      confirmLabel: 'حذف تصویر',
+      danger: true,
+    });
+    if (!ok) return;
+
+    try {
+      const res = await api.delete(`/api/trades/${activeTrade.id}/screenshots`, {
+        data: { url }
+      });
+      const data = res.data;
+      if (data?.screenshots) {
+        updateActiveTradeField('screenshots', data.screenshots);
+      }
+    } catch (err) {
+      console.error('Failed to delete screenshot:', err);
+      notify.error('خطا در حذف تصویر. لطفا دوباره تلاش کنید.');
+    }
   };
 
   const updateActiveTradeField = (key: keyof Trade, value: any) => {
@@ -975,19 +932,7 @@ export default function TradesTable({
         </button>
       </div>
 
-      {/* 10. Reusable Dialog Modal */}
-      <ConfirmModal
-        isOpen={dialogConfig.isOpen}
-        title={dialogConfig.title}
-        message={dialogConfig.message}
-        type={dialogConfig.type}
-        confirmLabel={dialogConfig.confirmLabel}
-        cancelLabel={dialogConfig.cancelLabel}
-        onConfirm={dialogConfig.onConfirm}
-        onClose={() => setDialogConfig(prev => ({ ...prev, isOpen: false }))}
-      />
-
-      {/* 11. Lightbox Modal Overlay */}
+      {/* 10. Lightbox Modal Overlay */}
       {lightboxUrl && (
         <div className="lightbox-overlay" onClick={() => setLightboxUrl(null)}>
           <div className="lightbox-content" onClick={(e) => e.stopPropagation()}>

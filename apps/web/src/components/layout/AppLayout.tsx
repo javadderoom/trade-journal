@@ -5,6 +5,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import SideNavBar from './SideNavBar';
 import BottomNavBar from './BottomNavBar';
 import { useAuthStore } from '../../lib/auth';
+import Toaster from '../ui/Toaster';
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -133,11 +134,11 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
   // Public pages (landing) render full-bleed, no app chrome
   if (isLandingPage) {
-    return <>{children}</>;
+    return <><Toaster />{children}</>;
   }
 
   if (isAuthPage) {
-    return <div className="auth-wrapper">{children}</div>;
+    return <div className="auth-wrapper"><Toaster />{children}</div>;
   }
 
   return (
@@ -145,6 +146,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       <SideNavBar />
       <div className="main-content-wrapper">{children}</div>
       <BottomNavBar />
+      <Toaster />
     </div>
   );
 }

@@ -455,7 +455,7 @@ router.get('/status', authenticate, async (req: AuthRequest, res: Response) => {
     });
 
     const pendingReceipt = await prisma.manualReceipt.findFirst({
-      where: { user_id: userId, status: 'PENDING' },
+      where: { user_id: userId, status: { in: ['PENDING', 'REJECTED'] } },
       orderBy: { created_at: 'desc' },
     });
 
@@ -480,6 +480,7 @@ router.get('/status', authenticate, async (req: AuthRequest, res: Response) => {
             period: pendingReceipt.period,
             amount: pendingReceipt.amount,
             status: pendingReceipt.status,
+            rejectionReason: pendingReceipt.rejectionReason,
             created_at: pendingReceipt.created_at,
           }
         : null,

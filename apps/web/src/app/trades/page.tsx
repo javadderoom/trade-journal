@@ -6,14 +6,15 @@ import { useAppStore } from '../../store/useAppStore';
 import { useTradeStore } from '../../store/useTradeStore';
 import ManualTradeModal from '../../components/modals/ManualTradeModal';
 import ImportMT4Modal from '../../components/modals/ImportMT4Modal';
-import ConfirmModal from '../../components/ui/ConfirmModal';
 import { api } from '../../lib/api';
+import { notify } from '../../lib/notify';
 import Link from 'next/link';
 
 export default function TradesPage() {
   const [autoOpenTradeId, setAutoOpenTradeId] = useState<string | null>(null);
   const [dateFilter, setDateFilter] = useState<string | null>(null);
   const [subStatus, setSubStatus] = useState<any>(null);
+  const [dismissedRejectionId, setDismissedRejectionId] = useState<string | null>(null);
 
   const fetchSubStatus = async () => {
     try {
@@ -59,20 +60,6 @@ export default function TradesPage() {
     deleteMultipleTrades: handleDeleteMultipleTrades,
   } = useTradeStore();
 
-  // Dialog State for custom alerts
-  const [dialogConfig, setDialogConfig] = useState<{
-    isOpen: boolean;
-    title: string;
-    message: string;
-    type: 'info' | 'confirm' | 'error' | 'success';
-    confirmLabel?: string;
-  }>({
-    isOpen: false,
-    title: '',
-    message: '',
-    type: 'info',
-  });
-
   const fetchAccounts = async () => {
     try {
       const res = await api.get('/api/trades/accounts');
@@ -112,13 +99,7 @@ export default function TradesPage() {
   }, [trades]);
 
   const handleImportSuccess = async (result: any) => {
-    setDialogConfig({
-      isOpen: true,
-      title: 'واردات موفقیت‌آمیز',
-      message: `واردات فایل با موفقیت انجام شد:\nتعداد معامله یافت شده: ${result.found}\nتعداد وارد شده: ${result.imported}\nتعداد تکراری (نادیده گرفته شده): ${result.skipped}`,
-      type: 'success',
-      confirmLabel: 'باشه',
-    });
+    notify.success(`واردات فایل با موفقیت انجام شد:\nتعداد معامله یافت شده: ${result.found}\nتعداد وارد شده: ${result.imported}\nتعداد تکراری (نادیده گرفته شده): ${result.skipped}`);
     await fetchTrades(true, selectedAccountId);
     fetchSubStatus();
   };
@@ -150,7 +131,7 @@ export default function TradesPage() {
   }
   return (
     <main style={{ minHeight: '100vh', backgroundColor: '#111319' }}>
-      {subStatus?.pendingReceipt && (
+      {subStatus?.pendingReceipt && subStatus.pendingReceipt.status === 'PENDING' && (
         <div style={{
           backgroundColor: 'rgba(255, 179, 0, 0.08)',
           borderBottom: '1px solid rgba(255, 179, 0, 0.2)',
@@ -170,6 +151,42 @@ export default function TradesPage() {
             <strong>{subStatus.pendingReceipt.plan === 'STANDARD' ? 'استاندارد' : 'حرفه‌ای'}</strong> (دوره{' '}
             {subStatus.pendingReceipt.period === 'annual' ? 'سالانه' : 'ماهانه'}) ثبت شده و در حال بررسی توسط مدیریت است.
           </span>
+        </div>
+      )}
+
+      {subStatus?.pendingReceipt && subStatus.pendingReceipt.status === 'REJECTED' && dismissedRejectionId !== subStatus.pendingReceipt.id && (
+        <div style={{
+          backgroundColor: 'rgba(255, 83, 112, 0.08)',
+          borderBottom: '1px solid rgba(255, 83, 112, 0.2)',
+          color: '#ff5370',
+          padding: '12px 20px',
+          textAlign: 'center',
+          fontFamily: 'Vazirmatn',
+          fontSize: '0.9rem',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          gap: '10px'
+        }}>
+          <span className="material-symbols-outlined">cancel</span>
+          <span style={{ flex: 1, textAlign: 'right' }}>
+            آخرین فیش واریزی شما برای پلن{' '}
+            <strong>{subStatus.pendingReceipt.plan === 'STANDARD' ? 'استاندارد' : 'حرفه‌ای'}</strong>{' '}
+            توسط مدیریت رد شد.
+            {subStatus.pendingReceipt.rejectionReason && (
+              <>
+                <br />
+                <span style={{ color: '#a0aec0' }}>علت رد شدن: </span>
+                <strong style={{ color: '#f8fafc' }}>{subStatus.pendingReceipt.rejectionReason}</strong>
+              </>
+            )}
+          </span>
+          <button
+            onClick={() => setDismissedRejectionId(subStatus.pendingReceipt.id)}
+            style={{ background: 'none', border: 'none', color: '#ff5370', cursor: 'pointer', padding: 0 }}
+          >
+            <span className="material-symbols-outlined">close</span>
+          </button>
         </div>
       )}
 
@@ -225,14 +242,7 @@ export default function TradesPage() {
         onSuccess={handleImportSuccess}
         accounts={accounts}
       />
-      <ConfirmModal
-        isOpen={dialogConfig.isOpen}
-        title={dialogConfig.title}
-        message={dialogConfig.message}
-        type={dialogConfig.type}
-        confirmLabel={dialogConfig.confirmLabel}
-        onClose={() => setDialogConfig(prev => ({ ...prev, isOpen: false }))}
-      />
+
     </main>
   );
 }
