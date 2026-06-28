@@ -17,6 +17,7 @@ model User {
   password_hash    String
   name             String?
   plan             Plan             @default(FREE)
+  role             Role             @default(USER)
   created_at       DateTime         @default(now())
   display_currency DisplayCurrency  @default(USD)
   avatar_url       String?
@@ -30,6 +31,7 @@ model User {
   emotions         Emotion[]
   refresh_tokens   RefreshToken[]
   userDiscounts    UserDiscount[]
+  manualReceipts   ManualReceipt[]
 }
 
 model Account {
@@ -186,7 +188,40 @@ model UserDiscount {
   @@unique([user_id, discount_id])
 }
 
+model SystemSetting {
+  key        String   @id
+  value      Json
+  updated_at DateTime @updatedAt
+}
+
+model ManualReceipt {
+  id             String        @id @default(uuid())
+  user_id        String
+  user           User          @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  plan           Plan
+  period         String
+  amount         Int
+  discountCode   String?
+  receipt_image  String
+  status         ReceiptStatus @default(PENDING)
+  created_at     DateTime      @default(now())
+  updated_at     DateTime      @updatedAt
+
+  @@index([user_id])
+}
+
 // --- Enums ---
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum ReceiptStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
 
 enum Direction {
   BUY

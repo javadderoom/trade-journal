@@ -175,6 +175,29 @@ export default function DashboardPage() {
 
   return (
     <main className="dashboard-page">
+      {subStatus?.pendingReceipt && (
+        <div style={{
+          backgroundColor: 'rgba(255, 179, 0, 0.08)',
+          border: '1px solid rgba(255, 179, 0, 0.2)',
+          color: '#ffb300',
+          padding: '12px 20px',
+          borderRadius: '8px',
+          marginBottom: '20px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '10px',
+          fontSize: '0.9rem',
+          fontFamily: 'Vazirmatn'
+        }}>
+          <span className="material-symbols-outlined">pending_actions</span>
+          <span>
+            فیش پرداخت شما برای ارتقا به پلن{' '}
+            <strong>{subStatus.pendingReceipt.plan === 'STANDARD' ? 'استاندارد' : 'حرفه‌ای'}</strong> (دوره{' '}
+            {subStatus.pendingReceipt.period === 'annual' ? 'سالانه' : 'ماهانه'}) ثبت شده و در حال بررسی توسط مدیریت است.
+          </span>
+        </div>
+      )}
+
       {subStatus?.plan === 'FREE' && subStatus?.usage?.monthlyTrades >= 24 && (
         <div style={{
           backgroundColor: '#ffb300',

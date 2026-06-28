@@ -3,27 +3,71 @@ import { prisma } from '../services/tradeSync';
 import { authenticate, AuthRequest } from '../middleware/auth';
 import { requestPayment, verifyPayment } from '../services/zarinpal';
 import { Plan, SubscriptionStatus } from '@prisma/client';
+import multer from 'multer';
+import crypto from 'crypto';
+import path from 'path';
+import fs from 'fs';
+
+const receiptDir = path.join(__dirname, '../../uploads/receipts');
+if (!fs.existsSync(receiptDir)) {
+  fs.mkdirSync(receiptDir, { recursive: true });
+}
+
+const receiptStorage = multer.diskStorage({
+  destination: (_req, _file, cb) => cb(null, receiptDir),
+  filename: (_req, file, cb) => {
+    const ext = path.extname(file.originalname);
+    cb(null, `${crypto.randomUUID()}${ext}`);
+  },
+});
+
+const receiptUpload = multer({
+  storage: receiptStorage,
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
+  fileFilter: (_req, file, cb) => {
+    const allowed = /jpeg|jpg|png/;
+    const mimetype = allowed.test(file.mimetype);
+    const extname = allowed.test(path.extname(file.originalname).toLowerCase());
+    if (mimetype && extname) return cb(null, true);
+    cb(new Error('Only JPG/PNG images are allowed'));
+  },
+});
 
 const router = Router();
 
-// Price configuration in Tomans
-export const PLAN_PRICES: Record<Exclude<Plan, 'FREE'>, Record<'monthly' | 'annual', number>> = {
+// Price configuration in Tomans (Fallback defaults)
+export const DEFAULT_PRICES = {
   STANDARD: {
     monthly: 249000,
     annual: 2390000,   // discounted (20%)
   },
   PRO: {
     monthly: 499000,
-    annual: 4790000,   // discounted
+    annual: 4790000,   // discounted (20%)
   },
 };
+
+export async function getPlanPrices() {
+  try {
+    const setting = await prisma.systemSetting.findUnique({
+      where: { key: 'PRICING_PLANS' },
+    });
+    if (setting && setting.value) {
+      return setting.value as typeof DEFAULT_PRICES;
+    }
+  } catch (err) {
+    console.error('Error fetching dynamic prices:', err);
+  }
+  return DEFAULT_PRICES;
+}
 
 /**
  * GET /api/payments/prices
  * Retrieve standard and pro subscription pricing packages
  */
 router.get('/prices', async (req, res) => {
-  return res.status(200).json(PLAN_PRICES);
+  const prices = await getPlanPrices();
+  return res.status(200).json(prices);
 });
 
 /**
@@ -74,7 +118,8 @@ router.post('/discount/validate', authenticate, async (req: AuthRequest, res: Re
       }
     }
 
-    const originalPrice = PLAN_PRICES[plan as Exclude<Plan, 'FREE'>][period as 'monthly' | 'annual'];
+    const prices = await getPlanPrices();
+    const originalPrice = prices[plan as Exclude<Plan, 'FREE'>][period as 'monthly' | 'annual'];
     const discountedPrice = Math.round(originalPrice * (1 - codeRecord.discountPercent / 100));
 
     return res.status(200).json({
@@ -148,7 +193,8 @@ router.post('/checkout', authenticate, async (req: AuthRequest, res: Response) =
       }
     }
 
-    let price = PLAN_PRICES[plan as Exclude<Plan, 'FREE'>][period as 'monthly' | 'annual'];
+    const prices = await getPlanPrices();
+    let price = prices[plan as Exclude<Plan, 'FREE'>][period as 'monthly' | 'annual'];
     if (discountPercent > 0) {
       price = Math.round(price * (1 - discountPercent / 100));
     }
@@ -280,6 +326,94 @@ router.post('/verify', authenticate, async (req: AuthRequest, res: Response) => 
 });
 
 /**
+ * POST /api/payments/receipt
+ * Submit manual card-to-card payment receipt screenshot
+ */
+router.post(
+  '/receipt',
+  authenticate,
+  receiptUpload.single('receipt'),
+  async (req: AuthRequest, res: Response) => {
+    try {
+      const userId = req.user!.userId;
+      const { plan, period, discountCode } = req.body;
+
+      if (!plan || !['STANDARD', 'PRO'].includes(plan)) {
+        return res.status(400).json({ error: 'پلن انتخابی معتبر نیست' });
+      }
+
+      if (!period || !['monthly', 'annual'].includes(period)) {
+        return res.status(400).json({ error: 'دوره زمانی معتبر نیست' });
+      }
+
+      if (!req.file) {
+        return res.status(400).json({ error: 'فایل فیش پرداخت ارسال نشده است' });
+      }
+
+      // Check if user already has a PENDING receipt
+      const existingPending = await prisma.manualReceipt.findFirst({
+        where: { user_id: userId, status: 'PENDING' },
+      });
+      if (existingPending) {
+        return res.status(400).json({ error: 'شما در حال حاضر یک فیش در حال بررسی دارید' });
+      }
+
+      // Compute total payable amount (incorporating dynamic discount)
+      const prices = await getPlanPrices();
+      let amount = prices[plan as 'STANDARD' | 'PRO'][period as 'monthly' | 'annual'];
+
+      if (discountCode) {
+        const codeClean = String(discountCode).trim().toUpperCase();
+        const coupon = await prisma.discountCode.findUnique({
+          where: { code: codeClean },
+          include: { userDiscounts: { where: { user_id: userId } } },
+        });
+
+        if (coupon) {
+          const hasUsed = coupon.userDiscounts.length > 0;
+          const isExpired = new Date(coupon.expireDate).getTime() < Date.now();
+          const isLimitReached = coupon.usedCount >= coupon.maxUses;
+
+          let validCoupon = false;
+          if (hasUsed && coupon.isAccountBound) {
+            validCoupon = true;
+          } else if (!hasUsed && !isExpired && !isLimitReached) {
+            validCoupon = true;
+          }
+
+          if (validCoupon) {
+            amount = Math.round(amount * (1 - coupon.discountPercent / 100));
+          }
+        }
+      }
+
+      // File path logic: e.g. /uploads/receipts/filename.png
+      const receiptUrl = `/uploads/receipts/${req.file.filename}`;
+
+      const receipt = await prisma.manualReceipt.create({
+        data: {
+          user_id: userId,
+          plan: plan as Plan,
+          period,
+          amount,
+          discountCode: discountCode || null,
+          receipt_image: receiptUrl,
+          status: 'PENDING',
+        },
+      });
+
+      return res.status(201).json({
+        message: 'فیش پرداخت با موفقیت ثبت شد و در حال بررسی توسط مدیریت است.',
+        receipt,
+      });
+    } catch (err: any) {
+      console.error('Submit receipt error:', err);
+      return res.status(500).json({ error: 'خطا در ثبت فیش پرداخت' });
+    }
+  }
+);
+
+/**
  * GET /api/payments/status
  * Get subscription information, metrics, and plan limits
  */
@@ -320,6 +454,11 @@ router.get('/status', authenticate, async (req: AuthRequest, res: Response) => {
       where: { user_id: userId },
     });
 
+    const pendingReceipt = await prisma.manualReceipt.findFirst({
+      where: { user_id: userId, status: 'PENDING' },
+      orderBy: { created_at: 'desc' },
+    });
+
     return res.status(200).json({
       plan: user.plan,
       subscription: activeSubscription
@@ -334,6 +473,16 @@ router.get('/status', authenticate, async (req: AuthRequest, res: Response) => {
         monthlyTrades: monthlyTradeCount,
         accounts: accountCount,
       },
+      pendingReceipt: pendingReceipt
+        ? {
+            id: pendingReceipt.id,
+            plan: pendingReceipt.plan,
+            period: pendingReceipt.period,
+            amount: pendingReceipt.amount,
+            status: pendingReceipt.status,
+            created_at: pendingReceipt.created_at,
+          }
+        : null,
     });
   } catch (err: any) {
     console.error('Get payment status error:', err);

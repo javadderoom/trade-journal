@@ -148,9 +148,31 @@ export default function TradesPage() {
       </div>
     );
   }
-
   return (
     <main style={{ minHeight: '100vh', backgroundColor: '#111319' }}>
+      {subStatus?.pendingReceipt && (
+        <div style={{
+          backgroundColor: 'rgba(255, 179, 0, 0.08)',
+          borderBottom: '1px solid rgba(255, 179, 0, 0.2)',
+          color: '#ffb300',
+          padding: '12px 20px',
+          textAlign: 'center',
+          fontFamily: 'Vazirmatn',
+          fontSize: '0.9rem',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          gap: '10px'
+        }}>
+          <span className="material-symbols-outlined">pending_actions</span>
+          <span>
+            فیش پرداخت شما برای ارتقا به پلن{' '}
+            <strong>{subStatus.pendingReceipt.plan === 'STANDARD' ? 'استاندارد' : 'حرفه‌ای'}</strong> (دوره{' '}
+            {subStatus.pendingReceipt.period === 'annual' ? 'سالانه' : 'ماهانه'}) ثبت شده و در حال بررسی توسط مدیریت است.
+          </span>
+        </div>
+      )}
+
       {subStatus?.plan === 'FREE' && subStatus?.usage?.monthlyTrades >= 24 && (
         <div style={{
           backgroundColor: '#ffb300',

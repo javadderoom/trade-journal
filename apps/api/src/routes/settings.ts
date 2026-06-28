@@ -317,6 +317,11 @@ router.get('/subscription', authenticate, async (req: AuthRequest, res: Response
       orderBy: { created_at: 'desc' },
     });
 
+    const pendingReceipt = await prisma.manualReceipt.findFirst({
+      where: { user_id: userId, status: 'PENDING' },
+      orderBy: { created_at: 'desc' },
+    });
+
     return res.json({
       plan: user!.plan,
       subscription: subscription
@@ -326,11 +331,21 @@ router.get('/subscription', authenticate, async (req: AuthRequest, res: Response
             status: subscription.status,
           }
         : null,
+      pendingReceipt: pendingReceipt
+        ? {
+            id: pendingReceipt.id,
+            plan: pendingReceipt.plan,
+            period: pendingReceipt.period,
+            amount: pendingReceipt.amount,
+            status: pendingReceipt.status,
+            created_at: pendingReceipt.created_at,
+          }
+        : null,
       // Plan pricing info for display
       pricing: {
         FREE: { monthly: 0, annual: 0 },
-        STANDARD: { monthly: 150000, annual: 1440000 },
-        PRO: { monthly: 350000, annual: 3360000 },
+        STANDARD: { monthly: 249000, annual: 2390000 },
+        PRO: { monthly: 499000, annual: 4790000 },
       },
     });
   } catch (err: any) {

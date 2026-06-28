@@ -82,6 +82,7 @@ export default function SettingsPage() {
   const [avatarUploading, setAvatarUploading] = useState(false);
   const [checkoutLoading, setCheckoutLoading] = useState(false);
   const [prices, setPrices] = useState<any>(null);
+  const [receiptFile, setReceiptFile] = useState<File | null>(null);
 
   const activePrices = prices || DEFAULT_PRICES;
   const standardMonthlyPrice = activePrices.STANDARD.monthly.toLocaleString('fa-IR');
@@ -281,22 +282,37 @@ export default function SettingsPage() {
     }
   };
 
-  const handleCheckout = async (targetPlan: string, period: string, code?: string) => {
+  const handleSubmitReceipt = async () => {
+    if (!checkoutTarget) return;
+    if (!receiptFile) {
+      showToast('لطفاً تصویر فیش واریزی را انتخاب کنید', 'error');
+      return;
+    }
     setCheckoutLoading(true);
     try {
-      const res = await api.post('/api/payments/checkout', {
-        plan: targetPlan,
-        period,
-        discountCode: code || undefined,
-      });
-      if (res.data.redirectUrl) {
-        window.location.href = res.data.redirectUrl;
-      } else {
-        showToast('خطا در دریافت لینک درگاه پرداخت', 'error');
+      const formData = new FormData();
+      formData.append('plan', checkoutTarget.plan);
+      formData.append('period', checkoutTarget.period);
+      if (discountCode) {
+        formData.append('discountCode', discountCode);
       }
+      formData.append('receipt', receiptFile);
+
+      const res = await api.post('/api/payments/receipt', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
+      showToast(res.data.message || 'فیش با موفقیت ثبت شد');
+      setCheckoutTarget(null);
+      setReceiptFile(null);
+      setDiscountCode('');
+      setDiscountDetails(null);
+      fetchSubscription();
     } catch (err: any) {
-      console.error('Checkout error:', err);
-      showToast(err.response?.data?.error || 'خطا در اتصال به درگاه پرداخت', 'error');
+      console.error('Submit receipt error:', err);
+      showToast(err.response?.data?.error || 'خطا در ثبت فیش پرداخت', 'error');
     } finally {
       setCheckoutLoading(false);
     }
@@ -637,6 +653,17 @@ export default function SettingsPage() {
               )}
             </div>
 
+            {subscription.pendingReceipt && (
+              <div className="plan-limit-banner" style={{ marginTop: '16px', background: 'rgba(255, 179, 0, 0.08)', border: '1px solid rgba(255, 179, 0, 0.2)', color: '#ffb300', padding: '12px 16px', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <span className="material-symbols-outlined">pending_actions</span>
+                <span style={{ fontSize: '0.85rem' }}>
+                  فیش پرداخت شما برای ارتقا به پلن{' '}
+                  <strong>{subscription.pendingReceipt.plan === 'STANDARD' ? 'استاندارد' : 'حرفه‌ای'}</strong> (دوره{' '}
+                  {subscription.pendingReceipt.period === 'annual' ? 'سالانه' : 'ماهانه'}) ثبت شده و در حال بررسی توسط مدیریت است.
+                </span>
+              </div>
+            )}
+
             {/* Pricing Packages Selection */}
             {subscription.plan !== 'PRO' && (
               <>
@@ -833,15 +860,63 @@ export default function SettingsPage() {
                       {discountError && <span className="discount-error-msg">{discountError}</span>}
                       {discountDetails && <span className="discount-success-msg">کد تخفیف با موفقیت اعمال شد.</span>}
                     </div>
+
+                    <div className="card-payment-instructions" style={{ marginTop: '10px', background: 'rgba(255, 255, 255, 0.02)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '8px', padding: '12px' }}>
+                      <h5 style={{ margin: '0 0 10px 0', fontSize: '0.88rem', color: '#ffb300' }}>مشخصات واریز کارت به کارت:</h5>
+                      <div className="instruction-row" style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.82rem', marginBottom: '6px', color: '#a0aec0' }}>
+                        <span>شماره کارت:</span>
+                        <strong style={{ direction: 'ltr', color: '#ffffff' }}>۶۰۳۷-۹۹۷۹-۱۲۳۴-۵۶۷۸</strong>
+                      </div>
+                      <div className="instruction-row" style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.82rem', marginBottom: '6px', color: '#a0aec0' }}>
+                        <span>بانک:</span>
+                        <span style={{ color: '#ffffff' }}>ملی ایران</span>
+                      </div>
+                      <div className="instruction-row" style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.82rem', color: '#a0aec0' }}>
+                        <span>به نام:</span>
+                        <span style={{ color: '#ffffff' }}>جواد احمدی</span>
+                      </div>
+                    </div>
+
+                    <div className="receipt-upload-section" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                      <label style={{ fontSize: '0.8rem', color: '#a0aec0', fontWeight: '500' }}>بارگذاری تصویر فیش پرداخت (الزامی)</label>
+                      <input 
+                        type="file" 
+                        id="receipt-file-input"
+                        accept="image/png, image/jpeg, image/jpg"
+                        onChange={(e) => {
+                          if (e.target.files && e.target.files[0]) {
+                            setReceiptFile(e.target.files[0]);
+                          }
+                        }}
+                        style={{ display: 'none' }}
+                      />
+                      <label htmlFor="receipt-file-input" style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '8px',
+                        padding: '12px',
+                        background: '#0f121d',
+                        border: '1px dashed rgba(255,255,255,0.2)',
+                        borderRadius: '8px',
+                        color: '#61f9b1',
+                        cursor: 'pointer',
+                        fontSize: '0.85rem',
+                        transition: 'border-color 0.2s'
+                      }}>
+                        <span className="material-symbols-outlined">upload_file</span>
+                        <span>{receiptFile ? receiptFile.name : 'انتخاب تصویر فیش (PNG, JPG)'}</span>
+                      </label>
+                    </div>
                   </div>
 
                   <div className="checkout-modal-footer">
                     <button
                       className="start-checkout-btn"
-                      disabled={checkoutLoading}
-                      onClick={() => handleCheckout(checkoutTarget.plan, checkoutTarget.period, discountCode)}
+                      disabled={checkoutLoading || !receiptFile}
+                      onClick={handleSubmitReceipt}
                     >
-                      {checkoutLoading ? 'در حال اتصال به درگاه...' : 'اتصال به درگاه پرداخت زرین‌پال'}
+                      {checkoutLoading ? 'در حال ثبت اطلاعات...' : 'ثبت فیش پرداخت'}
                     </button>
                   </div>
                 </div>

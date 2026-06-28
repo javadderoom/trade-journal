@@ -7,6 +7,7 @@ export interface AuthRequest extends Request {
     userId: string;
     email: string;
     plan: string;
+    role: string;
   };
   account?: {
     id: string;
@@ -35,6 +36,17 @@ export const authenticate = (
   } catch (err) {
     return res.status(401).json({ error: 'توکن نامعتبر یا منقضی شده است' });
   }
+};
+
+export const requireAdmin = (
+  req: AuthRequest,
+  res: Response,
+  next: NextFunction
+) => {
+  if (!req.user || req.user.role !== 'ADMIN') {
+    return res.status(403).json({ error: 'دسترسی غیرمجاز. فقط مدیران مجاز هستند.' });
+  }
+  next();
 };
 
 /**
@@ -91,6 +103,7 @@ export const authenticateAccountToken = async (
       userId: accountToken.account.user_id,
       email: '',
       plan: 'FREE',
+      role: 'USER',
     };
 
     next();

@@ -7,6 +7,7 @@ export interface User {
   email: string;
   phone?: string;
   plan: string;
+  role: string;
 }
 
 interface AuthState {

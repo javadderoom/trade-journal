@@ -20,11 +20,14 @@ export default function SideNavBar() {
   const navItems = [
     { href: '/dashboard', label: 'داشبورد', icon: 'dashboard' },
     { href: '/trades', label: 'معاملات', icon: 'analytics', fillIcon: true },
-
     { href: '/analytics', label: 'گزارش عملکرد', icon: 'bar_chart' },
     { href: '/journal', label: 'ژورنال', icon: 'sticky_note_2' },
     { href: '/settings', label: 'تنظیمات', icon: 'settings' },
   ];
+
+  if (user?.role === 'ADMIN') {
+    navItems.push({ href: '/admin', label: 'پنل مدیریت', icon: 'admin_panel_settings' });
+  }
 
   return (
     <nav className="sidenav-container">

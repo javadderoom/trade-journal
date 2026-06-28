@@ -64,6 +64,7 @@ router.post('/register', async (req: Request, res: Response) => {
       userId: user.id,
       email: user.email,
       plan: user.plan,
+      role: user.role,
     });
     const refreshToken = generateRefreshToken();
 
@@ -82,7 +83,7 @@ router.post('/register', async (req: Request, res: Response) => {
 
     return res.status(201).json({
       accessToken,
-      user: { id: user.id, name: user.name, email: user.email, plan: user.plan },
+      user: { id: user.id, name: user.name, email: user.email, plan: user.plan, role: user.role },
     });
   } catch (err: any) {
     console.error('Register error:', err);
@@ -114,6 +115,7 @@ router.post('/login', async (req: Request, res: Response) => {
       userId: user.id,
       email: user.email,
       plan: user.plan,
+      role: user.role,
     });
     const refreshToken = generateRefreshToken();
 
@@ -132,7 +134,7 @@ router.post('/login', async (req: Request, res: Response) => {
 
     return res.json({
       accessToken,
-      user: { id: user.id, name: user.name, email: user.email, plan: user.plan },
+      user: { id: user.id, name: user.name, email: user.email, plan: user.plan, role: user.role },
     });
   } catch (err: any) {
     console.error('Login error:', err);
@@ -181,6 +183,7 @@ router.post('/refresh', async (req: Request, res: Response) => {
       userId: stored.user.id,
       email: stored.user.email,
       plan: stored.user.plan,
+      role: stored.user.role,
     });
 
     setRefreshCookie(res, newRefreshToken);
@@ -192,6 +195,7 @@ router.post('/refresh', async (req: Request, res: Response) => {
         name: stored.user.name,
         email: stored.user.email,
         plan: stored.user.plan,
+        role: stored.user.role,
       },
     });
   } catch (err: any) {
@@ -224,7 +228,7 @@ router.get('/me', authenticate, async (req: AuthRequest, res: Response) => {
   try {
     const user = await prisma.user.findUnique({
       where: { id: req.user!.userId },
-      select: { id: true, name: true, email: true, phone: true, plan: true, created_at: true },
+      select: { id: true, name: true, email: true, phone: true, plan: true, role: true, created_at: true },
     });
     if (!user) return res.status(404).json({ error: 'کاربر یافت نشد' });
     return res.json({ user });

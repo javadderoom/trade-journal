@@ -128,12 +128,7 @@ export default function LandingPage() {
   const user = useAuthStore((s) => s.user);
   const isInitialized = useAuthStore((s) => s.isInitialized);
 
-  // Logged-in users skip the landing and go straight to the app
-  useEffect(() => {
-    if (isInitialized && user) {
-      router.replace('/dashboard');
-    }
-  }, [isInitialized, user, router]);
+  // Landing page configuration
 
   const [navScrolled, setNavScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);

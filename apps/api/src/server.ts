@@ -11,6 +11,7 @@ import journalRouter from './routes/journal';
 import dashboardRouter from './routes/dashboard';
 import settingsRouter from './routes/settings';
 import paymentsRouter from './routes/payments';
+import adminRouter from './routes/admin';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -46,6 +47,7 @@ app.use('/api/journal', journalRouter);
 app.use('/api/dashboard', dashboardRouter);
 app.use('/api/settings', settingsRouter);
 app.use('/api/payments', paymentsRouter);
+app.use('/api/admin', adminRouter);
 
 // Health check
 app.get('/api/health', (_req, res) => {
