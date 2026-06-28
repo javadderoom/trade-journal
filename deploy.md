@@ -101,7 +101,7 @@ Coolify offers one-click database services.
    * **Application Port:** `3000`
    * **Base Directory:** `/` (must be the root directory to access root workspace packages).
    * **Dockerfile Path:** `apps/api/Dockerfile`
-   * **Domain:** Assign your subdomain (e.g. `https://api.yourdomain.com`). Coolify will auto-request Let's Encrypt SSL.
+   * **Domain:** Assign your subdomain (e.g. `https://api.tradekav.ir`). Coolify will auto-request Let's Encrypt SSL.
 
 5. Configure **Environment Variables**:
    Add the following variables under the **Environment Variables** tab:
