@@ -17,6 +17,7 @@
     "build": "concurrently \"npm run build:web\" \"npm run build:api\""
   },
   "devDependencies": {
+    "agentation": "^3.0.2",
     "concurrently": "^9.0.0",
     "typescript": "^6.0.3"
   },

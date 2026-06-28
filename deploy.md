@@ -134,6 +134,7 @@ Coolify offers one-click database services.
 
 5. Configure **Environment Variables**:
    * `NEXT_PUBLIC_API_URL` = `https://api.yourdomain.com` (your backend API endpoint).
+   * `NEXT_PUBLIC_API_BASE_URL` = `https://api.yourdomain.com` (required by the HTTP client wrapper).
    * `NEXT_PUBLIC_WEB_URL` = `https://yourdomain.com` (your frontend domain).
 
 6. Click **Deploy**.

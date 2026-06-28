@@ -753,7 +753,7 @@ export default function DetailPanel({
               
               <div className="screenshots-grid">
                 {activeTrade.screenshots && activeTrade.screenshots.map((url, idx) => {
-                  const fullUrl = url.startsWith('http') ? url : `${process.env.NEXT_PUBLIC_API_BASE_URL || 'http://127.0.0.1:3000'}${url}`;
+                  const fullUrl = url.startsWith('http') ? url : `${process.env.NEXT_PUBLIC_API_BASE_URL || process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:3000'}${url}`;
                   return (
                     <div key={idx} className="screenshot-card">
                       <img src={fullUrl} alt={`screenshot-${idx}`} onClick={() => setLightboxUrl(fullUrl)} />

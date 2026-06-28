@@ -6,6 +6,7 @@ import SideNavBar from './SideNavBar';
 import BottomNavBar from './BottomNavBar';
 import { useAuthStore } from '../../lib/auth';
 import Toaster from '../ui/Toaster';
+import { Agentation } from 'agentation';
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -134,11 +135,23 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
   // Public pages (landing) render full-bleed, no app chrome
   if (isLandingPage) {
-    return <><Toaster />{children}</>;
+    return (
+      <>
+        <Toaster />
+        {children}
+        {process.env.NODE_ENV === 'development' && <Agentation />}
+      </>
+    );
   }
 
   if (isAuthPage) {
-    return <div className="auth-wrapper"><Toaster />{children}</div>;
+    return (
+      <div className="auth-wrapper">
+        <Toaster />
+        {children}
+        {process.env.NODE_ENV === 'development' && <Agentation />}
+      </div>
+    );
   }
 
   return (
@@ -147,6 +160,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       <div className="main-content-wrapper">{children}</div>
       <BottomNavBar />
       <Toaster />
+      {process.env.NODE_ENV === 'development' && <Agentation />}
     </div>
   );
 }
