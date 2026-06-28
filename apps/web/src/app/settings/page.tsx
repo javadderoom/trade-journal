@@ -46,6 +46,17 @@ const BROKER_PRESETS = [
   'Amarkets', 'LiteFinance', 'Errante', 'Alpari', 'RoboForex', 'HFM', 'IC Markets', 'Pepperstone',
 ];
 
+const DEFAULT_PRICES = {
+  STANDARD: {
+    monthly: 249000,
+    annual: 2300000,
+  },
+  PRO: {
+    monthly: 499000,
+    annual: 4790000,
+  },
+};
+
 export default function SettingsPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -70,6 +81,51 @@ export default function SettingsPage() {
   const [profileDirty, setProfileDirty] = useState(false);
   const [avatarUploading, setAvatarUploading] = useState(false);
   const [checkoutLoading, setCheckoutLoading] = useState(false);
+  const [prices, setPrices] = useState<any>(null);
+
+  const activePrices = prices || DEFAULT_PRICES;
+  const standardMonthlyPrice = activePrices.STANDARD.monthly.toLocaleString('fa-IR');
+  const standardAnnualPrice = activePrices.STANDARD.annual.toLocaleString('fa-IR');
+  const proMonthlyPrice = activePrices.PRO.monthly.toLocaleString('fa-IR');
+  const proAnnualPrice = activePrices.PRO.annual.toLocaleString('fa-IR');
+
+  const standardDiscountPercent = Math.round((1 - activePrices.STANDARD.annual / (activePrices.STANDARD.monthly * 12)) * 100);
+  const proDiscountPercent = Math.round((1 - activePrices.PRO.annual / (activePrices.PRO.monthly * 12)) * 100);
+
+  // Checkout modal & discount states
+  const [checkoutTarget, setCheckoutTarget] = useState<{ plan: string; period: string } | null>(null);
+  const [discountCode, setDiscountCode] = useState('');
+  const [discountDetails, setDiscountDetails] = useState<{
+    valid: boolean;
+    discountPercent: number;
+    originalPrice: number;
+    discountedPrice: number;
+  } | null>(null);
+  const [discountError, setDiscountError] = useState('');
+  const [validatingDiscount, setValidatingDiscount] = useState(false);
+
+  const handleValidateDiscount = async (codeStr: string, plan: string, period: string) => {
+    if (!codeStr) {
+      setDiscountDetails(null);
+      setDiscountError('');
+      return;
+    }
+    setValidatingDiscount(true);
+    setDiscountError('');
+    try {
+      const res = await api.post('/api/payments/discount/validate', {
+        code: codeStr,
+        plan,
+        period,
+      });
+      setDiscountDetails(res.data);
+    } catch (err: any) {
+      setDiscountDetails(null);
+      setDiscountError(err.response?.data?.error || 'کد تخفیف معتبر نیست');
+    } finally {
+      setValidatingDiscount(false);
+    }
+  };
 
   // ─── Accounts state ──────────────────────────────────────────────────────
   const [accounts, setAccounts] = useState<BrokerAccount[]>([]);
@@ -132,6 +188,18 @@ export default function SettingsPage() {
   }, []);
 
   useEffect(() => { fetchSubscription(); }, [fetchSubscription]);
+
+  // ─── Fetch prices ─────────────────────────────────────────────────────────
+  const fetchPrices = useCallback(async () => {
+    try {
+      const res = await api.get('/api/payments/prices');
+      setPrices(res.data);
+    } catch (err) {
+      console.error('Failed to fetch prices:', err);
+    }
+  }, []);
+
+  useEffect(() => { fetchPrices(); }, [fetchPrices]);
 
   // ─── Fetch sessions ──────────────────────────────────────────────────────
   const fetchSessions = useCallback(async () => {
@@ -213,12 +281,13 @@ export default function SettingsPage() {
     }
   };
 
-  const handleCheckout = async (targetPlan: string, period: string) => {
+  const handleCheckout = async (targetPlan: string, period: string, code?: string) => {
     setCheckoutLoading(true);
     try {
       const res = await api.post('/api/payments/checkout', {
         plan: targetPlan,
         period,
+        discountCode: code || undefined,
       });
       if (res.data.redirectUrl) {
         window.location.href = res.data.redirectUrl;
@@ -580,42 +649,30 @@ export default function SettingsPage() {
                         <span className="plan-title">پلن استاندارد</span>
                         <span className="plan-badge-tag">محبوب‌ترین</span>
                       </div>
-                      <p className="plan-upgrade-desc">دسترسی به ۳ حساب معاملاتی، واردات نامحدود فایل‌های MT4/MT5 و همگام‌سازی EA.</p>
+                      <p className="plan-upgrade-desc">دسترسی به ۳ حساب معاملاتی، واردات فایل‌های MT4/MT5 (تا ۱۵۰ معامله در هر فایل) و همگام‌سازی خودکار EA هر ۱ ساعت.</p>
                       <div className="plan-upgrade-periods">
                         <div className="period-checkout-row">
                           <span className="period-name">۱ ماهه</span>
-                          <button 
-                            className="period-price-btn" 
+                          <button
+                            className="period-price-btn"
                             disabled={checkoutLoading}
-                            onClick={() => handleCheckout('STANDARD', 'monthly')}
+                            onClick={() => setCheckoutTarget({ plan: 'STANDARD', period: 'monthly' })}
                           >
-                            ۱۵۰٬۰۰۰ تومان
-                          </button>
-                        </div>
-                        <div className="period-checkout-row">
-                          <span className="period-name">
-                            ۴ ماهه
-                            <span className="period-discount">۱۶٪ تخفیف</span>
-                          </span>
-                          <button 
-                            className="period-price-btn" 
-                            disabled={checkoutLoading}
-                            onClick={() => handleCheckout('STANDARD', '4-month')}
-                          >
-                            ۵۰۰٬۰۰۰ تومان
+                            {standardMonthlyPrice} تومان
                           </button>
                         </div>
                         <div className="period-checkout-row">
                           <span className="period-name">
                             سالانه
-                            <span className="period-discount">۲۰٪ تخفیف</span>
+
+                            <span className="period-discount">۳۳٪ تخفیف</span>
                           </span>
-                          <button 
-                            className="period-price-btn" 
+                          <button
+                            className="period-price-btn"
                             disabled={checkoutLoading}
-                            onClick={() => handleCheckout('STANDARD', 'annual')}
+                            onClick={() => setCheckoutTarget({ plan: 'STANDARD', period: 'annual' })}
                           >
-                            ۱٬۴۴۰٬۰۰۰ تومان
+                            {standardAnnualPrice} تومان
                           </button>
                         </div>
                       </div>
@@ -627,42 +684,29 @@ export default function SettingsPage() {
                     <div className="plan-upgrade-header">
                       <span className="plan-title">پلن حرفه‌ای</span>
                     </div>
-                    <p className="plan-upgrade-desc">دسترسی به حساب‌های نامحدود، گزارش عملکرد کامل و دسترسی مستقیم به API (بزودی).</p>
+                    <p className="plan-upgrade-desc">حساب‌های نامحدود، همگام‌سازی ۶۰ ثانیه‌ای EA، گزارش عملکرد نامحدود، پشتیبانی ویژه و خروجی کامل داده‌ها.</p>
                     <div className="plan-upgrade-periods">
                       <div className="period-checkout-row">
                         <span className="period-name">۱ ماهه</span>
-                        <button 
-                          className="period-price-btn" 
+                        <button
+                          className="period-price-btn"
                           disabled={checkoutLoading}
-                          onClick={() => handleCheckout('PRO', 'monthly')}
+                          onClick={() => setCheckoutTarget({ plan: 'PRO', period: 'monthly' })}
                         >
-                          ۳۵۰٬۰۰۰ تومان
-                        </button>
-                      </div>
-                      <div className="period-checkout-row">
-                        <span className="period-name">
-                          ۴ ماهه
-                          <span className="period-discount">۱۴٪ تخفیف</span>
-                        </span>
-                        <button 
-                          className="period-price-btn" 
-                          disabled={checkoutLoading}
-                          onClick={() => handleCheckout('PRO', '4-month')}
-                        >
-                          ۱٬۲۰۰٬۰۰۰ تومان
+                          {proMonthlyPrice} تومان
                         </button>
                       </div>
                       <div className="period-checkout-row">
                         <span className="period-name">
                           سالانه
-                          <span className="period-discount">۲۰٪ تخفیف</span>
+                          <span className="period-discount">{toPersianDigits(proDiscountPercent)}٪ تخفیف</span>
                         </span>
-                        <button 
-                          className="period-price-btn" 
+                        <button
+                          className="period-price-btn"
                           disabled={checkoutLoading}
-                          onClick={() => handleCheckout('PRO', 'annual')}
+                          onClick={() => setCheckoutTarget({ plan: 'PRO', period: 'annual' })}
                         >
-                          ۳٬۳۶۰٬۰۰۰ تومان
+                          {proAnnualPrice} تومان
                         </button>
                       </div>
                     </div>
@@ -684,42 +728,125 @@ export default function SettingsPage() {
                 </thead>
                 <tbody>
                   <tr>
-                    <td>معاملات</td>
-                    <td>۵۰/ماه</td><td>نامحدود</td><td>نامحدود</td>
+                    <td>سقف ثبت معامله دستی</td>
+                    <td>۳۰ در ماه</td><td>نامحدود</td><td>نامحدود</td>
                   </tr>
                   <tr>
-                    <td>حساب بروکر</td>
-                    <td>۱</td><td>۳</td><td>نامحدود</td>
+                    <td>حساب بروکر مجاز</td>
+                    <td>۱ حساب</td><td>۳ حساب</td><td>نامحدود</td>
                   </tr>
                   <tr>
-                    <td>واردات MT4/MT5</td>
-                    <td>✗</td><td>✓</td><td>✓</td>
+                    <td>بازه زمانی محاسبات</td>
+                    <td>۱ ماه گذشته</td><td>۶ ماه گذشته</td><td>نامحدود (کل تاریخچه)</td>
                   </tr>
                   <tr>
-                    <td>گزارش عملکرد</td>
-                    <td>محدود</td><td>کامل</td><td>کامل</td>
+                    <td>همگام‌سازی خودکار EA</td>
+                    <td>✗</td><td>هر ۱ ساعت</td><td>هر ۶۰ ثانیه</td>
+                  </tr>
+                  <tr>
+                    <td>واردات فایل MT4/MT5</td>
+                    <td>۱ فایل در ماه (تست)</td><td>✓ (تا ۱۵۰ ردیف)</td><td>✓ (نامحدود)</td>
+                  </tr>
+                  <tr>
+                    <td>خروجی داده‌ها (Excel/CSV)</td>
+                    <td>✗</td><td>✗</td><td>✓</td>
+                  </tr>
+                  <tr>
+                    <td>پشتیبانی کاربران</td>
+                    <td>✗</td><td>عادی (ایمیل)</td><td>ویژه (Priority)</td>
                   </tr>
                   <tr>
                     <td>قیمت ماهانه</td>
                     <td>رایگان</td>
-                    <td>۱۵۰٬۰۰۰ ت</td>
-                    <td>۳۵۰٬۰۰۰ ت</td>
-                  </tr>
-                  <tr>
-                    <td>قیمت ۴ ماهه</td>
-                    <td>-</td>
-                    <td>۵۰۰٬۰۰۰ ت</td>
-                    <td>۱٬۲۰۰٬۰۰۰ ت</td>
+                    <td>{standardMonthlyPrice} ت</td>
+                    <td>{proMonthlyPrice} ت</td>
                   </tr>
                   <tr>
                     <td>قیمت سالانه</td>
                     <td>-</td>
-                    <td>۱٬۴۴۰٬۰۰۰ ت</td>
-                    <td>۳٬۳۶۰٬۰۰۰ ت</td>
+                    <td>{standardAnnualPrice} ت</td>
+                    <td>{proAnnualPrice} ت</td>
                   </tr>
                 </tbody>
               </table>
             </div>
+
+            {/* Checkout Discount Modal */}
+            {checkoutTarget && (
+              <div className="checkout-modal-overlay">
+                <div className="checkout-modal-card">
+                  <div className="checkout-modal-header">
+                    <h4>
+                      خرید پلن {checkoutTarget.plan === 'STANDARD' ? 'استاندارد' : 'حرفه‌ای'} - {checkoutTarget.period === 'monthly' ? 'ماهانه' : 'سالانه'}
+                    </h4>
+                    <button className="close-modal-btn" onClick={() => {
+                      setCheckoutTarget(null);
+                      setDiscountCode('');
+                      setDiscountDetails(null);
+                      setDiscountError('');
+                    }}>
+                      <span className="material-symbols-outlined">close</span>
+                    </button>
+                  </div>
+
+                  <div className="checkout-modal-body">
+                    <div className="price-details-section">
+                      <div className="price-row">
+                        <span>مبلغ پایه:</span>
+                        <span className={discountDetails ? 'original-price-crossed' : 'final-price'}>
+                          {activePrices[checkoutTarget.plan as 'STANDARD' | 'PRO'][checkoutTarget.period as 'monthly' | 'annual'].toLocaleString('fa-IR')} تومان
+                        </span>
+                      </div>
+                      {discountDetails && (
+                        <div className="price-row discount-applied">
+                          <span>مبلغ با تخفیف ({toPersianDigits(discountDetails.discountPercent)}٪):</span>
+                          <span className="final-price">
+                            {discountDetails.discountedPrice.toLocaleString('fa-IR')} تومان
+                          </span>
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="discount-input-section">
+                      <label>کد تخفیف (اختیاری)</label>
+                      <div className="discount-input-wrap">
+                        <input
+                          type="text"
+                          value={discountCode}
+                          onChange={(e) => {
+                            setDiscountCode(e.target.value);
+                            setDiscountError('');
+                            setDiscountDetails(null);
+                          }}
+                          placeholder="مثال: OFF50"
+                          style={{ direction: 'ltr', textAlign: 'center' }}
+                        />
+                        <button
+                          type="button"
+                          className="discount-apply-btn"
+                          disabled={validatingDiscount || !discountCode}
+                          onClick={() => handleValidateDiscount(discountCode, checkoutTarget.plan, checkoutTarget.period)}
+                        >
+                          {validatingDiscount ? 'بررسی...' : 'اعمال'}
+                        </button>
+                      </div>
+                      {discountError && <span className="discount-error-msg">{discountError}</span>}
+                      {discountDetails && <span className="discount-success-msg">کد تخفیف با موفقیت اعمال شد.</span>}
+                    </div>
+                  </div>
+
+                  <div className="checkout-modal-footer">
+                    <button
+                      className="start-checkout-btn"
+                      disabled={checkoutLoading}
+                      onClick={() => handleCheckout(checkoutTarget.plan, checkoutTarget.period, discountCode)}
+                    >
+                      {checkoutLoading ? 'در حال اتصال به درگاه...' : 'اتصال به درگاه پرداخت زرین‌پال'}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
           </section>
         )}
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '../lib/auth';
 import { toPersianDigits } from '../utils/farsi';
@@ -138,6 +138,49 @@ export default function LandingPage() {
   const [navScrolled, setNavScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [openFaq, setOpenFaq] = useState<number | null>(0);
+  const [prices, setPrices] = useState<any>(null);
+
+  useEffect(() => {
+    fetch('/api/payments/prices')
+      .then(r => r.json())
+      .then(data => setPrices(data))
+      .catch(e => console.error('Failed to fetch pricing:', e));
+  }, []);
+
+  const plans = useMemo(() => {
+    const standardMonthly = prices ? prices.STANDARD.monthly.toLocaleString('fa-IR') : '۲۴۹٬۰۰۰';
+    const proMonthly = prices ? prices.PRO.monthly.toLocaleString('fa-IR') : '۴۹۹٬۰۰۰';
+
+    return [
+      {
+        name: 'رایگان',
+        price: '۰',
+        unit: 'تومان',
+        note: 'مناسب شروع',
+        features: ['۱ حساب بروکر', 'ثبت ۳۰ معامله در ماه', 'بازه زمانی ۱ ماهه محاسبات', 'ژورنال روزانه'],
+        cta: 'شروع رایگان',
+        featured: false,
+      },
+      {
+        name: 'استاندارد',
+        price: standardMonthly,
+        unit: 'تومان / ماه',
+        note: 'محبوب‌ترین',
+        features: ['۳ حساب بروکر', 'واردات فایل (تا ۱۵۰ ردیف)', 'بازه ۶ ماهه محاسبات', 'همگام‌سازی EA (هر ۱ ساعت)'],
+        cta: 'انتخاب استاندارد',
+        featured: true,
+      },
+      {
+        name: 'حرفه‌ای',
+        price: proMonthly,
+        unit: 'تومان / ماه',
+        note: 'برای حرفه‌ای‌ها',
+        features: ['حساب نامحدود', 'همگام‌سازی ۶۰ ثانیه‌ای EA', 'کل تاریخچه محاسبات (نامحدود)', 'خروجی داده‌ها و پشتیبانی ویژه'],
+        cta: 'انتخاب حرفه‌ای',
+        featured: false,
+      },
+    ];
+  }, [prices]);
 
   useEffect(() => {
     const onScroll = () => setNavScrolled(window.scrollY > 24);
@@ -369,7 +412,7 @@ export default function LandingPage() {
           <p className="section-sub">پرداخت به تومان، بدون کارت بانکی بین‌المللی.</p>
         </div>
         <div className="pricing-grid">
-          {PLANS.map((plan) => (
+          {plans.map((plan) => (
             <div className={`price-card ${plan.featured ? 'featured' : ''}`} key={plan.name}>
               {plan.featured && <span className="price-badge">محبوب‌ترین</span>}
               <h3 className="price-name">{plan.name}</h3>

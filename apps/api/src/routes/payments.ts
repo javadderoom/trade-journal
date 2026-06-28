@@ -7,18 +7,87 @@ import { Plan, SubscriptionStatus } from '@prisma/client';
 const router = Router();
 
 // Price configuration in Tomans
-export const PLAN_PRICES: Record<Exclude<Plan, 'FREE'>, Record<'monthly' | '4-month' | 'annual', number>> = {
+export const PLAN_PRICES: Record<Exclude<Plan, 'FREE'>, Record<'monthly' | 'annual', number>> = {
   STANDARD: {
-    monthly: 150000,
-    '4-month': 500000, // discounted
-    annual: 1440000,   // discounted
+    monthly: 249000,
+    annual: 2390000,   // discounted (20%)
   },
   PRO: {
-    monthly: 350000,
-    '4-month': 1200000, // discounted
-    annual: 3360000,    // discounted
+    monthly: 499000,
+    annual: 4790000,   // discounted
   },
 };
+
+/**
+ * GET /api/payments/prices
+ * Retrieve standard and pro subscription pricing packages
+ */
+router.get('/prices', async (req, res) => {
+  return res.status(200).json(PLAN_PRICES);
+});
+
+/**
+ * POST /api/payments/discount/validate
+ * Check if a discount code is valid for the authenticated user and return details
+ */
+router.post('/discount/validate', authenticate, async (req: AuthRequest, res: Response) => {
+  try {
+    const userId = req.user!.userId;
+    const { code, plan, period } = req.body;
+
+    if (!code || !plan || !period) {
+      return res.status(400).json({ error: 'اطلاعات ارسالی کامل نیست' });
+    }
+
+    if (!['STANDARD', 'PRO'].includes(plan)) {
+      return res.status(400).json({ error: 'پلن انتخابی معتبر نیست' });
+    }
+
+    if (!['monthly', 'annual'].includes(period)) {
+      return res.status(400).json({ error: 'دوره زمانی معتبر نیست' });
+    }
+
+    const codeClean = String(code).trim().toUpperCase();
+    const codeRecord = await prisma.discountCode.findUnique({
+      where: { code: codeClean },
+      include: { userDiscounts: { where: { user_id: userId } } },
+    });
+
+    if (!codeRecord) {
+      return res.status(400).json({ error: 'کد تخفیف معتبر نیست' });
+    }
+
+    const hasUsed = codeRecord.userDiscounts.length > 0;
+    const isExpired = new Date(codeRecord.expireDate).getTime() < Date.now();
+    const isLimitReached = codeRecord.usedCount >= codeRecord.maxUses;
+
+    if (hasUsed && !codeRecord.isAccountBound) {
+      return res.status(400).json({ error: 'شما قبلاً از این کد تخفیف استفاده کرده‌اید' });
+    }
+
+    if (!hasUsed) {
+      if (isExpired) {
+        return res.status(400).json({ error: 'کد تخفیف منقضی شده است' });
+      }
+      if (isLimitReached) {
+        return res.status(400).json({ error: 'ظرفیت استفاده از این کد تخفیف به پایان رسیده است' });
+      }
+    }
+
+    const originalPrice = PLAN_PRICES[plan as Exclude<Plan, 'FREE'>][period as 'monthly' | 'annual'];
+    const discountedPrice = Math.round(originalPrice * (1 - codeRecord.discountPercent / 100));
+
+    return res.status(200).json({
+      valid: true,
+      discountPercent: codeRecord.discountPercent,
+      originalPrice,
+      discountedPrice,
+    });
+  } catch (err: any) {
+    console.error('Discount validate error:', err);
+    return res.status(500).json({ error: 'خطا در بررسی کد تخفیف' });
+  }
+});
 
 /**
  * POST /api/payments/checkout
@@ -27,13 +96,13 @@ export const PLAN_PRICES: Record<Exclude<Plan, 'FREE'>, Record<'monthly' | '4-mo
 router.post('/checkout', authenticate, async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user!.userId;
-    const { plan, period } = req.body;
+    const { plan, period, discountCode } = req.body;
 
     if (!plan || !['STANDARD', 'PRO'].includes(plan)) {
       return res.status(400).json({ error: 'پلن انتخابی معتبر نیست' });
     }
 
-    if (!period || !['monthly', '4-month', 'annual'].includes(period)) {
+    if (!period || !['monthly', 'annual'].includes(period)) {
       return res.status(400).json({ error: 'دوره زمانی معتبر نیست' });
     }
 
@@ -46,12 +115,49 @@ router.post('/checkout', authenticate, async (req: AuthRequest, res: Response) =
       return res.status(404).json({ error: 'کاربر یافت نشد' });
     }
 
-    const price = PLAN_PRICES[plan as Exclude<Plan, 'FREE'>][period as 'monthly' | '4-month' | 'annual'];
-    const description = `خرید پلن ${plan === 'STANDARD' ? 'استاندارد' : 'حرفه‌ای'} - دوره ${period === 'monthly' ? 'ماهانه' : period === '4-month' ? '۴ ماهه' : 'سالانه'}`;
-    
+    // Validate discount code if provided
+    let discountPercent = 0;
+    if (discountCode) {
+      const codeClean = String(discountCode).trim().toUpperCase();
+      const codeRecord = await prisma.discountCode.findUnique({
+        where: { code: codeClean },
+        include: { userDiscounts: { where: { user_id: userId } } },
+      });
+
+      if (!codeRecord) {
+        return res.status(400).json({ error: 'کد تخفیف معتبر نیست' });
+      }
+
+      const hasUsed = codeRecord.userDiscounts.length > 0;
+      const isExpired = new Date(codeRecord.expireDate).getTime() < Date.now();
+      const isLimitReached = codeRecord.usedCount >= codeRecord.maxUses;
+
+      if (hasUsed) {
+        if (!codeRecord.isAccountBound) {
+          return res.status(400).json({ error: 'شما قبلاً از این کد تخفیف استفاده کرده‌اید' });
+        }
+        discountPercent = codeRecord.discountPercent;
+      } else {
+        if (isExpired) {
+          return res.status(400).json({ error: 'کد تخفیف منقضی شده است' });
+        }
+        if (isLimitReached) {
+          return res.status(400).json({ error: 'ظرفیت استفاده از این کد تخفیف به پایان رسیده است' });
+        }
+        discountPercent = codeRecord.discountPercent;
+      }
+    }
+
+    let price = PLAN_PRICES[plan as Exclude<Plan, 'FREE'>][period as 'monthly' | 'annual'];
+    if (discountPercent > 0) {
+      price = Math.round(price * (1 - discountPercent / 100));
+    }
+
+    const description = `خرید پلن ${plan === 'STANDARD' ? 'استاندارد' : 'حرفه‌ای'} - دوره ${period === 'monthly' ? 'ماهانه' : 'سالانه'}`;
+
     // Front-end callback url, e.g. http://localhost:3001/payments/callback
     const frontendBase = process.env.NEXT_PUBLIC_WEB_URL || 'http://localhost:3001';
-    const callbackUrl = `${frontendBase}/payments/callback?plan=${plan}&period=${period}&amount=${price}`;
+    const callbackUrl = `${frontendBase}/payments/callback?plan=${plan}&period=${period}&amount=${price}${discountCode ? `&discountCode=${discountCode}` : ''}`;
 
     const { authority, redirectUrl } = await requestPayment(
       price,
@@ -74,7 +180,7 @@ router.post('/checkout', authenticate, async (req: AuthRequest, res: Response) =
 router.post('/verify', authenticate, async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user!.userId;
-    const { authority, status, amount, plan, period } = req.body;
+    const { authority, status, amount, plan, period, discountCode } = req.body;
 
     if (!authority || !status || !amount || !plan || !period) {
       return res.status(400).json({ error: 'اطلاعات تایید پرداخت نامعتبر است' });
@@ -95,13 +201,11 @@ router.post('/verify', authenticate, async (req: AuthRequest, res: Response) => 
     const endDate = new Date();
     if (period === 'monthly') {
       endDate.setDate(startDate.getDate() + 30);
-    } else if (period === '4-month') {
-      endDate.setDate(startDate.getDate() + 120);
     } else if (period === 'annual') {
       endDate.setDate(startDate.getDate() + 365);
     }
 
-    // Start a Prisma transaction to update both user plan and create subscription
+    // Start a Prisma transaction to update both user plan, create subscription, and record discount
     const result = await prisma.$transaction(async (tx) => {
       // 1. Expire any existing active subscriptions for this user
       await tx.subscription.updateMany({
@@ -125,6 +229,37 @@ router.post('/verify', authenticate, async (req: AuthRequest, res: Response) => 
         where: { id: userId },
         data: { plan: plan as Plan },
       });
+
+      // 4. Record discount code usage if applicable
+      if (discountCode) {
+        const codeClean = String(discountCode).trim().toUpperCase();
+        const codeRecord = await tx.discountCode.findUnique({
+          where: { code: codeClean },
+        });
+
+        if (codeRecord) {
+          // Increment usedCount
+          await tx.discountCode.update({
+            where: { id: codeRecord.id },
+            data: { usedCount: { increment: 1 } },
+          });
+
+          // Create UserDiscount entry if not already exists (upsert)
+          await tx.userDiscount.upsert({
+            where: {
+              user_id_discount_id: {
+                user_id: userId,
+                discount_id: codeRecord.id,
+              },
+            },
+            create: {
+              user_id: userId,
+              discount_id: codeRecord.id,
+            },
+            update: {},
+          });
+        }
+      }
 
       return subscription;
     });
@@ -189,11 +324,11 @@ router.get('/status', authenticate, async (req: AuthRequest, res: Response) => {
       plan: user.plan,
       subscription: activeSubscription
         ? {
-            id: activeSubscription.id,
-            start_date: activeSubscription.start_date,
-            end_date: activeSubscription.end_date,
-            status: activeSubscription.status,
-          }
+          id: activeSubscription.id,
+          start_date: activeSubscription.start_date,
+          end_date: activeSubscription.end_date,
+          status: activeSubscription.status,
+        }
         : null,
       usage: {
         monthlyTrades: monthlyTradeCount,

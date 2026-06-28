@@ -136,6 +136,16 @@ export async function syncTradesFromEA(
     await Promise.all(chunk.map(op => op()));
   }
 
+  // Update last_sync_at for the account
+  try {
+    await prisma.account.update({
+      where: { id: accountId },
+      data: { last_sync_at: new Date() },
+    });
+  } catch (err: any) {
+    console.error('Failed to update account last_sync_at:', err);
+  }
+
   return result;
 }
 
@@ -177,10 +187,27 @@ export async function getTradesForAccount(params: {
 
   const filterAccount = accountId && accountId !== 'all';
 
+  // Retrieve user plan to apply historical limit
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { plan: true },
+  });
+
+  const plan = user?.plan || 'FREE';
+  let dateLimit: Date | null = null;
+  if (plan === 'FREE') {
+    dateLimit = new Date();
+    dateLimit.setMonth(dateLimit.getMonth() - 1);
+  } else if (plan === 'STANDARD') {
+    dateLimit = new Date();
+    dateLimit.setMonth(dateLimit.getMonth() - 6);
+  }
+
   const trades = await prisma.trade.findMany({
     where: {
       user_id: userId,
       ...(filterAccount ? { account_id: accountId } : {}),
+      ...(dateLimit ? { open_time: { gte: dateLimit } } : {}),
     },
     orderBy: { open_time: 'desc' },
     skip: offset,

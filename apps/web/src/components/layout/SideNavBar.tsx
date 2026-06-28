@@ -8,7 +8,14 @@ import { useAuthStore } from '../../lib/auth';
 export default function SideNavBar() {
   const pathname = usePathname();
   const router = useRouter();
+  const user = useAuthStore(state => state.user);
   const logout = useAuthStore(state => state.logout);
+
+  const planLabel = user?.plan === 'PRO' 
+    ? 'نسخه حرفه‌ای' 
+    : user?.plan === 'STANDARD' 
+    ? 'نسخه استاندارد' 
+    : 'نسخه رایگان';
 
   const navItems = [
     { href: '/dashboard', label: 'داشبورد', icon: 'dashboard' },
@@ -35,7 +42,7 @@ export default function SideNavBar() {
           </div>
           <div className="title-group">
             <span className="title-text">پنل معامله‌گر</span>
-            <span className="subtitle-text">نسخه حرفه‌ای</span>
+            <span className="subtitle-text">{planLabel}</span>
           </div>
         </div>
 
@@ -62,11 +69,21 @@ export default function SideNavBar() {
         </div>
 
         {/* CTA Upgrade */}
-        <div className="sidenav-cta-box">
-          <span className="cta-title">حساب حرفه‌ای</span>
-          <span className="cta-desc">دسترسی به تمامی ابزارها و گزارش‌های پیشرفته معاملات</span>
-          <button className="upgrade-btn">ارتقاء حساب</button>
-        </div>
+        {user?.plan !== 'PRO' && (
+          <div className="sidenav-cta-box">
+            <span className="cta-title">
+              {user?.plan === 'STANDARD' ? 'ارتقا به حساب حرفه‌ای' : 'حساب حرفه‌ای'}
+            </span>
+            <span className="cta-desc">
+              {user?.plan === 'STANDARD'
+                ? 'دسترسی به تحلیل‌های پیشرفته‌تر و امکان اتصال نامحدود حساب‌ها'
+                : 'دسترسی به تمامی ابزارها و گزارش‌های پیشرفته معاملات'}
+            </span>
+            <button className="upgrade-btn" onClick={() => router.push('/settings?tab=subscription')}>
+              ارتقاء حساب
+            </button>
+          </div>
+        )}
 
         {/* Footer Link */}
         <div className="sidenav-footer">

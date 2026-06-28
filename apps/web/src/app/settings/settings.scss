@@ -655,3 +655,215 @@ $set-gold: #f5c542;
   }
 }
 
+// Checkout Modal Styles
+.checkout-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(15, 17, 23, 0.7);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.checkout-modal-card {
+  background: #181d28;
+  border: 1px solid rgba($set-accent, 0.15);
+  border-radius: 16px;
+  width: 100%;
+  max-width: 440px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  animation: modalScaleIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes modalScaleIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.checkout-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid rgba($set-border, 0.4);
+  h4 {
+    margin: 0;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #ffffff;
+  }
+  .close-modal-btn {
+    background: none;
+    border: none;
+    color: $set-muted;
+    cursor: pointer;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    border-radius: 50%;
+    transition: all 0.2s;
+    &:hover {
+      background: rgba(255, 255, 255, 0.05);
+      color: #ffffff;
+    }
+    .material-symbols-outlined {
+      font-size: 20px;
+    }
+  }
+}
+
+.checkout-modal-body {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.price-details-section {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba($set-border, 0.4);
+  border-radius: 10px;
+  padding: 14px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  .price-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.9rem;
+    color: $set-muted;
+
+    .final-price {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: $set-accent;
+    }
+
+    .original-price-crossed {
+      text-decoration: line-through;
+      color: #a0aec0;
+      font-size: 0.95rem;
+    }
+
+    &.discount-applied {
+      color: #48bb78;
+      border-top: 1px dashed rgba($set-border, 0.4);
+      padding-top: 8px;
+      margin-top: 2px;
+      .final-price {
+        color: #48bb78;
+      }
+    }
+  }
+}
+
+.discount-input-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  
+  label {
+    font-size: 0.8rem;
+    color: $set-muted;
+    font-weight: 500;
+  }
+
+  .discount-input-wrap {
+    display: flex;
+    gap: 10px;
+    
+    input {
+      flex: 1;
+      background: #0f121d;
+      border: 1px solid rgba($set-border, 0.8);
+      border-radius: 8px;
+      padding: 10px 14px;
+      color: #ffffff;
+      font-size: 0.9rem;
+      font-family: inherit;
+      transition: border-color 0.2s;
+      
+      &:focus {
+        outline: none;
+        border-color: $set-accent;
+      }
+    }
+
+    .discount-apply-btn {
+      padding: 0 18px;
+      background: $set-accent;
+      color: #0f1117;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      transition: filter 0.2s;
+      
+      &:hover:not(:disabled) {
+        filter: brightness(1.1);
+      }
+      
+      &:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+      }
+    }
+  }
+
+  .discount-error-msg {
+    font-size: 0.78rem;
+    color: #e53e3e;
+    margin-right: 4px;
+  }
+
+  .discount-success-msg {
+    font-size: 0.78rem;
+    color: #48bb78;
+    margin-right: 4px;
+  }
+}
+
+.checkout-modal-footer {
+  padding: 16px 20px;
+  border-top: 1px solid rgba($set-border, 0.4);
+  background: rgba(255, 255, 255, 0.01);
+  display: flex;
+
+  .start-checkout-btn {
+    width: 100%;
+    padding: 12px;
+    background: #ffcc00;
+    color: #0f1117;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    transition: filter 0.2s;
+
+    &:hover:not(:disabled) {
+      filter: brightness(1.05);
+    }
+    
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+}
+
+

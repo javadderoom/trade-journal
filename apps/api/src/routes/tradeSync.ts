@@ -624,6 +624,7 @@ router.get('/emotions', authenticate, async (req: AuthRequest, res: Response) =>
           label: e.label,
           emoji: e.emoji,
         })),
+        skipDuplicates: true,
       });
 
       emotions = await prisma.emotion.findMany({
@@ -1157,6 +1158,19 @@ router.post('/import-mt4', authenticate, checkImportPermission, uploadMemory.sin
       return;
     }
 
+    // Verify STANDARD user limits
+    const userPlan = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { plan: true }
+    });
+
+    if (userPlan?.plan === 'STANDARD' && parsedTrades.length > 150) {
+      res.status(400).json({
+        error: `این فایل شامل ${parsedTrades.length} معامله است. در نسخه استاندارد حداکثر ۱۵۰ معامله در هر فایل پردازش می‌شود. برای واردات کامل، به نسخه حرفه‌ای ارتقا دهید.`
+      });
+      return;
+    }
+
     let imported = 0;
     let skipped = 0;
 
@@ -1203,6 +1217,22 @@ router.post('/import-mt4', authenticate, checkImportPermission, uploadMemory.sin
       } catch (err: any) {
         console.error(`Failed to insert trade ticket ${trade.ticket}:`, err.message);
       }
+    }
+
+    // Record the ImportJob
+    try {
+      await prisma.importJob.create({
+        data: {
+          user_id: userId,
+          account_id: accountId,
+          filename: req.file.originalname,
+          status: 'COMPLETED',
+          rows_total: parsedTrades.length,
+          rows_imported: imported,
+        },
+      });
+    } catch (err: any) {
+      console.error('Failed to log import job:', err);
     }
 
     res.status(200).json({

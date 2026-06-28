@@ -9,7 +9,7 @@ export const PLAN_ACCOUNT_LIMITS: Record<Plan, number | null> = {
   PRO: null, // unlimited
 };
 
-export const FREE_MONTHLY_TRADE_LIMIT = 50;
+export const FREE_MONTHLY_TRADE_LIMIT = 30;
 
 /**
  * Middleware to enforce account limits based on the user's plan.
@@ -133,9 +133,25 @@ export const checkImportPermission = async (
     }
 
     if (user.plan === 'FREE') {
-      return res.status(403).json({
-        error: 'قابلیت واردات فایل‌های MT4/MT5 در پلن رایگان در دسترس نیست. لطفا پلن خود را ارتقا دهید.',
+      const now = new Date();
+      const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+      const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
+
+      const importCount = await prisma.importJob.count({
+        where: {
+          user_id: userId,
+          created_at: {
+            gte: startOfMonth,
+            lte: endOfMonth,
+          },
+        },
       });
+
+      if (importCount >= 1) {
+        return res.status(403).json({
+          error: 'سقف واردات ۱ فایل در ماه برای پلن رایگان تکمیل شده است. برای واردات نامحدود، لطفا اشتراک خود را ارتقا دهید.',
+        });
+      }
     }
 
     next();
@@ -172,6 +188,34 @@ export const checkSyncPermission = async (
       return res.status(403).json({
         error: 'قابلیت همگام‌سازی خودکار با دستیار معاملاتی MT5 (EA) در پلن رایگان در دسترس نیست. لطفا پلن خود را ارتقا دهید.',
       });
+    }
+
+    const accountId = req.account?.id || req.body.accountId || req.query.accountId;
+    if (accountId) {
+      const account = await prisma.account.findUnique({
+        where: { id: accountId },
+        select: { last_sync_at: true },
+      });
+
+      if (account && account.last_sync_at) {
+        const lastSync = new Date(account.last_sync_at).getTime();
+        const now = Date.now();
+        const diffSeconds = (now - lastSync) / 1000;
+
+        if (user.plan === 'STANDARD' && diffSeconds < 3600) {
+          const remainMins = Math.ceil((3600 - diffSeconds) / 60);
+          return res.status(429).json({
+            error: `همگام‌سازی خودکار در پلن استاندارد به هر ۱ ساعت یک‌بار محدود است. لطفاً ${remainMins} دقیقه دیگر تلاش کنید یا برای همگام‌سازی سریع‌تر (۶۰ ثانیه)، پلن خود را به حرفه‌ای ارتقا دهید.`,
+          });
+        }
+
+        if (user.plan === 'PRO' && diffSeconds < 60) {
+          const remainSecs = Math.ceil(60 - diffSeconds);
+          return res.status(429).json({
+            error: `همگام‌سازی خودکار به هر ۶۰ ثانیه یک‌بار محدود است. لطفاً ${remainSecs} ثانیه دیگر تلاش کنید.`,
+          });
+        }
+      }
     }
 
     next();

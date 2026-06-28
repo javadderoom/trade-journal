@@ -267,10 +267,30 @@ router.get('/summary', authenticate, async (req: AuthRequest, res: Response) => 
     const userId = req.user!.userId;
     const accountId = (req.query.accountId as string | undefined) || 'all';
 
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { plan: true },
+    });
+
+    if (!user) {
+      return res.status(404).json({ error: 'کاربر یافت نشد' });
+    }
+
+    const plan = user.plan;
+    let dateLimit: Date | null = null;
+    if (plan === 'FREE') {
+      dateLimit = new Date();
+      dateLimit.setMonth(dateLimit.getMonth() - 1);
+    } else if (plan === 'STANDARD') {
+      dateLimit = new Date();
+      dateLimit.setMonth(dateLimit.getMonth() - 6);
+    }
+
     const filterAccount = accountId && accountId !== 'all';
     const accountWhere = {
       user_id: userId,
       ...(filterAccount ? { account_id: accountId } : {}),
+      ...(dateLimit ? { open_time: { gte: dateLimit } } : {}),
     };
 
     const now = new Date();

@@ -29,6 +29,7 @@ model User {
   tags             Tag[]
   emotions         Emotion[]
   refresh_tokens   RefreshToken[]
+  userDiscounts    UserDiscount[]
 }
 
 model Account {
@@ -42,6 +43,7 @@ model Account {
   trades         Trade[]
   importJobs     ImportJob[]
   account_tokens AccountToken[]
+  last_sync_at   DateTime?
 }
 
 model RefreshToken {
@@ -159,6 +161,29 @@ model Emotion {
   created_at DateTime @default(now())
 
   @@unique([user_id, value])
+}
+
+model DiscountCode {
+  id             String         @id @default(uuid())
+  code           String         @unique
+  discountPercent Int
+  maxUses        Int
+  usedCount      Int            @default(0)
+  expireDate     DateTime
+  isAccountBound Boolean        @default(false)
+  created_at     DateTime       @default(now())
+  userDiscounts  UserDiscount[]
+}
+
+model UserDiscount {
+  id             String       @id @default(uuid())
+  user_id        String
+  user           User         @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  discount_id    String
+  discountCode   DiscountCode @relation(fields: [discount_id], references: [id], onDelete: Cascade)
+  used_at        DateTime     @default(now())
+
+  @@unique([user_id, discount_id])
 }
 
 // --- Enums ---

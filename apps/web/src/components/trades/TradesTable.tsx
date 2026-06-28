@@ -10,6 +10,7 @@ import DesktopTable from './DesktopTable';
 import MobileCardsList from './MobileCardsList';
 import DetailPanel from './DetailPanel';
 import { getMainPair } from '../../utils/tradeHelpers';
+import { useAuthStore } from '../../lib/auth';
 
 export interface Trade {
   id: string;
@@ -131,6 +132,30 @@ export default function TradesTable({
   const [isUploading, setIsUploading] = useState(false);
   const [isFabOpen, setIsFabOpen] = useState(false);
   const [dateFilter, setDateFilter] = useState<string | null>(null);
+
+  const user = useAuthStore(state => state.user);
+
+  const handleExportData = () => {
+    const isPro = user?.plan === 'PRO';
+    if (!isPro) {
+      showAlertDialog(
+        'قابلیت مخصوص کاربران حرفه‌ای',
+        'خروجی داده فقط برای کاربران حرفه‌ای در دسترس است. برای دسترسی به این قابلیت و امکانات پیشرفته دیگر، لطفاً حساب خود را به حرفه‌ای ارتقا دهید.',
+        'info',
+        () => {
+          window.location.href = '/settings?tab=subscription';
+        },
+        'ارتقای حساب',
+        'بستن'
+      );
+      return;
+    }
+    showAlertDialog(
+      'خروجی داده‌ها (بزودی)',
+      'این قابلیت به زودی در نسخه حرفه‌ای فعال خواهد شد.',
+      'success'
+    );
+  };
 
   // Sync prop-level initialDateFilter if provided by parent
   useEffect(() => {
@@ -613,6 +638,11 @@ export default function TradesTable({
         <header className="trades-page-header">
           <h1>معاملات</h1>
           <div className="header-actions">
+            <button className="btn btn-secondary btn-export" onClick={handleExportData}>
+              <span className="material-symbols-outlined">download</span>
+              خروجی اکسل/CSV
+              <span className="pro-badge-mini">PRO</span>
+            </button>
             <button className="btn btn-secondary" onClick={onImportMT4}>
               <span className="material-symbols-outlined">cloud_download</span>
               واردات MT4/MT5

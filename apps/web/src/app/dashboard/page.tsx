@@ -175,7 +175,7 @@ export default function DashboardPage() {
 
   return (
     <main className="dashboard-page">
-      {subStatus?.plan === 'FREE' && subStatus?.usage?.monthlyTrades >= 40 && (
+      {subStatus?.plan === 'FREE' && subStatus?.usage?.monthlyTrades >= 24 && (
         <div style={{
           backgroundColor: '#ffb300',
           color: '#111319',
@@ -193,9 +193,9 @@ export default function DashboardPage() {
         }}>
           <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>warning</span>
           <span>
-            {subStatus.usage.monthlyTrades >= 50
-              ? 'سقف ثبت ۵۰ معامله در ماه برای پلن رایگان به پایان رسیده است. برای ثبت معامله جدید یا واردات فایل، لطفاً اشتراک خود را ارتقا دهید.'
-              : `شما ${subStatus.usage.monthlyTrades} معامله از سقف ۵۰ معامله مجاز در ماه برای پلن رایگان را ثبت کرده‌اید. برای ثبت معامله بیشتر، لطفاً اشتراک خود را ارتقا دهید.`
+            {subStatus.usage.monthlyTrades >= 30
+              ? 'سقف ثبت ۳۰ معامله در ماه برای پلن رایگان به پایان رسیده است. برای ثبت معامله جدید یا واردات فایل، لطفاً اشتراک خود را ارتقا دهید.'
+              : `شما ${subStatus.usage.monthlyTrades} معامله از سقف ۳۰ معامله مجاز در ماه برای پلن رایگان را ثبت کرده‌اید. برای ثبت معامله بیشتر، لطفاً اشتراک خود را ارتقا دهید.`
             }
           </span>
           <Link href="/settings?tab=subscription" style={{ color: '#111319', textDecoration: 'underline', marginRight: '15px' }}>

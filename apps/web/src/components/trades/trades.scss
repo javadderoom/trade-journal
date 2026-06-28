@@ -88,6 +88,26 @@
     }
   }
 
+  &.btn-export {
+    position: relative;
+    padding-left: 54px; // make space for badge
+    
+    .pro-badge-mini {
+      position: absolute;
+      left: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: #ffcc00;
+      color: #0f1117;
+      font-size: 9px;
+      font-weight: 850;
+      padding: 2px 5px;
+      border-radius: 4px;
+      letter-spacing: 0.5px;
+      line-height: 1;
+    }
+  }
+
   &.btn-primary {
     background-color: $primary-container;
     color: $on-primary-container;
@@ -2535,6 +2555,7 @@ input[type="checkbox"] {
   @media (max-width: 1024px) {
     .detail-panel {
       width: 480px;
+      z-index: 1100;
     }
 
     .trades-page-header {
