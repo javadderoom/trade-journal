@@ -4,7 +4,7 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 COPY apps/api/package.json ./apps/api/
 COPY apps/web/package.json ./apps/web/
-RUN npm install --include=dev
+RUN npm install --include=dev --no-audit --no-fund
 COPY . .
 RUN npx prisma generate --schema=apps/api/src/prisma/schema.prisma
 RUN npm run build --workspace=api
