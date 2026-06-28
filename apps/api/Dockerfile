@@ -17,4 +17,4 @@ COPY --from=builder /app/package.json /app/package-lock.json ./
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/apps/api ./apps/api
 EXPOSE 3000
-CMD ["sh", "-c", "npx prisma migrate deploy --schema=apps/api/src/prisma/schema.prisma && node apps/api/dist/server.js"]
+CMD ["sh", "-c", "npx prisma migrate deploy --schema=apps/api/src/prisma/schema.prisma --config=apps/api/src/prisma/prisma.config.ts && node apps/api/dist/server.js"]

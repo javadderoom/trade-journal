@@ -1,0 +1,291 @@
+2026-Jun-28 22:28:06.718171 Docker 29.6.1 with BuildKit and Buildx detected on deployment server (localhost).
+2026-Jun-28 22:28:06.743773 Starting deployment of javadderoom/trade-journal:main to localhost.
+2026-Jun-28 22:28:07.601700 Preparing container with helper image: ghcr.io/coollabsio/coolify-helper:1.0.14
+2026-Jun-28 22:28:07.930747 [CMD]: docker stop --time=30 ev0no7lypfizf62h4z2pbs6z
+2026-Jun-28 22:28:07.930747 Flag --time has been deprecated, use --timeout instead
+2026-Jun-28 22:28:07.937811 Error response from daemon: No such container: ev0no7lypfizf62h4z2pbs6z
+2026-Jun-28 22:28:08.538802 [CMD]: docker run -d --network 'coolify' --name ev0no7lypfizf62h4z2pbs6z --rm -v /root/.docker/buildx:/root/.docker/buildx -v /var/run/docker.sock:/var/run/docker.sock ghcr.io/coollabsio/coolify-helper:1.0.14
+2026-Jun-28 22:28:08.538802 0149a0f955265065feb3a3cf421bec2b736b851099f5daa8e35632e6426979a9
+2026-Jun-28 22:28:12.239232 [CMD]: docker exec ev0no7lypfizf62h4z2pbs6z bash -c 'GIT_SSH_COMMAND="ssh -o ConnectTimeout=30 -p 22 -o Port=22 -o LogLevel=ERROR -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" git ls-remote '\''https://github.com/javadderoom/trade-journal'\'' '\''refs/heads/main'\'''
+2026-Jun-28 22:28:12.239232 661cb9e12c83fa4a3c370f5ed99dee84a72963d3 refs/heads/main
+2026-Jun-28 22:28:12.289823 ----------------------------------------
+2026-Jun-28 22:28:12.300447 Importing javadderoom/trade-journal:main (commit sha 661cb9e12c83fa4a3c370f5ed99dee84a72963d3) to /artifacts/ev0no7lypfizf62h4z2pbs6z.
+2026-Jun-28 22:28:12.940169 [CMD]: docker exec ev0no7lypfizf62h4z2pbs6z bash -c 'git -c http.version=HTTP/1.1 clone --depth=1 --recurse-submodules --shallow-submodules -b '\''main'\'' '\''https://github.com/javadderoom/trade-journal'\'' '\''/artifacts/ev0no7lypfizf62h4z2pbs6z'\'' && cd '\''/artifacts/ev0no7lypfizf62h4z2pbs6z'\'' && GIT_SSH_COMMAND="ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" git -c http.version=HTTP/1.1 fetch --depth=1 origin '\''661cb9e12c83fa4a3c370f5ed99dee84a72963d3'\'' && git -c http.version=HTTP/1.1 -c advice.detachedHead=false checkout '\''661cb9e12c83fa4a3c370f5ed99dee84a72963d3'\'' >/dev/null 2>&1 && cd '\''/artifacts/ev0no7lypfizf62h4z2pbs6z'\'' && if [ -f .gitmodules ]; then sed -i "s#git@\(.*\):#https://\1/#g" '\''/artifacts/ev0no7lypfizf62h4z2pbs6z'\''/.gitmodules || true && git -c http.version=HTTP/1.1 submodule sync && GIT_SSH_COMMAND="ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" git -c http.version=HTTP/1.1 submodule update --init --recursive --depth=1; fi && cd '\''/artifacts/ev0no7lypfizf62h4z2pbs6z'\'' && GIT_SSH_COMMAND="ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" git -c http.version=HTTP/1.1 lfs pull'
+2026-Jun-28 22:28:12.940169 Cloning into '/artifacts/ev0no7lypfizf62h4z2pbs6z'...
+2026-Jun-28 22:28:26.607362 From https://github.com/javadderoom/trade-journal
+2026-Jun-28 22:28:26.607362 * branch 661cb9e12c83fa4a3c370f5ed99dee84a72963d3 -> FETCH_HEAD
+2026-Jun-28 22:28:29.747550 [CMD]: docker exec ev0no7lypfizf62h4z2pbs6z bash -c 'cd /artifacts/ev0no7lypfizf62h4z2pbs6z && git log -1 '\''661cb9e12c83fa4a3c370f5ed99dee84a72963d3'\'' --pretty=%B'
+2026-Jun-28 22:28:29.747550 fix: add url mapping to Prisma datasource
+2026-Jun-28 22:28:30.093844 Image not found (shwfdywr82rouombr863cjul:661cb9e12c83fa4a3c370f5ed99dee84a72963d3). Building new image.
+2026-Jun-28 22:28:32.515919 [CMD]: docker exec ev0no7lypfizf62h4z2pbs6z bash -c 'cat /artifacts/ev0no7lypfizf62h4z2pbs6z/apps/api/Dockerfile'
+2026-Jun-28 22:28:32.515919 # Stage 1: Build
+2026-Jun-28 22:28:32.515919 FROM node:22.13-alpine AS builder
+2026-Jun-28 22:28:32.515919 WORKDIR /app
+2026-Jun-28 22:28:32.515919 COPY package.json package-lock.json ./
+2026-Jun-28 22:28:32.515919 COPY apps/api/package.json ./apps/api/
+2026-Jun-28 22:28:32.515919 COPY apps/web/package.json ./apps/web/
+2026-Jun-28 22:28:32.515919 RUN npm config set registry https://mirror-npm.runflare.com && npm install --include=dev --no-audit --no-fund
+2026-Jun-28 22:28:32.515919 COPY . .
+2026-Jun-28 22:28:32.515919 RUN npx prisma generate --schema=apps/api/src/prisma/schema.prisma
+2026-Jun-28 22:28:32.515919 RUN npm run build --workspace=api
+2026-Jun-28 22:28:32.515919
+2026-Jun-28 22:28:32.515919 # Stage 2: Runner
+2026-Jun-28 22:28:32.515919 FROM node:22.13-alpine AS runner
+2026-Jun-28 22:28:32.515919 WORKDIR /app
+2026-Jun-28 22:28:32.515919 ENV NODE_ENV=production
+2026-Jun-28 22:28:32.515919 COPY --from=builder /app/package.json /app/package-lock.json ./
+2026-Jun-28 22:28:32.515919 COPY --from=builder /app/node_modules ./node_modules
+2026-Jun-28 22:28:32.515919 COPY --from=builder /app/apps/api ./apps/api
+2026-Jun-28 22:28:32.515919 EXPOSE 3000
+2026-Jun-28 22:28:32.515919 CMD ["sh", "-c", "npx prisma migrate deploy --schema=apps/api/src/prisma/schema.prisma && node apps/api/dist/server.js"]
+2026-Jun-28 22:28:33.282953 Creating build-time .env file in /artifacts (outside Docker context).
+2026-Jun-28 22:28:34.046884 ----------------------------------------
+2026-Jun-28 22:28:34.082077 ⚠️ Build-time environment variable warning: NODE_ENV=production
+2026-Jun-28 22:28:34.129000 Affects: Node.js/npm/yarn/bun/pnpm
+2026-Jun-28 22:28:34.190848 Issue: Skips devDependencies installation which are often required for building (webpack, typescript, etc.)
+2026-Jun-28 22:28:34.222914 Recommendation: Uncheck "Available at Buildtime" or use "development" during build
+2026-Jun-28 22:28:34.266298
+2026-Jun-28 22:28:34.286480 💡 Tips to resolve build issues:
+2026-Jun-28 22:28:34.311604 1. Set these variables as "Runtime only" in the environment variables settings
+2026-Jun-28 22:28:34.331976 2. Use different values for build-time (e.g., NODE_ENV=development for build)
+2026-Jun-28 22:28:34.410682 3. Consider using multi-stage Docker builds to separate build and runtime environments
+2026-Jun-28 22:28:34.960702 [CMD]: docker exec ev0no7lypfizf62h4z2pbs6z bash -c 'cat /artifacts/ev0no7lypfizf62h4z2pbs6z/apps/api/Dockerfile'
+2026-Jun-28 22:28:34.960702 # Stage 1: Build
+2026-Jun-28 22:28:34.960702 FROM node:22.13-alpine AS builder
+2026-Jun-28 22:28:34.960702 WORKDIR /app
+2026-Jun-28 22:28:34.960702 COPY package.json package-lock.json ./
+2026-Jun-28 22:28:34.960702 COPY apps/api/package.json ./apps/api/
+2026-Jun-28 22:28:34.960702 COPY apps/web/package.json ./apps/web/
+2026-Jun-28 22:28:34.960702 RUN npm config set registry https://mirror-npm.runflare.com && npm install --include=dev --no-audit --no-fund
+2026-Jun-28 22:28:34.960702 COPY . .
+2026-Jun-28 22:28:34.960702 RUN npx prisma generate --schema=apps/api/src/prisma/schema.prisma
+2026-Jun-28 22:28:34.960702 RUN npm run build --workspace=api
+2026-Jun-28 22:28:34.960702
+2026-Jun-28 22:28:34.960702 # Stage 2: Runner
+2026-Jun-28 22:28:34.960702 FROM node:22.13-alpine AS runner
+2026-Jun-28 22:28:34.960702 WORKDIR /app
+2026-Jun-28 22:28:34.960702 ENV NODE_ENV=production
+2026-Jun-28 22:28:34.960702 COPY --from=builder /app/package.json /app/package-lock.json ./
+2026-Jun-28 22:28:34.960702 COPY --from=builder /app/node_modules ./node_modules
+2026-Jun-28 22:28:34.960702 COPY --from=builder /app/apps/api ./apps/api
+2026-Jun-28 22:28:34.960702 EXPOSE 3000
+2026-Jun-28 22:28:34.960702 CMD ["sh", "-c", "npx prisma migrate deploy --schema=apps/api/src/prisma/schema.prisma && node apps/api/dist/server.js"]
+2026-Jun-28 22:28:35.044253 Final Dockerfile:
+2026-Jun-28 22:28:36.652831 [CMD]: docker exec ev0no7lypfizf62h4z2pbs6z bash -c 'cat /artifacts/ev0no7lypfizf62h4z2pbs6z/apps/api/Dockerfile'
+2026-Jun-28 22:28:36.652831 # Stage 1: Build
+2026-Jun-28 22:28:36.652831 FROM node:22.13-alpine AS builder
+2026-Jun-28 22:28:36.652831 ARG JWT_ACCESS_EXPIRES_IN=15m
+2026-Jun-28 22:28:36.652831 ARG JWT_ACCESS_SECRET=89037dc1409519f3838d4914145bcd240aad781d5257ed15a707c406f29133ec
+2026-Jun-28 22:28:36.652831 ARG NODE_ENV=production
+2026-Jun-28 22:28:36.652831 ARG PORT=3000
+2026-Jun-28 22:28:36.652831 ARG NAVASAN_API_KEY=<REDACTED>
+2026-Jun-28 22:28:36.652831 ARG DATABASE_URL=postgres://postgres:<REDACTED>@q11sdh57gulm0ia7y1lj994t:5432/postgres
+2026-Jun-28 22:28:36.652831 ARG COOLIFY_URL=https://api.tradekav.ir
+2026-Jun-28 22:28:36.652831 ARG COOLIFY_FQDN=api.tradekav.ir
+2026-Jun-28 22:28:36.652831 ARG COOLIFY_BRANCH='main'
+2026-Jun-28 22:28:36.652831 ARG COOLIFY_RESOURCE_UUID=shwfdywr82rouombr863cjul
+2026-Jun-28 22:28:36.652831 WORKDIR /app
+2026-Jun-28 22:28:36.652831 COPY package.json package-lock.json ./
+2026-Jun-28 22:28:36.652831 COPY apps/api/package.json ./apps/api/
+2026-Jun-28 22:28:36.652831 COPY apps/web/package.json ./apps/web/
+2026-Jun-28 22:28:36.652831 RUN npm config set registry https:<REDACTED>@q11sdh57gulm0ia7y1lj994t:5432/postgres
+2026-Jun-28 22:28:36.652831 ARG COOLIFY_URL=https://api.tradekav.ir
+2026-Jun-28 22:28:36.652831 ARG COOLIFY_FQDN=api.tradekav.ir
+2026-Jun-28 22:28:36.652831 ARG COOLIFY_BRANCH='main'
+2026-Jun-28 22:28:36.652831 ARG COOLIFY_RESOURCE_UUID=shwfdywr82rouombr863cjul
+2026-Jun-28 22:28:36.652831 WORKDIR /app
+2026-Jun-28 22:28:36.652831 ENV NODE_ENV=production
+2026-Jun-28 22:28:36.652831 COPY --from=builder /app/package.json /app/package-lock.json ./
+2026-Jun-28 22:28:36.652831 COPY --from=builder /app/node_modules ./node_modules
+2026-Jun-28 22:28:36.652831 COPY --from=builder /app/apps/api ./apps/api
+2026-Jun-28 22:28:36.652831 EXPOSE 3000
+2026-Jun-28 22:28:36.652831 CMD ["sh", "-c", "npx prisma migrate deploy --schema=apps/api/src/prisma/schema.prisma && node apps/api/dist/server.js"]
+2026-Jun-28 22:28:36.687185 ----------------------------------------
+2026-Jun-28 22:28:36.706799 Building docker image started.
+2026-Jun-28 22:28:36.720703 To check the current progress, click on Show Debug Logs.
+2026-Jun-28 22:28:38.005303 [CMD]: docker exec ev0no7lypfizf62h4z2pbs6z bash -c 'cat /artifacts/build.sh'
+2026-Jun-28 22:28:38.005303 cd /artifacts/ev0no7lypfizf62h4z2pbs6z && set -a && source /artifacts/build-time.env && set +a && DOCKER_BUILDKIT=1 docker build --add-host coolify:10.0.1.5 --add-host coolify-db:10.0.1.4 --add-host coolify-realtime:10.0.1.2 --add-host coolify-redis:10.0.1.3 --add-host q11sdh57gulm0ia7y1lj994t:10.0.1.6 --network host -f /artifacts/ev0no7lypfizf62h4z2pbs6z/apps/api/Dockerfile --progress plain -t shwfdywr82rouombr863cjul:661cb9e12c83fa4a3c370f5ed99dee84a72963d3 --build-arg COOLIFY_URL --build-arg COOLIFY_FQDN --build-arg COOLIFY_BRANCH --build-arg COOLIFY_RESOURCE_UUID --build-arg JWT_ACCESS_EXPIRES_IN --build-arg JWT_ACCESS_SECRET --build-arg NODE_ENV --build-arg PORT --build-arg NAVASAN_API_KEY --build-arg DATABASE_URL --build-arg COOLIFY_BUILD_SECRETS_HASH=5cf78199e5181ccb725dedf309d8d57c7598a56439a418558a20603facd4da55 --build-arg 'COOLIFY_URL' --build-arg 'COOLIFY_FQDN' --build-arg 'COOLIFY_BRANCH' --build-arg 'COOLIFY_RESOURCE_UUID' /artifacts/ev0no7lypfizf62h4z2pbs6z
+2026-Jun-28 22:28:39.814188 [CMD]: docker exec ev0no7lypfizf62h4z2pbs6z bash -c 'bash /artifacts/build.sh'
+2026-Jun-28 22:28:39.814188 #0 building with "default" instance using docker driver
+2026-Jun-28 22:28:39.814188
+2026-Jun-28 22:28:39.814188 #1 [internal] load build definition from Dockerfile
+2026-Jun-28 22:28:39.833792 #1 transferring dockerfile: 1.82kB 0.0s done
+2026-Jun-28 22:28:39.833792 #1 DONE 0.1s
+2026-Jun-28 22:28:39.833792
+2026-Jun-28 22:28:39.833792 #2 [internal] load metadata for docker.io/library/node:22.13-alpine
+2026-Jun-28 22:28:46.182198 #2 DONE 6.4s
+2026-Jun-28 22:28:46.357234 #3 [internal] load .dockerignore
+2026-Jun-28 22:28:46.357234 #3 transferring context: 2B done
+2026-Jun-28 22:28:46.357234 #3 DONE 0.1s
+2026-Jun-28 22:28:46.357234
+2026-Jun-28 22:28:46.357234 #4 [internal] load build context
+2026-Jun-28 22:28:46.357234 #4 DONE 0.0s
+2026-Jun-28 22:28:46.357234
+2026-Jun-28 22:28:46.357234 #5 [builder 1/9] FROM docker.io/library/node:22.13-alpine@sha256:e2b39f7b64281324929257d0f8004fb6cb4bf0fdfb9aa8cedb235a766aec31da
+2026-Jun-28 22:28:46.357234 #5 resolve docker.io/library/node:22.13-alpine@sha256:e2b39f7b64281324929257d0f8004fb6cb4bf0fdfb9aa8cedb235a766aec31da 0.1s done
+2026-Jun-28 22:28:46.357234 #5 DONE 0.1s
+2026-Jun-28 22:28:46.509883 #4 [internal] load build context
+2026-Jun-28 22:28:47.685349 #4 transferring context: 17.59MB 1.3s done
+2026-Jun-28 22:28:47.894225 #4 DONE 1.3s
+2026-Jun-28 22:28:47.894225
+2026-Jun-28 22:28:47.894225 #6 [builder 2/9] WORKDIR /app
+2026-Jun-28 22:28:47.894225 #6 CACHED
+2026-Jun-28 22:28:47.894225
+2026-Jun-28 22:28:47.894225 #7 [builder 3/9] COPY package.json package-lock.json ./
+2026-Jun-28 22:28:48.063039 #7 DONE 0.3s
+2026-Jun-28 22:28:48.196834 #8 [builder 4/9] COPY apps/api/package.json ./apps/api/
+2026-Jun-28 22:28:48.196834 #8 DONE 0.1s
+2026-Jun-28 22:28:48.322260 #9 [builder 5/9] COPY apps/web/package.json ./apps/web/
+2026-Jun-28 22:28:48.322260 #9 DONE 0.1s
+2026-Jun-28 22:28:48.478023 #10 [builder 6/9] RUN npm config set registry https://mirror-npm.runflare.com && npm install --include=dev --no-audit --no-fund
+2026-Jun-28 22:30:13.774562 #10 85.45
+2026-Jun-28 22:30:13.774562 #10 85.45 added 341 packages in 1m
+2026-Jun-28 22:30:14.377316 #10 DONE 86.0s
+2026-Jun-28 22:30:14.538606 #11 [builder 7/9] COPY . .
+2026-Jun-28 22:30:18.029594 #11 DONE 3.6s
+2026-Jun-28 22:30:18.191046 #12 [builder 8/9] RUN npx prisma generate --schema=apps/api/src/prisma/schema.prisma
+2026-Jun-28 22:30:31.197889 #12 13.16 Prisma schema loaded from apps/api/src/prisma/schema.prisma.
+2026-Jun-28 22:30:31.356897 #12 13.17 Error: Prisma schema validation - (get-config wasm)
+2026-Jun-28 22:30:31.356897 #12 13.17 Error code: P1012
+2026-Jun-28 22:30:31.356897 #12 13.17 error: The datasource property `url` is no longer supported in schema files. Move connection URLs for Migrate to `prisma.config.ts` and pass either `adapter` for a direct database connection or `accelerateUrl` for Accelerate to the `PrismaClient` constructor. See https://pris.ly/d/config-datasource and https://pris.ly/d/prisma7-client-config
+2026-Jun-28 22:30:31.356897 #12 13.17 --> apps/api/src/prisma/schema.prisma:5
+2026-Jun-28 22:30:31.356897 #12 13.17 |
+2026-Jun-28 22:30:31.356897 #12 13.17 4 | provider = "postgresql"
+2026-Jun-28 22:30:31.356897 #12 13.17 5 | url = env("DATABASE_URL")
+2026-Jun-28 22:30:31.356897 #12 13.17 |
+2026-Jun-28 22:30:31.356897 #12 13.17
+2026-Jun-28 22:30:31.356897 #12 13.17 Validation Error Count: 1
+2026-Jun-28 22:30:31.356897 #12 13.17 [Context: getConfig]
+2026-Jun-28 22:30:31.356897 #12 13.17
+2026-Jun-28 22:30:31.356897 #12 13.17 Prisma CLI Version : 7.8.0
+2026-Jun-28 22:30:31.634984 #12 ERROR: process "/bin/sh -c npx prisma generate --schema=apps/api/src/prisma/schema.prisma" did not complete successfully: exit code: 1
+2026-Jun-28 22:30:31.787452 ------
+2026-Jun-28 22:30:31.787452 > [builder 8/9] RUN npx prisma generate --schema=apps/api/src/prisma/schema.prisma:
+2026-Jun-28 22:30:31.787452 13.17 --> apps/api/src/prisma/schema.prisma:5
+2026-Jun-28 22:30:31.787452 13.17 |
+2026-Jun-28 22:30:31.787452 13.17 4 | provider = "postgresql"
+2026-Jun-28 22:30:31.787452 13.17 5 | url = env("DATABASE_URL")
+2026-Jun-28 22:30:31.787452 13.17 |
+2026-Jun-28 22:30:31.787452 13.17
+2026-Jun-28 22:30:31.787452 13.17 Validation Error Count: 1
+2026-Jun-28 22:30:31.787452 13.17 [Context: getConfig]
+2026-Jun-28 22:30:31.787452 13.17
+2026-Jun-28 22:30:31.787452 13.17 Prisma CLI Version : 7.8.0
+2026-Jun-28 22:30:31.787452 ------
+2026-Jun-28 22:30:31.799708 4 warnings found (use docker --debug to expand):
+2026-Jun-28 22:30:31.799708 - SecretsUsedInArgOrEnv: Do not use ARG or ENV instructions for sensitive data (ARG "NAVASAN_API_KEY") (line 28)
+2026-Jun-28 22:30:31.799708 - SecretsUsedInArgOrEnv: Do not use ARG or ENV instructions for sensitive data (ARG "JWT_ACCESS_SECRET") (line 4)
+2026-Jun-28 22:30:31.799708 - SecretsUsedInArgOrEnv: Do not use ARG or ENV instructions for sensitive data (ARG "NAVASAN_API_KEY") (line 7)
+2026-Jun-28 22:30:31.799708 - SecretsUsedInArgOrEnv: Do not use ARG or ENV instructions for sensitive data (ARG "JWT_ACCESS_SECRET") (line 25)
+2026-Jun-28 22:30:31.799708 Dockerfile:19
+2026-Jun-28 22:30:31.799708 --------------------
+2026-Jun-28 22:30:31.799708 17 | RUN npm config set registry https://mirror-npm.runflare.com && npm install --include=dev --no-audit --no-fund
+2026-Jun-28 22:30:31.799708 18 | COPY . .
+2026-Jun-28 22:30:31.799708 19 | >>> RUN npx prisma generate --schema=apps/api/src/prisma/schema.prisma
+2026-Jun-28 22:30:31.799708 20 | RUN npm run build --workspace=api
+2026-Jun-28 22:30:31.799708 21 |
+2026-Jun-28 22:30:31.799708 --------------------
+2026-Jun-28 22:30:31.799708 ERROR: failed to build: failed to solve: process "/bin/sh -c npx prisma generate --schema=apps/api/src/prisma/schema.prisma" did not complete successfully: exit code: 1
+2026-Jun-28 22:30:31.817522 exit status 1
+2026-Jun-28 22:30:32.003723 ========================================
+2026-Jun-28 22:30:32.035558 Deployment failed: Command execution failed (exit code 1): docker exec ev0no7lypfizf62h4z2pbs6z bash -c 'bash /artifacts/build.sh'
+2026-Jun-28 22:30:32.035558 Error: #0 building with "default" instance using docker driver
+2026-Jun-28 22:30:32.035558
+2026-Jun-28 22:30:32.035558 #1 [internal] load build definition from Dockerfile
+2026-Jun-28 22:30:32.035558 #1 transferring dockerfile: 1.82kB 0.0s done
+2026-Jun-28 22:30:32.035558 #1 DONE 0.1s
+2026-Jun-28 22:30:32.035558
+2026-Jun-28 22:30:32.035558 #2 [internal] load metadata for docker.io/library/node:22.13-alpine
+2026-Jun-28 22:30:32.035558 #2 DONE 6.4s
+2026-Jun-28 22:30:32.035558
+2026-Jun-28 22:30:32.035558 #3 [internal] load .dockerignore
+2026-Jun-28 22:30:32.035558 #3 transferring context: 2B done
+2026-Jun-28 22:30:32.035558 #3 DONE 0.1s
+2026-Jun-28 22:30:32.035558
+2026-Jun-28 22:30:32.035558 #4 [internal] load build context
+2026-Jun-28 22:30:32.035558 #4 DONE 0.0s
+2026-Jun-28 22:30:32.035558
+2026-Jun-28 22:30:32.035558 #5 [builder 1/9] FROM docker.io/library/node:22.13-alpine@sha256:e2b39f7b64281324929257d0f8004fb6cb4bf0fdfb9aa8cedb235a766aec31da
+2026-Jun-28 22:30:32.035558 #5 resolve docker.io/library/node:22.13-alpine@sha256:e2b39f7b64281324929257d0f8004fb6cb4bf0fdfb9aa8cedb235a766aec31da 0.1s done
+2026-Jun-28 22:30:32.035558 #5 DONE 0.1s
+2026-Jun-28 22:30:32.035558
+2026-Jun-28 22:30:32.035558 #4 [internal] load build context
+2026-Jun-28 22:30:32.035558 #4 transferring context: 17.59MB 1.3s done
+2026-Jun-28 22:30:32.035558 #4 DONE 1.3s
+2026-Jun-28 22:30:32.035558
+2026-Jun-28 22:30:32.035558 #6 [builder 2/9] WORKDIR /app
+2026-Jun-28 22:30:32.035558 #6 CACHED
+2026-Jun-28 22:30:32.035558
+2026-Jun-28 22:30:32.035558 #7 [builder 3/9] COPY package.json package-lock.json ./
+2026-Jun-28 22:30:32.035558 #7 DONE 0.3s
+2026-Jun-28 22:30:32.035558
+2026-Jun-28 22:30:32.035558 #8 [builder 4/9] COPY apps/api/package.json ./apps/api/
+2026-Jun-28 22:30:32.035558 #8 DONE 0.1s
+2026-Jun-28 22:30:32.035558
+2026-Jun-28 22:30:32.035558 #9 [builder 5/9] COPY apps/web/package.json ./apps/web/
+2026-Jun-28 22:30:32.035558 #9 DONE 0.1s
+2026-Jun-28 22:30:32.035558
+2026-Jun-28 22:30:32.035558 #10 [builder 6/9] RUN npm config set registry https://mirror-npm.runflare.com && npm install --include=dev --no-audit --no-fund
+2026-Jun-28 22:30:32.035558 #10 85.45
+2026-Jun-28 22:30:32.035558 #10 85.45 added 341 packages in 1m
+2026-Jun-28 22:30:32.035558 #10 DONE 86.0s
+2026-Jun-28 22:30:32.035558
+2026-Jun-28 22:30:32.035558 #11 [builder 7/9] COPY . .
+2026-Jun-28 22:30:32.035558 #11 DONE 3.6s
+2026-Jun-28 22:30:32.035558
+2026-Jun-28 22:30:32.035558 #12 [builder 8/9] RUN npx prisma generate --schema=apps/api/src/prisma/schema.prisma
+2026-Jun-28 22:30:32.035558 #12 13.16 Prisma schema loaded from apps/api/src/prisma/schema.prisma.
+2026-Jun-28 22:30:32.035558 #12 13.17 Error: Prisma schema validation - (get-config wasm)
+2026-Jun-28 22:30:32.035558 #12 13.17 Error code: P1012
+2026-Jun-28 22:30:32.035558 #12 13.17 error: The datasource property `url` is no longer supported in schema files. Move connection URLs for Migrate to `prisma.config.ts` and pass either `adapter` for a direct database connection or `accelerateUrl` for Accelerate to the `PrismaClient` constructor. See https://pris.ly/d/config-datasource and https://pris.ly/d/prisma7-client-config
+2026-Jun-28 22:30:32.035558 #12 13.17 --> apps/api/src/prisma/schema.prisma:5
+2026-Jun-28 22:30:32.035558 #12 13.17 |
+2026-Jun-28 22:30:32.035558 #12 13.17 4 | provider = "postgresql"
+2026-Jun-28 22:30:32.035558 #12 13.17 5 | url = env("DATABASE_URL")
+2026-Jun-28 22:30:32.035558 #12 13.17 |
+2026-Jun-28 22:30:32.035558 #12 13.17
+2026-Jun-28 22:30:32.035558 #12 13.17 Validation Error Count: 1
+2026-Jun-28 22:30:32.035558 #12 13.17 [Context: getConfig]
+2026-Jun-28 22:30:32.035558 #12 13.17
+2026-Jun-28 22:30:32.035558 #12 13.17 Prisma CLI Version : 7.8.0
+2026-Jun-28 22:30:32.035558 #12 ERROR: process "/bin/sh -c npx prisma generate --schema=apps/api/src/prisma/schema.prisma" did not complete successfully: exit code: 1
+2026-Jun-28 22:30:32.035558 ------
+2026-Jun-28 22:30:32.035558 > [builder 8/9] RUN npx prisma generate --schema=apps/api/src/prisma/schema.prisma:
+2026-Jun-28 22:30:32.035558 13.17 --> apps/api/src/prisma/schema.prisma:5
+2026-Jun-28 22:30:32.035558 13.17 |
+2026-Jun-28 22:30:32.035558 13.17 4 | provider = "postgresql"
+2026-Jun-28 22:30:32.035558 13.17 5 | url = env("DATABASE_URL")
+2026-Jun-28 22:30:32.035558 13.17 |
+2026-Jun-28 22:30:32.035558 13.17
+2026-Jun-28 22:30:32.035558 13.17 Validation Error Count: 1
+2026-Jun-28 22:30:32.035558 13.17 [Context: getConfig]
+2026-Jun-28 22:30:32.035558 13.17
+2026-Jun-28 22:30:32.035558 13.17 Prisma CLI Version : 7.8.0
+2026-Jun-28 22:30:32.035558 ------
+2026-Jun-28 22:30:32.035558
+2026-Jun-28 22:30:32.035558 4 warnings found (use docker --debug to expand):
+2026-Jun-28 22:30:32.035558 - SecretsUsedInArgOrEnv: Do not use ARG or ENV instructions for sensitive data (ARG "NAVASAN_API_KEY") (line 28)
+2026-Jun-28 22:30:32.035558 - SecretsUsedInArgOrEnv: Do not use ARG or ENV instructions for sensitive data (ARG "JWT_ACCESS_SECRET") (line 4)
+2026-Jun-28 22:30:32.035558 - SecretsUsedInArgOrEnv: Do not use ARG or ENV instructions for sensitive data (ARG "NAVASAN_API_KEY") (line 7)
+2026-Jun-28 22:30:32.035558 - SecretsUsedInArgOrEnv: Do not use ARG or ENV instructions for sensitive data (ARG "JWT_ACCESS_SECRET") (line 25)
+2026-Jun-28 22:30:32.035558 Dockerfile:19
+2026-Jun-28 22:30:32.035558 --------------------
+2026-Jun-28 22:30:32.035558 17 | RUN npm config set registry https://mirror-npm.runflare.com && npm install --include=dev --no-audit --no-fund
+2026-Jun-28 22:30:32.035558 18 | COPY . .
+2026-Jun-28 22:30:32.035558 19 | >>> RUN npx prisma generate --schema=apps/api/src/prisma/schema.prisma
+2026-Jun-28 22:30:32.035558 20 | RUN npm run build --workspace=api
+2026-Jun-28 22:30:32.035558 21 |
+2026-Jun-28 22:30:32.035558 --------------------
+2026-Jun-28 22:30:32.035558 ERROR: failed to build: failed to solve: process "/bin/sh -c npx prisma generate --schema=apps/api/src/prisma/schema.prisma" did not complete successfully: exit code: 1
+2026-Jun-28 22:30:32.035558 exit status 1
+2026-Jun-28 22:30:32.058373 Error type: App\Exceptions\DeploymentException
+2026-Jun-28 22:30:32.082988 Error code: 0
+2026-Jun-28 22:30:32.107625 Location: /var/www/html/app/Traits/ExecuteRemoteCommand.php:242
+2026-Jun-28 22:30:32.129446 Stack trace (first 5 lines):
+2026-Jun-28 22:30:32.150999 #0 /var/www/html/app/Traits/ExecuteRemoteCommand.php(106): App\Jobs\ApplicationDeploymentJob->executeCommandWithProcess()
+2026-Jun-28 22:30:32.171464 #1 /var/www/html/vendor/laravel/framework/src/Illuminate/Collections/Traits/EnumeratesValues.php(275): App\Jobs\ApplicationDeploymentJob->{closure:App\Traits\ExecuteRemoteCommand::execute_remote_command():72}()
+2026-Jun-28 22:30:32.191357 #2 /var/www/html/app/Traits/ExecuteRemoteCommand.php(72): Illuminate\Support\Collection->each()
+2026-Jun-28 22:30:32.208708 #3 /var/www/html/app/Jobs/ApplicationDeploymentJob.php(3821): App\Jobs\ApplicationDeploymentJob->execute_remote_command()
+2026-Jun-28 22:30:32.229723 #4 /var/www/html/app/Jobs/ApplicationDeploymentJob.php(912): App\Jobs\ApplicationDeploymentJob->build_image()
+2026-Jun-28 22:30:32.249936 ========================================
+2026-Jun-28 22:30:32.269043 Deployment failed. Removing the new version of your application.
