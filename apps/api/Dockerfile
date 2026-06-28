@@ -4,7 +4,7 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 COPY apps/api/package.json ./apps/api/
 COPY apps/web/package.json ./apps/web/
-RUN npm install --include=dev --no-audit --no-fund
+RUN npm config set registry https://mirror-npm.runflare.com && npm install --include=dev --no-audit --no-fund
 COPY . .
 RUN npx prisma generate --schema=apps/api/src/prisma/schema.prisma
 RUN npm run build --workspace=api
@@ -17,4 +17,4 @@ COPY --from=builder /app/package.json /app/package-lock.json ./
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/apps/api ./apps/api
 EXPOSE 3000
-CMD ["node", "apps/api/dist/server.js"]
+CMD ["sh", "-c", "npx prisma migrate deploy --schema=apps/api/src/prisma/schema.prisma && node apps/api/dist/server.js"]

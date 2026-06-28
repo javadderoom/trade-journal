@@ -4,7 +4,7 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 COPY apps/api/package.json ./apps/api/
 COPY apps/web/package.json ./apps/web/
-RUN npm install --include=dev --no-audit --no-fund
+RUN npm config set registry https://mirror-npm.runflare.com && npm install --include=dev --no-audit --no-fund
 COPY . .
 ARG NEXT_PUBLIC_API_URL
 ARG NEXT_PUBLIC_API_BASE_URL

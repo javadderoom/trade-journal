@@ -111,11 +111,8 @@ Coolify offers one-click database services.
    * `NODE_ENV` = `production`
    * `PORT` = `3000`
 
-6. **Add Migration Hook (Crucial):**
-   To make sure Prisma migrations apply automatically on deployment, go to **Pre-start command** (or deployment lifecycle hooks) in Coolify settings and insert:
-   ```bash
-   npx prisma migrate deploy --schema src/prisma/schema.prisma --config src/prisma/prisma.config.ts
-   ```
+6. **Database Migrations:**
+   *(Note: The Dockerfile is pre-configured to automatically run `npx prisma migrate deploy` on startup to initialize/update your database tables, so you do not need to configure any manual hooks or pre-start commands in Coolify).*
 
 7. Click **Deploy**.
 
