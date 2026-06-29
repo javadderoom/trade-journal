@@ -9,7 +9,7 @@
 #property strict
 
 //--- Input parameters (configure in MT5 Properties → Inputs)
-input string   InpApiUrl       = "http://127.0.0.1:3000";  // API Base URL
+input string   InpApiUrl       = "https://api.tradekav.ir";  // API Base URL
 input string   InpApiToken     = "";                       // API Auth Token (leave empty if no auth)
 input int      InpAccountId    = 1;                        // Account ID in معامله‌یار
 input int      InpSyncInterval = 60;                       // Sync interval in seconds (0 = manual only)
@@ -372,7 +372,16 @@ bool SendToApi(string jsonPayload)
 
    if(response == 200 || response == 201)
    {
+      // Reset timer to input interval on success
+      if(InpSyncInterval > 0)
+         EventSetTimer(InpSyncInterval);
       return true;
+   }
+   else if(response == 429)
+   {
+      // Rate limited: adjust timer to 1 hour (3600 seconds) to avoid spamming
+      Print("Rate limit reached (429). Setting sync interval to 1 hour.");
+      EventSetTimer(3600);
    }
    else if(response == -1)
    {

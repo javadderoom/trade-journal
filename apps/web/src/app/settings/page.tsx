@@ -621,6 +621,73 @@ export default function SettingsPage() {
                 <span>افزودن حساب بروکر جدید</span>
               </button>
             )}
+
+            {/* MetaTrader EA Syncing Section */}
+            <div className="ea-sync-section" style={{
+              marginTop: '32px',
+              padding: '24px',
+              background: 'rgba(255,255,255,0.02)',
+              border: '1px solid rgba(255,255,255,0.05)',
+              borderRadius: '12px',
+              boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)'
+            }}>
+              <div style={{ display: 'flex', gap: '16px', alignItems: 'flex-start' }}>
+                <div style={{
+                  background: 'rgba(59, 130, 246, 0.1)',
+                  color: '#3b82f6',
+                  padding: '12px',
+                  borderRadius: '10px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}>
+                  <span className="material-symbols-outlined" style={{ fontSize: '2rem' }}>sync_alt</span>
+                </div>
+                <div style={{ flex: 1 }}>
+                  <h3 style={{ margin: '0 0 8px 0', fontSize: '1.1rem', fontWeight: 'bold', color: '#f8fafc' }}>همگام‌سازی خودکار با متاتریدر ۵</h3>
+                  <p style={{ margin: '0 0 16px 0', color: '#94a3b8', fontSize: '0.85rem', lineHeight: '1.6' }}>
+                    با دانلود و نصب اکسپرت اختصاصی تریدکاو روی متاتریدر ۵، معاملات شما به صورت کاملاً خودکار و در لحظه به ژورنال منتقل می‌شوند. نیازی به خروجی گرفتن دستی نیست.
+                  </p>
+                  
+                  <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+                    <a
+                      href="/downloads/TradeJournal_EA.ex5"
+                      download="TradeJournal_EA.ex5"
+                      className="settings-save-btn"
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        textDecoration: 'none',
+                        fontSize: '0.85rem',
+                        padding: '10px 16px'
+                      }}
+                    >
+                      <span className="material-symbols-outlined" style={{ fontSize: '1.2rem' }}>download</span>
+                      <span>دانلود اکسپرت متاتریدر ۵ (EX5)</span>
+                    </a>
+                    
+                    <a
+                      href="https://tradekav.ir/help/ea-setup"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="settings-cancel-btn"
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        textDecoration: 'none',
+                        fontSize: '0.85rem',
+                        padding: '10px 16px'
+                      }}
+                    >
+                      <span className="material-symbols-outlined" style={{ fontSize: '1.2rem' }}>help</span>
+                      <span>راهنمای نصب و راه‌اندازی</span>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
           </section>
         )}
 
