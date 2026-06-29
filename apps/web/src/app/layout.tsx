@@ -5,7 +5,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html dir="rtl" lang="fa" suppressHydrationWarning>
       <head>
-        <title>تریدکاو | ژورنال معاملاتی هوشمند</title>
+        <title>9817210</title>
         {/* Vazirmatn — self-hosted, no CDN (Google Fonts is blocked in Iran) */}
         <link rel="stylesheet" href="/fonts/vazirmatn.css" />
         {/* Material Symbols — keep CDN for icons (not blocked) */}
