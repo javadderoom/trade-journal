@@ -7,6 +7,7 @@ COPY apps/web/package.json ./apps/web/
 RUN npm install --include=dev --no-audit --no-fund
 COPY . .
 RUN npx prisma generate --schema=apps/api/src/prisma/schema.prisma
+ENV NODE_OPTIONS="--max-old-space-size=2048"
 RUN npm run build --workspace=api
 
 # Stage 2: Runner
