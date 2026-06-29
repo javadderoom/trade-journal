@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuthStore } from '../../../lib/auth';
+import { notify } from '../../../lib/notify';
 import '../auth.scss';
 
 function RegisterForm() {
@@ -69,7 +70,9 @@ function RegisterForm() {
   const handleSendOtp = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!phone) {
-      setError('لطفاً شماره موبایل خود را وارد کنید');
+      const msg = 'لطفاً شماره موبایل خود را وارد کنید';
+      setError(msg);
+      notify.error(msg);
       return;
     }
 
@@ -78,11 +81,14 @@ function RegisterForm() {
 
     try {
       await sendOtp(phone);
+      notify.success('کد تایید با موفقیت ارسال شد');
       setStep(2);
       setTimer(120);
       setTimerActive(true);
     } catch (err: any) {
-      setError(err.message || 'خطا در ارسال کد تایید');
+      const msg = err.message || 'خطا در ارسال کد تایید';
+      setError(msg);
+      notify.error(msg);
     } finally {
       setLoading(false);
     }
@@ -91,7 +97,9 @@ function RegisterForm() {
   const handleVerifyOtp = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!phone || !code) {
-      setError('لطفاً کد تایید را وارد کنید');
+      const msg = 'لطفاً کد تایید را وارد کنید';
+      setError(msg);
+      notify.error(msg);
       return;
     }
 
@@ -101,14 +109,18 @@ function RegisterForm() {
     try {
       const res = await verifyOtp(phone, code);
       if (res.isNewUser) {
+        notify.success('شماره موبایل تایید شد. لطفاً ثبت نام خود را کامل کنید.');
         setRegisterToken(res.registerToken || null);
         setStep(3);
       } else {
+        notify.success('ورود با موفقیت انجام شد');
         // User already exists, they got logged in automatically
         router.replace('/trades');
       }
     } catch (err: any) {
-      setError(err.message || 'کد تایید نامعتبر یا منقضی شده است');
+      const msg = err.message || 'کد تایید نامعتبر یا منقضی شده است';
+      setError(msg);
+      notify.error(msg);
     } finally {
       setLoading(false);
     }
@@ -120,11 +132,14 @@ function RegisterForm() {
     setLoading(true);
     try {
       await sendOtp(phone);
+      notify.success('کد تایید مجدداً ارسال شد');
       setTimer(120);
       setTimerActive(true);
       setCode('');
     } catch (err: any) {
-      setError(err.message || 'خطا در ارسال مجدد کد تایید');
+      const msg = err.message || 'خطا در ارسال مجدد کد تایید';
+      setError(msg);
+      notify.error(msg);
     } finally {
       setLoading(false);
     }
@@ -133,17 +148,23 @@ function RegisterForm() {
   const handleCompleteRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name || !email || !password || !confirmPassword) {
-      setError('لطفاً تمامی فیلدها را پر کنید');
+      const msg = 'لطفاً تمامی فیلدها را پر کنید';
+      setError(msg);
+      notify.error(msg);
       return;
     }
 
     if (password !== confirmPassword) {
-      setError('رمز عبور و تایید آن مطابقت ندارند');
+      const msg = 'رمز عبور و تایید آن مطابقت ندارند';
+      setError(msg);
+      notify.error(msg);
       return;
     }
 
     if (!registerToken) {
-      setError('توکن ثبت‌نام منقضی شده یا نامعتبر است. لطفاً فرآیند را از ابتدا آغاز کنید.');
+      const msg = 'توکن ثبت‌نام منقضی شده یا نامعتبر است. لطفاً فرآیند را از ابتدا آغاز کنید.';
+      setError(msg);
+      notify.error(msg);
       setStep(1);
       return;
     }
@@ -153,9 +174,12 @@ function RegisterForm() {
 
     try {
       await registerOtp(registerToken, name, email, password);
+      notify.success('عضویت شما با موفقیت تکمیل شد');
       router.replace('/trades');
     } catch (err: any) {
-      setError(err.message || 'خطا در تکمیل ثبت نام');
+      const msg = err.message || 'خطا در تکمیل ثبت نام';
+      setError(msg);
+      notify.error(msg);
     } finally {
       setLoading(false);
     }

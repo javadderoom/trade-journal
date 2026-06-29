@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '../../../lib/auth';
+import { notify } from '../../../lib/notify';
 import '../auth.scss';
 
 export default function LoginPage() {
@@ -47,7 +48,9 @@ export default function LoginPage() {
   const handlePasswordSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email || !password) {
-      setError('لطفاً تمامی فیلدها را پر کنید');
+      const msg = 'لطفاً تمامی فیلدها را پر کنید';
+      setError(msg);
+      notify.error(msg);
       return;
     }
 
@@ -56,9 +59,12 @@ export default function LoginPage() {
 
     try {
       await login(email, password);
+      notify.success('ورود با موفقیت انجام شد');
       router.replace('/trades');
     } catch (err: any) {
-      setError(err.message || 'خطا در ورود به سیستم');
+      const msg = err.message || 'خطا در ورود به سیستم';
+      setError(msg);
+      notify.error(msg);
     } finally {
       setLoading(false);
     }
@@ -67,7 +73,9 @@ export default function LoginPage() {
   const handleSendOtp = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!phone) {
-      setError('لطفاً شماره موبایل خود را وارد کنید');
+      const msg = 'لطفاً شماره موبایل خود را وارد کنید';
+      setError(msg);
+      notify.error(msg);
       return;
     }
 
@@ -76,11 +84,14 @@ export default function LoginPage() {
 
     try {
       await sendOtp(phone);
+      notify.success('کد تایید با موفقیت ارسال شد');
       setOtpStep(2);
       setTimer(120);
       setTimerActive(true);
     } catch (err: any) {
-      setError(err.message || 'خطا در ارسال کد تایید');
+      const msg = err.message || 'خطا در ارسال کد تایید';
+      setError(msg);
+      notify.error(msg);
     } finally {
       setLoading(false);
     }
@@ -89,7 +100,9 @@ export default function LoginPage() {
   const handleVerifyOtp = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!phone || !code) {
-      setError('لطفاً کد تایید را وارد کنید');
+      const msg = 'لطفاً کد تایید را وارد کنید';
+      setError(msg);
+      notify.error(msg);
       return;
     }
 
@@ -99,13 +112,16 @@ export default function LoginPage() {
     try {
       const res = await verifyOtp(phone, code);
       if (res.isNewUser) {
-        // Redirect to register wizard with token
+        notify.success('شماره موبایل تایید شد. لطفاً ثبت نام خود را کامل کنید.');
         router.replace(`/register?token=${res.registerToken}&phone=${phone}`);
       } else {
+        notify.success('ورود با موفقیت انجام شد');
         router.replace('/trades');
       }
     } catch (err: any) {
-      setError(err.message || 'کد تایید نامعتبر یا منقضی شده است');
+      const msg = err.message || 'کد تایید نامعتبر یا منقضی شده است';
+      setError(msg);
+      notify.error(msg);
     } finally {
       setLoading(false);
     }
@@ -117,11 +133,14 @@ export default function LoginPage() {
     setLoading(true);
     try {
       await sendOtp(phone);
+      notify.success('کد تایید مجدداً ارسال شد');
       setTimer(120);
       setTimerActive(true);
       setCode('');
     } catch (err: any) {
-      setError(err.message || 'خطا در ارسال مجدد کد تایید');
+      const msg = err.message || 'خطا در ارسال مجدد کد تایید';
+      setError(msg);
+      notify.error(msg);
     } finally {
       setLoading(false);
     }

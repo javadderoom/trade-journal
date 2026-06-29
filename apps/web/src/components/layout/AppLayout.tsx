@@ -24,10 +24,18 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
       try {
         const parsedUrl = new URL(url, window.location.origin);
-        isApiCall = parsedUrl.pathname.startsWith('/api') && !parsedUrl.pathname.startsWith('/api/exchange-rate');
+        const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+        let apiOrigin = '';
+        try {
+          apiOrigin = new URL(apiBase).origin;
+        } catch (_) {}
+
+        const isLocalOrigin = parsedUrl.origin === window.location.origin || (apiOrigin && parsedUrl.origin === apiOrigin);
+        isApiCall = isLocalOrigin && parsedUrl.pathname.startsWith('/api') && !parsedUrl.pathname.startsWith('/api/exchange-rate');
         isAuthRoute = parsedUrl.pathname.includes('/api/auth/refresh') || parsedUrl.pathname.includes('/api/auth/login');
       } catch (e) {
-        isApiCall = url.startsWith('/api') && !url.startsWith('/api/exchange-rate');
+        const isRelative = !url.startsWith('http://') && !url.startsWith('https://') && !url.startsWith('//');
+        isApiCall = isRelative && url.startsWith('/api') && !url.startsWith('/api/exchange-rate');
         isAuthRoute = url.includes('/api/auth/refresh') || url.includes('/api/auth/login');
       }
 

@@ -1,0 +1,50 @@
+# Stalwart Mail Server Docker Compose for Coolify
+#
+# How to deploy this in Coolify:
+# 1. In Coolify, go to your Project -> Production -> click "New Resource" -> choose "Docker Compose".
+# 2. Copy and paste the contents of this file into the Compose configuration box.
+# 3. In the Coolify environment variables or configuration, map your domain (e.g., https://mail.tradekav.ir) 
+#    to point to port 8080 (the Stalwart web admin and webmail port).
+#    Coolify's built-in reverse proxy (Traefik) will automatically request SSL for mail.tradekav.ir.
+# 4. Under the Stalwart container settings in Coolify, make sure the exposed ports (25, 465, 587, 993) 
+#    are mapped to the host system.
+
+version: '3.8'
+
+services:
+  stalwart-mail:
+    image: stalwartlabs/mail-server:latest
+    container_name: stalwart-mail
+    restart: always
+    ports:
+      # SMTP ports (must be exposed directly to the VPS host)
+      - "25:25"     # SMTP (Incoming mail, requires Port 25 to be unblocked by your VPS provider)
+      - "465:465"   # SMTPS (Implicit TLS for sending mail)
+      - "587:587"   # SMTP Submission (Explicit TLS / STARTTLS for sending mail)
+      
+      # IMAP ports (for connecting email clients like Outlook, Thunderbird, or Gmail app)
+      - "993:993"   # IMAPS (Secure IMAP)
+      - "143:143"   # IMAP (STARTTLS)
+      
+      # Optional POP3 ports (if needed)
+      # - "995:995" # POP3S
+      # - "110:110" # POP3
+      
+      # Web Interface port (Internal only, mapped to Coolify for reverse proxying)
+      # In Coolify, assign your domain (e.g. https://mail.tradekav.ir) and target port 8080.
+      # You can also expose it directly if you want, but using Traefik/Coolify's domain routing is cleaner.
+      - "8080:8080"
+    volumes:
+      # Persistent volume to store all configurations, accounts, and actual emails.
+      # Coolify will mount this to the VPS host system so your data persists across updates.
+      - stalwart-data:/opt/stalwart-mail
+    environment:
+      # Set a temporary admin password for the initial setup. 
+      # Change this immediately upon first login to the web panel.
+      - STALWART_ADMIN_PASSWORD=change-me-to-something-secure
+      # Configure timezone
+      - TZ=Asia/Tehran
+
+volumes:
+  stalwart-data:
+    driver: local
