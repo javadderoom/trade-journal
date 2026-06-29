@@ -843,4 +843,217 @@ $set-gold: #f5c542;
   }
 }
 
+/* Broker API Tokens Sub-panel */
+.broker-tokens-panel {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px dashed rgba($set-border, 0.8);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  text-align: right;
+
+  .tokens-list-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    h5 {
+      margin: 0;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: $set-text;
+    }
+  }
+
+  .tokens-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .token-item {
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba($set-border, 0.5);
+    padding: 8px 12px;
+    border-radius: 6px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    direction: ltr;
+
+    .token-details {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      text-align: right;
+      .token-name {
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: #ffffff;
+      }
+      .token-meta {
+        font-size: 0.72rem;
+        color: $set-muted;
+        code {
+          background: rgba(255, 255, 255, 0.05);
+          padding: 1px 4px;
+          border-radius: 3px;
+          color: #f43f5e;
+          font-family: monospace;
+          margin-left: 6px;
+        }
+      }
+    }
+
+    .delete-token-btn {
+      background: transparent;
+      border: none;
+      color: #ef4444;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      padding: 4px;
+      border-radius: 4px;
+      transition: background 0.2s;
+      &:hover {
+        background: rgba(239, 68, 68, 0.1);
+      }
+      .material-symbols-outlined {
+        font-size: 1.1rem;
+      }
+    }
+  }
+
+  .create-token-form {
+    display: flex;
+    gap: 8px;
+    margin-top: 4px;
+    direction: rtl;
+    input {
+      flex: 1;
+      padding: 6px 12px;
+      background: rgba(0, 0, 0, 0.2);
+      border: 1px solid $set-border;
+      border-radius: 6px;
+      color: $set-text;
+      font-size: 0.8rem;
+      font-family: inherit;
+      outline: none;
+      &:focus {
+        border-color: $set-accent;
+      }
+    }
+    button {
+      padding: 6px 14px;
+      background: $set-accent;
+      border: none;
+      border-radius: 6px;
+      color: #ffffff;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+      &:hover {
+        background: darken($set-accent, 5%);
+      }
+    }
+  }
+
+  .no-tokens {
+    font-size: 0.78rem;
+    color: $set-muted;
+    text-align: center;
+    padding: 12px 0;
+  }
+}
+
+/* Secure Token Reveal Modal */
+.token-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  direction: rtl;
+}
+
+.token-modal {
+  background: #111827;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  width: 90%;
+  max-width: 480px;
+  padding: 24px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  text-align: right;
+
+  h3 {
+    margin: 0 0 12px 0;
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: #ffffff;
+  }
+
+  p {
+    font-size: 0.85rem;
+    color: #94a3b8;
+    line-height: 1.6;
+    margin-bottom: 20px;
+  }
+
+  .token-reveal-box {
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 12px 16px;
+    border-radius: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    direction: ltr;
+
+    code {
+      color: #34d399;
+      font-size: 1rem;
+      font-weight: 700;
+      font-family: monospace;
+      user-select: all;
+    }
+
+    .copy-token-btn {
+      background: transparent;
+      border: none;
+      color: #64748b;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      transition: color 0.2s;
+      &:hover { color: #ffffff; }
+      .material-symbols-outlined { font-size: 1.2rem; }
+    }
+  }
+
+  .token-modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    button {
+      padding: 8px 20px;
+      background: #6366f1;
+      color: #ffffff;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      &:hover { background: #4f46e5; }
+    }
+  }
+}
+
+
 

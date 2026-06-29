@@ -134,6 +134,13 @@ export default function SettingsPage() {
   // ─── Subscription state ──────────────────────────────────────────────────
   const [subscription, setSubscription] = useState<any>(null);
 
+  // ─── API Tokens state ───────────────────────────────────────────────────
+  const [tokens, setTokens] = useState<{[accountId: string]: any[]}>({});
+  const [loadingTokens, setLoadingTokens] = useState<{[accountId: string]: boolean}>({});
+  const [newTokenName, setNewTokenName] = useState('');
+  const [showTokenModal, setShowTokenModal] = useState<{ token: string; name: string } | null>(null);
+  const [expandedTokenAccountId, setExpandedTokenAccountId] = useState<string | null>(null);
+
   // ─── Security state ──────────────────────────────────────────────────────
   const [passwordForm, setPasswordForm] = useState({ currentPassword: '', newPassword: '', confirmPassword: '' });
   const [showPasswords, setShowPasswords] = useState({ current: false, new: false, confirm: false });
@@ -277,6 +284,61 @@ export default function SettingsPage() {
       notify.success('حساب حذف شد');
     } catch (err: any) {
       notify.error(err.response?.data?.error || 'خطا در حذف');
+    }
+  };
+
+  // ─── API Tokens handlers ──────────────────────────────────────────────────
+  const fetchTokens = useCallback(async (accountId: string) => {
+    try {
+      setLoadingTokens(prev => ({ ...prev, [accountId]: true }));
+      const res = await api.get(`/api/accounts/${accountId}/tokens`);
+      setTokens(prev => ({ ...prev, [accountId]: res.data }));
+    } catch (err: any) {
+      notify.error(err.response?.data?.error || 'خطا در دریافت کلیدها');
+    } finally {
+      setLoadingTokens(prev => ({ ...prev, [accountId]: false }));
+    }
+  }, []);
+
+  const handleCreateToken = async (accountId: string) => {
+    if (!newTokenName.trim()) {
+      notify.error('لطفاً نامی برای کلید انتخاب کنید');
+      return;
+    }
+    try {
+      const res = await api.post(`/api/accounts/${accountId}/tokens`, { name: newTokenName });
+      setShowTokenModal({ token: res.data.token, name: res.data.name });
+      setNewTokenName('');
+      fetchTokens(accountId);
+      notify.success('کلید اتصال جدید ایجاد شد');
+    } catch (err: any) {
+      notify.error(err.response?.data?.error || 'خطا در ایجاد کلید اتصال');
+    }
+  };
+
+  const handleDeleteToken = async (accountId: string, tokenId: string) => {
+    const ok = await notify.confirm({
+      title: 'حذف کلید اتصال',
+      message: 'آیا از حذف این کلید اتصال مطمئن هستید؟ اکسپرت‌های متصل به این کلید دیگر کار نخواهند کرد.',
+      danger: true,
+      confirmLabel: 'حذف کلید',
+    });
+    if (!ok) return;
+    try {
+      await api.delete(`/api/accounts/${accountId}/tokens/${tokenId}`);
+      fetchTokens(accountId);
+      notify.success('کلید اتصال حذف شد');
+    } catch (err: any) {
+      notify.error(err.response?.data?.error || 'خطا در حذف کلید اتصال');
+    }
+  };
+
+  const handleToggleTokens = (accountId: string) => {
+    if (expandedTokenAccountId === accountId) {
+      setExpandedTokenAccountId(null);
+    } else {
+      setExpandedTokenAccountId(accountId);
+      fetchTokens(accountId);
     }
   };
 
@@ -563,8 +625,59 @@ export default function SettingsPage() {
                           currency: acc.currency,
                         });
                       }}>ویرایش</button>
+                      <button 
+                        className={`broker-action-btn ${expandedTokenAccountId === acc.id ? 'active' : ''}`} 
+                        onClick={() => handleToggleTokens(acc.id)}
+                      >
+                        کلیدهای اتصال (API)
+                      </button>
                       <button className="broker-action-btn danger" onClick={() => handleDeleteAccount(acc.id, acc.trade_count)}>حذف</button>
                     </div>
+
+                    {/* Expanded Tokens Sub-panel */}
+                    {expandedTokenAccountId === acc.id && (
+                      <div className="broker-tokens-panel">
+                        <div className="tokens-list-header">
+                          <h5>کلیدهای اتصال متاتریدر ۵ (API Keys)</h5>
+                        </div>
+
+                        {loadingTokens[acc.id] ? (
+                          <div className="no-tokens">در حال بارگذاری...</div>
+                        ) : !tokens[acc.id] || tokens[acc.id].length === 0 ? (
+                          <div className="no-tokens">هیچ کلید اتصالی برای این حساب ساخته نشده است.</div>
+                        ) : (
+                          <div className="tokens-list">
+                            {tokens[acc.id].map((tok: any) => (
+                              <div key={tok.id} className="token-item">
+                                <button 
+                                  className="delete-token-btn" 
+                                  onClick={() => handleDeleteToken(acc.id, tok.id)}
+                                  title="حذف کلید"
+                                >
+                                  <span className="material-symbols-outlined">delete</span>
+                                </button>
+                                <div className="token-details">
+                                  <span className="token-name">{tok.name}</span>
+                                  <span className="token-meta">
+                                    پیش‌نمایش: <code>{tok.token_preview}</code>
+                                  </span>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+
+                        <div className="create-token-form">
+                          <input
+                            type="text"
+                            placeholder="نام کلید (مثلاً لپ‌تاپ من)"
+                            value={newTokenName}
+                            onChange={(e) => setNewTokenName(e.target.value)}
+                          />
+                          <button onClick={() => handleCreateToken(acc.id)}>ایجاد کلید</button>
+                        </div>
+                      </div>
+                    )}
                   </>
                 )}
               </div>
@@ -1128,6 +1241,34 @@ export default function SettingsPage() {
           </section>
         )}
       </div>
+
+      {/* API Token Reveal Modal */}
+      {showTokenModal && (
+        <div className="token-modal-overlay">
+          <div className="token-modal">
+            <h3>کلید اتصال جدید ایجاد شد</h3>
+            <p>
+              لطفاً این کلید اتصال را کپی کرده و در محل امنی ذخیره کنید. به دلایل امنیتی، این کلید <strong>دیگر نمایش داده نخواهد شد</strong>!
+            </p>
+            <div className="token-reveal-box">
+              <code>{showTokenModal.token}</code>
+              <button 
+                className="copy-token-btn" 
+                onClick={() => {
+                  navigator.clipboard.writeText(showTokenModal.token);
+                  notify.success('کلید اتصال کپی شد');
+                }}
+                title="کپی کلید"
+              >
+                <span className="material-symbols-outlined">content_copy</span>
+              </button>
+            </div>
+            <div className="token-modal-actions">
+              <button onClick={() => setShowTokenModal(null)}>بستن و فهمیدم</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
