@@ -48,6 +48,10 @@ export default function RegisterPage() {
   return (
     <div className="auth-page">
       <div className="auth-card">
+        <Link href="/" className="auth-back-link">
+          <span className="material-symbols-outlined">arrow_forward</span>
+          <span>بازگشت</span>
+        </Link>
         <div className="auth-header">
           <div className="auth-logo">
             <span className="material-symbols-outlined">person_add</span>

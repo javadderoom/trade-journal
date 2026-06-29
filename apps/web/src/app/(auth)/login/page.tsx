@@ -9,7 +9,7 @@ import '../auth.scss';
 export default function LoginPage() {
   const router = useRouter();
   const login = useAuthStore((state) => state.login);
-  
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -38,6 +38,10 @@ export default function LoginPage() {
   return (
     <div className="auth-page">
       <div className="auth-card">
+        <Link href="/" className="auth-back-link">
+          <span className="material-symbols-outlined">arrow_forward</span>
+          <span>بازگشت</span>
+        </Link>
         <div className="auth-header">
           <div className="auth-logo">
             <span className="material-symbols-outlined">analytics</span>

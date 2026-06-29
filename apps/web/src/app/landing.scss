@@ -1033,22 +1033,28 @@ $maxw: 1200px;
   gap: 32px;
   align-items: start;
 
-  .footer-brand {
+  .footer-brand-col {
     display: flex;
-    align-items: center;
-    gap: 8px;
-    .logo-mark {
-      display: grid; place-items: center;
-      width: 34px; height: 34px;
-      border-radius: 9px;
-      background: linear-gradient(135deg, rgba(61, 220, 151, 0.22), rgba(61, 220, 151, 0.06));
-      border: 1px solid rgba(61, 220, 151, 0.3);
-      color: $land-accent;
-      .material-symbols-outlined { font-size: 20px; }
+    flex-direction: column;
+    align-items: flex-start;
+
+    .footer-brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      .logo-mark {
+        display: grid; place-items: center;
+        width: 34px; height: 34px;
+        border-radius: 9px;
+        background: linear-gradient(135deg, rgba(61, 220, 151, 0.22), rgba(61, 220, 151, 0.06));
+        border: 1px solid rgba(61, 220, 151, 0.3);
+        color: $land-accent;
+        .material-symbols-outlined { font-size: 20px; }
+      }
+      .logo-text { font-weight: 700; font-size: 1.05rem; color: $land-text; }
     }
-    .logo-text { font-weight: 700; font-size: 1.05rem; color: $land-text; }
+    .footer-tag { font-size: 0.86rem; color: $land-muted; line-height: 1.7; margin: 12px 0 0; max-width: 32ch; }
   }
-  .footer-tag { font-size: 0.86rem; color: $land-muted; line-height: 1.7; margin: 12px 0 0; max-width: 32ch; }
 }
 
 .footer-links {
@@ -1107,7 +1113,10 @@ $maxw: 1200px;
   .bento-cell.wide { grid-column: span 2; }
   .pricing-grid { grid-template-columns: 1fr; max-width: 420px; margin: 0 auto; }
   .price-card.featured { transform: none; }
-  .footer-inner { grid-template-columns: 1fr 1fr; }
+  .footer-inner {
+    grid-template-columns: 1fr 1fr;
+    .footer-brand-col { grid-column: span 2; }
+  }
 }
 
 @media (max-width: 768px) {

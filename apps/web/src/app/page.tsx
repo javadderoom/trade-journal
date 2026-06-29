@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { useAuthStore } from '../lib/auth';
 import { toPersianDigits } from '../utils/farsi';
 import './landing.scss';
@@ -136,7 +137,8 @@ export default function LandingPage() {
   const [prices, setPrices] = useState<any>(null);
 
   useEffect(() => {
-    fetch('/api/payments/prices')
+    const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+    fetch(`${apiBase}/api/payments/prices`)
       .then(r => r.json())
       .then(data => setPrices(data))
       .catch(e => console.error('Failed to fetch pricing:', e));
@@ -470,11 +472,23 @@ export default function LandingPage() {
       {/* ─── Footer ─── */}
       <footer className="landing-footer">
         <div className="footer-inner">
-          <div className="footer-brand">
-            <img src="/logo.png" alt="تریدکاو" className="logo-img-landing" style={{ height: '34px', width: 'auto', objectFit: 'contain' }} />
-            <span className="logo-text">تریدکاو</span>
+          <div className="footer-brand-col">
+            <div className="footer-brand">
+              <img src="/logo.png" alt="تریدکاو" className="logo-img-landing" style={{ height: '34px', width: 'auto', objectFit: 'contain' }} />
+              <span className="logo-text">تریدکاو</span>
+            </div>
+            <p className="footer-tag">ژورنال معاملاتی هوشمند فارسی، ساخته‌شده برای معامله‌گران ایرانی.</p>
+            <div className="footer-namad" style={{ marginTop: '16px' }}>
+              <Link href="/namad">
+                <img
+                  referrerPolicy="origin"
+                  src="https://trustseal.enamad.ir/logo.aspx?id=6712312&Code=ijlypx97VzY8LxxCpiKO81gBE1Ju0VRE"
+                  alt="نماد اعتماد الکترونیکی تریدکاو"
+                  style={{ cursor: 'pointer', width: '60px', height: '60px', backgroundColor: '#ffffff', padding: '6px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.08)' }}
+                />
+              </Link>
+            </div>
           </div>
-          <p className="footer-tag">ژورنال معاملاتی هوشمند فارسی، ساخته‌شده برای معامله‌گران ایرانی.</p>
           <div className="footer-links">
             <div>
               <h4>محصول</h4>
