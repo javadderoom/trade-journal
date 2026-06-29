@@ -257,3 +257,63 @@
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
+
+.method-tabs {
+  display: flex;
+  margin-bottom: 1.5rem;
+  background: rgba($surface-variant, 0.4);
+  padding: 4px;
+  border-radius: 8px;
+  border: 1px solid rgba($outline-variant, 0.2);
+
+  button {
+    flex: 1;
+    padding: 8px 0;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: $muted;
+    background: none;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &.active {
+      background: $primary;
+      color: $on-primary;
+    }
+
+    &:hover:not(.active) {
+      color: $on-surface;
+    }
+  }
+}
+
+.otp-timer-text {
+  font-size: 0.75rem;
+  color: $muted;
+  text-align: center;
+  margin-top: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+}
+
+.resend-otp-btn {
+  background: none;
+  border: none;
+  color: $primary;
+  font-weight: 600;
+  font-family: inherit;
+  font-size: 0.75rem;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+
+  &:disabled {
+    color: $muted;
+    text-decoration: none;
+    cursor: not-allowed;
+  }
+}

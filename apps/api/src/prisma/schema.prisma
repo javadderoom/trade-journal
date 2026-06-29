@@ -270,3 +270,14 @@ enum DisplayCurrency {
   TOMAN
   BOTH
 }
+
+model Otp {
+  id         String   @id @default(uuid())
+  phone      String
+  code       String
+  expires_at DateTime
+  created_at DateTime @default(now())
+  used       Boolean  @default(false)
+
+  @@index([phone])
+}

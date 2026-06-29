@@ -19,6 +19,9 @@ interface AuthState {
   logout: () => Promise<void>;
   refresh: () => Promise<string | null>;
   initialize: () => Promise<void>;
+  sendOtp: (phone: string) => Promise<void>;
+  verifyOtp: (phone: string, code: string) => Promise<{ isNewUser: boolean; registerToken?: string }>;
+  registerOtp: (registerToken: string, name: string, email: string, password: string) => Promise<void>;
 }
 
 let refreshPromise: Promise<string | null> | null = null;
@@ -35,6 +38,43 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       set({ accessToken, user });
     } catch (err: any) {
       const errMsg = err.response?.data?.error || 'خطا در ورود به حساب کاربری';
+      throw new Error(errMsg);
+    }
+  },
+
+  sendOtp: async (phone) => {
+    try {
+      await api.post('/api/auth/otp/send', { phone });
+    } catch (err: any) {
+      const errMsg = err.response?.data?.error || 'خطا در ارسال کد تایید';
+      throw new Error(errMsg);
+    }
+  },
+
+  verifyOtp: async (phone, code) => {
+    try {
+      const res = await api.post('/api/auth/otp/verify', { phone, code });
+      if (!res.data.isNewUser) {
+        const { accessToken, user } = res.data;
+        set({ accessToken, user });
+      }
+      return {
+        isNewUser: res.data.isNewUser,
+        registerToken: res.data.registerToken,
+      };
+    } catch (err: any) {
+      const errMsg = err.response?.data?.error || 'کد تایید نامعتبر است';
+      throw new Error(errMsg);
+    }
+  },
+
+  registerOtp: async (registerToken, name, email, password) => {
+    try {
+      const res = await api.post('/api/auth/otp/register', { registerToken, name, email, password });
+      const { accessToken, user } = res.data;
+      set({ accessToken, user });
+    } catch (err: any) {
+      const errMsg = err.response?.data?.error || 'خطا در تکمیل ثبت نام';
       throw new Error(errMsg);
     }
   },
