@@ -29,11 +29,6 @@ services:
       # Optional POP3 ports (if needed)
       # - "995:995" # POP3S
       # - "110:110" # POP3
-      
-      # Web Interface port (Internal only, mapped to Coolify for reverse proxying)
-      # In Coolify, assign your domain (e.g. https://mail.tradekav.ir) and target port 8080.
-      # You can also expose it directly if you want, but using Traefik/Coolify's domain routing is cleaner.
-      - "8080:8080"
     volumes:
       # Persistent volume to store all configurations, accounts, and actual emails.
       # Coolify will mount this to the VPS host system so your data persists across updates.
