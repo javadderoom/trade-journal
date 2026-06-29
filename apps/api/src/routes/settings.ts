@@ -549,7 +549,13 @@ router.delete('/account', authenticate, async (req: AuthRequest, res: Response) 
     // Invalidate all sessions
     await prisma.refreshToken.deleteMany({ where: { user_id: userId } });
 
-    res.clearCookie('refreshToken', { path: '/' });
+    res.clearCookie('refreshToken', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'lax' : 'lax',
+      domain: process.env.NODE_ENV === 'production' ? '.tradekav.ir' : undefined,
+      path: '/',
+    });
 
     return res.json({ message: 'حساب کاربری برای حذف علامت‌گذاری شد' });
   } catch (err: any) {

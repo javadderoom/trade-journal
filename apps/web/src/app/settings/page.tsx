@@ -358,7 +358,6 @@ export default function SettingsPage() {
     try {
       await api.delete('/api/settings/account', { data: { confirmEmail: deleteConfirmEmail } });
       await logout();
-      router.push('/login');
     } catch (err: any) {
       notify.error(err.response?.data?.error || 'خطا در حذف حساب');
     }

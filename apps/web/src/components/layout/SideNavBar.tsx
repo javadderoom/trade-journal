@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuthStore } from '../../lib/auth';
@@ -10,6 +10,7 @@ export default function SideNavBar() {
   const router = useRouter();
   const user = useAuthStore(state => state.user);
   const logout = useAuthStore(state => state.logout);
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
   const planLabel = user?.plan === 'PRO' 
     ? 'نسخه حرفه‌ای' 
@@ -91,10 +92,7 @@ export default function SideNavBar() {
         {/* Footer Link */}
         <div className="sidenav-footer">
           <button
-            onClick={async () => {
-              await logout();
-              router.push('/login');
-            }}
+            onClick={() => setShowLogoutConfirm(true)}
             className="logout-link"
             style={{
               background: 'none',
@@ -113,6 +111,35 @@ export default function SideNavBar() {
           </button>
         </div>
       </div>
+
+      {showLogoutConfirm && (
+        <div className="logout-confirm-overlay" onClick={() => setShowLogoutConfirm(false)}>
+          <div className="logout-confirm-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <span className="material-symbols-outlined modal-icon">logout</span>
+              <h3>خروج از حساب کاربری</h3>
+            </div>
+            <p className="modal-desc">آیا برای خروج از حساب کاربری خود اطمینان دارید؟</p>
+            <div className="modal-actions">
+              <button
+                className="confirm-btn"
+                onClick={async () => {
+                  setShowLogoutConfirm(false);
+                  await logout();
+                }}
+              >
+                خروج
+              </button>
+              <button
+                className="cancel-btn"
+                onClick={() => setShowLogoutConfirm(false)}
+              >
+                انصراف
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </nav>
   );
 }

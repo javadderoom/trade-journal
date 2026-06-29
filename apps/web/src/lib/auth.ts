@@ -69,6 +69,9 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       console.warn('Backend logout failed:', err);
     } finally {
       set({ user: null, accessToken: null });
+      if (typeof window !== 'undefined') {
+        window.location.href = '/login';
+      }
     }
   },
 

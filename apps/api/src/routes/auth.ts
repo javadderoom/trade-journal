@@ -23,6 +23,16 @@ const setRefreshCookie = (res: Response, token: string) => {
   });
 };
 
+const clearRefreshCookie = (res: Response) => {
+  res.clearCookie('refreshToken', {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: process.env.NODE_ENV === 'production' ? 'lax' : 'lax',
+    domain: process.env.NODE_ENV === 'production' ? '.tradekav.ir' : undefined,
+    path: '/',
+  });
+};
+
 // ─── POST /api/auth/register ─────────────────────────────────────────────────
 router.post('/register', async (req: Request, res: Response) => {
   try {
@@ -157,11 +167,7 @@ router.post('/refresh', async (req: Request, res: Response) => {
     });
 
     if (!stored || stored.expires_at < new Date()) {
-      res.clearCookie('refreshToken', {
-        path: '/',
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
-      });
+      clearRefreshCookie(res);
       return res.status(401).json({ error: 'توکن بازیابی منقضی شده است' });
     }
 
@@ -212,11 +218,7 @@ router.post('/logout', async (req: Request, res: Response) => {
     if (token) {
       await prisma.refreshToken.deleteMany({ where: { token } });
     }
-    res.clearCookie('refreshToken', {
-      path: '/',
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
-    });
+    clearRefreshCookie(res);
     return res.json({ message: 'با موفقیت خارج شدید' });
   } catch (err: any) {
     console.error('Logout error:', err);

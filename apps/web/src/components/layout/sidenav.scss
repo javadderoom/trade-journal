@@ -244,6 +244,116 @@
   }
 }
 
+.logout-confirm-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(#080a0f, 0.65);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  animation: fadeIn 0.25s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.logout-confirm-modal {
+  width: 90%;
+  max-width: 400px;
+  background: rgba($surface-container, 0.9);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba($outline-variant, 0.45);
+  border-radius: 24px;
+  padding: 24px;
+  box-shadow: 0 24px 48px -12px rgba(0, 0, 0, 0.6);
+  direction: rtl;
+  animation: scaleIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  .modal-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+    color: $error;
+
+    .modal-icon {
+      font-size: 28px;
+    }
+
+    h3 {
+      font-size: 18px;
+      font-weight: 700;
+      margin: 0;
+      color: $on-surface;
+    }
+  }
+
+  .modal-desc {
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 22px;
+    color: $on-surface-variant;
+    margin-bottom: 24px;
+  }
+
+  .modal-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+
+    button {
+      flex: 1;
+      padding: 12px 0;
+      font-size: 14px;
+      font-weight: 700;
+      border-radius: 12px;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.23, 1, 0.32, 1);
+
+      &:active {
+        transform: scale(0.96);
+      }
+    }
+
+    .confirm-btn {
+      background: linear-gradient(135deg, rgba($error, 0.85), $error-container);
+      color: $on-error;
+      box-shadow: 0 4px 12px rgba($error, 0.15);
+
+      &:hover {
+        filter: brightness(1.1);
+        box-shadow: 0 6px 16px rgba($error, 0.25);
+      }
+    }
+
+    .cancel-btn {
+      background: rgba($surface-variant, 0.5);
+      color: $on-surface-variant;
+      border: 1px solid rgba($outline-variant, 0.3);
+
+      &:hover {
+        background: rgba($surface-variant, 0.8);
+        color: $on-surface;
+      }
+    }
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes scaleIn {
+  from { transform: scale(0.95); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
 // Mobile responsiveness for SideNavBar
 @media (max-width: 1024px) {
   .sidenav-container {
