@@ -86,18 +86,20 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
   const isAuthPage = pathname ? (pathname.startsWith('/login') || pathname.startsWith('/register')) : false;
   const isLandingPage = pathname === '/' || pathname === '/namad';
+  const isHelpPage = pathname ? pathname.startsWith('/help') : false;
+  const isPublicPage = isLandingPage || isHelpPage;
 
   useEffect(() => {
     if (!isInitialized || !pathname) return;
 
-    if (!user && !isAuthPage && !isLandingPage) {
+    if (!user && !isAuthPage && !isPublicPage) {
       router.replace('/login');
     } else if (user && isAuthPage) {
       router.replace('/dashboard');
     }
     // Logged-in users on the landing page are redirected to /dashboard by the
     // LandingPage component itself.
-  }, [user, isInitialized, isAuthPage, isLandingPage, pathname, router]);
+  }, [user, isInitialized, isAuthPage, isPublicPage, pathname, router]);
 
   if (!isInitialized || !pathname) {
     return (
@@ -132,7 +134,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   }
 
   // Prevent flash of protected page content while redirecting to login
-  if (!user && !isAuthPage && !isLandingPage) {
+  if (!user && !isAuthPage && !isPublicPage) {
     return null;
   }
 
@@ -142,7 +144,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   }
 
   // Public pages (landing) render full-bleed, no app chrome
-  if (isLandingPage) {
+  if (isPublicPage) {
     return (
       <>
         <Toaster />
