@@ -1,5 +1,5 @@
 //+------------------------------------------------------------------+
-//|                                    TradeJournal_EA.mq5           |
+//|                                    TradeKav_EA.mq5               |
 //|            معامله‌یار — Trade History Sync Expert Advisor          |
 //|              Sends open + closed trades to API via HTTP           |
 //+------------------------------------------------------------------+
@@ -31,7 +31,7 @@ int OnInit()
       g_authHeader = "Authorization: Bearer " + InpApiToken;
    
    // Load last synced ticket from global variable
-   string gvName = "TradeJournal_LastTicket_" + IntegerToString(InpAccountId);
+   string gvName = "TradeKav_LastTicket_" + IntegerToString(InpAccountId);
    if(GlobalVariableCheck(gvName))
       g_lastTicket = (int)GlobalVariableGet(gvName);
    
@@ -43,7 +43,7 @@ int OnInit()
    SyncOpenPositions();
    SyncTrades();
    
-   Print("TradeJournal EA initialized. Last ticket: ", g_lastTicket);
+   Print("TradeKav EA initialized. Last ticket: ", g_lastTicket);
    return(INIT_SUCCEEDED);
 }
 
@@ -344,7 +344,7 @@ void SyncTrades()
       // Update last synced ticket
       g_lastTicket = maxTicket;
       g_lastSyncTime = TimeCurrent();
-      string gvName = "TradeJournal_LastTicket_" + IntegerToString(InpAccountId);
+      string gvName = "TradeKav_LastTicket_" + IntegerToString(InpAccountId);
       GlobalVariableSet(gvName, g_lastTicket);
       
       Print("Synced ", newTrades, " closed trade(s). Last ticket: ", g_lastTicket);

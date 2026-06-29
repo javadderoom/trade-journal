@@ -651,8 +651,8 @@ export default function SettingsPage() {
                   
                   <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
                     <a
-                      href="/downloads/TradeJournal_EA.ex5"
-                      download="TradeJournal_EA.ex5"
+                      href="/downloads/TradeKav_EA.ex5"
+                      download="TradeKav_EA.ex5"
                       className="settings-save-btn"
                       style={{
                         display: 'inline-flex',

@@ -35,7 +35,7 @@ npx next dev apps/web --port 3001
 ```
 
 ## 5. Install MT5 Expert Advisor
-1. Copy `apps/ea/TradeJournal_EA.mq5` to `MQL5/Experts/`
+1. Copy `apps/ea/TradeKav_EA.mq5` to `MQL5/Experts/`
 2. Open in MetaEditor → Compile
 3. In MT5: Tools → Options → Expert Advisors → Allow WebRequest for `http://localhost:3000`
 4. Drag EA onto any chart

@@ -1,10 +1,10 @@
 # MT5 Expert Advisor — Trade Sync
 
 ## File
-`TradeJournal_EA.mq5` — copy to MT5 `Experts/` folder, compile in MetaEditor.
+`TradeKav_EA.mq5` — copy to MT5 `Experts/` folder, compile in MetaEditor.
 
 ## Setup
-1. Copy `TradeJournal_EA.mq5` to `MQL5/Experts/`
+1. Copy `TradeKav_EA.mq5` to `MQL5/Experts/`
 2. Open in MetaEditor → Compile
 3. In MT5: Tools → Options → Expert Advisors →勾选 "Allow WebRequest for listed URL"
 4. Add API URL: `http://localhost:3000` (or your server URL)

@@ -34,8 +34,8 @@ export default function EaSetupHelpPage() {
               <p>سازگار با متاتریدر ۵ (نسخه ویندوز و سرور مجازی)</p>
             </div>
             <a 
-              href="/downloads/TradeJournal_EA.ex5" 
-              download="TradeJournal_EA.ex5"
+              href="/downloads/TradeKav_EA.ex5" 
+              download="TradeKav_EA.ex5"
               className="download-action-btn"
             >
               <span className="material-symbols-outlined">download</span>
@@ -53,7 +53,7 @@ export default function EaSetupHelpPage() {
               <h3>انتقال فایل اکسپرت به متاتریدر</h3>
               <p>
                 نرم‌افزار متاتریدر ۵ را باز کنید. از منوی بالا به مسیر <strong>File</strong> &gt; <strong>Open Data Folder</strong> بروید. 
-                در پنجره باز شده، وارد پوشه <strong>MQL5</strong> و سپس پوشه <strong>Experts</strong> شوید. فایل دانلود شده (<code>TradeJournal_EA.ex5</code>) را در این پوشه کپی کنید.
+                در پنجره باز شده، وارد پوشه <strong>MQL5</strong> و سپس پوشه <strong>Experts</strong> شوید. فایل دانلود شده (<code>TradeKav_EA.ex5</code>) را در این پوشه کپی کنید.
               </p>
             </div>
           </div>
@@ -91,7 +91,7 @@ export default function EaSetupHelpPage() {
               <h3>فعال‌سازی روی چارت</h3>
               <p>
                 در متاتریدر، در منوی سمت چپ (پنجره Navigator)، روی گزینه‌ی <strong>Expert Advisors</strong> راست‌کلیک کرده و <strong>Refresh</strong> را بزنید. 
-                اکنون اکسپرت <code>TradeJournal_EA</code> را در لیست مشاهده می‌کنید. آن را بکشید (Drag) و روی یکی از چارت‌ها رها کنید (نماد یا تایم‌فریم چارت تأثیری در کارکرد اکسپرت ندارد).
+                اکنون اکسپرت <code>TradeKav_EA</code> را در لیست مشاهده می‌کنید. آن را بکشید (Drag) و روی یکی از چارت‌ها رها کنید (نماد یا تایم‌فریم چارت تأثیری در کارکرد اکسپرت ندارد).
               </p>
             </div>
           </div>
