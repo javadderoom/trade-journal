@@ -3,15 +3,12 @@ import crypto from 'node:crypto';
 interface PayPingRequestResponse {
   code?: string;
   paymentCode?: string;
+  url?: string;
   [key: string]: any;
 }
 
 const getBaseUrl = (): string => {
   return 'https://api.payping.ir/v3/pay';
-};
-
-const getGatewayUrl = (code: string): string => {
-  return `https://api.payping.ir/v3/pay/start/${code}`;
 };
 
 /**
@@ -67,11 +64,12 @@ export async function requestPaypingPayment(
     const body = (await response.json()) as PayPingRequestResponse;
 
     const paymentCode = body.paymentCode || body.code;
+    const redirectUrl = body.url || `https://api.payping.ir/v3/pay/start/${paymentCode}`;
 
     if (body && paymentCode) {
       return {
         code: paymentCode,
-        redirectUrl: getGatewayUrl(paymentCode),
+        redirectUrl: redirectUrl,
       };
     }
 
@@ -106,7 +104,7 @@ export async function verifyPaypingPayment(
 
   const url = `${getBaseUrl()}/verify`;
   const payload = {
-    refId,
+    paymentCode: refId, // using refId as paymentCode for V3
     amount: amountInTomans,
   };
 
@@ -121,9 +119,10 @@ export async function verifyPaypingPayment(
     });
 
     if (response.status === 200) {
+      const body = await response.json();
       return {
         success: true,
-        refId,
+        refId: body.paymentRefId?.toString() || refId,
         message: 'پرداخت با موفقیت تایید شد',
       };
     }
