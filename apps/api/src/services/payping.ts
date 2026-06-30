@@ -85,14 +85,15 @@ export async function requestPaypingPayment(
  */
 export async function verifyPaypingPayment(
   amountInTomans: number,
-  refId: string
-): Promise<{ success: boolean; refId: string; message: string }> {
-  const isMock = process.env.MOCK_PAYMENT === 'true' || refId.startsWith('MOCK-PAYPING-');
+  paymentCode: string,
+  paymentRefId: number
+): Promise<{ success: boolean; refId: string; message: string; data?: any }> {
+  const isMock = process.env.MOCK_PAYMENT === 'true' || paymentCode.startsWith('MOCK-PAYPING-');
 
   if (isMock) {
     return {
       success: true,
-      refId: refId.startsWith('MOCK-PAYPING-') ? refId.replace('MOCK-PAYPING-', '') : refId,
+      refId: paymentCode.startsWith('MOCK-PAYPING-') ? paymentCode.replace('MOCK-PAYPING-', '') : paymentCode,
       message: 'پرداخت آزمایشی پی‌پینگ با موفقیت تایید شد (Mock Mode)',
     };
   }
@@ -104,7 +105,8 @@ export async function verifyPaypingPayment(
 
   const url = `${getBaseUrl()}/verify`;
   const payload = {
-    paymentCode: refId, // using refId as paymentCode for V3
+    paymentRefId: Number(paymentRefId),
+    paymentCode: paymentCode,
     amount: amountInTomans,
   };
 
@@ -122,8 +124,9 @@ export async function verifyPaypingPayment(
       const body = await response.json();
       return {
         success: true,
-        refId: body.paymentRefId?.toString() || refId,
+        refId: body.paymentRefId?.toString() || paymentRefId.toString(),
         message: 'پرداخت با موفقیت تایید شد',
+        data: body,
       };
     }
 
