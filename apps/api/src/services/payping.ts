@@ -2,6 +2,7 @@ import crypto from 'node:crypto';
 
 interface PayPingRequestResponse {
   code?: string;
+  paymentCode?: string;
   [key: string]: any;
 }
 
@@ -65,10 +66,12 @@ export async function requestPaypingPayment(
 
     const body = (await response.json()) as PayPingRequestResponse;
 
-    if (body && body.code) {
+    const paymentCode = body.paymentCode || body.code;
+
+    if (body && paymentCode) {
       return {
-        code: body.code,
-        redirectUrl: getGatewayUrl(body.code),
+        code: paymentCode,
+        redirectUrl: getGatewayUrl(paymentCode),
       };
     }
 
