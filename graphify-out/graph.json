@@ -7530,7 +7530,7 @@
       "source_location": "L106",
       "_origin": "ast",
       "id": "agents_skills_impeccable_scripts_hook_lib_safereadjson",
-      "community": 118,
+      "community": 9,
       "norm_label": "safereadjson()"
     },
     {
@@ -7590,7 +7590,7 @@
       "source_location": "L137",
       "_origin": "ast",
       "id": "agents_skills_impeccable_scripts_hook_lib_readconfig",
-      "community": 118,
+      "community": 9,
       "norm_label": "readconfig()"
     },
     {
@@ -7600,7 +7600,7 @@
       "source_location": "L151",
       "_origin": "ast",
       "id": "agents_skills_impeccable_scripts_hook_lib_hooksection",
-      "community": 118,
+      "community": 9,
       "norm_label": "hooksection()"
     },
     {
@@ -7610,7 +7610,7 @@
       "source_location": "L156",
       "_origin": "ast",
       "id": "agents_skills_impeccable_scripts_hook_lib_detectorsection",
-      "community": 118,
+      "community": 9,
       "norm_label": "detectorsection()"
     },
     {
@@ -7630,7 +7630,7 @@
       "source_location": "L165",
       "_origin": "ast",
       "id": "agents_skills_impeccable_scripts_hook_lib_clonedefaultconfig",
-      "community": 118,
+      "community": 9,
       "norm_label": "clonedefaultconfig()"
     },
     {
@@ -7830,7 +7830,7 @@
       "source_location": "L425",
       "_origin": "ast",
       "id": "agents_skills_impeccable_scripts_hook_lib_readcache",
-      "community": 118,
+      "community": 9,
       "norm_label": "readcache()"
     },
     {
@@ -8310,7 +8310,7 @@
       "source_location": "L1224",
       "_origin": "ast",
       "id": "agents_skills_impeccable_scripts_hook_lib_writeauditlog",
-      "community": 118,
+      "community": 49,
       "norm_label": "writeauditlog()"
     },
     {
@@ -8430,7 +8430,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agents_skills_impeccable_scripts_hook",
-      "community": 118,
+      "community": 49,
       "norm_label": "hook.mjs"
     },
     {
@@ -8440,7 +8440,7 @@
       "source_location": "L18",
       "_origin": "ast",
       "id": "agents_skills_impeccable_scripts_hook_readstdin",
-      "community": 118,
+      "community": 49,
       "norm_label": "readstdin()"
     },
     {
@@ -8450,7 +8450,7 @@
       "source_location": "L25",
       "_origin": "ast",
       "id": "agents_skills_impeccable_scripts_hook_main",
-      "community": 118,
+      "community": 49,
       "norm_label": "main()"
     },
     {
@@ -21930,7 +21930,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "apps_web_src_app_analytics_page",
-      "community": 54,
+      "community": 32,
       "norm_label": "page.tsx"
     },
     {
@@ -21940,7 +21940,7 @@
       "source_location": "L16",
       "_origin": "ast",
       "id": "apps_web_src_app_analytics_page_emotion_map",
-      "community": 54,
+      "community": 32,
       "norm_label": "emotion_map"
     },
     {
@@ -21950,7 +21950,7 @@
       "source_location": "L26",
       "_origin": "ast",
       "id": "apps_web_src_app_analytics_page_weekday_names",
-      "community": 54,
+      "community": 32,
       "norm_label": "weekday_names"
     },
     {
@@ -22020,7 +22020,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "apps_web_src_app_dashboard_page",
-      "community": 32,
+      "community": 65,
       "norm_label": "page.tsx"
     },
     {
@@ -22030,7 +22030,7 @@
       "source_location": "L14",
       "_origin": "ast",
       "id": "apps_web_src_app_dashboard_page_dashboarddata",
-      "community": 32,
+      "community": 65,
       "norm_label": "dashboarddata"
     },
     {
@@ -22040,7 +22040,7 @@
       "source_location": "L49",
       "_origin": "ast",
       "id": "apps_web_src_app_dashboard_page_weekday_full",
-      "community": 32,
+      "community": 65,
       "norm_label": "weekday_full"
     },
     {
@@ -22060,7 +22060,7 @@
       "source_location": "L541",
       "_origin": "ast",
       "id": "apps_web_src_app_dashboard_page_equitycurvesvg",
-      "community": 32,
+      "community": 65,
       "norm_label": "equitycurvesvg()"
     },
     {
@@ -22070,7 +22070,7 @@
       "source_location": "L677",
       "_origin": "ast",
       "id": "apps_web_src_app_dashboard_page_kpicard",
-      "community": 32,
+      "community": 65,
       "norm_label": "kpicard()"
     },
     {
@@ -22350,7 +22350,7 @@
       "source_location": "L127",
       "_origin": "ast",
       "id": "apps_web_src_app_page_landingpage",
-      "community": 32,
+      "community": 53,
       "norm_label": "landingpage()"
     },
     {
@@ -22380,7 +22380,7 @@
       "source_location": "L560",
       "_origin": "ast",
       "id": "apps_web_src_app_page_countup",
-      "community": 32,
+      "community": 53,
       "norm_label": "countup()"
     },
     {
@@ -22620,7 +22620,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "apps_web_src_components_journal_equitychart",
-      "community": 54,
+      "community": 32,
       "norm_label": "equitychart.tsx"
     },
     {
@@ -22630,7 +22630,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "apps_web_src_components_journal_equitychart_trade",
-      "community": 54,
+      "community": 32,
       "norm_label": "trade"
     },
     {
@@ -22640,7 +22640,7 @@
       "source_location": "L14",
       "_origin": "ast",
       "id": "apps_web_src_components_journal_equitychart_equitychartprops",
-      "community": 54,
+      "community": 32,
       "norm_label": "equitychartprops"
     },
     {
@@ -22650,7 +22650,7 @@
       "source_location": "L18",
       "_origin": "ast",
       "id": "apps_web_src_components_journal_equitychart_equitychart",
-      "community": 54,
+      "community": 32,
       "norm_label": "equitychart()"
     },
     {
@@ -23200,7 +23200,7 @@
       "source_location": "L79",
       "_origin": "ast",
       "id": "apps_web_src_components_trades_tradestable_getjalalidisplaydate",
-      "community": 32,
+      "community": 119,
       "norm_label": "getjalalidisplaydate()"
     },
     {
@@ -23220,7 +23220,7 @@
       "source_location": "L113",
       "_origin": "ast",
       "id": "apps_web_src_components_trades_tradestable_tradestable",
-      "community": 32,
+      "community": 119,
       "norm_label": "tradestable()"
     },
     {
@@ -89652,7 +89652,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "apps/web/src/app/admin/page.tsx",
-      "source_location": "L328",
+      "source_location": "L360",
       "weight": 1.0,
       "source": "apps_web_src_app_admin_page_adminpage",
       "target": "apps_web_src_utils_farsi_topersiandigits"
@@ -91095,7 +91095,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "apps/web/src/app/settings/page.tsx",
-      "source_location": "L911",
+      "source_location": "L927",
       "weight": 1.0,
       "source": "apps_web_src_app_settings_page_settingspage",
       "target": "apps_web_src_utils_farsi_topersiandigits"
@@ -103174,5 +103174,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "f91402ca171bfaa5bb9331bf1844a30794139497"
+  "built_at_commit": "64716268e236dec01e47b8b638b71d94a5c05991"
 }

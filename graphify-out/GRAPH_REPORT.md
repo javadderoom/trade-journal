@@ -1,16 +1,16 @@
 # Graph Report - trade-journal  (2026-06-30)
 
 ## Corpus Check
-- 204 files · ~551,789 words
+- 204 files · ~552,303 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 3367 nodes · 6610 edges · 179 communities (173 shown, 6 thin omitted)
+- 3367 nodes · 6610 edges · 178 communities (172 shown, 6 thin omitted)
 - Extraction: 99% EXTRACTED · 1% INFERRED · 0% AMBIGUOUS · INFERRED: 53 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `f91402ca`
+- Built from commit: `64716268`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -133,7 +133,6 @@
 - [[_COMMUNITY_Community 115|Community 115]]
 - [[_COMMUNITY_Community 116|Community 116]]
 - [[_COMMUNITY_Community 117|Community 117]]
-- [[_COMMUNITY_Community 118|Community 118]]
 - [[_COMMUNITY_Community 119|Community 119]]
 - [[_COMMUNITY_Community 120|Community 120]]
 - [[_COMMUNITY_Community 121|Community 121]]
@@ -214,7 +213,7 @@
 ## Import Cycles
 - None detected.
 
-## Communities (179 total, 6 thin omitted)
+## Communities (178 total, 6 thin omitted)
 
 ### Community 0 - "Community 0"
 Cohesion: 0.06
@@ -253,8 +252,8 @@ Cohesion: 0.11
 Nodes (18): dependencies, impeccable, devDependencies, agentation, concurrently, typescript, name, prisma (+10 more)
 
 ### Community 9 - "Community 9"
-Cohesion: 0.07
-Nodes (49): ACK_EXTS, ALLOWED_EXTS, applyConfigSource(), applyDetectorConfigSource(), applyPatchText(), clampByte(), CO_SCAN_STYLE_NAMES, coLocatedStylesheets() (+41 more)
+Cohesion: 0.06
+Nodes (55): ACK_EXTS, ALLOWED_EXTS, applyConfigSource(), applyDetectorConfigSource(), applyPatchText(), clampByte(), cloneDefaultConfig(), CO_SCAN_STYLE_NAMES (+47 more)
 
 ### Community 10 - "Community 10"
 Cohesion: 0.18
@@ -345,8 +344,8 @@ Cohesion: 0.12
 Nodes (33): armPageChatForTyping(), attachSteerFocusDebug(), clearSteerAwaitTimer(), collapsePageChat(), expandPageChat(), focusConfigureInput(), focusPageChatInput(), focusSteerChat() (+25 more)
 
 ### Community 32 - "Community 32"
-Cohesion: 0.10
-Nodes (23): ContactInfo, ContactPage(), DashboardData, DashboardPage(), WEEKDAY_FULL, CountUp(), LandingPage(), JALALI_MONTH_NAMES (+15 more)
+Cohesion: 0.12
+Nodes (22): EMOTION_MAP, WEEKDAY_NAMES, ContactInfo, ContactPage(), DashboardPage(), EquityChart(), EquityChartProps, Trade (+14 more)
 
 ### Community 33 - "Community 33"
 Cohesion: 0.13
@@ -413,8 +412,8 @@ Cohesion: 0.14
 Nodes (20): browserHasDirectText(), browserPrimaryFont(), browserRadiusTokens(), browserSampleText(), checkElementDesignSystemDOM(), checkElementQuality(), checkElementQualityDOM(), checkQuality() (+12 more)
 
 ### Community 49 - "Community 49"
-Cohesion: 0.14
-Nodes (22): cursorBlockMessage(), bumpEditCount(), clampGroupedToBudget(), clampToBudget(), dedupeAgainstCache(), depthIsSet(), directiveFooter(), ensureFile() (+14 more)
+Cohesion: 0.12
+Nodes (25): cursorBlockMessage(), bumpEditCount(), clampGroupedToBudget(), clampToBudget(), dedupeAgainstCache(), depthIsSet(), directiveFooter(), ensureFile() (+17 more)
 
 ### Community 50 - "Community 50"
 Cohesion: 0.14
@@ -429,12 +428,12 @@ Cohesion: 0.09
 Nodes (21): API Integration in `page.tsx`, App Layout (`src/app/layout.tsx`), Dashboard & Analytics (Journal Page - Overview & Charts Tabs), Design System (`src/app/variables.scss`, `src/app/globals.scss`), ✅ Done, Exchange Rate API Route (`src/app/api/exchange-rate/route.ts`), High Priority, Import MT4/MT5 statement Modal (`src/components/ImportMT4Modal.tsx`) (+13 more)
 
 ### Community 53 - "Community 53"
-Cohesion: 0.10
-Nodes (12): BENTO, CellType, CompareItem, CompareRow, CompareSection, COMPARISON_DATA, FAQS, NAV_LINKS (+4 more)
+Cohesion: 0.09
+Nodes (14): BENTO, CellType, CompareItem, CompareRow, CompareSection, COMPARISON_DATA, CountUp(), FAQS (+6 more)
 
 ### Community 54 - "Community 54"
-Cohesion: 0.11
-Nodes (21): EMOTION_MAP, JournalPage(), WEEKDAY_NAMES, TradesPage(), EquityChart(), EquityChartProps, Trade, ImportAccount (+13 more)
+Cohesion: 0.14
+Nodes (16): JournalPage(), TradesPage(), ImportAccount, ImportMT4Modal(), ImportMT4ModalProps, ImportStep, ImportUiState, ManualTradeModal() (+8 more)
 
 ### Community 55 - "Community 55"
 Cohesion: 0.10
@@ -477,8 +476,8 @@ Cohesion: 0.22
 Nodes (13): directChildDirs(), discoverRootsForPattern(), discoverTargetCandidates(), escapeRegExp(), expandSimplePattern(), isIgnoredWorkspaceDiscoveryDir(), nearestPackageRootBetween(), normalizeWorkspacePattern() (+5 more)
 
 ### Community 65 - "Community 65"
-Cohesion: 0.32
-Nodes (6): FilterBar(), FilterBarProps, Select(), SelectOption, SelectProps, getSymbolFilterOptions()
+Cohesion: 0.19
+Nodes (8): DashboardData, WEEKDAY_FULL, FilterBar(), FilterBarProps, Select(), SelectOption, SelectProps, getSymbolFilterOptions()
 
 ### Community 66 - "Community 66"
 Cohesion: 0.11
@@ -688,13 +687,9 @@ Nodes (9): Color, Components, Layout, Motion, Product bans (on top of the shared
 Cohesion: 0.36
 Nodes (9): addRules(), applyInlineIgnores(), getSet(), hasDirectives(), isInlineIgnored(), normalizeRule(), parseInlineIgnores(), parseRuleList() (+1 more)
 
-### Community 118 - "Community 118"
-Cohesion: 0.24
-Nodes (9): cloneDefaultConfig(), detectorSection(), hookSection(), readCache(), readConfig(), safeReadJson(), writeAuditLog(), main() (+1 more)
-
 ### Community 119 - "Community 119"
-Cohesion: 0.14
-Nodes (20): DesktopTableProps, DetailPanel(), DetailPanelProps, MobileCardsList(), MobileCardsListProps, CandlestickData, TradeChart(), TradeChartProps (+12 more)
+Cohesion: 0.13
+Nodes (22): DesktopTableProps, DetailPanel(), DetailPanelProps, MobileCardsList(), MobileCardsListProps, CandlestickData, TradeChart(), TradeChartProps (+14 more)
 
 ### Community 120 - "Community 120"
 Cohesion: 0.15
