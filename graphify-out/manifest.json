@@ -335,8 +335,8 @@
     "semantic_hash": ""
   },
   "apps/web/src/components/layout/AppLayout.tsx": {
-    "mtime": 1782757858.4809248,
-    "ast_hash": "8d5258ae717fdb8a08ebd96d841a767d",
+    "mtime": 1782818085.1813922,
+    "ast_hash": "8671476e9792a08401b038fc996b66ad",
     "semantic_hash": ""
   },
   "apps/web/src/lib/api.ts": {

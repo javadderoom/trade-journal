@@ -87,7 +87,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const isAuthPage = pathname ? (pathname.startsWith('/login') || pathname.startsWith('/register')) : false;
   const isLandingPage = pathname === '/' || pathname === '/namad';
   const isHelpPage = pathname ? pathname.startsWith('/help') : false;
-  const isPublicPage = isLandingPage || isHelpPage;
+  const isContactPage = pathname === '/contact';
+  const isPublicPage = isLandingPage || isHelpPage || isContactPage;
 
   useEffect(() => {
     if (!isInitialized || !pathname) return;
