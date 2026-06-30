@@ -64,7 +64,7 @@ const COMPARISON_DATA: CompareItem[] = [
   { type: 'row', feature: 'ورود از MT4 / MT5', excel: 'دستی', notion: 'دستی', tradekav: 'check' },
   { type: 'row', feature: 'ثبت دستی معامله', excel: 'check', notion: 'check', tradekav: 'check' },
   { type: 'row', feature: 'تگ احساسات', excel: 'دستی', notion: 'محدود', tradekav: 'check' },
-  { type: 'row', feature: 'تگ محدود', excel: 'دستی', notion: 'محدود', tradekav: 'check' },
+  { type: 'row', feature: 'تگ استراتژی', excel: 'دستی', notion: 'محدود', tradekav: 'check' },
 
   // { type: 'section', label: 'تحلیل عملکرد' },
   // { type: 'row', feature: 'نرخ موفقیت', excel: 'فرمول', notion: 'فرمول', tradekav: 'check' },
