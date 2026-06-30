@@ -679,8 +679,8 @@ router.post('/payping/checkout', authenticate, async (req: AuthRequest, res: Res
 
     const description = `خرید پلن ${plan === 'STANDARD' ? 'استاندارد' : 'حرفه‌ای'} - دوره ${period === 'monthly' ? 'ماهانه' : 'سالانه'}`;
 
-    const apiBase = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
-    const callbackUrl = `${apiBase}/api/payments/payping/callback?plan=${plan}&period=${period}&amount=${price}${discountCode ? `&discountCode=${discountCode}` : ''}`;
+    const webBase = process.env.NEXT_PUBLIC_WEB_URL || 'http://localhost:3001';
+    const callbackUrl = `${webBase}/api/payments/payping/callback?plan=${plan}&period=${period}&amount=${price}${discountCode ? `&discountCode=${discountCode}` : ''}`;
 
     const { code, redirectUrl } = await requestPaypingPayment(
       price,
