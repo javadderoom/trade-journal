@@ -564,4 +564,31 @@ router.delete('/account', authenticate, async (req: AuthRequest, res: Response) 
   }
 });
 
+/**
+ * GET /api/settings/contact
+ * Public route to retrieve contact information
+ */
+router.get('/contact', async (req, res) => {
+  try {
+    const setting = await prisma.systemSetting.findUnique({
+      where: { key: 'CONTACT_INFO' },
+    });
+
+    if (setting && setting.value) {
+      return res.status(200).json(setting.value);
+    }
+
+    // Default fallback
+    return res.status(200).json({
+      email: 'support@tradekav.ir',
+      mobile: '09123456789',
+      landline: '02188888888',
+      address: 'تهران، میدان ونک، خیابان ولیعصر، پلاک ۱',
+    });
+  } catch (err: any) {
+    console.error('Fetch contact settings error:', err);
+    return res.status(500).json({ error: 'خطا در دریافت اطلاعات تماس' });
+  }
+});
+
 export default router;

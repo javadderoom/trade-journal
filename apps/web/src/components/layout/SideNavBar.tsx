@@ -90,7 +90,22 @@ export default function SideNavBar() {
         )}
 
         {/* Footer Link */}
-        <div className="sidenav-footer">
+        <div className="sidenav-footer" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+          <Link
+            href="/contact"
+            className="logout-link"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              color: 'inherit',
+              textDecoration: 'none',
+              padding: 0,
+            }}
+          >
+            <span className="material-symbols-outlined icon">contact_support</span>
+            <span className="label" style={{ marginRight: '12px' }}>ارتباط با ما</span>
+          </Link>
+
           <button
             onClick={() => setShowLogoutConfirm(true)}
             className="logout-link"

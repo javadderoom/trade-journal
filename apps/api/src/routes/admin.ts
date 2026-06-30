@@ -354,4 +354,30 @@ router.put('/settings/prices', async (req: AuthRequest, res: Response) => {
   }
 });
 
+/**
+ * PUT /api/admin/settings/contact
+ * Update contact settings
+ */
+router.put('/settings/contact', async (req: AuthRequest, res: Response) => {
+  try {
+    const { email, mobile, landline, address } = req.body;
+
+    await prisma.systemSetting.upsert({
+      where: { key: 'CONTACT_INFO' },
+      create: {
+        key: 'CONTACT_INFO',
+        value: { email, mobile, landline, address },
+      },
+      update: {
+        value: { email, mobile, landline, address },
+      },
+    });
+
+    return res.status(200).json({ message: 'اطلاعات تماس با موفقیت بروزرسانی شد' });
+  } catch (err: any) {
+    console.error('Admin update contact info error:', err);
+    return res.status(500).json({ error: 'خطا در ذخیره‌سازی تنظیمات اطلاعات تماس' });
+  }
+});
+
 export default router;

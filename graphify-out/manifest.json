@@ -200,8 +200,8 @@
     "semantic_hash": ""
   },
   "apps/web/src/app/page.tsx": {
-    "mtime": 1782765591.272482,
-    "ast_hash": "f276c0eed31331c188a2cbeae76bba62",
+    "mtime": 1782815956.4259603,
+    "ast_hash": "17f3872676e101484fa3d17e375ee91c",
     "semantic_hash": ""
   },
   "apps/web/src/components/layout/BottomNavBar.tsx": {
@@ -210,8 +210,8 @@
     "semantic_hash": ""
   },
   "apps/web/src/components/layout/SideNavBar.tsx": {
-    "mtime": 1782735133.745988,
-    "ast_hash": "d71a229a64619d7d263df7547956f5c9",
+    "mtime": 1782815998.3147495,
+    "ast_hash": "2e0c787dd9ca8b368fb369f03237ccda",
     "semantic_hash": ""
   },
   "apps/web/src/components/modals/ImportMT4Modal.tsx": {
@@ -740,8 +740,8 @@
     "semantic_hash": ""
   },
   "apps/api/src/routes/settings.ts": {
-    "mtime": 1782735093.2253573,
-    "ast_hash": "1af95dcf756465f5bc8b321f808cf51f",
+    "mtime": 1782815752.1090593,
+    "ast_hash": "883a8b3e69598ca912eecb0a701b0f39",
     "semantic_hash": ""
   },
   "apps/web/src/app/dashboard/page.tsx": {
@@ -980,8 +980,8 @@
     "semantic_hash": ""
   },
   "apps/api/src/routes/admin.ts": {
-    "mtime": 1782655189.2662203,
-    "ast_hash": "35681dc522fa9fa141f3b6877ea9ba97",
+    "mtime": 1782815787.3948936,
+    "ast_hash": "1d2d4aad403b7ad2d399db0fda42bc75",
     "semantic_hash": ""
   },
   "apps/api/src/routes/payments.ts": {
@@ -1005,8 +1005,8 @@
     "semantic_hash": ""
   },
   "apps/web/src/app/admin/page.tsx": {
-    "mtime": 1782656573.9826603,
-    "ast_hash": "f43f68dbabdffbe44137305792c6d9f6",
+    "mtime": 1782816501.1894822,
+    "ast_hash": "f80bddd696859d26875ae9a07d293411",
     "semantic_hash": ""
   },
   "apps/web/src/app/help/ea-setup/page.tsx": {
@@ -1097,6 +1097,11 @@
   "apps/api/src/services/payping.ts": {
     "mtime": 1782809560.0162313,
     "ast_hash": "ba9c5183e86fe855cefce4263e5d2a30",
+    "semantic_hash": ""
+  },
+  "apps/web/src/app/contact/page.tsx": {
+    "mtime": 1782815829.948061,
+    "ast_hash": "dc8d5315965fc8bc63a4ed6b1101db80",
     "semantic_hash": ""
   }
 }

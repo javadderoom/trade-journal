@@ -501,6 +501,11 @@ export default function LandingPage() {
               <a href="/register">ثبت‌نام</a>
               <a href="/login">ورود</a>
             </div>
+            <div>
+              <h4>پشتیبانی</h4>
+              <Link href="/contact">ارتباط با ما</Link>
+              <Link href="/help/ea-setup">راهنمای اکسپرت</Link>
+            </div>
           </div>
         </div>
         <div className="footer-bottom">

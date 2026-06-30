@@ -1,0 +1,223 @@
+@import '../variables.scss';
+
+.contact-page-container {
+  min-height: 100vh;
+  background-color: $background;
+  color: $on-background;
+  font-family: $font-primary;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px 20px;
+  position: relative;
+  overflow: hidden;
+
+  // Ambient glows
+  .bg-glow {
+    position: absolute;
+    width: 300px;
+    height: 300px;
+    border-radius: 50%;
+    filter: blur(120px);
+    opacity: 0.15;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  .bg-glow-1 {
+    top: 10%;
+    right: 15%;
+    background-color: $primary;
+  }
+
+  .bg-glow-2 {
+    bottom: 20%;
+    left: 10%;
+    background-color: $secondary;
+  }
+
+  .contact-header {
+    max-width: 800px;
+    width: 100%;
+    text-align: center;
+    margin-bottom: 50px;
+    z-index: 1;
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: $primary;
+      text-decoration: none;
+      font-size: 0.9rem;
+      margin-bottom: 20px;
+      transition: opacity 0.2s;
+
+      &:hover {
+        opacity: 0.8;
+      }
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: $text;
+      margin: 10px 0;
+    }
+
+    p {
+      color: $muted;
+      font-size: 1.1rem;
+      margin: 10px 0 0;
+    }
+  }
+
+  .contact-main {
+    max-width: 800px;
+    width: 100%;
+    z-index: 1;
+    flex: 1;
+  }
+
+  .status-container {
+    background-color: $surface;
+    border: 1px solid $outline-variant;
+    border-radius: 12px;
+    padding: 40px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid rgba(255, 255, 255, 0.05);
+      border-top-color: $primary;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    &.error-box {
+      border-color: rgba($error, 0.3);
+      background-color: rgba($error-container, 0.05);
+      .error-icon {
+        font-size: 3rem;
+        color: $error;
+      }
+    }
+
+    &.empty-box {
+      .empty-icon {
+        font-size: 3rem;
+        color: $muted;
+      }
+    }
+  }
+
+  .contact-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 24px;
+  }
+
+  .contact-card {
+    background-color: $surface;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 16px;
+    padding: 30px 24px;
+    text-align: center;
+    transition: transform 0.25s, border-color 0.25s, box-shadow 0.25s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    &:hover {
+      transform: translateY(-5px);
+      border-color: rgba($primary, 0.3);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    }
+
+    .card-icon-wrapper {
+      width: 60px;
+      height: 60px;
+      border-radius: 12px;
+      background-color: rgba(255, 255, 255, 0.02);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: $primary;
+      margin-bottom: 20px;
+
+      .material-symbols-outlined {
+        font-size: 2rem;
+      }
+    }
+
+    &.card-mobile .card-icon-wrapper {
+      color: #38bdf8;
+    }
+    &.card-landline .card-icon-wrapper {
+      color: #fb7185;
+    }
+    &.card-email .card-icon-wrapper {
+      color: #34d399;
+    }
+    &.card-address .card-icon-wrapper {
+      color: #fb923c;
+    }
+
+    h3 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: $text;
+      margin: 0 0 12px 0;
+    }
+
+    .card-link {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: $primary;
+      text-decoration: none;
+      margin-bottom: 12px;
+      transition: opacity 0.2s;
+
+      &:hover {
+        opacity: 0.8;
+      }
+    }
+
+    .card-text {
+      font-size: 1rem;
+      line-height: 1.6;
+      margin: 0 0 12px 0;
+      color: $text;
+    }
+
+    .card-hint {
+      font-size: 0.82rem;
+      color: $muted;
+      margin: auto 0 0 0;
+      line-height: 1.5;
+    }
+
+    .font-ltr {
+      direction: ltr;
+      display: inline-block;
+    }
+  }
+
+  .contact-footer {
+    margin-top: 60px;
+    text-align: center;
+    color: $muted;
+    font-size: 0.85rem;
+    z-index: 1;
+  }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}

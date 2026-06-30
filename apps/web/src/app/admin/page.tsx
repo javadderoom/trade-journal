@@ -8,7 +8,7 @@ import { toPersianDigits } from '../../utils/farsi';
 import { notify } from '../../lib/notify';
 import './admin.scss';
 
-type AdminTab = 'stats' | 'users' | 'receipts' | 'coupons' | 'pricing';
+type AdminTab = 'stats' | 'users' | 'receipts' | 'coupons' | 'pricing' | 'contact';
 
 interface AdminStats {
   totalUsers: number;
@@ -89,6 +89,12 @@ export default function AdminPage() {
     STANDARD: { monthly: 249000, annual: 2390000 },
     PRO: { monthly: 499000, annual: 4790000 },
   });
+  const [contactConfig, setContactConfig] = useState({
+    email: '',
+    mobile: '',
+    landline: '',
+    address: '',
+  });
 
   // Modal states
   const [selectedReceipt, setSelectedReceipt] = useState<AdminReceipt | null>(null);
@@ -146,6 +152,22 @@ export default function AdminPage() {
     }
   }, []);
 
+  const fetchContactSetting = useCallback(async () => {
+    try {
+      const res = await api.get('/api/settings/contact');
+      if (res.data) {
+        setContactConfig({
+          email: res.data.email || '',
+          mobile: res.data.mobile || '',
+          landline: res.data.landline || '',
+          address: res.data.address || '',
+        });
+      }
+    } catch (err) {
+      console.error('Failed to fetch contact config:', err);
+    }
+  }, []);
+
   // Fetch initial data based on active tab
   useEffect(() => {
     if (!user || user.role !== 'ADMIN') return;
@@ -154,7 +176,8 @@ export default function AdminPage() {
     if (activeTab === 'receipts') fetchReceipts();
     if (activeTab === 'coupons') fetchCoupons();
     if (activeTab === 'pricing') fetchPricesSetting();
-  }, [activeTab, user, fetchStats, fetchUsers, fetchReceipts, fetchCoupons, fetchPricesSetting]);
+    if (activeTab === 'contact') fetchContactSetting();
+  }, [activeTab, user, fetchStats, fetchUsers, fetchReceipts, fetchCoupons, fetchPricesSetting, fetchContactSetting]);
 
   // Actions
   const handleVerifyReceipt = async (id: string, status: 'APPROVED' | 'REJECTED', inlineReason?: string) => {
@@ -236,6 +259,15 @@ export default function AdminPage() {
     }
   };
 
+  const handleUpdateContactInfo = async () => {
+    try {
+      await api.put('/api/admin/settings/contact', contactConfig);
+      notify.success('اطلاعات تماس با موفقیت بروزرسانی شد');
+    } catch (err: any) {
+      notify.error(err.response?.data?.error || 'خطا در ذخیره‌سازی اطلاعات تماس');
+    }
+  };
+
   const handleManualPlanOverride = async () => {
     if (!selectedUserForPlan) return;
     const ok = await notify.confirm({
@@ -309,6 +341,13 @@ export default function AdminPage() {
         >
           <span className="material-symbols-outlined">settings_suggest</span>
           <span>تنظیمات قیمت</span>
+        </button>
+        <button
+          className={`admin-tab-btn ${activeTab === 'contact' ? 'active' : ''}`}
+          onClick={() => setActiveTab('contact')}
+        >
+          <span className="material-symbols-outlined">contact_support</span>
+          <span>اطلاعات تماس</span>
         </button>
       </div>
 
@@ -645,6 +684,67 @@ export default function AdminPage() {
 
             <div>
               <button className="admin-btn" onClick={handleUpdatePrices}>ذخیره تغییرات قیمت</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Contact Info Tab */}
+      {activeTab === 'contact' && (
+        <div className="admin-panel-card">
+          <div className="card-header-actions">
+            <h3>مدیریت اطلاعات تماس</h3>
+          </div>
+          <p style={{ color: '#a0aec0', fontSize: '0.85rem', marginBottom: '20px' }}>
+            اطلاعات تماس زیر در صفحه عمومی «ارتباط با ما» نمایش داده می‌شوند. در صورت خالی گذاشتن هر کدام از فیلدها، کارت مربوطه در صفحه ارتباط با ما مخفی خواهد شد.
+          </p>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', maxWidth: '600px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+              <label style={{ fontSize: '0.88rem', color: '#e2e2eb', fontWeight: 'bold' }}>پست الکترونیک (ایمیل)</label>
+              <input
+                type="email"
+                placeholder="مثال: support@tradekav.ir"
+                style={{ background: '#0b0d19', border: '1px solid rgba(255,255,255,0.1)', padding: '12px', color: '#fff', borderRadius: '6px', fontSize: '0.9rem', direction: 'ltr' }}
+                value={contactConfig.email}
+                onChange={(e) => setContactConfig({ ...contactConfig, email: e.target.value })}
+              />
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+              <label style={{ fontSize: '0.88rem', color: '#e2e2eb', fontWeight: 'bold' }}>شماره همراه پشتیبانی</label>
+              <input
+                type="text"
+                placeholder="مثال: 09123456789"
+                style={{ background: '#0b0d19', border: '1px solid rgba(255,255,255,0.1)', padding: '12px', color: '#fff', borderRadius: '6px', fontSize: '0.9rem', direction: 'ltr' }}
+                value={contactConfig.mobile}
+                onChange={(e) => setContactConfig({ ...contactConfig, mobile: e.target.value })}
+              />
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+              <label style={{ fontSize: '0.88rem', color: '#e2e2eb', fontWeight: 'bold' }}>تلفن ثابت دفتر</label>
+              <input
+                type="text"
+                placeholder="مثال: 02188888888"
+                style={{ background: '#0b0d19', border: '1px solid rgba(255,255,255,0.1)', padding: '12px', color: '#fff', borderRadius: '6px', fontSize: '0.9rem', direction: 'ltr' }}
+                value={contactConfig.landline}
+                onChange={(e) => setContactConfig({ ...contactConfig, landline: e.target.value })}
+              />
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+              <label style={{ fontSize: '0.88rem', color: '#e2e2eb', fontWeight: 'bold' }}>آدرس پستی</label>
+              <textarea
+                placeholder="مثال: تهران، میدان ونک، خیابان ولیعصر، پلاک ۱"
+                style={{ background: '#0b0d19', border: '1px solid rgba(255,255,255,0.1)', padding: '12px', color: '#fff', borderRadius: '6px', fontSize: '0.9rem', minHeight: '80px', fontFamily: 'inherit', resize: 'vertical' }}
+                value={contactConfig.address}
+                onChange={(e) => setContactConfig({ ...contactConfig, address: e.target.value })}
+              />
+            </div>
+
+            <div style={{ marginTop: '10px' }}>
+              <button className="admin-btn" onClick={handleUpdateContactInfo}>ذخیره تغییرات اطلاعات تماس</button>
             </div>
           </div>
         </div>
