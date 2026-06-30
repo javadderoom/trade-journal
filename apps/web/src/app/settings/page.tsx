@@ -73,6 +73,11 @@ export default function SettingsPage() {
   const [checkoutLoading, setCheckoutLoading] = useState(false);
   const [prices, setPrices] = useState<any>(null);
   const [receiptFile, setReceiptFile] = useState<File | null>(null);
+  const [cardDetails, setCardDetails] = useState({
+    cardNumber: '۶۰۳۷-۹۹۷۵-۹۴۴۴-۴۱۲۸',
+    bankName: 'ملی ایران',
+    ownerName: 'جواد شیخ اعظمی',
+  });
 
   const activePrices = prices || DEFAULT_PRICES;
   const standardMonthlyPrice = activePrices.STANDARD.monthly.toLocaleString('fa-IR');
@@ -201,6 +206,17 @@ export default function SettingsPage() {
   }, []);
 
   useEffect(() => { fetchPrices(); }, [fetchPrices]);
+
+  const fetchCardDetails = useCallback(async () => {
+    try {
+      const res = await api.get('/api/settings/card-details');
+      setCardDetails(res.data);
+    } catch (err) {
+      console.error('Failed to fetch card details:', err);
+    }
+  }, []);
+
+  useEffect(() => { fetchCardDetails(); }, [fetchCardDetails]);
 
   // ─── Fetch sessions ──────────────────────────────────────────────────────
   const fetchSessions = useCallback(async () => {
@@ -1144,15 +1160,15 @@ export default function SettingsPage() {
                           <h5 style={{ margin: '0 0 10px 0', fontSize: '0.88rem', color: '#ffb300' }}>مشخصات واریز کارت به کارت:</h5>
                           <div className="instruction-row" style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.82rem', marginBottom: '6px', color: '#a0aec0' }}>
                             <span>شماره کارت:</span>
-                            <strong style={{ direction: 'ltr', color: '#ffffff' }}>۶۰۳۷-۹۹۷۵-۹۴۴۴-۴۱۲۸</strong>
+                            <strong style={{ direction: 'ltr', color: '#ffffff' }}>{toPersianDigits(cardDetails.cardNumber)}</strong>
                           </div>
                           <div className="instruction-row" style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.82rem', marginBottom: '6px', color: '#a0aec0' }}>
                             <span>بانک:</span>
-                            <span style={{ color: '#ffffff' }}>ملی ایران</span>
+                            <span style={{ color: '#ffffff' }}>{cardDetails.bankName}</span>
                           </div>
                           <div className="instruction-row" style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.82rem', color: '#a0aec0' }}>
                             <span>به نام:</span>
-                            <span style={{ color: '#ffffff' }}>جواد شیخ اعظمی</span>
+                            <span style={{ color: '#ffffff' }}>{cardDetails.ownerName}</span>
                           </div>
                         </div>
 

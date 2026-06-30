@@ -95,6 +95,11 @@ export default function AdminPage() {
     landline: '',
     address: '',
   });
+  const [cardConfig, setCardConfig] = useState({
+    cardNumber: '',
+    bankName: '',
+    ownerName: '',
+  });
 
   // Modal states
   const [selectedReceipt, setSelectedReceipt] = useState<AdminReceipt | null>(null);
@@ -168,6 +173,21 @@ export default function AdminPage() {
     }
   }, []);
 
+  const fetchCardSetting = useCallback(async () => {
+    try {
+      const res = await api.get('/api/settings/card-details');
+      if (res.data) {
+        setCardConfig({
+          cardNumber: res.data.cardNumber || '',
+          bankName: res.data.bankName || '',
+          ownerName: res.data.ownerName || '',
+        });
+      }
+    } catch (err) {
+      console.error('Failed to fetch card config:', err);
+    }
+  }, []);
+
   // Fetch initial data based on active tab
   useEffect(() => {
     if (!user || user.role !== 'ADMIN') return;
@@ -176,8 +196,11 @@ export default function AdminPage() {
     if (activeTab === 'receipts') fetchReceipts();
     if (activeTab === 'coupons') fetchCoupons();
     if (activeTab === 'pricing') fetchPricesSetting();
-    if (activeTab === 'contact') fetchContactSetting();
-  }, [activeTab, user, fetchStats, fetchUsers, fetchReceipts, fetchCoupons, fetchPricesSetting, fetchContactSetting]);
+    if (activeTab === 'contact') {
+      fetchContactSetting();
+      fetchCardSetting();
+    }
+  }, [activeTab, user, fetchStats, fetchUsers, fetchReceipts, fetchCoupons, fetchPricesSetting, fetchContactSetting, fetchCardSetting]);
 
   // Actions
   const handleVerifyReceipt = async (id: string, status: 'APPROVED' | 'REJECTED', inlineReason?: string) => {
@@ -265,6 +288,15 @@ export default function AdminPage() {
       notify.success('اطلاعات تماس با موفقیت بروزرسانی شد');
     } catch (err: any) {
       notify.error(err.response?.data?.error || 'خطا در ذخیره‌سازی اطلاعات تماس');
+    }
+  };
+
+  const handleUpdateCardDetails = async () => {
+    try {
+      await api.put('/api/admin/settings/card-details', cardConfig);
+      notify.success('مشخصات کارت بانکی با موفقیت بروزرسانی شد');
+    } catch (err: any) {
+      notify.error(err.response?.data?.error || 'خطا در ذخیره‌سازی اطلاعات کارت بانکی');
     }
   };
 
@@ -745,6 +777,47 @@ export default function AdminPage() {
 
             <div style={{ marginTop: '10px' }}>
               <button className="admin-btn" onClick={handleUpdateContactInfo}>ذخیره تغییرات اطلاعات تماس</button>
+            </div>
+
+            <div style={{ marginTop: '20px', paddingTop: '20px', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
+              <h3 style={{ fontSize: '1.1rem', color: '#61f9b1', marginBottom: '12px' }}>مشخصات کارت بانکی (کارت به کارت)</h3>
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+              <label style={{ fontSize: '0.88rem', color: '#e2e2eb', fontWeight: 'bold' }}>شماره کارت</label>
+              <input
+                type="text"
+                placeholder="مثال: 6037-9975-9444-4128"
+                style={{ background: '#0b0d19', border: '1px solid rgba(255,255,255,0.1)', padding: '12px', color: '#fff', borderRadius: '6px', fontSize: '0.9rem', direction: 'ltr' }}
+                value={cardConfig.cardNumber}
+                onChange={(e) => setCardConfig({ ...cardConfig, cardNumber: e.target.value })}
+              />
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+              <label style={{ fontSize: '0.88rem', color: '#e2e2eb', fontWeight: 'bold' }}>نام بانک</label>
+              <input
+                type="text"
+                placeholder="مثال: ملی ایران"
+                style={{ background: '#0b0d19', border: '1px solid rgba(255,255,255,0.1)', padding: '12px', color: '#fff', borderRadius: '6px', fontSize: '0.9rem' }}
+                value={cardConfig.bankName}
+                onChange={(e) => setCardConfig({ ...cardConfig, bankName: e.target.value })}
+              />
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+              <label style={{ fontSize: '0.88rem', color: '#e2e2eb', fontWeight: 'bold' }}>صاحب کارت</label>
+              <input
+                type="text"
+                placeholder="مثال: جواد شیخ اعظمی"
+                style={{ background: '#0b0d19', border: '1px solid rgba(255,255,255,0.1)', padding: '12px', color: '#fff', borderRadius: '6px', fontSize: '0.9rem' }}
+                value={cardConfig.ownerName}
+                onChange={(e) => setCardConfig({ ...cardConfig, ownerName: e.target.value })}
+              />
+            </div>
+
+            <div style={{ marginTop: '10px' }}>
+              <button className="admin-btn" onClick={handleUpdateCardDetails}>ذخیره تغییرات کارت بانکی</button>
             </div>
           </div>
         </div>

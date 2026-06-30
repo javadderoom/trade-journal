@@ -591,4 +591,30 @@ router.get('/contact', async (req, res) => {
   }
 });
 
+/**
+ * GET /api/settings/card-details
+ * Retrieve manual card-to-card payment credentials
+ */
+router.get('/card-details', async (req, res) => {
+  try {
+    const setting = await prisma.systemSetting.findUnique({
+      where: { key: 'CARD_DETAILS' },
+    });
+
+    if (setting && setting.value) {
+      return res.status(200).json(setting.value);
+    }
+
+    // Default fallback
+    return res.status(200).json({
+      cardNumber: '۶۰۳۷-۹۹۷۵-۹۴۴۴-۴۱۲۸',
+      bankName: 'ملی ایران',
+      ownerName: 'جواد شیخ اعظمی',
+    });
+  } catch (err: any) {
+    console.error('Fetch card details error:', err);
+    return res.status(500).json({ error: 'خطا در دریافت اطلاعات کارت بانکی' });
+  }
+});
+
 export default router;

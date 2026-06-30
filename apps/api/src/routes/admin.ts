@@ -380,4 +380,30 @@ router.put('/settings/contact', async (req: AuthRequest, res: Response) => {
   }
 });
 
+/**
+ * PUT /api/admin/settings/card-details
+ * Update card settings
+ */
+router.put('/settings/card-details', async (req: AuthRequest, res: Response) => {
+  try {
+    const { cardNumber, bankName, ownerName } = req.body;
+
+    await prisma.systemSetting.upsert({
+      where: { key: 'CARD_DETAILS' },
+      create: {
+        key: 'CARD_DETAILS',
+        value: { cardNumber, bankName, ownerName },
+      },
+      update: {
+        value: { cardNumber, bankName, ownerName },
+      },
+    });
+
+    return res.status(200).json({ message: 'مشخصات کارت بانکی با موفقیت بروزرسانی شد' });
+  } catch (err: any) {
+    console.error('Admin update card details error:', err);
+    return res.status(500).json({ error: 'خطا در ذخیره‌سازی تنظیمات کارت بانکی' });
+  }
+});
+
 export default router;

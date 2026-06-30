@@ -85,7 +85,7 @@ export default function ContactPage() {
                 <a href={`tel:${contact.mobile}`} className="card-link font-ltr">
                   {toPersianDigits(contact.mobile)}
                 </a>
-                <p className="card-hint font-rtl">پشتیبانی ۲۴ ساعته در تلگرام و واتس‌اپ</p>
+                <p className="card-hint font-rtl">پشتیبانی در پیامرسان بله و تلگرام</p>
               </div>
             )}
 
