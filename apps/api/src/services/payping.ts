@@ -6,11 +6,11 @@ interface PayPingRequestResponse {
 }
 
 const getBaseUrl = (): string => {
-  return 'https://api.payping.ir/v2/pay';
+  return 'https://api.payping.ir/v3/pay';
 };
 
 const getGatewayUrl = (code: string): string => {
-  return `https://api.payping.ir/v2/pay/goto/${code}`;
+  return `https://api.payping.ir/v3/pay/start/${code}`;
 };
 
 /**
