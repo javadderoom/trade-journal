@@ -703,13 +703,13 @@ router.post('/payping/checkout', authenticate, async (req: AuthRequest, res: Res
 router.post('/payping/verify', authenticate, async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user!.userId;
-    const { refid, amount, plan, period, discountCode } = req.body;
+    const { refid, code, amount, plan, period, discountCode } = req.body;
 
     if (!refid || !amount || !plan || !period) {
       return res.status(400).json({ error: 'اطلاعات تایید پرداخت نامعتبر است' });
     }
 
-    const verification = await verifyPaypingPayment(Number(amount), refid);
+    const verification = await verifyPaypingPayment(Number(amount), code || '', Number(refid));
 
     if (!verification.success) {
       return res.status(400).json({ error: verification.message });
