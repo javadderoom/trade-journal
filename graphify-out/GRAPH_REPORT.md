@@ -1,16 +1,16 @@
-# Graph Report - trade-journal  (2026-06-29)
+# Graph Report - trade-journal  (2026-06-30)
 
 ## Corpus Check
-- 202 files · ~548,893 words
+- 203 files · ~550,792 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 3355 nodes · 6589 edges · 181 communities (174 shown, 7 thin omitted)
+- 3364 nodes · 6603 edges · 179 communities (172 shown, 7 thin omitted)
 - Extraction: 99% EXTRACTED · 1% INFERRED · 0% AMBIGUOUS · INFERRED: 53 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `e5ea60c9`
+- Built from commit: `4e0fcb7c`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -172,8 +172,6 @@
 - [[_COMMUNITY_Community 155|Community 155]]
 - [[_COMMUNITY_Community 156|Community 156]]
 - [[_COMMUNITY_Community 157|Community 157]]
-- [[_COMMUNITY_Community 158|Community 158]]
-- [[_COMMUNITY_Community 159|Community 159]]
 - [[_COMMUNITY_Community 160|Community 160]]
 - [[_COMMUNITY_Community 161|Community 161]]
 - [[_COMMUNITY_Community 162|Community 162]]
@@ -216,7 +214,7 @@
 ## Import Cycles
 - None detected.
 
-## Communities (181 total, 7 thin omitted)
+## Communities (179 total, 7 thin omitted)
 
 ### Community 0 - "Community 0"
 Cohesion: 0.06
@@ -228,7 +226,7 @@ Nodes (106): addManualContextText(), applyGlobalBarLabelState(), applySvelteComp
 
 ### Community 2 - "Community 2"
 Cohesion: 0.04
-Nodes (83): isNeutralBorderColor(), makeStaticStyle(), borderColorsFromStyle(), borderWidthsFromStyle(), checkBorders(), checkClippedOverflow(), checkCreamPalette(), checkElementBorders() (+75 more)
+Nodes (84): makeStaticStyle(), borderColorsFromStyle(), borderWidthsFromStyle(), checkBorders(), checkClippedOverflow(), checkCreamPalette(), checkElementBorders(), checkElementBordersDOM() (+76 more)
 
 ### Community 3 - "Community 3"
 Cohesion: 0.07
@@ -240,15 +238,15 @@ Nodes (65): addBrowserFindings(), addVisualContrastFindings(), addVisualContrast
 
 ### Community 5 - "Community 5"
 Cohesion: 0.09
-Nodes (41): mergeDesignSystemFindings(), detectUrl(), runVisualContrastFallback(), serializeDesignSystemForBrowser(), CSS_IN_JS_EXTENSIONS, detectText(), extFromFilePath(), extractCSSinJS() (+33 more)
+Nodes (39): detectUrl(), runVisualContrastFallback(), serializeDesignSystemForBrowser(), CSS_IN_JS_EXTENSIONS, extFromFilePath(), isNeutralBorderColor(), PAGE_ANALYZER_EXTS, REGEX_ANALYZERS (+31 more)
 
 ### Community 6 - "Community 6"
 Cohesion: 0.11
 Nodes (53): ae(), be(), bt(), Ce(), Ct(), de(), dt(), _e() (+45 more)
 
 ### Community 7 - "Community 7"
-Cohesion: 0.09
-Nodes (51): addColorObject(), addDesignColor(), addRoundedScale(), addRoundedToken(), addSidecarColors(), addSidecarRadii(), addTypographyFonts(), canonicalDesignFindingKey() (+43 more)
+Cohesion: 0.10
+Nodes (48): addColorObject(), addDesignColor(), addRoundedScale(), addRoundedToken(), addSidecarColors(), addSidecarRadii(), addTypographyFonts(), canonicalDesignFindingKey() (+40 more)
 
 ### Community 8 - "Community 8"
 Cohesion: 0.11
@@ -308,7 +306,7 @@ Nodes (36): appendOriginToDirective(), buildTagBlock(), commentClose(), commentO
 
 ### Community 22 - "Community 22"
 Cohesion: 0.10
-Nodes (34): detectCli(), formatFindings(), formatFindingSummary(), handleStdin(), printUsage(), createBrowserDetector(), buildImportGraph(), detectFrameworkConfig() (+26 more)
+Nodes (38): detectCli(), formatFindings(), formatFindingSummary(), handleStdin(), printUsage(), loadDesignSystemForCwd(), parseFrontmatter(), resolveDesignSidecarPath() (+30 more)
 
 ### Community 23 - "Community 23"
 Cohesion: 0.08
@@ -367,8 +365,8 @@ Cohesion: 0.11
 Nodes (24): applyStaticDeclaration(), buildBorderOverrideMap(), compareStaticPriority(), cssPropToCamel(), expandStaticBoxValues(), expandStaticDeclaration(), extractStaticColor(), NAMED_COLORS (+16 more)
 
 ### Community 37 - "Community 37"
-Cohesion: 0.07
-Nodes (27): Accessibility Considerations, Anti-reflexes worth defending against, Assess Current Typography, Classic Typography Principles, Establish Hierarchy, Fix Readability, Fluid Type, Font Selection (+19 more)
+Cohesion: 0.12
+Nodes (16): Accessibility Considerations, Anti-reflexes worth defending against, Classic Typography Principles, Fluid Type, Font Selection & Pairing, Modern Web Typography, Modular Scale & Hierarchy, OpenType Features (+8 more)
 
 ### Community 38 - "Community 38"
 Cohesion: 0.12
@@ -395,8 +393,8 @@ Cohesion: 0.18
 Nodes (20): args, buffer, cwd, pageUrlFilter, remaining, summarizeManualDiagnostics(), buildManualEditEvidence(), createManualEditRoutes() (+12 more)
 
 ### Community 44 - "Community 44"
-Cohesion: 0.11
-Nodes (11): canCreateInsert(), clampPlaceholderSize(), computeInsertPosition(), groupSiblingRows(), hitSiblingInsertGap(), horizontalOverlap(), insertCreateDisabledReason(), insertLineCoords() (+3 more)
+Cohesion: 0.12
+Nodes (9): clampPlaceholderSize(), computeInsertPosition(), groupSiblingRows(), hitSiblingInsertGap(), horizontalOverlap(), insertLineCoords(), resizePlaceholderFromEdge(), resolveInsertHover() (+1 more)
 
 ### Community 45 - "Community 45"
 Cohesion: 0.09
@@ -447,16 +445,16 @@ Cohesion: 0.10
 Nodes (20): 1. Prisma Schema, 2. Install Dependencies, 3. Environment Variables, 4.1 Token utilities — `src/lib/tokens.ts`, 4.2 Auth middleware — `src/middleware/auth.ts`, 4.3 Validation schemas — `src/validators/auth.ts`, 4.4 Auth routes — `src/routes/auth.ts`, 4.5 Register the router — `src/index.ts` (+12 more)
 
 ### Community 58 - "Community 58"
-Cohesion: 0.11
-Nodes (14): Assess Animation Opportunities, Plan Animation Strategy, Register, Verify Quality, Assess Current Layout, Live-mode signature params, Plan Layout Improvements, Register (+6 more)
+Cohesion: 0.13
+Nodes (18): contextSourcePath(), contextSourceStatus(), findMonorepoRoot(), firstExisting(), hasGitBoundary(), isCandidateProjectRoot(), isExcludedByWorkspacePattern(), isPathInside() (+10 more)
 
 ### Community 59 - "Community 59"
 Cohesion: 0.10
 Nodes (19): Clean Up, Code Quality, Color & Contrast, Content & Copy, Design System Discovery, Edge Cases & Error States, Final Verification, Forms & Inputs (+11 more)
 
 ### Community 60 - "Community 60"
-Cohesion: 0.21
-Nodes (17): isLiveServerPidReachable(), readLiveServerInfo(), completeCli(), completeThroughServer(), parseArgs(), readServerInfo(), collectManualApplyFiles(), manualApplyReplyCommand() (+9 more)
+Cohesion: 0.22
+Nodes (15): completeCli(), completeThroughServer(), parseArgs(), readServerInfo(), collectManualApplyFiles(), manualApplyReplyCommand(), manualApplyResumeHint(), parseArgs() (+7 more)
 
 ### Community 61 - "Community 61"
 Cohesion: 0.11
@@ -471,8 +469,8 @@ Cohesion: 0.11
 Nodes (18): dependencies, axios, lightweight-charts, next, react, react-dom, sass, zustand (+10 more)
 
 ### Community 64 - "Community 64"
-Cohesion: 0.13
-Nodes (18): contextSourcePath(), contextSourceStatus(), findMonorepoRoot(), firstExisting(), hasGitBoundary(), isCandidateProjectRoot(), isExcludedByWorkspacePattern(), isPathInside() (+10 more)
+Cohesion: 0.22
+Nodes (13): directChildDirs(), discoverRootsForPattern(), discoverTargetCandidates(), escapeRegExp(), expandSimplePattern(), isIgnoredWorkspaceDiscoveryDir(), nearestPackageRootBetween(), normalizeWorkspacePattern() (+5 more)
 
 ### Community 65 - "Community 65"
 Cohesion: 0.14
@@ -511,7 +509,7 @@ Cohesion: 0.13
 Nodes (14): 1. Accessibility (A11y), 2. Performance, 3. Theming, 4. Responsive Design, 5. Anti-Patterns (CRITICAL), Anti-Patterns Verdict, Audit Health Score, Detailed Findings by Severity (+6 more)
 
 ### Community 74 - "Community 74"
-Cohesion: 0.13
+Cohesion: 0.14
 Nodes (14): Brand bans (on top of the shared absolute bans), Brand permissions, Brand register, Color, Font selection procedure, Imagery, Layout, Motion (+6 more)
 
 ### Community 75 - "Community 75"
@@ -531,8 +529,8 @@ Cohesion: 0.13
 Nodes (14): API Progress — معامله‌یار, Database Schema (`src/prisma/schema.prisma`), ✅ Done, Express Server (`src/server.ts`), File Upload & Screenshots Middleware, High Priority, Low Priority, Medium Priority (+6 more)
 
 ### Community 79 - "Community 79"
-Cohesion: 0.16
-Nodes (11): authenticateAccountToken(), checkAccountLimit(), checkImportPermission(), checkSyncPermission(), checkTradeLimit(), PLAN_ACCOUNT_LIMITS, router, storage (+3 more)
+Cohesion: 0.12
+Nodes (15): authenticateAccountToken(), checkAccountLimit(), checkImportPermission(), checkSyncPermission(), checkTradeLimit(), PLAN_ACCOUNT_LIMITS, router, storage (+7 more)
 
 ### Community 80 - "Community 80"
 Cohesion: 0.20
@@ -547,24 +545,24 @@ Cohesion: 0.14
 Nodes (13): Animation Performance, Assess Performance Issues, Core Web Vitals Optimization, Cumulative Layout Shift (CLS < 0.1), First Input Delay (FID < 100ms) / INP (< 200ms), Largest Contentful Paint (LCP < 2.5s), Loading Performance, Network Optimization (+5 more)
 
 ### Community 83 - "Community 83"
-Cohesion: 0.23
-Nodes (11): extractRegister(), cli(), COMMON_DEV_PORTS, devServerSignals(), gatherSignals(), gitSignals(), hasCode(), latestCritique() (+3 more)
+Cohesion: 0.24
+Nodes (10): cli(), COMMON_DEV_PORTS, devServerSignals(), gatherSignals(), gitSignals(), hasCode(), latestCritique(), SCANNABLE_EXT (+2 more)
 
 ### Community 84 - "Community 84"
-Cohesion: 0.25
-Nodes (12): FORBIDDEN_MANUAL_EDIT_TEXT_CHARS, INSERT_POSITIONS, isValidId(), isValidVariantId(), validateAnnotationFields(), validateEvent(), validateInsertGenerate(), validateManualEditEvent() (+4 more)
+Cohesion: 0.22
+Nodes (14): FORBIDDEN_MANUAL_EDIT_TEXT_CHARS, INSERT_POSITIONS, isValidId(), isValidVariantId(), validateAnnotationFields(), validateEvent(), validateInsertGenerate(), validateManualEditEvent() (+6 more)
 
 ### Community 85 - "Community 85"
-Cohesion: 0.20
-Nodes (11): DEFAULT_PRICES, receiptDir, receiptStorage, receiptUpload, router, getBaseUrl(), getGatewayUrl(), requestPayment() (+3 more)
+Cohesion: 0.15
+Nodes (16): DEFAULT_PRICES, receiptDir, receiptStorage, receiptUpload, router, getBaseUrl(), getGatewayUrl(), PayPingRequestResponse (+8 more)
 
 ### Community 86 - "Community 86"
-Cohesion: 0.22
-Nodes (13): directChildDirs(), discoverRootsForPattern(), discoverTargetCandidates(), escapeRegExp(), expandSimplePattern(), isIgnoredWorkspaceDiscoveryDir(), nearestPackageRootBetween(), normalizeWorkspacePattern() (+5 more)
+Cohesion: 0.29
+Nodes (8): buildMissingTargetDirective(), buildResolvedContextDirective(), buildTargetSelectionDirective(), cli(), extractRegister(), hasTargetOption(), pathExistsForTarget(), shouldWarnMissingTarget()
 
 ### Community 87 - "Community 87"
-Cohesion: 0.28
-Nodes (11): loadContext(), resolveTargetSelection(), safeRead(), __dirname, ensureServerRunning(), resolveFiles(), liveCli(), missingLiveContext() (+3 more)
+Cohesion: 0.24
+Nodes (13): loadContext(), resolveTargetSelection(), safeRead(), isLiveServerPidReachable(), readLiveServerInfo(), __dirname, ensureServerRunning(), resolveFiles() (+5 more)
 
 ### Community 88 - "Community 88"
 Cohesion: 0.10
@@ -599,8 +597,8 @@ Cohesion: 0.15
 Nodes (12): 1. Initial VPS Setup & Coolify Installation, 2. DNS Configuration (Prerequisite), 3. Set Up PostgreSQL Database in Coolify, 4. Connect your Git Repository, 5. Deploy Backend API, 6. Deploy Frontend Web (Next.js), 7. Static Upload Directory Persistency (Multer Uploads), Configure Docker Registry Mirror (Required for Restricted Networks like Iran) (+4 more)
 
 ### Community 96 - "Community 96"
-Cohesion: 0.17
-Nodes (11): Amplify the Design, Assess Current State, Color Intensification, Composition Boldness, Motion & Animation, Plan Amplification, Register, Spatial Drama (+3 more)
+Cohesion: 0.29
+Nodes (7): Amplify the Design, Color Intensification, Composition Boldness, Motion & Animation, Spatial Drama, Typography Amplification, Visual Effects
 
 ### Community 97 - "Community 97"
 Cohesion: 0.17
@@ -695,15 +693,15 @@ Cohesion: 0.22
 Nodes (8): DetailPanelProps, MobileCardsList(), DEFAULT_EMOTIONS, DEFAULT_SYSTEM_TAGS, getJalaliDisplayDate(), TagObject, TradesTable(), TradesTableProps
 
 ### Community 120 - "Community 120"
-Cohesion: 0.20
-Nodes (9): Important Context for `.ir` Domains, Option A: Cloudflare Email Routing (Free, Easiest), Option B: cPanel / Email Hosting (Highly Recommended), Option C: Self-Hosting a Mail Server in Coolify (Advanced), Setting Up Your Custom Email: `info@tradekav.ir`, Step-by-Step Setup:, Step-by-Step Setup:, Step-by-Step Setup: (+1 more)
+Cohesion: 0.15
+Nodes (12): 1. Coolify Configuration (Docker Compose), 2. Restoring Existing Configurations (If moving volumes), 3. SSL/TLS Certificate Setup (Let's Encrypt), 4. DNS Configuration, 5. Connecting Mail Clients, Compose File (`docker-compose.yml`), Domain Routing Settings in Coolify GUI, Gmail Integration (Send Mail As) (+4 more)
 
 ### Community 121 - "Community 121"
 Cohesion: 0.22
 Nodes (8): Accessibility, Design Engineering, Initial Response, prefers-reduced-motion, Review Checklist, Review Format (Required), Stagger Animations, Touch device hover states
 
 ### Community 122 - "Community 122"
-Cohesion: 0.22
+Cohesion: 0.17
 Nodes (9): After This File, Codex: Visual Direction & Asset Production, Four stop points before code, Step A: Explore Directions with the User, Step B: Generate the Brand Palette First, Step C: Generate 1-3 Visual Mocks Against the Palette, Step D: Approval Loop, Step E: Mock Fidelity Inventory (+1 more)
 
 ### Community 123 - "Community 123"
@@ -731,8 +729,8 @@ Cohesion: 0.25
 Nodes (8): Animate enter states with @starting-style, Buttons must feel responsive, Component Building Principles, Make popovers origin-aware, Never animate from scale(0), Tooltips: skip delay on subsequent hovers, Use blur to mask imperfect transitions, Use CSS transitions over keyframes for interruptible UI
 
 ### Community 129 - "Community 129"
-Cohesion: 0.25
-Nodes (8): Accessibility, CSS Animations, JavaScript Animation, Motion Materials, Perceived Performance, Performance, Technical Implementation, Timing & Easing
+Cohesion: 0.36
+Nodes (5): parseCliOptions(), parseTargetOptions(), parseTargetPath(), TargetArgError, resolveLiveTarget()
 
 ### Community 130 - "Community 130"
 Cohesion: 0.25
@@ -751,28 +749,28 @@ Cohesion: 0.25
 Nodes (7): Init Flow, Step 1: Load current state, Step 2: Explore the codebase, Step 4: Write PRODUCT.md, Step 5: Decide on DESIGN.md, Step 6: Configure live mode (when code exists), Step 7: Recommend starting points, then wrap up
 
 ### Community 134 - "Community 134"
-Cohesion: 0.25
-Nodes (8): Break Card Grid Monotony, Choose the Right Layout Tool, Create Visual Rhythm, Establish a Spacing System, Improve Layout Systematically, Manage Depth & Elevation, Optical Adjustments, Strengthen Visual Hierarchy
+Cohesion: 0.14
+Nodes (13): Assess Current Layout, Break Card Grid Monotony, Choose the Right Layout Tool, Create Visual Rhythm, Establish a Spacing System, Improve Layout Systematically, Live-mode signature params, Manage Depth & Elevation (+5 more)
 
 ### Community 135 - "Community 135"
 Cohesion: 0.29
-Nodes (8): buildMissingTargetDirective(), buildResolvedContextDirective(), buildTargetSelectionDirective(), cli(), hasTargetOption(), parseCliOptions(), pathExistsForTarget(), shouldWarnMissingTarget()
+Nodes (6): Constraints, Failure modes, Flow, $impeccable hooks, Intentional findings, Routing
 
 ### Community 136 - "Community 136"
 Cohesion: 0.29
 Nodes (8): checkElementTextOverflowDOM(), classSelector(), clippedByInset(), clippedByRect(), expandBoxShorthand(), firstMetricLengthPx(), isScreenReaderOnlyTextStyle(), metricLengthPx()
 
 ### Community 137 - "Community 137"
-Cohesion: 0.29
-Nodes (7): Delight Moments, Entrance Animations, Feedback & Guidance, Implement Animations, Micro-interactions, Navigation & Flow, State Transitions
+Cohesion: 0.10
+Nodes (19): Accessibility, Assess Animation Opportunities, CSS Animations, Delight Moments, Entrance Animations, Feedback & Guidance, Implement Animations, JavaScript Animation (+11 more)
 
 ### Community 138 - "Community 138"
 Cohesion: 0.29
 Nodes (7): Cognitive Load Assessment, Cognitive Load Checklist, Extraneous Load: Bad Design, Germane Load: Learning Effort, Intrinsic Load: The Task Itself, The Working Memory Rule, Three Types of Cognitive Load
 
 ### Community 139 - "Community 139"
-Cohesion: 0.29
-Nodes (6): Constraints, Failure modes, Flow, $impeccable hooks, Intentional findings, Routing
+Cohesion: 0.09
+Nodes (20): Assess Current State, Plan Amplification, Register, Verify Quality, Assess Current Typography, Establish Hierarchy, Fix Readability, Font Selection (+12 more)
 
 ### Community 140 - "Community 140"
 Cohesion: 0.29
@@ -795,12 +793,12 @@ Cohesion: 0.33
 Nodes (7): checkRepeatedSectionKickers(), checkRepeatedSectionKickersDOM(), checkRepeatedSectionKickersFromDoc(), cleanInlineText(), collectRepeatedSectionKickerCandidates(), isRepeatedKickerCandidate(), isRepeatedKickerCardContext()
 
 ### Community 145 - "Community 145"
-Cohesion: 0.43
-Nodes (4): parseTargetOptions(), parseTargetPath(), TargetArgError, resolveLiveTarget()
+Cohesion: 0.40
+Nodes (5): 4. Plan three variants: identity first, then mode, then axes, Phase A: Extract the identity (non-skippable), Phase B: Pick mode (default vs departure), Phase C: Plan three variants, Phase D: Squint test
 
 ### Community 146 - "Community 146"
-Cohesion: 0.29
-Nodes (4): adapter, getTradesForAccount(), syncTradesFromEA(), TradeListRow
+Cohesion: 0.40
+Nodes (5): Handle fallback, Step 1: Identify where the element actually lives, Step 2: Show three variants in the DOM for preview, Step 3: On accept, write to true source, Step 4: On discard, clean up the served file
 
 ### Community 147 - "Community 147"
 Cohesion: 0.29
@@ -842,14 +840,6 @@ Nodes (5): Asymmetric enter/exit timing, Cohesion matters, Review your work the 
 Cohesion: 0.40
 Nodes (5): Interruptibility advantage, Spring Animations, Spring-based mouse interactions, Spring configuration, When to use springs
 
-### Community 158 - "Community 158"
-Cohesion: 0.40
-Nodes (5): 4. Plan three variants: identity first, then mode, then axes, Phase A: Extract the identity (non-skippable), Phase B: Pick mode (default vs departure), Phase C: Plan three variants, Phase D: Squint test
-
-### Community 159 - "Community 159"
-Cohesion: 0.40
-Nodes (5): Handle fallback, Step 1: Identify where the element actually lives, Step 2: Show three variants in the DOM for preview, Step 3: On accept, write to true source, Step 4: On discard, clean up the served file
-
 ### Community 160 - "Community 160"
 Cohesion: 0.40
 Nodes (5): checkElementHeroEyebrow(), checkElementHeroEyebrowDOM(), checkHeroEyebrow(), isAccentColor(), resolveVarRefs()
@@ -883,7 +873,7 @@ Cohesion: 0.50
 Nodes (3): CandlestickData, TradeChart(), TradeChartProps
 
 ## Knowledge Gaps
-- **1035 isolated node(s):** `COMMON_DEV_PORTS`, `SCANNABLE_EXT`, `SOURCE_DIRS`, `PRODUCT_NAMES`, `DESIGN_NAMES` (+1030 more)
+- **1039 isolated node(s):** `COMMON_DEV_PORTS`, `SCANNABLE_EXT`, `SOURCE_DIRS`, `PRODUCT_NAMES`, `DESIGN_NAMES` (+1034 more)
   These have ≤1 connection - possible missing edges or undocumented components.
 - **7 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
@@ -891,16 +881,16 @@ Nodes (3): CandlestickData, TradeChart(), TradeChartProps
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `confirm()` connect `Community 29` to `Community 22`?**
-  _High betweenness centrality (0.133) - this node is a cross-community bridge._
+  _High betweenness centrality (0.135) - this node is a cross-community bridge._
 - **Why does `pickVariantContent()` connect `Community 50` to `Community 1`, `Community 3`, `Community 44`?**
   _High betweenness centrality (0.085) - this node is a cross-community bridge._
 - **Why does `resolveInsertSessionAnchor()` connect `Community 44` to `Community 50`?**
-  _High betweenness centrality (0.085) - this node is a cross-community bridge._
+  _High betweenness centrality (0.084) - this node is a cross-community bridge._
 - **What connects `COMMON_DEV_PORTS`, `SCANNABLE_EXT`, `SOURCE_DIRS` to the rest of the system?**
-  _1035 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _1039 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Community 0` be split into smaller, more focused modules?**
   _Cohesion score 0.05714285714285714 - nodes in this community are weakly interconnected._
 - **Should `Community 1` be split into smaller, more focused modules?**
   _Cohesion score 0.028051181102362203 - nodes in this community are weakly interconnected._
 - **Should `Community 2` be split into smaller, more focused modules?**
-  _Cohesion score 0.04295485636114911 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.04276931301790965 - nodes in this community are weakly interconnected._

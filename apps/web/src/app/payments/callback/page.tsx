@@ -20,34 +20,55 @@ function CallbackContent() {
   useEffect(() => {
     if (hasVerified.current) return;
 
+    const gateway = searchParams.get('gateway');
     const authority = searchParams.get('Authority');
     const status = searchParams.get('Status');
+    
+    // PayPing parameters
+    const refid = searchParams.get('refid');
+    const code = searchParams.get('code');
+
     const plan = searchParams.get('plan');
     const period = searchParams.get('period');
     const amount = searchParams.get('amount');
+    const discountCode = searchParams.get('discountCode');
 
-    if (!authority || !status || !plan || !period || !amount) {
-      setError('اطلاعات بازگشت از پرداخت معتبر نیست.');
-      setLoading(false);
-      return;
-    }
+    const isPayPing = gateway === 'payping' || (refid !== null && code !== null);
 
-    if (status !== 'OK') {
-      setError('پرداخت با خطا مواجه شد یا توسط کاربر لغو گردید.');
-      setLoading(false);
-      return;
+    if (isPayPing) {
+      if (!refid) {
+        setError('پرداخت پی‌پینگ با خطا مواجه شد یا توسط کاربر لغو گردید.');
+        setLoading(false);
+        return;
+      }
+      if (!plan || !period || !amount) {
+        setError('اطلاعات بازگشت از پرداخت پی‌پینگ معتبر نیست.');
+        setLoading(false);
+        return;
+      }
+    } else {
+      if (!authority || !status || !plan || !period || !amount) {
+        setError('اطلاعات بازگشت از پرداخت معتبر نیست.');
+        setLoading(false);
+        return;
+      }
+
+      if (status !== 'OK') {
+        setError('پرداخت با خطا مواجه شد یا توسط کاربر لغو گردید.');
+        setLoading(false);
+        return;
+      }
     }
 
     const verifyTransaction = async () => {
       hasVerified.current = true;
       try {
-        const res = await api.post('/api/payments/verify', {
-          authority,
-          status,
-          amount,
-          plan,
-          period,
-        });
+        const verifyEndpoint = isPayPing ? '/api/payments/payping/verify' : '/api/payments/verify';
+        const verifyPayload = isPayPing
+          ? { refid, code, amount, plan, period, discountCode }
+          : { authority, status, amount, plan, period, discountCode };
+
+        const res = await api.post(verifyEndpoint, verifyPayload);
 
         if (res.data.success) {
           setSuccess(true);

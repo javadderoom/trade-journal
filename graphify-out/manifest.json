@@ -200,8 +200,8 @@
     "semantic_hash": ""
   },
   "apps/web/src/app/page.tsx": {
-    "mtime": 1782731193.8500915,
-    "ast_hash": "da2faaf35ef808a12093b8459d91d20d",
+    "mtime": 1782765591.272482,
+    "ast_hash": "f276c0eed31331c188a2cbeae76bba62",
     "semantic_hash": ""
   },
   "apps/web/src/components/layout/BottomNavBar.tsx": {
@@ -330,8 +330,8 @@
     "semantic_hash": ""
   },
   "apps/web/src/app/settings/page.tsx": {
-    "mtime": 1782758167.6276777,
-    "ast_hash": "324bb91f79c98222d822b03514f949f5",
+    "mtime": 1782810202.548865,
+    "ast_hash": "8279797eded43a8306223b0dd66200bc",
     "semantic_hash": ""
   },
   "apps/web/src/components/layout/AppLayout.tsx": {
@@ -985,8 +985,8 @@
     "semantic_hash": ""
   },
   "apps/api/src/routes/payments.ts": {
-    "mtime": 1782655268.2640014,
-    "ast_hash": "6a006a22b8af65122af3db58d62ffed4",
+    "mtime": 1782809623.5570903,
+    "ast_hash": "bdaa16310bbe23ea9fde84236199ac9a",
     "semantic_hash": ""
   },
   "apps/api/src/services/sms.ts": {
@@ -1020,8 +1020,8 @@
     "semantic_hash": ""
   },
   "apps/web/src/app/payments/callback/page.tsx": {
-    "mtime": 1782592257.7968006,
-    "ast_hash": "b18b040e59198f623ec798b08c427892",
+    "mtime": 1782810033.5378726,
+    "ast_hash": "299c2541e904905565caf7973586ee23",
     "semantic_hash": ""
   },
   "apps/web/src/app/robots.ts": {
@@ -1065,13 +1065,13 @@
     "semantic_hash": ""
   },
   "email-setup-guide.md": {
-    "mtime": 1782749403.7754905,
-    "ast_hash": "ce190db659399ae787bebe77939b497a",
+    "mtime": 1782773481.14793,
+    "ast_hash": "57fa7237575f704f933585e36cbd8e8b",
     "semantic_hash": ""
   },
   "stalwart-compose.yml": {
-    "mtime": 1782752979.1606479,
-    "ast_hash": "c2e140af1afc4956c0ece5b29c80a3eb",
+    "mtime": 1782773467.4143398,
+    "ast_hash": "84e36566e2f308c62160a34e161583af",
     "semantic_hash": ""
   },
   "subscription_plans.md": {
@@ -1092,6 +1092,11 @@
   "apps/api/uploads/receipts/5c59ef58-8c8e-4839-8799-a43a5ba53705.png": {
     "mtime": 1782655971.6113608,
     "ast_hash": "6f516fd33b895bfdcb7b08d19dd0b058",
+    "semantic_hash": ""
+  },
+  "apps/api/src/services/payping.ts": {
+    "mtime": 1782809560.0162313,
+    "ast_hash": "ba9c5183e86fe855cefce4263e5d2a30",
     "semantic_hash": ""
   }
 }

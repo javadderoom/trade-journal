@@ -2,6 +2,7 @@ import { Router, Response } from 'express';
 import { prisma } from '../services/tradeSync';
 import { authenticate, AuthRequest } from '../middleware/auth';
 import { requestPayment, verifyPayment } from '../services/zarinpal';
+import { requestPaypingPayment, verifyPaypingPayment } from '../services/payping';
 import { Plan, SubscriptionStatus } from '@prisma/client';
 import multer from 'multer';
 import crypto from 'crypto';
@@ -602,6 +603,305 @@ router.get('/mock-gateway', async (req, res) => {
           const callback = decodeURIComponent("${CallbackUrl}");
           const hasQuery = callback.includes('?');
           const finalUrl = callback + (hasQuery ? '&' : '?') + 'Authority=${Authority}&Status=' + status;
+          window.location.href = finalUrl;
+        }
+      </script>
+    </body>
+    </html>
+  `;
+
+  return res.status(200).send(html);
+});
+
+/**
+ * POST /api/payments/payping/checkout
+ * Request PayPing payment session URL
+ */
+router.post('/payping/checkout', authenticate, async (req: AuthRequest, res: Response) => {
+  try {
+    const userId = req.user!.userId;
+    const { plan, period, discountCode } = req.body;
+
+    if (!plan || !['STANDARD', 'PRO'].includes(plan)) {
+      return res.status(400).json({ error: 'پلن انتخابی معتبر نیست' });
+    }
+
+    if (!period || !['monthly', 'annual'].includes(period)) {
+      return res.status(400).json({ error: 'دوره زمانی معتبر نیست' });
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { email: true, phone: true },
+    });
+
+    if (!user) {
+      return res.status(404).json({ error: 'کاربر یافت نشد' });
+    }
+
+    let discountPercent = 0;
+    if (discountCode) {
+      const codeClean = String(discountCode).trim().toUpperCase();
+      const codeRecord = await prisma.discountCode.findUnique({
+        where: { code: codeClean },
+        include: { userDiscounts: { where: { user_id: userId } } },
+      });
+
+      if (!codeRecord) {
+        return res.status(400).json({ error: 'کد تخفیف معتبر نیست' });
+      }
+
+      const hasUsed = codeRecord.userDiscounts.length > 0;
+      const isExpired = new Date(codeRecord.expireDate).getTime() < Date.now();
+      const isLimitReached = codeRecord.usedCount >= codeRecord.maxUses;
+
+      if (hasUsed) {
+        if (!codeRecord.isAccountBound) {
+          return res.status(400).json({ error: 'شما قبلاً از این کد تخفیف استفاده کرده‌اید' });
+        }
+        discountPercent = codeRecord.discountPercent;
+      } else {
+        if (isExpired) {
+          return res.status(400).json({ error: 'کد تخفیف منقضی شده است' });
+        }
+        if (isLimitReached) {
+          return res.status(400).json({ error: 'ظرفیت استفاده از این کد تخفیف به پایان رسیده است' });
+        }
+        discountPercent = codeRecord.discountPercent;
+      }
+    }
+
+    const prices = await getPlanPrices();
+    let price = prices[plan as Exclude<Plan, 'FREE'>][period as 'monthly' | 'annual'];
+    if (discountPercent > 0) {
+      price = Math.round(price * (1 - discountPercent / 100));
+    }
+
+    const description = `خرید پلن ${plan === 'STANDARD' ? 'استاندارد' : 'حرفه‌ای'} - دوره ${period === 'monthly' ? 'ماهانه' : 'سالانه'}`;
+
+    const frontendBase = process.env.NEXT_PUBLIC_WEB_URL || 'http://localhost:3001';
+    const callbackUrl = `${frontendBase}/payments/callback?plan=${plan}&period=${period}&amount=${price}${discountCode ? `&discountCode=${discountCode}` : ''}&gateway=payping`;
+
+    const { code, redirectUrl } = await requestPaypingPayment(
+      price,
+      description,
+      callbackUrl,
+      { email: user.email, phone: user.phone || undefined }
+    );
+
+    return res.status(200).json({ code, redirectUrl });
+  } catch (err: any) {
+    console.error('PayPing checkout error:', err);
+    return res.status(500).json({ error: err.message || 'خطا در برقراری ارتباط با درگاه پرداخت پی‌پینگ' });
+  }
+});
+
+/**
+ * POST /api/payments/payping/verify
+ * Callback verification from PayPing
+ */
+router.post('/payping/verify', authenticate, async (req: AuthRequest, res: Response) => {
+  try {
+    const userId = req.user!.userId;
+    const { refid, amount, plan, period, discountCode } = req.body;
+
+    if (!refid || !amount || !plan || !period) {
+      return res.status(400).json({ error: 'اطلاعات تایید پرداخت نامعتبر است' });
+    }
+
+    const verification = await verifyPaypingPayment(Number(amount), refid);
+
+    if (!verification.success) {
+      return res.status(400).json({ error: verification.message });
+    }
+
+    const startDate = new Date();
+    const endDate = new Date();
+    if (period === 'monthly') {
+      endDate.setDate(startDate.getDate() + 30);
+    } else if (period === 'annual') {
+      endDate.setDate(startDate.getDate() + 365);
+    }
+
+    const result = await prisma.$transaction(async (tx) => {
+      await tx.subscription.updateMany({
+        where: { user_id: userId, status: 'ACTIVE' },
+        data: { status: 'EXPIRED' },
+      });
+
+      const subscription = await tx.subscription.create({
+        data: {
+          user_id: userId,
+          plan: plan as Plan,
+          status: 'ACTIVE',
+          start_date: startDate,
+          end_date: endDate,
+        },
+      });
+
+      await tx.user.update({
+        where: { id: userId },
+        data: { plan: plan as Plan },
+      });
+
+      if (discountCode) {
+        const codeClean = String(discountCode).trim().toUpperCase();
+        const codeRecord = await tx.discountCode.findUnique({
+          where: { code: codeClean },
+        });
+
+        if (codeRecord) {
+          await tx.discountCode.update({
+            where: { id: codeRecord.id },
+            data: { usedCount: { increment: 1 } },
+          });
+
+          await tx.userDiscount.upsert({
+            where: {
+              user_id_discount_id: {
+                user_id: userId,
+                discount_id: codeRecord.id,
+              },
+            },
+            create: {
+              user_id: userId,
+              discount_id: codeRecord.id,
+            },
+            update: {},
+          });
+        }
+      }
+
+      return subscription;
+    });
+
+    return res.status(200).json({
+      success: true,
+      refId: verification.refId,
+      message: 'پرداخت با موفقیت انجام شد و پلن شما فعال گردید.',
+      subscription: {
+        plan: result.plan,
+        end_date: result.end_date,
+      },
+    });
+  } catch (err: any) {
+    console.error('PayPing verify error:', err);
+    return res.status(500).json({ error: err.message || 'خطا در تایید تراکنش پرداخت پی‌پینگ' });
+  }
+});
+
+/**
+ * GET /api/payments/payping/mock-gateway
+ * Render mock gate for PayPing development testing
+ */
+router.get('/payping/mock-gateway', async (req, res) => {
+  const { Code, Amount, CallbackUrl } = req.query;
+
+  if (!Code || !Amount || !CallbackUrl) {
+    return res.status(400).send('پارامترهای درگاه پرداخت آزمایشی معتبر نیست');
+  }
+
+  const html = `
+    <!DOCTYPE html>
+    <html lang="fa" dir="rtl">
+    <head>
+      <meta charset="UTF-8">
+      <title>شبیه‌ساز درگاه پرداخت پی‌پینگ</title>
+      <style>
+        body {
+          font-family: Tahoma, Geneva, sans-serif;
+          background-color: #f0f4f8;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          height: 100vh;
+          margin: 0;
+        }
+        .container {
+          background-color: #ffffff;
+          padding: 30px;
+          border-radius: 12px;
+          box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+          max-width: 450px;
+          width: 100%;
+          text-align: center;
+          border-top: 5px solid #234f9a;
+        }
+        h2 {
+          color: #234f9a;
+          margin-bottom: 20px;
+        }
+        .info-row {
+          display: flex;
+          justify-content: space-between;
+          padding: 10px 0;
+          border-bottom: 1px dashed #e2e8f0;
+          font-size: 0.95rem;
+        }
+        .label {
+          color: #718096;
+        }
+        .value {
+          font-weight: bold;
+          color: #2d3748;
+        }
+        .btn-group {
+          margin-top: 30px;
+          display: flex;
+          gap: 15px;
+        }
+        button {
+          flex: 1;
+          padding: 12px;
+          border: none;
+          border-radius: 6px;
+          cursor: pointer;
+          font-size: 1rem;
+          font-weight: bold;
+          transition: background-color 0.2s;
+        }
+        .btn-success {
+          background-color: #319795;
+          color: white;
+        }
+        .btn-success:hover {
+          background-color: #2c7a7b;
+        }
+        .btn-danger {
+          background-color: #e53e3e;
+          color: white;
+        }
+        .btn-danger:hover {
+          background-color: #c53030;
+        }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <h2>شبیه‌ساز پرداخت پی‌پینگ (تست محلی)</h2>
+        <p style="color: #718096; font-size: 0.85rem; margin-bottom: 25px;">شما در حال شبیه‌سازی پرداخت برای سامانه معامله‌یار هستید.</p>
+        
+        <div class="info-row">
+          <span class="label">کد پرداخت (Code):</span>
+          <span class="value" style="font-family: monospace;">${Code}</span>
+        </div>
+        <div class="info-row">
+          <span class="label">مبلغ پرداخت:</span>
+          <span class="value" style="color: #2b6cb0;">${Number(Amount).toLocaleString('fa-IR')} تومان</span>
+        </div>
+        
+        <div class="btn-group">
+          <button class="btn-success" onclick="redirect('success')">پرداخت موفق</button>
+          <button class="btn-danger" onclick="redirect('cancel')">انصراف از پرداخت</button>
+        </div>
+      </div>
+
+      <script>
+        function redirect(action) {
+          const callback = decodeURIComponent("${CallbackUrl}");
+          const hasQuery = callback.includes('?');
+          const refid = action === 'success' ? 'PP-REF-' + Math.floor(10000000 + Math.random() * 90000000) : '';
+          const finalUrl = callback + (hasQuery ? '&' : '?') + 'refid=' + refid + '&code=${Code}' + '&clientrefid=test-ref-id';
           window.location.href = finalUrl;
         }
       </script>

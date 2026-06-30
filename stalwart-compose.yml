@@ -30,16 +30,24 @@ services:
       # - "995:995" # POP3S
       # - "110:110" # POP3
     volumes:
-      # Persistent volume to store all configurations, accounts, and actual emails.
-      # Coolify will mount this to the VPS host system so your data persists across updates.
-      - stalwart-data:/opt/stalwart-mail
+      # Persistent volumes matching Stalwart v0.16+ specifications
+      - /data/coolify/source/stalwart/etc:/etc/stalwart
+      - stalwart-data:/var/lib/stalwart
     environment:
       # Set a temporary admin password for the initial setup. 
       # Change this immediately upon first login to the web panel.
       - STALWART_ADMIN_PASSWORD=change-me-to-something-secure
       # Configure timezone
       - TZ=Asia/Tehran
+    networks:
+      - default
+      - coolify
 
 volumes:
   stalwart-data:
     driver: local
+
+networks:
+  coolify:
+    name: coolify
+    external: true

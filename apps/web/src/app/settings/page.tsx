@@ -87,6 +87,7 @@ export default function SettingsPage() {
 
   // Checkout modal & discount states
   const [checkoutTarget, setCheckoutTarget] = useState<{ plan: string; period: string } | null>(null);
+  const [paymentMethod, setPaymentMethod] = useState<'payping' | 'zarinpal' | 'manual'>('payping');
   const [discountCode, setDiscountCode] = useState('');
   const [discountDetails, setDiscountDetails] = useState<{
     valid: boolean;
@@ -373,6 +374,30 @@ export default function SettingsPage() {
     } catch (err: any) {
       console.error('Submit receipt error:', err);
       notify.error(err.response?.data?.error || 'خطا در ثبت فیش پرداخت');
+    } finally {
+      setCheckoutLoading(false);
+    }
+  };
+
+  const handleOnlineCheckout = async () => {
+    if (!checkoutTarget) return;
+    setCheckoutLoading(true);
+    try {
+      const endpoint = paymentMethod === 'payping' ? '/api/payments/payping/checkout' : '/api/payments/checkout';
+      const res = await api.post(endpoint, {
+        plan: checkoutTarget.plan,
+        period: checkoutTarget.period,
+        discountCode: discountCode || undefined,
+      });
+
+      if (res.data.redirectUrl) {
+        window.location.href = res.data.redirectUrl;
+      } else {
+        notify.error('آدرس انتقال به درگاه پرداخت یافت نشد.');
+      }
+    } catch (err: any) {
+      console.error('Online checkout error:', err);
+      notify.error(err.response?.data?.error || 'خطا در اتصال به درگاه پرداخت');
     } finally {
       setCheckoutLoading(false);
     }
@@ -1052,63 +1077,142 @@ export default function SettingsPage() {
                       {discountDetails && <span className="discount-success-msg">کد تخفیف با موفقیت اعمال شد.</span>}
                     </div>
 
-                    <div className="card-payment-instructions" style={{ marginTop: '10px', background: 'rgba(255, 255, 255, 0.02)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '8px', padding: '12px' }}>
-                      <h5 style={{ margin: '0 0 10px 0', fontSize: '0.88rem', color: '#ffb300' }}>مشخصات واریز کارت به کارت:</h5>
-                      <div className="instruction-row" style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.82rem', marginBottom: '6px', color: '#a0aec0' }}>
-                        <span>شماره کارت:</span>
-                        <strong style={{ direction: 'ltr', color: '#ffffff' }}>۶۰۳۷-۹۹۷۹-۱۲۳۴-۵۶۷۸</strong>
-                      </div>
-                      <div className="instruction-row" style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.82rem', marginBottom: '6px', color: '#a0aec0' }}>
-                        <span>بانک:</span>
-                        <span style={{ color: '#ffffff' }}>ملی ایران</span>
-                      </div>
-                      <div className="instruction-row" style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.82rem', color: '#a0aec0' }}>
-                        <span>به نام:</span>
-                        <span style={{ color: '#ffffff' }}>جواد احمدی</span>
+                    {/* Select Payment Method */}
+                    <div className="payment-method-selector" style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '15px', marginTop: '15px' }}>
+                      <label style={{ fontSize: '0.85rem', color: '#a0aec0', fontWeight: '500' }}>روش پرداخت</label>
+                      <div style={{ display: 'flex', gap: '10px' }}>
+                        <button
+                          type="button"
+                          onClick={() => setPaymentMethod('payping')}
+                          style={{
+                            flex: 1,
+                            padding: '10px',
+                            background: paymentMethod === 'payping' ? 'rgba(97, 249, 177, 0.15)' : '#0f121d',
+                            border: paymentMethod === 'payping' ? '1px solid #61f9b1' : '1px solid rgba(255,255,255,0.1)',
+                            borderRadius: '8px',
+                            color: paymentMethod === 'payping' ? '#61f9b1' : '#a0aec0',
+                            fontWeight: 'bold',
+                            cursor: 'pointer',
+                            fontSize: '0.82rem',
+                            transition: 'all 0.2s',
+                          }}
+                        >
+                          درگاه پی‌پینگ
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setPaymentMethod('zarinpal')}
+                          style={{
+                            flex: 1,
+                            padding: '10px',
+                            background: paymentMethod === 'zarinpal' ? 'rgba(255, 204, 0, 0.15)' : '#0f121d',
+                            border: paymentMethod === 'zarinpal' ? '1px solid #ffcc00' : '1px solid rgba(255,255,255,0.1)',
+                            borderRadius: '8px',
+                            color: paymentMethod === 'zarinpal' ? '#ffcc00' : '#a0aec0',
+                            fontWeight: 'bold',
+                            cursor: 'pointer',
+                            fontSize: '0.82rem',
+                            transition: 'all 0.2s',
+                          }}
+                        >
+                          درگاه زرین‌پال
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setPaymentMethod('manual')}
+                          style={{
+                            flex: 1,
+                            padding: '10px',
+                            background: paymentMethod === 'manual' ? 'rgba(49, 130, 206, 0.15)' : '#0f121d',
+                            border: paymentMethod === 'manual' ? '1px solid #3182ce' : '1px solid rgba(255,255,255,0.1)',
+                            borderRadius: '8px',
+                            color: paymentMethod === 'manual' ? '#3182ce' : '#a0aec0',
+                            fontWeight: 'bold',
+                            cursor: 'pointer',
+                            fontSize: '0.82rem',
+                            transition: 'all 0.2s',
+                          }}
+                        >
+                          کارت به کارت
+                        </button>
                       </div>
                     </div>
 
-                    <div className="receipt-upload-section" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                      <label style={{ fontSize: '0.8rem', color: '#a0aec0', fontWeight: '500' }}>بارگذاری تصویر فیش پرداخت (الزامی)</label>
-                      <input
-                        type="file"
-                        id="receipt-file-input"
-                        accept="image/png, image/jpeg, image/jpg"
-                        onChange={(e) => {
-                          if (e.target.files && e.target.files[0]) {
-                            setReceiptFile(e.target.files[0]);
-                          }
-                        }}
-                        style={{ display: 'none' }}
-                      />
-                      <label htmlFor="receipt-file-input" style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        gap: '8px',
-                        padding: '12px',
-                        background: '#0f121d',
-                        border: '1px dashed rgba(255,255,255,0.2)',
-                        borderRadius: '8px',
-                        color: '#61f9b1',
-                        cursor: 'pointer',
-                        fontSize: '0.85rem',
-                        transition: 'border-color 0.2s'
-                      }}>
-                        <span className="material-symbols-outlined">upload_file</span>
-                        <span>{receiptFile ? receiptFile.name : 'انتخاب تصویر فیش (PNG, JPG)'}</span>
-                      </label>
-                    </div>
+                    {paymentMethod === 'manual' && (
+                      <>
+                        <div className="card-payment-instructions" style={{ marginTop: '10px', background: 'rgba(255, 255, 255, 0.02)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '8px', padding: '12px' }}>
+                          <h5 style={{ margin: '0 0 10px 0', fontSize: '0.88rem', color: '#ffb300' }}>مشخصات واریز کارت به کارت:</h5>
+                          <div className="instruction-row" style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.82rem', marginBottom: '6px', color: '#a0aec0' }}>
+                            <span>شماره کارت:</span>
+                            <strong style={{ direction: 'ltr', color: '#ffffff' }}>۶۰۳۷-۹۹۷۵-۹۴۴۴-۴۱۲۸</strong>
+                          </div>
+                          <div className="instruction-row" style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.82rem', marginBottom: '6px', color: '#a0aec0' }}>
+                            <span>بانک:</span>
+                            <span style={{ color: '#ffffff' }}>ملی ایران</span>
+                          </div>
+                          <div className="instruction-row" style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.82rem', color: '#a0aec0' }}>
+                            <span>به نام:</span>
+                            <span style={{ color: '#ffffff' }}>جواد شیخ اعظمی</span>
+                          </div>
+                        </div>
+
+                        <div className="receipt-upload-section" style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '12px' }}>
+                          <label style={{ fontSize: '0.8rem', color: '#a0aec0', fontWeight: '500' }}>بارگذاری تصویر فیش پرداخت (الزامی)</label>
+                          <input
+                            type="file"
+                            id="receipt-file-input"
+                            accept="image/png, image/jpeg, image/jpg"
+                            onChange={(e) => {
+                              if (e.target.files && e.target.files[0]) {
+                                setReceiptFile(e.target.files[0]);
+                              }
+                            }}
+                            style={{ display: 'none' }}
+                          />
+                          <label htmlFor="receipt-file-input" style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: '8px',
+                            padding: '12px',
+                            background: '#0f121d',
+                            border: '1px dashed rgba(255,255,255,0.2)',
+                            borderRadius: '8px',
+                            color: '#61f9b1',
+                            cursor: 'pointer',
+                            fontSize: '0.85rem',
+                            transition: 'border-color 0.2s'
+                          }}>
+                            <span className="material-symbols-outlined">upload_file</span>
+                            <span>{receiptFile ? receiptFile.name : 'انتخاب تصویر فیش (PNG, JPG)'}</span>
+                          </label>
+                        </div>
+                      </>
+                    )}
                   </div>
 
                   <div className="checkout-modal-footer">
-                    <button
-                      className="start-checkout-btn"
-                      disabled={checkoutLoading || !receiptFile}
-                      onClick={handleSubmitReceipt}
-                    >
-                      {checkoutLoading ? 'در حال ثبت اطلاعات...' : 'ثبت فیش پرداخت'}
-                    </button>
+                    {paymentMethod === 'manual' ? (
+                      <button
+                        className="start-checkout-btn"
+                        disabled={checkoutLoading || !receiptFile}
+                        onClick={handleSubmitReceipt}
+                      >
+                        {checkoutLoading ? 'در حال ثبت اطلاعات...' : 'ثبت فیش پرداخت'}
+                      </button>
+                    ) : (
+                      <button
+                        className="start-checkout-btn"
+                        disabled={checkoutLoading}
+                        onClick={handleOnlineCheckout}
+                        style={{
+                          background: paymentMethod === 'payping' ? '#2c7a7b' : '#b7791f',
+                          color: '#ffffff'
+                        }}
+                      >
+                        {checkoutLoading ? 'در حال انتقال به درگاه...' : `اتصال به درگاه ${paymentMethod === 'payping' ? 'پی‌پینگ' : 'زرین‌پال'}`}
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>

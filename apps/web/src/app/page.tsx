@@ -261,7 +261,7 @@ export default function LandingPage() {
               ترید
             </h1>
             <p className="hero-sub">
-              معاملاتت رو وارد کن، الگوها رو پیدا کن، سودت رو بیشتر کن. همه‌چیز به فارسی، با تقویم جلالی و پرداخت تومانی.
+              معاملاتت رو وارد کن، الگوها رو پیدا کن، سودت رو بیشتر کن.
             </p>
             <div className="hero-ctas">
               <button className="btn-primary lg" onClick={goRegister}>

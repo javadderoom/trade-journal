@@ -220,7 +220,7 @@
       "source_location": "L57",
       "_origin": "ast",
       "id": "agents_skills_impeccable_scripts_context_resolvecontextdir",
-      "community": 64,
+      "community": 58,
       "norm_label": "resolvecontextdir()"
     },
     {
@@ -240,7 +240,7 @@
       "source_location": "L84",
       "_origin": "ast",
       "id": "agents_skills_impeccable_scripts_context_resolvecontext",
-      "community": 64,
+      "community": 58,
       "norm_label": "resolvecontext()"
     },
     {
@@ -270,7 +270,7 @@
       "source_location": "L152",
       "_origin": "ast",
       "id": "agents_skills_impeccable_scripts_context_resolveproject",
-      "community": 64,
+      "community": 58,
       "norm_label": "resolveproject()"
     },
     {
@@ -280,7 +280,7 @@
       "source_location": "L178",
       "_origin": "ast",
       "id": "agents_skills_impeccable_scripts_context_ispathinside",
-      "community": 64,
+      "community": 58,
       "norm_label": "ispathinside()"
     },
     {
@@ -290,7 +290,7 @@
       "source_location": "L183",
       "_origin": "ast",
       "id": "agents_skills_impeccable_scripts_context_resolvelocalcontextdir",
-      "community": 64,
+      "community": 58,
       "norm_label": "resolvelocalcontextdir()"
     },
     {
@@ -300,7 +300,7 @@
       "source_location": "L196",
       "_origin": "ast",
       "id": "agents_skills_impeccable_scripts_context_resolveenvcontextdir",
-      "community": 64,
+      "community": 58,
       "norm_label": "resolveenvcontextdir()"
     },
     {
@@ -310,7 +310,7 @@
       "source_location": "L203",
       "_origin": "ast",
       "id": "agents_skills_impeccable_scripts_context_resolvetargetdir",
-      "community": 64,
+      "community": 58,
       "norm_label": "resolvetargetdir()"
     },
     {
@@ -320,7 +320,7 @@
       "source_location": "L215",
       "_origin": "ast",
       "id": "agents_skills_impeccable_scripts_context_findmonoreporoot",
-      "community": 64,
+      "community": 58,
       "norm_label": "findmonoreporoot()"
     },
     {
@@ -340,7 +340,7 @@
       "source_location": "L240",
       "_origin": "ast",
       "id": "agents_skills_impeccable_scripts_context_hasgitboundary",
-      "community": 64,
+      "community": 58,
       "norm_label": "hasgitboundary()"
     },
     {
@@ -360,7 +360,7 @@
       "source_location": "L258",
       "_origin": "ast",
       "id": "agents_skills_impeccable_scripts_context_discovertargetcandidates",
-      "community": 86,
+      "community": 64,
       "norm_label": "discovertargetcandidates()"
     },
     {
@@ -370,7 +370,7 @@
       "source_location": "L300",
       "_origin": "ast",
       "id": "agents_skills_impeccable_scripts_context_resolvecandidatecontextsummary",
-      "community": 64,
+      "community": 58,
       "norm_label": "resolvecandidatecontextsummary()"
     },
     {
@@ -380,7 +380,7 @@
       "source_location": "L316",
       "_origin": "ast",
       "id": "agents_skills_impeccable_scripts_context_contextsourcestatus",
-      "community": 64,
+      "community": 58,
       "norm_label": "contextsourcestatus()"
     },
     {
@@ -390,7 +390,7 @@
       "source_location": "L330",
       "_origin": "ast",
       "id": "agents_skills_impeccable_scripts_context_contextsourcepath",
-      "community": 64,
+      "community": 58,
       "norm_label": "contextsourcepath()"
     },
     {
@@ -400,7 +400,7 @@
       "source_location": "L339",
       "_origin": "ast",
       "id": "agents_skills_impeccable_scripts_context_discoverrootsforpattern",
-      "community": 86,
+      "community": 64,
       "norm_label": "discoverrootsforpattern()"
     },
     {
@@ -410,7 +410,7 @@
       "source_location": "L359",
       "_origin": "ast",
       "id": "agents_skills_impeccable_scripts_context_expandsimplepattern",
-      "community": 86,
+      "community": 64,
       "norm_label": "expandsimplepattern()"
     },
     {
@@ -420,7 +420,7 @@
       "source_location": "L380",
       "_origin": "ast",
       "id": "agents_skills_impeccable_scripts_context_directchilddirs",
-      "community": 86,
+      "community": 64,
       "norm_label": "directchilddirs()"
     },
     {
@@ -430,7 +430,7 @@
       "source_location": "L390",
       "_origin": "ast",
       "id": "agents_skills_impeccable_scripts_context_walkdirs",
-      "community": 86,
+      "community": 64,
       "norm_label": "walkdirs()"
     },
     {
@@ -440,7 +440,7 @@
       "source_location": "L405",
       "_origin": "ast",
       "id": "agents_skills_impeccable_scripts_context_iscandidateprojectroot",
-      "community": 64,
+      "community": 58,
       "norm_label": "iscandidateprojectroot()"
     },
     {
@@ -450,7 +450,7 @@
       "source_location": "L416",
       "_origin": "ast",
       "id": "agents_skills_impeccable_scripts_context_isignoredworkspacediscoverydir",
-      "community": 86,
+      "community": 64,
       "norm_label": "isignoredworkspacediscoverydir()"
     },
     {
@@ -470,7 +470,7 @@
       "source_location": "L439",
       "_origin": "ast",
       "id": "agents_skills_impeccable_scripts_context_resolveworkspaceprojectroot",
-      "community": 64,
+      "community": 58,
       "norm_label": "resolveworkspaceprojectroot()"
     },
     {
@@ -480,7 +480,7 @@
       "source_location": "L463",
       "_origin": "ast",
       "id": "agents_skills_impeccable_scripts_context_isexcludedbyworkspacepattern",
-      "community": 64,
+      "community": 58,
       "norm_label": "isexcludedbyworkspacepattern()"
     },
     {
@@ -490,7 +490,7 @@
       "source_location": "L471",
       "_origin": "ast",
       "id": "agents_skills_impeccable_scripts_context_nearestprojectlikeroot",
-      "community": 64,
+      "community": 58,
       "norm_label": "nearestprojectlikeroot()"
     },
     {
@@ -500,7 +500,7 @@
       "source_location": "L488",
       "_origin": "ast",
       "id": "agents_skills_impeccable_scripts_context_nearestpackagerootbetween",
-      "community": 86,
+      "community": 64,
       "norm_label": "nearestpackagerootbetween()"
     },
     {
@@ -510,7 +510,7 @@
       "source_location": "L501",
       "_origin": "ast",
       "id": "agents_skills_impeccable_scripts_context_ispathinsideorequal",
-      "community": 64,
+      "community": 58,
       "norm_label": "ispathinsideorequal()"
     },
     {
@@ -520,7 +520,7 @@
       "source_location": "L505",
       "_origin": "ast",
       "id": "agents_skills_impeccable_scripts_context_workspacepatternmatchesrel",
-      "community": 86,
+      "community": 64,
       "norm_label": "workspacepatternmatchesrel()"
     },
     {
@@ -610,7 +610,7 @@
       "source_location": "L628",
       "_origin": "ast",
       "id": "agents_skills_impeccable_scripts_context_projectrootfromworkspacepattern",
-      "community": 86,
+      "community": 64,
       "norm_label": "projectrootfromworkspacepattern()"
     },
     {
@@ -620,7 +620,7 @@
       "source_location": "L643",
       "_origin": "ast",
       "id": "agents_skills_impeccable_scripts_context_projectrootfromdoublestarpattern",
-      "community": 86,
+      "community": 64,
       "norm_label": "projectrootfromdoublestarpattern()"
     },
     {
@@ -630,7 +630,7 @@
       "source_location": "L659",
       "_origin": "ast",
       "id": "agents_skills_impeccable_scripts_context_normalizeworkspacepattern",
-      "community": 86,
+      "community": 64,
       "norm_label": "normalizeworkspacepattern()"
     },
     {
@@ -640,7 +640,7 @@
       "source_location": "L667",
       "_origin": "ast",
       "id": "agents_skills_impeccable_scripts_context_segmentmatches",
-      "community": 86,
+      "community": 64,
       "norm_label": "segmentmatches()"
     },
     {
@@ -650,7 +650,7 @@
       "source_location": "L674",
       "_origin": "ast",
       "id": "agents_skills_impeccable_scripts_context_firstexisting",
-      "community": 64,
+      "community": 58,
       "norm_label": "firstexisting()"
     },
     {
@@ -670,7 +670,7 @@
       "source_location": "L690",
       "_origin": "ast",
       "id": "agents_skills_impeccable_scripts_context_escaperegexp",
-      "community": 86,
+      "community": 64,
       "norm_label": "escaperegexp()"
     },
     {
@@ -680,7 +680,7 @@
       "source_location": "L699",
       "_origin": "ast",
       "id": "agents_skills_impeccable_scripts_context_extractregister",
-      "community": 83,
+      "community": 86,
       "norm_label": "extractregister()"
     },
     {
@@ -770,7 +770,7 @@
       "source_location": "L837",
       "_origin": "ast",
       "id": "agents_skills_impeccable_scripts_context_cli",
-      "community": 135,
+      "community": 86,
       "norm_label": "cli()"
     },
     {
@@ -780,7 +780,7 @@
       "source_location": "L891",
       "_origin": "ast",
       "id": "agents_skills_impeccable_scripts_context_parseclioptions",
-      "community": 135,
+      "community": 129,
       "norm_label": "parseclioptions()"
     },
     {
@@ -790,7 +790,7 @@
       "source_location": "L895",
       "_origin": "ast",
       "id": "agents_skills_impeccable_scripts_context_hastargetoption",
-      "community": 135,
+      "community": 86,
       "norm_label": "hastargetoption()"
     },
     {
@@ -800,7 +800,7 @@
       "source_location": "L899",
       "_origin": "ast",
       "id": "agents_skills_impeccable_scripts_context_pathexistsfortarget",
-      "community": 135,
+      "community": 86,
       "norm_label": "pathexistsfortarget()"
     },
     {
@@ -810,7 +810,7 @@
       "source_location": "L904",
       "_origin": "ast",
       "id": "agents_skills_impeccable_scripts_context_buildresolvedcontextdirective",
-      "community": 135,
+      "community": 86,
       "norm_label": "buildresolvedcontextdirective()"
     },
     {
@@ -820,7 +820,7 @@
       "source_location": "L916",
       "_origin": "ast",
       "id": "agents_skills_impeccable_scripts_context_shouldwarnmissingtarget",
-      "community": 135,
+      "community": 86,
       "norm_label": "shouldwarnmissingtarget()"
     },
     {
@@ -830,7 +830,7 @@
       "source_location": "L927",
       "_origin": "ast",
       "id": "agents_skills_impeccable_scripts_context_buildmissingtargetdirective",
-      "community": 135,
+      "community": 86,
       "norm_label": "buildmissingtargetdirective()"
     },
     {
@@ -840,7 +840,7 @@
       "source_location": "L936",
       "_origin": "ast",
       "id": "agents_skills_impeccable_scripts_context_buildtargetselectiondirective",
-      "community": 135,
+      "community": 86,
       "norm_label": "buildtargetselectiondirective()"
     },
     {
@@ -1980,7 +1980,7 @@
       "source_location": "L42",
       "_origin": "ast",
       "id": "agents_skills_impeccable_scripts_detector_design_system_resolvedesignsidecarpath",
-      "community": 7,
+      "community": 22,
       "norm_label": "resolvedesignsidecarpath()"
     },
     {
@@ -1990,7 +1990,7 @@
       "source_location": "L53",
       "_origin": "ast",
       "id": "agents_skills_impeccable_scripts_detector_design_system_parsefrontmatter",
-      "community": 7,
+      "community": 22,
       "norm_label": "parsefrontmatter()"
     },
     {
@@ -2050,7 +2050,7 @@
       "source_location": "L147",
       "_origin": "ast",
       "id": "agents_skills_impeccable_scripts_detector_design_system_safereadjson",
-      "community": 7,
+      "community": 22,
       "norm_label": "safereadjson()"
     },
     {
@@ -2230,7 +2230,7 @@
       "source_location": "L358",
       "_origin": "ast",
       "id": "agents_skills_impeccable_scripts_detector_design_system_loaddesignsystemforcwd",
-      "community": 7,
+      "community": 22,
       "norm_label": "loaddesignsystemforcwd()"
     },
     {
@@ -2420,7 +2420,7 @@
       "source_location": "L704",
       "_origin": "ast",
       "id": "agents_skills_impeccable_scripts_detector_design_system_mergedesignsystemfindings",
-      "community": 5,
+      "community": 7,
       "norm_label": "mergedesignsystemfindings()"
     },
     {
@@ -4340,7 +4340,7 @@
       "source_location": "L41",
       "_origin": "ast",
       "id": "agents_skills_impeccable_scripts_detector_engines_regex_detect_text_isneutralbordercolor",
-      "community": 2,
+      "community": 5,
       "norm_label": "isneutralbordercolor()"
     },
     {
@@ -4370,7 +4370,7 @@
       "source_location": "L346",
       "_origin": "ast",
       "id": "agents_skills_impeccable_scripts_detector_engines_regex_detect_text_extractstyleblocks",
-      "community": 5,
+      "community": 22,
       "norm_label": "extractstyleblocks()"
     },
     {
@@ -4390,7 +4390,7 @@
       "source_location": "L366",
       "_origin": "ast",
       "id": "agents_skills_impeccable_scripts_detector_engines_regex_detect_text_extractcssinjs",
-      "community": 5,
+      "community": 22,
       "norm_label": "extractcssinjs()"
     },
     {
@@ -4430,7 +4430,7 @@
       "source_location": "L462",
       "_origin": "ast",
       "id": "agents_skills_impeccable_scripts_detector_engines_regex_detect_text_detecttext",
-      "community": 5,
+      "community": 22,
       "norm_label": "detecttext()"
     },
     {
@@ -5220,7 +5220,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "agents_skills_impeccable_scripts_detector_profile_profiler_createdetectorprofile",
-      "community": 22,
+      "community": 5,
       "norm_label": "createdetectorprofile()"
     },
     {
@@ -5300,7 +5300,7 @@
       "source_location": "L104",
       "_origin": "ast",
       "id": "agents_skills_impeccable_scripts_detector_profile_profiler_summarizedetectorprofile",
-      "community": 22,
+      "community": 5,
       "norm_label": "summarizedetectorprofile()"
     },
     {
@@ -6000,7 +6000,7 @@
       "source_location": "L1881",
       "_origin": "ast",
       "id": "agents_skills_impeccable_scripts_detector_rules_checks_checkrepeatedsectionkickersfromdoc",
-      "community": 5,
+      "community": 2,
       "norm_label": "checkrepeatedsectionkickersfromdoc()"
     },
     {
@@ -6060,7 +6060,7 @@
       "source_location": "L2014",
       "_origin": "ast",
       "id": "agents_skills_impeccable_scripts_detector_rules_checks_checkpagetypography",
-      "community": 22,
+      "community": 2,
       "norm_label": "checkpagetypography()"
     },
     {
@@ -6080,7 +6080,7 @@
       "source_location": "L2112",
       "_origin": "ast",
       "id": "agents_skills_impeccable_scripts_detector_rules_checks_checkpagelayout",
-      "community": 5,
+      "community": 2,
       "norm_label": "checkpagelayout()"
     },
     {
@@ -6450,7 +6450,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "agents_skills_impeccable_scripts_detector_shared_color_isneutralcolor",
-      "community": 2,
+      "community": 5,
       "norm_label": "isneutralcolor()"
     },
     {
@@ -9410,7 +9410,7 @@
       "source_location": "L66",
       "_origin": "ast",
       "id": "agents_skills_impeccable_scripts_lib_impeccable_paths_readliveserverinfo",
-      "community": 60,
+      "community": 87,
       "norm_label": "readliveserverinfo()"
     },
     {
@@ -9420,7 +9420,7 @@
       "source_location": "L82",
       "_origin": "ast",
       "id": "agents_skills_impeccable_scripts_lib_impeccable_paths_isliveserverpidreachable",
-      "community": 60,
+      "community": 87,
       "norm_label": "isliveserverpidreachable()"
     },
     {
@@ -9560,7 +9560,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agents_skills_impeccable_scripts_lib_target_args",
-      "community": 145,
+      "community": 129,
       "norm_label": "target-args.mjs"
     },
     {
@@ -9570,7 +9570,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agents_skills_impeccable_scripts_lib_target_args_targetargerror",
-      "community": 145,
+      "community": 129,
       "norm_label": "targetargerror"
     },
     {
@@ -9580,7 +9580,7 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "agents_skills_impeccable_scripts_lib_target_args_targetargerror_constructor",
-      "community": 145,
+      "community": 129,
       "norm_label": ".constructor()"
     },
     {
@@ -9590,7 +9590,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "agents_skills_impeccable_scripts_lib_target_args_parsetargetpath",
-      "community": 145,
+      "community": 129,
       "norm_label": "parsetargetpath()"
     },
     {
@@ -9600,7 +9600,7 @@
       "source_location": "L39",
       "_origin": "ast",
       "id": "agents_skills_impeccable_scripts_lib_target_args_parsetargetoptions",
-      "community": 145,
+      "community": 129,
       "norm_label": "parsetargetoptions()"
     },
     {
@@ -17110,7 +17110,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agents_skills_impeccable_scripts_live_target",
-      "community": 145,
+      "community": 129,
       "norm_label": "live-target.mjs"
     },
     {
@@ -17120,7 +17120,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "agents_skills_impeccable_scripts_live_target_resolvelivetarget",
-      "community": 145,
+      "community": 129,
       "norm_label": "resolvelivetarget()"
     },
     {
@@ -17730,7 +17730,7 @@
       "source_location": "L61",
       "_origin": "ast",
       "id": "agents_skills_impeccable_scripts_live_insert_ui_cancreateinsert",
-      "community": 44,
+      "community": 84,
       "norm_label": "cancreateinsert()"
     },
     {
@@ -17740,7 +17740,7 @@
       "source_location": "L71",
       "_origin": "ast",
       "id": "agents_skills_impeccable_scripts_live_insert_ui_insertcreatedisabledreason",
-      "community": 44,
+      "community": 84,
       "norm_label": "insertcreatedisabledreason()"
     },
     {
@@ -20530,7 +20530,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "apps_api_src_delete_latest_user",
-      "community": 146,
+      "community": 79,
       "norm_label": "delete-latest-user.ts"
     },
     {
@@ -20540,7 +20540,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "apps_api_src_delete_latest_user_main",
-      "community": 146,
+      "community": 79,
       "norm_label": "main()"
     },
     {
@@ -20907,7 +20907,7 @@
       "label": "receiptDir",
       "file_type": "code",
       "source_file": "apps/api/src/routes/payments.ts",
-      "source_location": "L11",
+      "source_location": "L12",
       "_origin": "ast",
       "id": "apps_api_src_routes_payments_receiptdir",
       "community": 85,
@@ -20917,7 +20917,7 @@
       "label": "receiptStorage",
       "file_type": "code",
       "source_file": "apps/api/src/routes/payments.ts",
-      "source_location": "L16",
+      "source_location": "L17",
       "_origin": "ast",
       "id": "apps_api_src_routes_payments_receiptstorage",
       "community": 85,
@@ -20927,7 +20927,7 @@
       "label": "receiptUpload",
       "file_type": "code",
       "source_file": "apps/api/src/routes/payments.ts",
-      "source_location": "L24",
+      "source_location": "L25",
       "_origin": "ast",
       "id": "apps_api_src_routes_payments_receiptupload",
       "community": 85,
@@ -20937,7 +20937,7 @@
       "label": "router",
       "file_type": "code",
       "source_file": "apps/api/src/routes/payments.ts",
-      "source_location": "L36",
+      "source_location": "L37",
       "_origin": "ast",
       "id": "apps_api_src_routes_payments_router",
       "community": 85,
@@ -20947,7 +20947,7 @@
       "label": "DEFAULT_PRICES",
       "file_type": "code",
       "source_file": "apps/api/src/routes/payments.ts",
-      "source_location": "L39",
+      "source_location": "L40",
       "_origin": "ast",
       "id": "apps_api_src_routes_payments_default_prices",
       "community": 85,
@@ -20957,7 +20957,7 @@
       "label": "getPlanPrices()",
       "file_type": "code",
       "source_file": "apps/api/src/routes/payments.ts",
-      "source_location": "L50",
+      "source_location": "L51",
       "_origin": "ast",
       "id": "apps_api_src_routes_payments_getplanprices",
       "community": 85,
@@ -21204,6 +21204,66 @@
       "norm_label": "parsetrades()"
     },
     {
+      "label": "payping.ts",
+      "file_type": "code",
+      "source_file": "apps/api/src/services/payping.ts",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "apps_api_src_services_payping",
+      "community": 85,
+      "norm_label": "payping.ts"
+    },
+    {
+      "label": "PayPingRequestResponse",
+      "file_type": "code",
+      "source_file": "apps/api/src/services/payping.ts",
+      "source_location": "L3",
+      "_origin": "ast",
+      "id": "apps_api_src_services_payping_paypingrequestresponse",
+      "community": 85,
+      "norm_label": "paypingrequestresponse"
+    },
+    {
+      "label": "getBaseUrl()",
+      "file_type": "code",
+      "source_file": "apps/api/src/services/payping.ts",
+      "source_location": "L8",
+      "_origin": "ast",
+      "id": "apps_api_src_services_payping_getbaseurl",
+      "community": 85,
+      "norm_label": "getbaseurl()"
+    },
+    {
+      "label": "getGatewayUrl()",
+      "file_type": "code",
+      "source_file": "apps/api/src/services/payping.ts",
+      "source_location": "L12",
+      "_origin": "ast",
+      "id": "apps_api_src_services_payping_getgatewayurl",
+      "community": 85,
+      "norm_label": "getgatewayurl()"
+    },
+    {
+      "label": "requestPaypingPayment()",
+      "file_type": "code",
+      "source_file": "apps/api/src/services/payping.ts",
+      "source_location": "L19",
+      "_origin": "ast",
+      "id": "apps_api_src_services_payping_requestpaypingpayment",
+      "community": 85,
+      "norm_label": "requestpaypingpayment()"
+    },
+    {
+      "label": "verifyPaypingPayment()",
+      "file_type": "code",
+      "source_file": "apps/api/src/services/payping.ts",
+      "source_location": "L85",
+      "_origin": "ast",
+      "id": "apps_api_src_services_payping_verifypaypingpayment",
+      "community": 85,
+      "norm_label": "verifypaypingpayment()"
+    },
+    {
       "label": "sms.ts",
       "file_type": "code",
       "source_file": "apps/api/src/services/sms.ts",
@@ -21230,7 +21290,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "apps_api_src_services_tradesync",
-      "community": 146,
+      "community": 79,
       "norm_label": "tradesync.ts"
     },
     {
@@ -21240,7 +21300,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "apps_api_src_services_tradesync_adapter",
-      "community": 146,
+      "community": 79,
       "norm_label": "adapter"
     },
     {
@@ -21260,7 +21320,7 @@
       "source_location": "L16",
       "_origin": "ast",
       "id": "apps_api_src_services_tradesync_synctradesfromea",
-      "community": 146,
+      "community": 79,
       "norm_label": "synctradesfromea()"
     },
     {
@@ -21270,7 +21330,7 @@
       "source_location": "L153",
       "_origin": "ast",
       "id": "apps_api_src_services_tradesync_tradelistrow",
-      "community": 146,
+      "community": 79,
       "norm_label": "tradelistrow"
     },
     {
@@ -21280,7 +21340,7 @@
       "source_location": "L178",
       "_origin": "ast",
       "id": "apps_api_src_services_tradesync_gettradesforaccount",
-      "community": 146,
+      "community": 79,
       "norm_label": "gettradesforaccount()"
     },
     {
@@ -22377,7 +22437,7 @@
       "label": "PaymentCallbackPage()",
       "file_type": "code",
       "source_file": "apps/web/src/app/payments/callback/page.tsx",
-      "source_location": "L231",
+      "source_location": "L252",
       "_origin": "ast",
       "id": "apps_web_src_app_payments_callback_page_paymentcallbackpage",
       "community": 54,
@@ -24850,7 +24910,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agents_skills_impeccable_skill",
-      "community": 58,
+      "community": 139,
       "norm_label": "skill.md"
     },
     {
@@ -24860,7 +24920,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "agents_skills_impeccable_skill_setup",
-      "community": 58,
+      "community": 139,
       "norm_label": "setup"
     },
     {
@@ -24980,7 +25040,7 @@
       "source_location": "L107",
       "_origin": "ast",
       "id": "agents_skills_impeccable_skill_commands",
-      "community": 58,
+      "community": 139,
       "norm_label": "commands"
     },
     {
@@ -24990,7 +25050,7 @@
       "source_location": "L137",
       "_origin": "ast",
       "id": "agents_skills_impeccable_skill_routing_rules",
-      "community": 58,
+      "community": 139,
       "norm_label": "routing rules"
     },
     {
@@ -25000,7 +25060,7 @@
       "source_location": "L162",
       "_origin": "ast",
       "id": "agents_skills_impeccable_skill_pin_unpin",
-      "community": 58,
+      "community": 139,
       "norm_label": "pin / unpin"
     },
     {
@@ -25010,7 +25070,7 @@
       "source_location": "L172",
       "_origin": "ast",
       "id": "agents_skills_impeccable_skill_hooks",
-      "community": 58,
+      "community": 139,
       "norm_label": "hooks"
     },
     {
@@ -25280,7 +25340,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agents_skills_impeccable_reference_animate",
-      "community": 58,
+      "community": 137,
       "norm_label": "animate.md"
     },
     {
@@ -25290,7 +25350,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "agents_skills_impeccable_reference_animate_register",
-      "community": 58,
+      "community": 137,
       "norm_label": "register"
     },
     {
@@ -25300,7 +25360,7 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "agents_skills_impeccable_reference_animate_assess_animation_opportunities",
-      "community": 58,
+      "community": 137,
       "norm_label": "assess animation opportunities"
     },
     {
@@ -25310,7 +25370,7 @@
       "source_location": "L36",
       "_origin": "ast",
       "id": "agents_skills_impeccable_reference_animate_plan_animation_strategy",
-      "community": 58,
+      "community": 137,
       "norm_label": "plan animation strategy"
     },
     {
@@ -25390,7 +25450,7 @@
       "source_location": "L95",
       "_origin": "ast",
       "id": "agents_skills_impeccable_reference_animate_technical_implementation",
-      "community": 129,
+      "community": 137,
       "norm_label": "technical implementation"
     },
     {
@@ -25400,7 +25460,7 @@
       "source_location": "L99",
       "_origin": "ast",
       "id": "agents_skills_impeccable_reference_animate_timing_easing",
-      "community": 129,
+      "community": 137,
       "norm_label": "timing & easing"
     },
     {
@@ -25410,7 +25470,7 @@
       "source_location": "L124",
       "_origin": "ast",
       "id": "agents_skills_impeccable_reference_animate_css_animations",
-      "community": 129,
+      "community": 137,
       "norm_label": "css animations"
     },
     {
@@ -25420,7 +25480,7 @@
       "source_location": "L133",
       "_origin": "ast",
       "id": "agents_skills_impeccable_reference_animate_javascript_animation",
-      "community": 129,
+      "community": 137,
       "norm_label": "javascript animation"
     },
     {
@@ -25430,7 +25490,7 @@
       "source_location": "L141",
       "_origin": "ast",
       "id": "agents_skills_impeccable_reference_animate_motion_materials",
-      "community": 129,
+      "community": 137,
       "norm_label": "motion materials"
     },
     {
@@ -25440,7 +25500,7 @@
       "source_location": "L153",
       "_origin": "ast",
       "id": "agents_skills_impeccable_reference_animate_performance",
-      "community": 129,
+      "community": 137,
       "norm_label": "performance"
     },
     {
@@ -25450,7 +25510,7 @@
       "source_location": "L160",
       "_origin": "ast",
       "id": "agents_skills_impeccable_reference_animate_perceived_performance",
-      "community": 129,
+      "community": 137,
       "norm_label": "perceived performance"
     },
     {
@@ -25460,7 +25520,7 @@
       "source_location": "L170",
       "_origin": "ast",
       "id": "agents_skills_impeccable_reference_animate_accessibility",
-      "community": 129,
+      "community": 137,
       "norm_label": "accessibility"
     },
     {
@@ -25470,7 +25530,7 @@
       "source_location": "L190",
       "_origin": "ast",
       "id": "agents_skills_impeccable_reference_animate_verify_quality",
-      "community": 58,
+      "community": 137,
       "norm_label": "verify quality"
     },
     {
@@ -25630,7 +25690,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agents_skills_impeccable_reference_bolder",
-      "community": 96,
+      "community": 139,
       "norm_label": "bolder.md"
     },
     {
@@ -25640,7 +25700,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "agents_skills_impeccable_reference_bolder_register",
-      "community": 96,
+      "community": 139,
       "norm_label": "register"
     },
     {
@@ -25650,7 +25710,7 @@
       "source_location": "L13",
       "_origin": "ast",
       "id": "agents_skills_impeccable_reference_bolder_assess_current_state",
-      "community": 96,
+      "community": 139,
       "norm_label": "assess current state"
     },
     {
@@ -25660,7 +25720,7 @@
       "source_location": "L37",
       "_origin": "ast",
       "id": "agents_skills_impeccable_reference_bolder_plan_amplification",
-      "community": 96,
+      "community": 139,
       "norm_label": "plan amplification"
     },
     {
@@ -25740,7 +25800,7 @@
       "source_location": "L100",
       "_origin": "ast",
       "id": "agents_skills_impeccable_reference_bolder_verify_quality",
-      "community": 96,
+      "community": 139,
       "norm_label": "verify quality"
     },
     {
@@ -25750,7 +25810,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agents_skills_impeccable_reference_brand",
-      "community": 74,
+      "community": 139,
       "norm_label": "brand.md"
     },
     {
@@ -26220,7 +26280,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agents_skills_impeccable_reference_codex",
-      "community": 58,
+      "community": 122,
       "norm_label": "codex.md"
     },
     {
@@ -26650,7 +26710,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agents_skills_impeccable_reference_craft",
-      "community": 58,
+      "community": 122,
       "norm_label": "craft.md"
     },
     {
@@ -28120,7 +28180,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agents_skills_impeccable_reference_hooks",
-      "community": 139,
+      "community": 135,
       "norm_label": "hooks.md"
     },
     {
@@ -28130,7 +28190,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agents_skills_impeccable_reference_hooks_impeccable_hooks",
-      "community": 139,
+      "community": 135,
       "norm_label": "$impeccable hooks"
     },
     {
@@ -28140,7 +28200,7 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "agents_skills_impeccable_reference_hooks_routing",
-      "community": 139,
+      "community": 135,
       "norm_label": "routing"
     },
     {
@@ -28150,7 +28210,7 @@
       "source_location": "L30",
       "_origin": "ast",
       "id": "agents_skills_impeccable_reference_hooks_flow",
-      "community": 139,
+      "community": 135,
       "norm_label": "flow"
     },
     {
@@ -28160,7 +28220,7 @@
       "source_location": "L44",
       "_origin": "ast",
       "id": "agents_skills_impeccable_reference_hooks_intentional_findings",
-      "community": 139,
+      "community": 135,
       "norm_label": "intentional findings"
     },
     {
@@ -28170,7 +28230,7 @@
       "source_location": "L80",
       "_origin": "ast",
       "id": "agents_skills_impeccable_reference_hooks_constraints",
-      "community": 139,
+      "community": 135,
       "norm_label": "constraints"
     },
     {
@@ -28180,7 +28240,7 @@
       "source_location": "L87",
       "_origin": "ast",
       "id": "agents_skills_impeccable_reference_hooks_failure_modes",
-      "community": 139,
+      "community": 135,
       "norm_label": "failure modes"
     },
     {
@@ -28340,7 +28400,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agents_skills_impeccable_reference_interaction_design",
-      "community": 58,
+      "community": 122,
       "norm_label": "interaction-design.md"
     },
     {
@@ -28520,7 +28580,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agents_skills_impeccable_reference_layout",
-      "community": 58,
+      "community": 134,
       "norm_label": "layout.md"
     },
     {
@@ -28530,7 +28590,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "agents_skills_impeccable_reference_layout_register",
-      "community": 58,
+      "community": 134,
       "norm_label": "register"
     },
     {
@@ -28540,7 +28600,7 @@
       "source_location": "L13",
       "_origin": "ast",
       "id": "agents_skills_impeccable_reference_layout_assess_current_layout",
-      "community": 58,
+      "community": 134,
       "norm_label": "assess current layout"
     },
     {
@@ -28550,7 +28610,7 @@
       "source_location": "L43",
       "_origin": "ast",
       "id": "agents_skills_impeccable_reference_layout_plan_layout_improvements",
-      "community": 58,
+      "community": 134,
       "norm_label": "plan layout improvements"
     },
     {
@@ -28640,7 +28700,7 @@
       "source_location": "L132",
       "_origin": "ast",
       "id": "agents_skills_impeccable_reference_layout_verify_layout_improvements",
-      "community": 58,
+      "community": 134,
       "norm_label": "verify layout improvements"
     },
     {
@@ -28650,7 +28710,7 @@
       "source_location": "L143",
       "_origin": "ast",
       "id": "agents_skills_impeccable_reference_layout_live_mode_signature_params",
-      "community": 58,
+      "community": 134,
       "norm_label": "live-mode signature params"
     },
     {
@@ -28780,7 +28840,7 @@
       "source_location": "L196",
       "_origin": "ast",
       "id": "agents_skills_impeccable_reference_live_4_plan_three_variants_identity_first_then_mode_then_axes",
-      "community": 158,
+      "community": 145,
       "norm_label": "4. plan three variants: identity first, then mode, then axes"
     },
     {
@@ -28790,7 +28850,7 @@
       "source_location": "L202",
       "_origin": "ast",
       "id": "agents_skills_impeccable_reference_live_phase_a_extract_the_identity_non_skippable",
-      "community": 158,
+      "community": 145,
       "norm_label": "phase a: extract the identity (non-skippable)"
     },
     {
@@ -28800,7 +28860,7 @@
       "source_location": "L225",
       "_origin": "ast",
       "id": "agents_skills_impeccable_reference_live_phase_b_pick_mode_default_vs_departure",
-      "community": 158,
+      "community": 145,
       "norm_label": "phase b: pick mode (default vs departure)"
     },
     {
@@ -28810,7 +28870,7 @@
       "source_location": "L236",
       "_origin": "ast",
       "id": "agents_skills_impeccable_reference_live_phase_c_plan_three_variants",
-      "community": 158,
+      "community": 145,
       "norm_label": "phase c: plan three variants"
     },
     {
@@ -28820,7 +28880,7 @@
       "source_location": "L261",
       "_origin": "ast",
       "id": "agents_skills_impeccable_reference_live_phase_d_squint_test",
-      "community": 158,
+      "community": 145,
       "norm_label": "phase d: squint test"
     },
     {
@@ -28880,7 +28940,7 @@
       "source_location": "L420",
       "_origin": "ast",
       "id": "agents_skills_impeccable_reference_live_handle_fallback",
-      "community": 159,
+      "community": 146,
       "norm_label": "handle fallback"
     },
     {
@@ -28890,7 +28950,7 @@
       "source_location": "L426",
       "_origin": "ast",
       "id": "agents_skills_impeccable_reference_live_step_1_identify_where_the_element_actually_lives",
-      "community": 159,
+      "community": 146,
       "norm_label": "step 1: identify where the element actually lives"
     },
     {
@@ -28900,7 +28960,7 @@
       "source_location": "L436",
       "_origin": "ast",
       "id": "agents_skills_impeccable_reference_live_step_2_show_three_variants_in_the_dom_for_preview",
-      "community": 159,
+      "community": 146,
       "norm_label": "step 2: show three variants in the dom for preview"
     },
     {
@@ -28910,7 +28970,7 @@
       "source_location": "L446",
       "_origin": "ast",
       "id": "agents_skills_impeccable_reference_live_step_3_on_accept_write_to_true_source",
-      "community": 159,
+      "community": 146,
       "norm_label": "step 3: on accept, write to true source"
     },
     {
@@ -28920,7 +28980,7 @@
       "source_location": "L456",
       "_origin": "ast",
       "id": "agents_skills_impeccable_reference_live_step_4_on_discard_clean_up_the_served_file",
-      "community": 159,
+      "community": 146,
       "norm_label": "step 4: on discard, clean up the served file"
     },
     {
@@ -30230,7 +30290,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "agents_skills_impeccable_reference_typeset",
-      "community": 37,
+      "community": 139,
       "norm_label": "typeset.md"
     },
     {
@@ -30240,7 +30300,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "agents_skills_impeccable_reference_typeset_register",
-      "community": 37,
+      "community": 139,
       "norm_label": "register"
     },
     {
@@ -30250,7 +30310,7 @@
       "source_location": "L13",
       "_origin": "ast",
       "id": "agents_skills_impeccable_reference_typeset_assess_current_typography",
-      "community": 37,
+      "community": 139,
       "norm_label": "assess current typography"
     },
     {
@@ -30260,7 +30320,7 @@
       "source_location": "L44",
       "_origin": "ast",
       "id": "agents_skills_impeccable_reference_typeset_plan_typography_improvements",
-      "community": 37,
+      "community": 139,
       "norm_label": "plan typography improvements"
     },
     {
@@ -30270,7 +30330,7 @@
       "source_location": "L55",
       "_origin": "ast",
       "id": "agents_skills_impeccable_reference_typeset_improve_typography_systematically",
-      "community": 37,
+      "community": 139,
       "norm_label": "improve typography systematically"
     },
     {
@@ -30280,7 +30340,7 @@
       "source_location": "L57",
       "_origin": "ast",
       "id": "agents_skills_impeccable_reference_typeset_font_selection",
-      "community": 37,
+      "community": 139,
       "norm_label": "font selection"
     },
     {
@@ -30290,7 +30350,7 @@
       "source_location": "L64",
       "_origin": "ast",
       "id": "agents_skills_impeccable_reference_typeset_establish_hierarchy",
-      "community": 37,
+      "community": 139,
       "norm_label": "establish hierarchy"
     },
     {
@@ -30300,7 +30360,7 @@
       "source_location": "L73",
       "_origin": "ast",
       "id": "agents_skills_impeccable_reference_typeset_fix_readability",
-      "community": 37,
+      "community": 139,
       "norm_label": "fix readability"
     },
     {
@@ -30310,7 +30370,7 @@
       "source_location": "L80",
       "_origin": "ast",
       "id": "agents_skills_impeccable_reference_typeset_refine_details",
-      "community": 37,
+      "community": 139,
       "norm_label": "refine details"
     },
     {
@@ -30320,7 +30380,7 @@
       "source_location": "L87",
       "_origin": "ast",
       "id": "agents_skills_impeccable_reference_typeset_weight_consistency",
-      "community": 37,
+      "community": 139,
       "norm_label": "weight consistency"
     },
     {
@@ -30330,7 +30390,7 @@
       "source_location": "L103",
       "_origin": "ast",
       "id": "agents_skills_impeccable_reference_typeset_verify_typography_improvements",
-      "community": 37,
+      "community": 139,
       "norm_label": "verify typography improvements"
     },
     {
@@ -30340,7 +30400,7 @@
       "source_location": "L114",
       "_origin": "ast",
       "id": "agents_skills_impeccable_reference_typeset_live_mode_signature_params",
-      "community": 37,
+      "community": 139,
       "norm_label": "live-mode signature params"
     },
     {
@@ -31994,94 +32054,124 @@
       "norm_label": "email-setup-guide.md"
     },
     {
-      "label": "Setting Up Your Custom Email: `info@tradekav.ir`",
+      "label": "Self-Hosted Mail Server Setup Guide (Stalwart + Coolify)",
       "file_type": "document",
       "source_file": "email-setup-guide.md",
       "source_location": "L1",
       "_origin": "ast",
-      "id": "email_setup_guide_setting_up_your_custom_email_info_tradekav_ir",
+      "id": "email_setup_guide_self_hosted_mail_server_setup_guide_stalwart_coolify",
       "community": 120,
-      "norm_label": "setting up your custom email: `info@tradekav.ir`"
+      "norm_label": "self-hosted mail server setup guide (stalwart + coolify)"
     },
     {
-      "label": "Important Context for `.ir` Domains",
+      "label": "1. Coolify Configuration (Docker Compose)",
       "file_type": "document",
       "source_file": "email-setup-guide.md",
       "source_location": "L7",
       "_origin": "ast",
-      "id": "email_setup_guide_important_context_for_ir_domains",
+      "id": "email_setup_guide_1_coolify_configuration_docker_compose",
       "community": 120,
-      "norm_label": "important context for `.ir` domains"
+      "norm_label": "1. coolify configuration (docker compose)"
     },
     {
-      "label": "Option A: Cloudflare Email Routing (Free, Easiest)",
+      "label": "Compose File (`docker-compose.yml`)",
       "file_type": "document",
       "source_file": "email-setup-guide.md",
-      "source_location": "L22",
+      "source_location": "L11",
       "_origin": "ast",
-      "id": "email_setup_guide_option_a_cloudflare_email_routing_free_easiest",
+      "id": "email_setup_guide_compose_file_docker_compose_yml",
       "community": 120,
-      "norm_label": "option a: cloudflare email routing (free, easiest)"
+      "norm_label": "compose file (`docker-compose.yml`)"
     },
     {
-      "label": "Step-by-Step Setup:",
-      "file_type": "document",
-      "source_file": "email-setup-guide.md",
-      "source_location": "L26",
-      "_origin": "ast",
-      "id": "email_setup_guide_step_by_step_setup",
-      "community": 120,
-      "norm_label": "step-by-step setup:"
-    },
-    {
-      "label": "Option B: cPanel / Email Hosting (Highly Recommended)",
+      "label": "Domain Routing Settings in Coolify GUI",
       "file_type": "document",
       "source_file": "email-setup-guide.md",
       "source_location": "L55",
       "_origin": "ast",
-      "id": "email_setup_guide_option_b_cpanel_email_hosting_highly_recommended",
+      "id": "email_setup_guide_domain_routing_settings_in_coolify_gui",
       "community": 120,
-      "norm_label": "option b: cpanel / email hosting (highly recommended)"
+      "norm_label": "domain routing settings in coolify gui"
     },
     {
-      "label": "Step-by-Step Setup:",
+      "label": "2. Restoring Existing Configurations (If moving volumes)",
       "file_type": "document",
       "source_file": "email-setup-guide.md",
-      "source_location": "L63",
+      "source_location": "L66",
       "_origin": "ast",
-      "id": "email_setup_guide_step_by_step_setup_63",
+      "id": "email_setup_guide_2_restoring_existing_configurations_if_moving_volumes",
       "community": 120,
-      "norm_label": "step-by-step setup:"
+      "norm_label": "2. restoring existing configurations (if moving volumes)"
     },
     {
-      "label": "Option C: Self-Hosting a Mail Server in Coolify (Advanced)",
+      "label": "3. SSL/TLS Certificate Setup (Let's Encrypt)",
       "file_type": "document",
       "source_file": "email-setup-guide.md",
-      "source_location": "L79",
+      "source_location": "L78",
       "_origin": "ast",
-      "id": "email_setup_guide_option_c_self_hosting_a_mail_server_in_coolify_advanced",
+      "id": "email_setup_guide_3_ssl_tls_certificate_setup_let_s_encrypt",
       "community": 120,
-      "norm_label": "option c: self-hosting a mail server in coolify (advanced)"
+      "norm_label": "3. ssl/tls certificate setup (let's encrypt)"
     },
     {
-      "label": "Step-by-Step Setup:",
+      "label": "Step A: Run the Extraction Script",
       "file_type": "document",
       "source_file": "email-setup-guide.md",
-      "source_location": "L83",
+      "source_location": "L82",
       "_origin": "ast",
-      "id": "email_setup_guide_step_by_step_setup_83",
+      "id": "email_setup_guide_step_a_run_the_extraction_script",
       "community": 120,
-      "norm_label": "step-by-step setup:"
+      "norm_label": "step a: run the extraction script"
     },
     {
-      "label": "Summary Comparison",
+      "label": "Step B: Import into Stalwart Web UI",
       "file_type": "document",
       "source_file": "email-setup-guide.md",
-      "source_location": "L105",
+      "source_location": "L123",
       "_origin": "ast",
-      "id": "email_setup_guide_summary_comparison",
+      "id": "email_setup_guide_step_b_import_into_stalwart_web_ui",
       "community": 120,
-      "norm_label": "summary comparison"
+      "norm_label": "step b: import into stalwart web ui"
+    },
+    {
+      "label": "4. DNS Configuration",
+      "file_type": "document",
+      "source_file": "email-setup-guide.md",
+      "source_location": "L134",
+      "_origin": "ast",
+      "id": "email_setup_guide_4_dns_configuration",
+      "community": 120,
+      "norm_label": "4. dns configuration"
+    },
+    {
+      "label": "5. Connecting Mail Clients",
+      "file_type": "document",
+      "source_file": "email-setup-guide.md",
+      "source_location": "L149",
+      "_origin": "ast",
+      "id": "email_setup_guide_5_connecting_mail_clients",
+      "community": 120,
+      "norm_label": "5. connecting mail clients"
+    },
+    {
+      "label": "IMAP & SMTP Settings (Outlook, Thunderbird, etc.)",
+      "file_type": "document",
+      "source_file": "email-setup-guide.md",
+      "source_location": "L151",
+      "_origin": "ast",
+      "id": "email_setup_guide_imap_smtp_settings_outlook_thunderbird_etc",
+      "community": 120,
+      "norm_label": "imap & smtp settings (outlook, thunderbird, etc.)"
+    },
+    {
+      "label": "Gmail Integration (Send Mail As)",
+      "file_type": "document",
+      "source_file": "email-setup-guide.md",
+      "source_location": "L161",
+      "_origin": "ast",
+      "id": "email_setup_guide_gmail_integration_send_mail_as",
+      "community": 120,
+      "norm_label": "gmail integration (send mail as)"
     },
     {
       "label": "landing-comparison.md",
@@ -88009,7 +88099,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "apps/api/src/routes/payments.ts",
-      "source_location": "L39",
+      "source_location": "L40",
       "weight": 1.0,
       "source": "apps_api_src_routes_payments",
       "target": "apps_api_src_routes_payments_default_prices",
@@ -88019,7 +88109,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "apps/api/src/routes/payments.ts",
-      "source_location": "L50",
+      "source_location": "L51",
       "weight": 1.0,
       "source": "apps_api_src_routes_payments",
       "target": "apps_api_src_routes_payments_getplanprices",
@@ -88029,7 +88119,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "apps/api/src/routes/payments.ts",
-      "source_location": "L11",
+      "source_location": "L12",
       "weight": 1.0,
       "source": "apps_api_src_routes_payments",
       "target": "apps_api_src_routes_payments_receiptdir",
@@ -88039,7 +88129,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "apps/api/src/routes/payments.ts",
-      "source_location": "L16",
+      "source_location": "L17",
       "weight": 1.0,
       "source": "apps_api_src_routes_payments",
       "target": "apps_api_src_routes_payments_receiptstorage",
@@ -88049,7 +88139,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "apps/api/src/routes/payments.ts",
-      "source_location": "L24",
+      "source_location": "L25",
       "weight": 1.0,
       "source": "apps_api_src_routes_payments",
       "target": "apps_api_src_routes_payments_receiptupload",
@@ -88059,10 +88149,43 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "apps/api/src/routes/payments.ts",
-      "source_location": "L36",
+      "source_location": "L37",
       "weight": 1.0,
       "source": "apps_api_src_routes_payments",
       "target": "apps_api_src_routes_payments_router",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/src/routes/payments.ts",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "apps_api_src_routes_payments",
+      "target": "apps_api_src_services_payping",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/src/routes/payments.ts",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "apps_api_src_routes_payments",
+      "target": "apps_api_src_services_payping_requestpaypingpayment",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/src/routes/payments.ts",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "apps_api_src_routes_payments",
+      "target": "apps_api_src_services_payping_verifypaypingpayment",
       "confidence_score": 1.0
     },
     {
@@ -88582,6 +88705,89 @@
       "weight": 1.0,
       "source": "apps_api_src_services_mt4parser_parsetrades",
       "target": "apps_api_src_services_mt4parser_parsemt5csv",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/src/services/payping.ts",
+      "source_location": "L8",
+      "weight": 1.0,
+      "source": "apps_api_src_services_payping",
+      "target": "apps_api_src_services_payping_getbaseurl",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/src/services/payping.ts",
+      "source_location": "L12",
+      "weight": 1.0,
+      "source": "apps_api_src_services_payping",
+      "target": "apps_api_src_services_payping_getgatewayurl",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/src/services/payping.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "apps_api_src_services_payping",
+      "target": "apps_api_src_services_payping_paypingrequestresponse",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/src/services/payping.ts",
+      "source_location": "L19",
+      "weight": 1.0,
+      "source": "apps_api_src_services_payping",
+      "target": "apps_api_src_services_payping_requestpaypingpayment",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/src/services/payping.ts",
+      "source_location": "L85",
+      "weight": 1.0,
+      "source": "apps_api_src_services_payping",
+      "target": "apps_api_src_services_payping_verifypaypingpayment",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/src/services/payping.ts",
+      "source_location": "L42",
+      "weight": 1.0,
+      "source": "apps_api_src_services_payping_requestpaypingpayment",
+      "target": "apps_api_src_services_payping_getbaseurl",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/src/services/payping.ts",
+      "source_location": "L104",
+      "weight": 1.0,
+      "source": "apps_api_src_services_payping_verifypaypingpayment",
+      "target": "apps_api_src_services_payping_getbaseurl",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/api/src/services/payping.ts",
+      "source_location": "L71",
+      "weight": 1.0,
+      "source": "apps_api_src_services_payping_requestpaypingpayment",
+      "target": "apps_api_src_services_payping_getgatewayurl",
       "confidence_score": 1.0
     },
     {
@@ -90538,7 +90744,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "apps/web/src/app/payments/callback/page.tsx",
-      "source_location": "L231",
+      "source_location": "L252",
       "weight": 1.0,
       "source": "apps_web_src_app_payments_callback_page",
       "target": "apps_web_src_app_payments_callback_page_paymentcallbackpage",
@@ -90784,7 +90990,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "apps/web/src/app/settings/page.tsx",
-      "source_location": "L773",
+      "source_location": "L911",
       "weight": 1.0,
       "source": "apps_web_src_app_settings_page_settingspage",
       "target": "apps_web_src_utils_farsi_topersiandigits"
@@ -101348,7 +101554,7 @@
       "source_location": "L1",
       "weight": 1.0,
       "source": "email_setup_guide",
-      "target": "email_setup_guide_setting_up_your_custom_email_info_tradekav_ir",
+      "target": "email_setup_guide_self_hosted_mail_server_setup_guide_stalwart_coolify",
       "confidence_score": 1.0
     },
     {
@@ -101357,18 +101563,58 @@
       "source_file": "email-setup-guide.md",
       "source_location": "L7",
       "weight": 1.0,
-      "source": "email_setup_guide_setting_up_your_custom_email_info_tradekav_ir",
-      "target": "email_setup_guide_important_context_for_ir_domains",
+      "source": "email_setup_guide_self_hosted_mail_server_setup_guide_stalwart_coolify",
+      "target": "email_setup_guide_1_coolify_configuration_docker_compose",
       "confidence_score": 1.0
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "email-setup-guide.md",
-      "source_location": "L22",
+      "source_location": "L66",
       "weight": 1.0,
-      "source": "email_setup_guide_setting_up_your_custom_email_info_tradekav_ir",
-      "target": "email_setup_guide_option_a_cloudflare_email_routing_free_easiest",
+      "source": "email_setup_guide_self_hosted_mail_server_setup_guide_stalwart_coolify",
+      "target": "email_setup_guide_2_restoring_existing_configurations_if_moving_volumes",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "email-setup-guide.md",
+      "source_location": "L78",
+      "weight": 1.0,
+      "source": "email_setup_guide_self_hosted_mail_server_setup_guide_stalwart_coolify",
+      "target": "email_setup_guide_3_ssl_tls_certificate_setup_let_s_encrypt",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "email-setup-guide.md",
+      "source_location": "L134",
+      "weight": 1.0,
+      "source": "email_setup_guide_self_hosted_mail_server_setup_guide_stalwart_coolify",
+      "target": "email_setup_guide_4_dns_configuration",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "email-setup-guide.md",
+      "source_location": "L149",
+      "weight": 1.0,
+      "source": "email_setup_guide_self_hosted_mail_server_setup_guide_stalwart_coolify",
+      "target": "email_setup_guide_5_connecting_mail_clients",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "email-setup-guide.md",
+      "source_location": "L11",
+      "weight": 1.0,
+      "source": "email_setup_guide_1_coolify_configuration_docker_compose",
+      "target": "email_setup_guide_compose_file_docker_compose_yml",
       "confidence_score": 1.0
     },
     {
@@ -101377,58 +101623,48 @@
       "source_file": "email-setup-guide.md",
       "source_location": "L55",
       "weight": 1.0,
-      "source": "email_setup_guide_setting_up_your_custom_email_info_tradekav_ir",
-      "target": "email_setup_guide_option_b_cpanel_email_hosting_highly_recommended",
+      "source": "email_setup_guide_1_coolify_configuration_docker_compose",
+      "target": "email_setup_guide_domain_routing_settings_in_coolify_gui",
       "confidence_score": 1.0
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "email-setup-guide.md",
-      "source_location": "L79",
+      "source_location": "L82",
       "weight": 1.0,
-      "source": "email_setup_guide_setting_up_your_custom_email_info_tradekav_ir",
-      "target": "email_setup_guide_option_c_self_hosting_a_mail_server_in_coolify_advanced",
+      "source": "email_setup_guide_3_ssl_tls_certificate_setup_let_s_encrypt",
+      "target": "email_setup_guide_step_a_run_the_extraction_script",
       "confidence_score": 1.0
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "email-setup-guide.md",
-      "source_location": "L105",
+      "source_location": "L123",
       "weight": 1.0,
-      "source": "email_setup_guide_setting_up_your_custom_email_info_tradekav_ir",
-      "target": "email_setup_guide_summary_comparison",
+      "source": "email_setup_guide_3_ssl_tls_certificate_setup_let_s_encrypt",
+      "target": "email_setup_guide_step_b_import_into_stalwart_web_ui",
       "confidence_score": 1.0
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "email-setup-guide.md",
-      "source_location": "L26",
+      "source_location": "L161",
       "weight": 1.0,
-      "source": "email_setup_guide_option_a_cloudflare_email_routing_free_easiest",
-      "target": "email_setup_guide_step_by_step_setup",
+      "source": "email_setup_guide_5_connecting_mail_clients",
+      "target": "email_setup_guide_gmail_integration_send_mail_as",
       "confidence_score": 1.0
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "email-setup-guide.md",
-      "source_location": "L63",
+      "source_location": "L151",
       "weight": 1.0,
-      "source": "email_setup_guide_option_b_cpanel_email_hosting_highly_recommended",
-      "target": "email_setup_guide_step_by_step_setup_63",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "email-setup-guide.md",
-      "source_location": "L83",
-      "weight": 1.0,
-      "source": "email_setup_guide_option_c_self_hosting_a_mail_server_in_coolify_advanced",
-      "target": "email_setup_guide_step_by_step_setup_83",
+      "source": "email_setup_guide_5_connecting_mail_clients",
+      "target": "email_setup_guide_imap_smtp_settings_outlook_thunderbird_etc",
       "confidence_score": 1.0
     },
     {
@@ -102833,5 +103069,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "e5ea60c951e32e8a40b7c10fb418275ad9081154"
+  "built_at_commit": "4e0fcb7cf62eaba9d1b84d13cacea158b1b4d320"
 }
