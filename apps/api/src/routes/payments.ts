@@ -679,8 +679,8 @@ router.post('/payping/checkout', authenticate, async (req: AuthRequest, res: Res
 
     const description = `خرید پلن ${plan === 'STANDARD' ? 'استاندارد' : 'حرفه‌ای'} - دوره ${period === 'monthly' ? 'ماهانه' : 'سالانه'}`;
 
-    const frontendBase = process.env.NEXT_PUBLIC_WEB_URL || 'http://localhost:3001';
-    const callbackUrl = `${frontendBase}/payments/callback?plan=${plan}&period=${period}&amount=${price}${discountCode ? `&discountCode=${discountCode}` : ''}&gateway=payping`;
+    const apiBase = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+    const callbackUrl = `${apiBase}/api/payments/payping/callback?plan=${plan}&period=${period}&amount=${price}${discountCode ? `&discountCode=${discountCode}` : ''}`;
 
     const { code, redirectUrl } = await requestPaypingPayment(
       price,
@@ -788,6 +788,60 @@ router.post('/payping/verify', authenticate, async (req: AuthRequest, res: Respo
   } catch (err: any) {
     console.error('PayPing verify error:', err);
     return res.status(500).json({ error: err.message || 'خطا در تایید تراکنش پرداخت پی‌پینگ' });
+  }
+});
+
+/**
+ * GET/POST /api/payments/payping/callback
+ * Handles intermediate redirect from PayPing (supports both GET and POST redirects)
+ */
+router.all('/payping/callback', async (req, res) => {
+  try {
+    const { plan, period, amount, discountCode } = req.query;
+    
+    // PayPing parameters can be in query (GET) or body (POST)
+    let refid = req.query.refid || req.body.refid || req.query.paymentRefId || req.body.paymentRefId;
+    let code = req.query.code || req.body.code || req.query.paymentCode || req.body.paymentCode;
+    
+    // Also check if status is 1 (success) or 0
+    const status = req.query.status || req.body.status;
+
+    // Handle nested 'data' JSON string in x-www-form-urlencoded POST
+    if (req.body.data) {
+      try {
+        const parsedData = typeof req.body.data === 'string' ? JSON.parse(req.body.data) : req.body.data;
+        if (parsedData) {
+          refid = refid || parsedData.paymentRefId || parsedData.refid;
+          code = code || parsedData.paymentCode || parsedData.code;
+        }
+      } catch (e) {
+        console.error('[PayPing Callback] Error parsing data field:', e);
+      }
+    }
+    
+    console.log('[PayPing Backend Callback] Query:', req.query);
+    console.log('[PayPing Backend Callback] Body:', req.body);
+    console.log('[PayPing Backend Callback] Parsed:', { refid, code, status });
+
+    const frontendBase = process.env.NEXT_PUBLIC_WEB_URL || 'http://localhost:3001';
+    
+    // Redirect the user back to the frontend callback page with the parameters
+    const redirectUrl = new URL(`${frontendBase}/payments/callback`);
+    if (plan) redirectUrl.searchParams.set('plan', plan as string);
+    if (period) redirectUrl.searchParams.set('period', period as string);
+    if (amount) redirectUrl.searchParams.set('amount', amount as string);
+    if (discountCode) redirectUrl.searchParams.set('discountCode', discountCode as string);
+    redirectUrl.searchParams.set('gateway', 'payping');
+    
+    if (refid) redirectUrl.searchParams.set('refid', refid as string);
+    if (code) redirectUrl.searchParams.set('code', code as string);
+
+    console.log('[PayPing Backend Callback] Redirecting user to:', redirectUrl.toString());
+    return res.redirect(redirectUrl.toString());
+  } catch (err) {
+    console.error('Error in PayPing backend callback:', err);
+    const frontendBase = process.env.NEXT_PUBLIC_WEB_URL || 'http://localhost:3001';
+    return res.redirect(`${frontendBase}/payments/callback?gateway=payping&error=callback_failed`);
   }
 });
 
