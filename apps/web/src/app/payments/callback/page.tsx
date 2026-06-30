@@ -24,6 +24,11 @@ function CallbackContent() {
     const authority = searchParams.get('Authority');
     const status = searchParams.get('Status');
     
+    console.log('--- PayPing/ZarinPal Callback Debug ---');
+    console.log('Full Query Params URL:', window.location.href);
+    console.log('Parsed Search Params:', Object.fromEntries(searchParams.entries()));
+    console.log('----------------------------------------');
+    
     // PayPing parameters
     const refid = searchParams.get('refid');
     const code = searchParams.get('code');

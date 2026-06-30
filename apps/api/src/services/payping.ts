@@ -109,7 +109,7 @@ export async function verifyPaypingPayment(
     paymentCode: paymentCode,
     amount: amountInTomans,
   };
-
+  console.log('[PayPing Service] Sending Verify Request:', { url, payload });
   try {
     const response = await fetch(url, {
       method: 'POST',
@@ -120,8 +120,10 @@ export async function verifyPaypingPayment(
       body: JSON.stringify(payload),
     });
 
+    console.log('[PayPing Service] Verify Status:', response.status);
     if (response.status === 200) {
       const body = await response.json();
+      console.log('[PayPing Service] Verify Success Response:', body);
       return {
         success: true,
         refId: body.paymentRefId?.toString() || paymentRefId.toString(),
@@ -131,6 +133,7 @@ export async function verifyPaypingPayment(
     }
 
     const errText = await response.text();
+    console.warn('[PayPing Service] Verify Failed Response:', errText);
     return {
       success: false,
       refId: '',

@@ -704,6 +704,7 @@ router.post('/payping/verify', authenticate, async (req: AuthRequest, res: Respo
   try {
     const userId = req.user!.userId;
     const { refid, code, amount, plan, period, discountCode } = req.body;
+    console.log('[PayPing Verify Route] Received Body:', { refid, code, amount, plan, period, discountCode });
 
     if (!refid || !amount || !plan || !period) {
       return res.status(400).json({ error: 'اطلاعات تایید پرداخت نامعتبر است' });
