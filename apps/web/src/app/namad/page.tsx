@@ -57,12 +57,12 @@ export default function NamadPage() {
           <a
             referrerPolicy="origin"
             target="_blank"
-            href="https://trustseal.enamad.ir/?id=6712312&Code=ijlypx97VzY8LxxCpiKO81gBE1Ju0VRE"
+            href="https://trustseal.enamad.ir/?id=750622&Code=ijlypx97VzY8LxxCpiKO81gBE1Ju0VRE"
             rel="noopener noreferrer"
           >
             <img
               referrerPolicy="origin"
-              src="https://trustseal.enamad.ir/logo.aspx?id=6712312&Code=ijlypx97VzY8LxxCpiKO81gBE1Ju0VRE"
+              src="https://trustseal.enamad.ir/logo.aspx?id=750622&Code=ijlypx97VzY8LxxCpiKO81gBE1Ju0VRE"
               alt="نماد اعتماد الکترونیکی تریدکاو"
               style={{ cursor: 'pointer', width: '120px', height: '120px', objectFit: 'contain' }}
               {...{ code: "ijlypx97VzY8LxxCpiKO81gBE1Ju0VRE" } as any}

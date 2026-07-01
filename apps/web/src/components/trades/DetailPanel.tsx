@@ -33,6 +33,19 @@ interface DetailPanelProps {
   onSaveEmotionConfigurations?: (emotions: { value: string; label: string; emoji: string }[], deletes: string[]) => Promise<void>;
 }
 
+const inputStyle: React.CSSProperties = {
+  backgroundColor: 'transparent',
+  border: '1px solid rgba(255, 255, 255, 0.1)',
+  color: '#fff',
+  borderRadius: '4px',
+  padding: '2px 8px',
+  width: '100%',
+  fontFamily: 'Vazirmatn',
+  fontSize: '13px',
+  outline: 'none',
+  height: '32px',
+};
+
 export default function DetailPanel({
   activeTrade,
   setActiveTradeId,
@@ -257,101 +270,218 @@ export default function DetailPanel({
               <div className="details-grid">
                  <span className="grid-label">حساب معاملاتی:</span>
                  <span className="grid-value">
+                    <select
+                      className="grid-input"
+                      value={activeTrade.accountId || 'dev-account'}
+                      onChange={e => updateActiveTradeField('accountId', e.target.value)}
+                      style={inputStyle}
+                    >
+                      {accounts.map((acc: any) => (
+                        <option key={acc.id} value={acc.id} style={{ backgroundColor: '#1e222b', color: '#fff' }}>
+                          {acc.broker_name || 'MT5'} ({acc.account_number || acc.id})
+                        </option>
+                      ))}
+                    </select>
+                  </span>
+
+                 <span className="grid-label">نماد:</span>
+                 <span className="grid-value">
+                   <input
+                     type="text"
+                     className="grid-input"
+                     value={activeTrade.symbol}
+                     onChange={e => updateActiveTradeField('symbol', e.target.value.toUpperCase())}
+                     style={inputStyle}
+                   />
+                 </span>
+
+                 <span className="grid-label">جهت:</span>
+                 <span className="grid-value">
                    <select
                      className="grid-input"
-                     value={activeTrade.accountId || 'dev-account'}
-                     onChange={e => updateActiveTradeField('accountId', e.target.value)}
-                     style={{
-                       backgroundColor: 'transparent',
-                       border: '1px solid rgba(255, 255, 255, 0.1)',
-                       color: '#fff',
-                       borderRadius: '4px',
-                       padding: '2px 8px',
-                       width: '100%',
-                       fontFamily: 'Vazirmatn',
-                       fontSize: '13px',
-                       outline: 'none',
-                       height: '32px',
-                       cursor: 'pointer',
-                     }}
+                     value={activeTrade.direction}
+                     onChange={e => updateActiveTradeField('direction', e.target.value)}
+                     style={{ ...inputStyle, cursor: 'pointer' }}
                    >
-                     {accounts.map((acc: any) => (
-                       <option key={acc.id} value={acc.id} style={{ backgroundColor: '#1e222b', color: '#fff' }}>
-                         {acc.broker_name || 'MT5'} ({acc.account_number || acc.id})
-                       </option>
-                     ))}
+                     <option value="BUY" style={{ backgroundColor: '#1e222b', color: '#fff' }}>Buy</option>
+                     <option value="SELL" style={{ backgroundColor: '#1e222b', color: '#fff' }}>Sell</option>
                    </select>
                  </span>
 
-                 <span className="grid-label">زمان ورود:</span>
-                 <span className="grid-value direction-ltr">
-                   {formatDate(activeTrade.openTime, selectedTimezone).date}
+                 <span className="grid-label">حجم (Lot):</span>
+                 <span className="grid-value">
+                   <input
+                     type="number"
+                     step="any"
+                     className="grid-input"
+                     value={activeTrade.lotSize}
+                     onChange={e => updateActiveTradeField('lotSize', parseFloat(e.target.value) || 0)}
+                     style={inputStyle}
+                   />
                  </span>
 
-                <span className="grid-label">سشن ورود:</span>
-                <span className="grid-value">
-                  {(() => {
-                    const sess = getTradingSession(activeTrade.openTime);
-                    return (
-                      <span className={`session-badge ${sess.className}`}>
-                        {sess.emoji} {sess.label}
-                      </span>
-                    );
-                  })()}
-                </span>
+                 <span className="grid-label">زمان ورود:</span>
+                 <span className="grid-value">
+                   <input
+                     type="datetime-local"
+                     className="grid-input"
+                     value={activeTrade.openTime ? activeTrade.openTime.substring(0, 16) : ''}
+                     onChange={e => updateActiveTradeField('openTime', e.target.value ? new Date(e.target.value).toISOString() : null)}
+                     style={inputStyle}
+                   />
+                 </span>
 
-                <span className="grid-label">قیمت ورود:</span>
-                <span className="grid-value font-mono direction-ltr">
-                  {toPersianDigits(activeTrade.openPrice.toFixed(5).replace(/\.?0+$/, ''))}
-                </span>
+                 <span className="grid-label">سشن ورود:</span>
+                 <span className="grid-value">
+                   {(() => {
+                     const sess = getTradingSession(activeTrade.openTime);
+                     return (
+                       <span className={`session-badge ${sess.className}`}>
+                         {sess.emoji} {sess.label}
+                       </span>
+                     );
+                   })()}
+                 </span>
 
-                <span className="grid-label">حد ضرر (SL):</span>
-                <span className="grid-value">
-                  <input
-                    type="number"
-                    step="any"
-                    className="grid-input sl-input"
-                    placeholder="--"
-                    value={activeTrade.stopLoss !== null ? activeTrade.stopLoss : ''}
-                    onChange={e => {
-                      const val = e.target.value === '' ? null : parseFloat(e.target.value);
-                      updateActiveTradeField('stopLoss', val);
-                    }}
-                  />
-                </span>
+                 <span className="grid-label">قیمت ورود:</span>
+                 <span className="grid-value font-mono direction-ltr">
+                   <input
+                     type="number"
+                     step="any"
+                     className="grid-input"
+                     value={activeTrade.openPrice}
+                     onChange={e => updateActiveTradeField('openPrice', parseFloat(e.target.value) || 0)}
+                     style={{ ...inputStyle, fontFamily: "'Courier New', monospace" }}
+                   />
+                 </span>
 
-                <span className="grid-label">حد سود (TP):</span>
-                <span className="grid-value">
-                  <input
-                    type="number"
-                    step="any"
-                    className="grid-input tp-input"
-                    placeholder="--"
-                    value={activeTrade.takeProfit !== null ? activeTrade.takeProfit : ''}
-                    onChange={e => {
-                      const val = e.target.value === '' ? null : parseFloat(e.target.value);
-                      updateActiveTradeField('takeProfit', val);
-                    }}
-                  />
-                </span>
+                 <span className="grid-label">حد ضرر (SL):</span>
+                 <span className="grid-value">
+                   <input
+                     type="number"
+                     step="any"
+                     className="grid-input sl-input"
+                     placeholder="--"
+                     value={activeTrade.stopLoss !== null ? activeTrade.stopLoss : ''}
+                     onChange={e => {
+                       const val = e.target.value === '' ? null : parseFloat(e.target.value);
+                       updateActiveTradeField('stopLoss', val);
+                     }}
+                   />
+                 </span>
 
-                {activeTrade.closeTime && (
-                  <>
-                    <span className="grid-label">زمان خروج:</span>
-                    <span className="grid-value direction-ltr">
-                      {formatDate(activeTrade.closeTime, selectedTimezone).date}
-                    </span>
+                 <span className="grid-label">حد سود (TP):</span>
+                 <span className="grid-value">
+                   <input
+                     type="number"
+                     step="any"
+                     className="grid-input tp-input"
+                     placeholder="--"
+                     value={activeTrade.takeProfit !== null ? activeTrade.takeProfit : ''}
+                     onChange={e => {
+                       const val = e.target.value === '' ? null : parseFloat(e.target.value);
+                       updateActiveTradeField('takeProfit', val);
+                     }}
+                   />
+                 </span>
 
-                    <span className="grid-label">قیمت خروج:</span>
-                    <span className="grid-value font-mono direction-ltr">
-                      {activeTrade.closePrice ? toPersianDigits(activeTrade.closePrice.toFixed(5).replace(/\.?0+$/, '')) : '-'}
-                    </span>
-                  </>
-                )}
+                 <span className="grid-label">زمان خروج:</span>
+                 <span className="grid-value">
+                   <input
+                     type="datetime-local"
+                     className="grid-input"
+                     value={activeTrade.closeTime ? activeTrade.closeTime.substring(0, 16) : ''}
+                     onChange={e => updateActiveTradeField('closeTime', e.target.value ? new Date(e.target.value).toISOString() : null)}
+                     style={inputStyle}
+                   />
+                 </span>
+
+                 <span className="grid-label">قیمت خروج:</span>
+                 <span className="grid-value font-mono direction-ltr">
+                   <input
+                     type="number"
+                     step="any"
+                     className="grid-input"
+                     value={activeTrade.closePrice !== null ? activeTrade.closePrice : ''}
+                     placeholder="--"
+                     onChange={e => {
+                       const val = e.target.value === '' ? null : parseFloat(e.target.value);
+                       updateActiveTradeField('closePrice', val);
+                     }}
+                     style={{ ...inputStyle, fontFamily: "'Courier New', monospace" }}
+                   />
+                 </span>
+
+                 <span className="grid-label">سود/زیان (USD):</span>
+                 <span className="grid-value">
+                   <input
+                     type="number"
+                     step="any"
+                     className="grid-input"
+                     value={activeTrade.profitUsd}
+                     onChange={e => updateActiveTradeField('profitUsd', parseFloat(e.target.value) || 0)}
+                     style={inputStyle}
+                   />
+                 </span>
+
+                 <span className="grid-label">کمیسیون:</span>
+                 <span className="grid-value">
+                   <input
+                     type="number"
+                     step="any"
+                     className="grid-input"
+                     value={activeTrade.commission}
+                     onChange={e => updateActiveTradeField('commission', parseFloat(e.target.value) || 0)}
+                     style={inputStyle}
+                   />
+                 </span>
+
+                 <span className="grid-label">سوآپ:</span>
+                 <span className="grid-value">
+                   <input
+                     type="number"
+                     step="any"
+                     className="grid-input"
+                     value={activeTrade.swap}
+                     onChange={e => updateActiveTradeField('swap', parseFloat(e.target.value) || 0)}
+                     style={inputStyle}
+                   />
+                 </span>
+               </div>
+
+               {!activeTrade.closeTime ? (
+                 <button
+                   type="button"
+                   className="btn-save"
+                   style={{ marginTop: '12px', width: '100%' }}
+                   onClick={() => {
+                     const now = new Date().toISOString();
+                     if (activeTrade.closePrice === null) {
+                       updateActiveTradeField('closePrice', activeTrade.openPrice);
+                     }
+                     updateActiveTradeField('closeTime', now);
+                   }}
+                 >
+                   <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>check_circle</span>
+                   بستن معامله
+                 </button>
+               ) : (
+                 <button
+                   type="button"
+                   className="btn-ghost"
+                   style={{ marginTop: '12px', width: '100%', justifyContent: 'center', display: 'flex', alignItems: 'center', gap: '6px', background: 'transparent', border: '1px solid rgba(255,255,255,0.15)', color: '#8898aa', borderRadius: '8px', padding: '8px 16px', cursor: 'pointer', fontFamily: 'Vazirmatn', fontSize: '13px' }}
+                   onClick={() => {
+                     updateActiveTradeField('closeTime', null);
+                     updateActiveTradeField('closePrice', null);
+                   }}
+                 >
+                   <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>undo</span>
+                   بازگشایی معامله
+                 </button>
+               )}
               </div>
-            </div>
-          </>
-        ) : (
+            </>
+         ) : (
           <>
             {/* Strategy & Emotions / Tags */}
             <div className="form-group">

@@ -281,6 +281,17 @@ export const useTradeStore = create<TradeState>((set, get) => ({
         stopLoss: updatedTrade.stopLoss,
         takeProfit: updatedTrade.takeProfit,
         tags: updatedTrade.tags,
+        accountId: updatedTrade.accountId,
+        closeTime: updatedTrade.closeTime,
+        closePrice: updatedTrade.closePrice,
+        profitUsd: updatedTrade.profitUsd,
+        commission: updatedTrade.commission,
+        swap: updatedTrade.swap,
+        symbol: updatedTrade.symbol,
+        direction: updatedTrade.direction,
+        lotSize: updatedTrade.lotSize,
+        openPrice: updatedTrade.openPrice,
+        openTime: updatedTrade.openTime,
       });
 
       return res.status >= 200 && res.status < 300;

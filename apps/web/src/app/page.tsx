@@ -482,7 +482,7 @@ export default function LandingPage() {
               <Link href="/namad">
                 <img
                   referrerPolicy="origin"
-                  src="https://trustseal.enamad.ir/logo.aspx?id=6712312&Code=ijlypx97VzY8LxxCpiKO81gBE1Ju0VRE"
+                  src="https://trustseal.enamad.ir/logo.aspx?id=750622&Code=ijlypx97VzY8LxxCpiKO81gBE1Ju0VRE"
                   alt="نماد اعتماد الکترونیکی تریدکاو"
                   style={{ cursor: 'pointer', width: '60px', height: '60px', backgroundColor: '#ffffff', padding: '6px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.08)' }}
                 />

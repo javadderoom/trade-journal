@@ -565,18 +565,27 @@ export default function TradesTable({
 
         const updated = { ...t, [key]: value };
 
-        if (key === 'stopLoss') {
+        // Recalc pips when closePrice or openPrice changes and we have both
+        if ((key === 'closePrice' || key === 'openPrice') && updated.closePrice !== null && updated.openPrice > 0) {
+          const sym = updated.symbol.toUpperCase();
+          let digits = 5;
+          if (sym.includes('JPY')) digits = 3;
+          else if (sym.includes('BTC') || sym.includes('ETH')) digits = 2;
+          else if (sym.includes('XAU') || sym.includes('GOLD')) digits = 2;
+          const pipSize = Math.pow(10, -digits) * ((digits === 3 || digits === 5) ? 10 : 1);
+          updated.pips = updated.direction === 'BUY'
+            ? (updated.closePrice - updated.openPrice) / pipSize
+            : (updated.openPrice - updated.closePrice) / pipSize;
+        }
+
+        // Recalc rMultiple when stopLoss, closePrice, or openPrice changes
+        if ((key === 'stopLoss' || key === 'closePrice' || key === 'openPrice') && updated.stopLoss && updated.stopLoss > 0 && updated.openPrice > 0) {
           const isBuy = updated.direction === 'BUY';
-          const stopLossVal = value ?? 0;
-          if (stopLossVal > 0 && updated.openPrice > 0) {
-            const risk = isBuy ? (updated.openPrice - stopLossVal) : (stopLossVal - updated.openPrice);
-            if (risk > 0) {
-              const exitPrice = updated.closePrice ?? updated.openPrice;
-              const reward = isBuy ? (exitPrice - updated.openPrice) : (updated.openPrice - exitPrice);
-              updated.rMultiple = reward / risk;
-            } else {
-              updated.rMultiple = 0;
-            }
+          const risk = isBuy ? (updated.openPrice - updated.stopLoss) : (updated.stopLoss - updated.openPrice);
+          if (risk > 0) {
+            const exitPrice = updated.closePrice ?? updated.openPrice;
+            const reward = isBuy ? (exitPrice - updated.openPrice) : (updated.openPrice - exitPrice);
+            updated.rMultiple = reward / risk;
           } else {
             updated.rMultiple = 0;
           }

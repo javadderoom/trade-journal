@@ -253,13 +253,17 @@ router.post('/', authenticate, checkTradeLimit, async (req: AuthRequest, res: Re
 
 /**
  * PUT /api/trades/:id
- * Updates trade notes, emotion, setup, stop_loss, and take_profit.
+ * Updates trade fields — notes, emotion, tags, SL/TP, close/reopen, or core trade data.
  */
 router.put('/:id', authenticate, async (req: AuthRequest, res: Response) => {
   try {
     const id = req.params.id as string;
     const userId = req.user!.userId;
-    const { notes, emotion, stopLoss, takeProfit, tags, accountId } = req.body;
+    const {
+      notes, emotion, stopLoss, takeProfit, tags, accountId,
+      closeTime, closePrice, profitUsd, commission, swap,
+      symbol, direction, lotSize, openPrice, openTime,
+    } = req.body;
 
     const existing = await prisma.trade.findFirst({
       where: { id, user_id: userId },
@@ -280,20 +284,50 @@ router.put('/:id', authenticate, async (req: AuthRequest, res: Response) => {
       }
     }
 
-    // Recalculate r_multiple when stop_loss is modified
+    // Resolve the effective values (existing or incoming) for calculations
+    const effDirection = direction !== undefined ? direction : existing.direction;
+    const effOpenPrice = openPrice !== undefined ? parseFloat(openPrice) : existing.open_price;
+    const effClosePrice = closePrice !== undefined
+      ? (closePrice === null ? null : parseFloat(closePrice))
+      : existing.close_price;
+    const effCloseTime = closeTime !== undefined
+      ? (closeTime === null ? null : new Date(closeTime))
+      : existing.close_time;
+    const effStopLoss = stopLoss !== undefined
+      ? (stopLoss === null ? null : parseFloat(stopLoss))
+      : existing.stop_loss;
+    const effProfitUsd = profitUsd !== undefined ? parseFloat(profitUsd) : existing.profit_usd;
+    const effCommission = commission !== undefined ? parseFloat(commission) : existing.commission;
+    const effSwap = swap !== undefined ? parseFloat(swap) : existing.swap;
+
+    // Calculate pips when closePrice or openPrice changes
+    let pipsUpdate: number | undefined = undefined;
+    const isPipsChange = closePrice !== undefined || openPrice !== undefined || closeTime !== undefined;
+    if (isPipsChange && effClosePrice !== null && effOpenPrice > 0) {
+      let digits = 5;
+      const sym = (symbol || existing.symbol).toUpperCase();
+      if (sym.includes('JPY')) digits = 3;
+      else if (sym.includes('BTC') || sym.includes('ETH')) digits = 2;
+      else if (sym.includes('XAU') || sym.includes('GOLD')) digits = 2;
+
+      let pipSize = Math.pow(10, -digits);
+      if (digits === 3 || digits === 5) pipSize *= 10;
+
+      pipsUpdate = effDirection === 'BUY'
+        ? (effClosePrice - effOpenPrice) / pipSize
+        : (effOpenPrice - effClosePrice) / pipSize;
+    }
+
+    // Calculate r_multiple when stopLoss or closePrice changes
     let rMultipleUpdate: number | undefined = undefined;
-    if (stopLoss !== undefined) {
-      const stopLossVal = stopLoss === null ? null : parseFloat(stopLoss);
-      if (stopLossVal && stopLossVal > 0 && existing.open_price) {
-        const isBuy = existing.direction === 'BUY';
-        const risk = isBuy ? (existing.open_price - stopLossVal) : (stopLossVal - existing.open_price);
-        if (risk > 0) {
-          const exitPrice = existing.close_price ?? existing.open_price;
-          const reward = isBuy ? (exitPrice - existing.open_price) : (existing.open_price - exitPrice);
-          rMultipleUpdate = reward / risk;
-        } else {
-          rMultipleUpdate = 0;
-        }
+    const isRChange = stopLoss !== undefined || closePrice !== undefined || openPrice !== undefined || closeTime !== undefined;
+    if (isRChange && effStopLoss && effStopLoss > 0 && effOpenPrice > 0) {
+      const isBuy = effDirection === 'BUY';
+      const risk = isBuy ? (effOpenPrice - effStopLoss) : (effStopLoss - effOpenPrice);
+      if (risk > 0) {
+        const exitPrice = effClosePrice !== null ? effClosePrice : effOpenPrice;
+        const reward = isBuy ? (exitPrice - effOpenPrice) : (effOpenPrice - exitPrice);
+        rMultipleUpdate = reward / risk;
       } else {
         rMultipleUpdate = 0;
       }
@@ -307,8 +341,21 @@ router.put('/:id', authenticate, async (req: AuthRequest, res: Response) => {
         emotion: emotion !== undefined ? emotion : undefined,
         stop_loss: stopLoss !== undefined ? (stopLoss === null ? null : parseFloat(stopLoss)) : undefined,
         take_profit: takeProfit !== undefined ? (takeProfit === null ? null : parseFloat(takeProfit)) : undefined,
-        r_multiple: rMultipleUpdate !== undefined ? rMultipleUpdate : undefined,
         tags: tags !== undefined ? tags : undefined,
+        r_multiple: rMultipleUpdate !== undefined ? rMultipleUpdate : undefined,
+        // Core trade fields
+        symbol: symbol !== undefined ? symbol : undefined,
+        direction: direction !== undefined ? direction : undefined,
+        lot_size: lotSize !== undefined ? parseFloat(lotSize) : undefined,
+        open_price: openPrice !== undefined ? parseFloat(openPrice) : undefined,
+        open_time: openTime !== undefined ? new Date(openTime) : undefined,
+        // Close/reopen fields
+        close_time: closeTime !== undefined ? (closeTime === null ? null : new Date(closeTime)) : undefined,
+        close_price: closePrice !== undefined ? (closePrice === null ? null : parseFloat(closePrice)) : undefined,
+        profit_usd: profitUsd !== undefined ? parseFloat(profitUsd) : undefined,
+        commission: commission !== undefined ? parseFloat(commission) : undefined,
+        swap: swap !== undefined ? parseFloat(swap) : undefined,
+        pips: pipsUpdate !== undefined ? pipsUpdate : undefined,
       },
     });
 
