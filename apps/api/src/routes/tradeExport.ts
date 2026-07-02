@@ -29,28 +29,35 @@ const HEADERS = {
   notes: 'یادداشت',
 };
 
-// Formats Gregorian Date to Tehran format YYYY.MM.DD HH:mm:ss
+// Formats Date to YYYY.MM.DD HH:mm:ss in Tehran timezone using ASCII numbers
 function formatTehranDateTime(dateStr: string | Date | null | undefined): string {
   if (!dateStr) return '';
   try {
     const d = new Date(dateStr);
     if (isNaN(d.getTime())) return '';
-    return new Intl.DateTimeFormat('fa-IR', {
+    
+    // Format to Tehran timezone using Gregorian calendar and standard digits
+    const formatter = new Intl.DateTimeFormat('en-US', {
       year: 'numeric',
       month: '2-digit',
       day: '2-digit',
       hour: '2-digit',
       minute: '2-digit',
       second: '2-digit',
-      calendar: 'persian',
+      hour12: false,
       timeZone: 'Asia/Tehran',
-    }).format(d).replace(/[\u0660-\u0669\u06f0-\u06f9]/g, (c) => String.fromCharCode(c.charCodeAt(0) - 1728 + 48)); // Keep numbers ASCII for excel if needed, or normal Jalali
+    });
+    
+    const parts = formatter.formatToParts(d);
+    const map = new Map(parts.map(p => [p.type, p.value]));
+    
+    return `${map.get('year')}.${map.get('month')}.${map.get('day')} ${map.get('hour')}:${map.get('minute')}:${map.get('second')}`;
   } catch {
     return String(dateStr);
   }
 }
 
-// Convert direction values to Persian
+// Convert direction values to Persian for CSV/Excel
 function formatDirection(dir: Direction | string): string {
   return dir === 'BUY' ? 'خرید (BUY)' : 'فروش (SELL)';
 }
@@ -68,8 +75,8 @@ router.get('/export', authenticate, async (req: AuthRequest, res: Response) => {
 
     if (!userObj || userObj.plan !== Plan.PRO) {
       return res.status(403).json({
-        error: 'دسترسی غیرمجاز',
-        message: 'خروجی داده فقط برای کاربران حرفه‌ای (PRO) فعال است. لطفا پلن خود را ارتقا دهید.',
+        error: 'Unauthorized',
+        message: 'Data export is only available for PRO users.',
       });
     }
 
@@ -108,7 +115,6 @@ router.get('/export', authenticate, async (req: AuthRequest, res: Response) => {
         } else if (status === 'CLOSED') {
           whereClause.close_time = { not: null };
         } else if (status === 'MISSED') {
-          // Missed trades are defined by tags containing missed keywords
           whereClause.tags = {
             hasSome: ['فرصت از دست رفته', 'Missed', 'ignore', 'Ignore', 'نادیده گرفتن'],
           };
@@ -124,7 +130,6 @@ router.get('/export', authenticate, async (req: AuthRequest, res: Response) => {
       if (dates) {
         const filterDates = dates.split(',').map((d: string) => d.trim()).filter(Boolean);
         if (filterDates.length > 0) {
-          // Filter by date range or specific dates matching open_time
           const ranges = filterDates.map((dateStr: string) => {
             const start = new Date(`${dateStr}T00:00:00.000Z`);
             const end = new Date(`${dateStr}T23:59:59.999Z`);
@@ -260,12 +265,12 @@ router.get('/export', authenticate, async (req: AuthRequest, res: Response) => {
       res.setHeader('Content-Type', 'application/pdf');
       res.setHeader('Content-Disposition', `attachment; filename="${filename}.pdf"`);
 
-      // Initialize PDF Document
+      // Initialize PDF Document (Landscape layout, standard font)
       const doc = new PDFDocument({ margin: 30, size: 'A4', layout: 'landscape' });
       doc.pipe(res);
 
-      // PDF Title
-      doc.fontSize(16).text('گزارش معاملات پلتفرم تریدکاو (TradeKav)', { align: 'right' });
+      // PDF Title in English
+      doc.fontSize(16).font('Helvetica-Bold').text('TradeKav Platform - Trade History Report', { align: 'left' });
       doc.moveDown();
 
       // Basic stats summaries
@@ -274,57 +279,78 @@ router.get('/export', authenticate, async (req: AuthRequest, res: Response) => {
       const winRate = totalTrades > 0 ? ((profitTrades / totalTrades) * 100).toFixed(2) : '0';
       const totalPnl = trades.reduce((sum, t) => sum + t.profit_usd, 0).toFixed(2);
 
-      doc.fontSize(11)
-        .text(`تعداد کل معاملات: ${totalTrades}`, { align: 'right' })
-        .text(`نرخ برد (Win Rate): ${winRate}%`, { align: 'right' })
-        .text(`کل سود/زیان خالص: $${totalPnl}`, { align: 'right' });
+      doc.fontSize(10).font('Helvetica')
+        .text(`Total Trades: ${totalTrades}`, { align: 'left' })
+        .text(`Win Rate: ${winRate}%`, { align: 'left' })
+        .text(`Net P&L: $${totalPnl}`, { align: 'left' });
 
       doc.moveDown(2);
 
-      // Render simplified table structure
-      doc.fontSize(10).text('لیست تاریخچه معاملات:', { align: 'right' });
-      doc.moveDown();
+      // Table Header
+      doc.fontSize(10).font('Helvetica-Bold').text('Positions History:', { align: 'left' });
+      doc.moveDown(0.5);
 
-      const tableTop = 200;
+      const tableTop = 180;
       doc.rect(30, tableTop, 780, 20).fill('#1a237e');
-      doc.fillColor('#ffffff').fontSize(8);
+      doc.fillColor('#ffffff').fontSize(8).font('Helvetica-Bold');
 
-      // Draw header names (L-to-R relative offsets in Landscape)
-      doc.text('تیکت', 40, tableTop + 5);
-      doc.text('نماد', 100, tableTop + 5);
-      doc.text('جهت', 160, tableTop + 5);
-      doc.text('حجم', 220, tableTop + 5);
-      doc.text('قیمت ورود', 280, tableTop + 5);
-      doc.text('قیمت خروج', 350, tableTop + 5);
-      doc.text('حد ضرر', 420, tableTop + 5);
-      doc.text('حد سود', 480, tableTop + 5);
-      doc.text('سود ($)', 540, tableTop + 5);
-      doc.text('احساس/برچسب‌ها', 620, tableTop + 5);
+      // Left-to-Right columns for English PDF
+      doc.text('Ticket', 40, tableTop + 5);
+      doc.text('Open Time', 100, tableTop + 5);
+      doc.text('Type', 210, tableTop + 5);
+      doc.text('Symbol', 270, tableTop + 5);
+      doc.text('Volume', 330, tableTop + 5);
+      doc.text('Price In', 380, tableTop + 5);
+      doc.text('S / L', 440, tableTop + 5);
+      doc.text('T / P', 500, tableTop + 5);
+      doc.text('Close Time', 560, tableTop + 5);
+      doc.text('Price Out', 670, tableTop + 5);
+      doc.text('Profit', 730, tableTop + 5);
 
       let y = tableTop + 20;
-      doc.fillColor('#000000');
+      doc.fillColor('#000000').font('Helvetica');
 
-      trades.slice(0, 20).forEach((t) => {
-        // Draw rows
-        doc.rect(30, y, 780, 20).stroke('#e0e0e0');
-        doc.text(String(t.ticket || '-'), 40, y + 6);
-        doc.text(t.symbol, 100, y + 6);
-        doc.text(t.direction, 160, y + 6);
-        doc.text(String(t.lot_size), 220, y + 6);
-        doc.text(String(t.open_price), 280, y + 6);
-        doc.text(String(t.close_price || '-'), 350, y + 6);
-        doc.text(String(t.stop_loss || '-'), 420, y + 6);
-        doc.text(String(t.take_profit || '-'), 480, y + 6);
-        
-        // P&L color coloring indicator
-        if (t.profit_usd >= 0) {
-          doc.fillColor('#2e7d32').text(`+$${t.profit_usd.toFixed(2)}`, 540, y + 6).fillColor('#000000');
-        } else {
-          doc.fillColor('#c62828').text(`-$${Math.abs(t.profit_usd).toFixed(2)}`, 540, y + 6).fillColor('#000000');
+      // Print rows
+      trades.forEach((t) => {
+        // Simple page breaking if list is long
+        if (y > 500) {
+          doc.addPage({ margin: 30, size: 'A4', layout: 'landscape' });
+          y = 50;
+          doc.rect(30, y, 780, 20).fill('#1a237e');
+          doc.fillColor('#ffffff').fontSize(8).font('Helvetica-Bold');
+          doc.text('Ticket', 40, y + 5);
+          doc.text('Open Time', 100, y + 5);
+          doc.text('Type', 210, y + 5);
+          doc.text('Symbol', 270, y + 5);
+          doc.text('Volume', 330, y + 5);
+          doc.text('Price In', 380, y + 5);
+          doc.text('S / L', 440, y + 5);
+          doc.text('T / P', 500, y + 5);
+          doc.text('Close Time', 560, y + 5);
+          doc.text('Price Out', 670, y + 5);
+          doc.text('Profit', 730, y + 5);
+          y += 20;
+          doc.fillColor('#000000').font('Helvetica');
         }
 
-        const tagsCombined = [t.emotion, ...(t.tags || [])].filter(Boolean).join(', ');
-        doc.text(tagsCombined.substring(0, 30), 620, y + 6);
+        doc.rect(30, y, 780, 20).stroke('#e0e0e0');
+        doc.text(String(t.ticket || '-'), 40, y + 6);
+        doc.text(formatTehranDateTime(t.open_time), 100, y + 6);
+        doc.text(t.direction === 'BUY' ? 'buy' : 'sell', 210, y + 6);
+        doc.text(t.symbol, 270, y + 6);
+        doc.text(String(t.lot_size), 330, y + 6);
+        doc.text(String(t.open_price), 380, y + 6);
+        doc.text(String(t.stop_loss || '-'), 440, y + 6);
+        doc.text(String(t.take_profit || '-'), 500, y + 6);
+        doc.text(t.close_time ? formatTehranDateTime(t.close_time) : '-', 560, y + 6);
+        doc.text(String(t.close_price || '-'), 670, y + 6);
+        
+        // P&L color indication
+        if (t.profit_usd >= 0) {
+          doc.fillColor('#2e7d32').text(`$${t.profit_usd.toFixed(2)}`, 730, y + 6).fillColor('#000000');
+        } else {
+          doc.fillColor('#c62828').text(`-$${Math.abs(t.profit_usd).toFixed(2)}`, 730, y + 6).fillColor('#000000');
+        }
 
         y += 20;
       });
@@ -333,7 +359,7 @@ router.get('/export', authenticate, async (req: AuthRequest, res: Response) => {
       return;
     }
 
-    res.status(400).json({ error: 'فرمت خروجی نامعتبر است' });
+    res.status(400).json({ error: 'Invalid format' });
   } catch (err: any) {
     console.error('Export route error:', err);
     res.status(500).json({ error: 'خطای سرور در خروجی داده' });
