@@ -12,6 +12,7 @@ import dashboardRouter from './routes/dashboard';
 import settingsRouter from './routes/settings';
 import paymentsRouter from './routes/payments';
 import adminRouter from './routes/admin';
+import tradeExportRouter from './routes/tradeExport';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -42,6 +43,7 @@ app.use((req, res, next) => {
 // Routes
 app.use('/api/auth', authRouter);
 app.use('/api', accountTokensRouter);
+app.use('/api/trades/export', tradeExportRouter);
 app.use('/api/trades', tradeSyncRouter);
 app.use('/api/journal', journalRouter);
 app.use('/api/dashboard', dashboardRouter);

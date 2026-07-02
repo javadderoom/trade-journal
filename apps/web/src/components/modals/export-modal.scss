@@ -1,0 +1,235 @@
+@import "../../app/variables";
+
+.export-modal-container {
+  background-color: $surface;
+  border: 1px solid $outline-variant;
+  border-radius: 16px;
+  width: 90%;
+  max-width: 600px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+  animation: modalSlideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  color: $on-surface;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px;
+    border-bottom: 1px solid $outline-variant;
+
+    h2 {
+      margin: 0;
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: $on-surface;
+    }
+
+    .close-btn {
+      background: none;
+      border: none;
+      color: $on-surface-variant;
+      cursor: pointer;
+      padding: 4px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background-color 0.2s;
+
+      &:hover {
+        background-color: rgba($on-surface, 0.08);
+      }
+    }
+  }
+
+  .modal-body {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+
+    .section-title {
+      font-weight: 700;
+      font-size: 0.95rem;
+      margin-bottom: 8px;
+      color: $on-surface;
+    }
+
+    .format-options-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+
+      @media (max-width: 576px) {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .format-option-card {
+      border: 1px solid $outline-variant;
+      border-radius: 12px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      background-color: rgba($surface-variant, 0.2);
+      position: relative;
+
+      input[type="radio"] {
+        position: absolute;
+        opacity: 0;
+        cursor: pointer;
+      }
+
+      .format-icon {
+        font-size: 32px;
+        color: $on-surface-variant;
+        margin-bottom: 12px;
+        transition: color 0.2s;
+      }
+
+      .format-name {
+        font-weight: 700;
+        font-size: 0.85rem;
+        margin-bottom: 6px;
+        color: $on-surface;
+      }
+
+      .format-desc {
+        font-size: 0.75rem;
+        color: $on-surface-variant;
+        line-height: 1.4;
+      }
+
+      &:hover {
+        border-color: rgba($primary, 0.4);
+        background-color: rgba($primary, 0.05);
+
+        .format-icon {
+          color: $primary;
+        }
+      }
+
+      &.active {
+        border-color: $primary;
+        background-color: rgba($primary, 0.08);
+        box-shadow: 0 0 12px rgba($primary, 0.15);
+
+        .format-icon {
+          color: $primary;
+        }
+
+        .format-name {
+          color: $primary;
+        }
+      }
+    }
+
+    .scope-selection-section {
+      border-top: 1px solid $outline-variant;
+      padding-top: 20px;
+      margin-top: 8px;
+    }
+
+    .scope-options {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .scope-radio-option {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      color: $on-surface;
+
+      input[type="radio"] {
+        accent-color: $primary;
+        width: 16px;
+        height: 16px;
+      }
+    }
+  }
+
+  .modal-footer {
+    display: flex;
+    justify-content: flex-start;
+    gap: 12px;
+    padding: 20px 24px;
+    background-color: rgba($surface-variant, 0.1);
+    border-top: 1px solid $outline-variant;
+
+    .btn {
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s;
+      border: none;
+
+      &.btn-primary {
+        background-color: $primary-container;
+        color: $on-primary-container;
+
+        &:hover:not(:disabled) {
+          background-color: rgba($primary, 0.2);
+          transform: translateY(-1px);
+        }
+
+        &:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+        }
+      }
+
+      &.btn-secondary {
+        background-color: transparent;
+        border: 1px solid $outline-variant;
+        color: $on-surface;
+
+        &:hover {
+          background-color: rgba($on-surface, 0.05);
+        }
+      }
+
+      .spinner {
+        width: 16px;
+        height: 16px;
+        border: 2px solid rgba($on-primary-container, 0.3);
+        border-top-color: $on-primary-container;
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+      }
+    }
+  }
+}
+
+@keyframes modalSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

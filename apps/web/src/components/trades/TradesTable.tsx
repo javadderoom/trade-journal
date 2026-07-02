@@ -11,6 +11,7 @@ import MobileCardsList from './MobileCardsList';
 import DetailPanel from './DetailPanel';
 import { getMainPair } from '../../utils/tradeHelpers';
 import { useAuthStore } from '../../lib/auth';
+import ExportModal from '../modals/ExportModal';
 
 export interface Trade {
   id: string;
@@ -132,6 +133,7 @@ export default function TradesTable({
   const [isUploading, setIsUploading] = useState(false);
   const [isFabOpen, setIsFabOpen] = useState(false);
   const [dateFilter, setDateFilter] = useState<string | null>(null);
+  const [isExportModalOpen, setIsExportModalOpen] = useState(false);
 
   const user = useAuthStore(state => state.user);
 
@@ -149,7 +151,7 @@ export default function TradesTable({
       }
       return;
     }
-    notify.info('این قابلیت به زودی در نسخه حرفه‌ای فعال خواهد شد.');
+    setIsExportModalOpen(true);
   };
 
   // Sync prop-level initialDateFilter if provided by parent
@@ -952,6 +954,22 @@ export default function TradesTable({
           </div>
         </div>
       )}
+
+      {/* 11. Export Dialog Modal */}
+      <ExportModal
+        isOpen={isExportModalOpen}
+        onClose={() => setIsExportModalOpen(false)}
+        filteredCount={filteredTrades.length}
+        totalCount={trades.length}
+        activeFilters={{
+          accountId: selectedAccountId,
+          symbol: selectedSymbol,
+          direction: selectedDirection,
+          status: selectedStatus,
+          searchQuery: searchQuery,
+          dateFilter: dateFilter,
+        }}
+      />
     </div>
   );
 }

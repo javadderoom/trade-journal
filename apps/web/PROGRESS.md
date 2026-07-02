@@ -1,12 +1,16 @@
-# Web Progress — معامله‌یار
+# Web Progress — TradeKav (تریدکاو)
 
 ## Tech Stack
 - **Framework:** Next.js 16 (App Router, `use client`)
-- **Styling:** Vanilla SCSS (`trades.scss`, `select.scss`, `globals.scss`, `variables.scss`) — no Chakra UI, no Tailwind
+- **Styling:** Vanilla SCSS (`trades.scss`, `sidenav.scss`, `journal.scss`, etc.) — no Chakra UI, no Tailwind
 - **Font:** Vazirmatn — self-hosted (Google Fonts is blocked in Iran), loaded via `/fonts/vazirmatn.css`
 - **Icons:** Material Symbols Outlined (Google CDN — not blocked)
+- **State:** Zustand (`useAuthStore`, `useAppStore`, `useTradeStore`, `useNotificationStore`)
+- **Charts:** TradingView `lightweight-charts`
+- **HTTP:** Axios with interceptors (`src/lib/api.ts`) — auto-attaches Bearer token, auto-refreshes on 401
 - **Layout:** Full RTL (`dir="rtl"`, `lang="fa"`)
-- **⚠️ Dep cleanup needed:** `@chakra-ui/react`, `@emotion/react`, `@emotion/styled` are still in `package.json` but unused — can be removed
+- **Push notifications:** Kavenegar Webpush SDK (injected in `layout.tsx`)
+- **SEO:** `sitemap.ts`, `robots.ts`, full OpenGraph + Twitter cards, JSON-LD schema, Google Search Console verification
 
 ---
 
@@ -16,118 +20,155 @@
 - RTL root layout with Persian `lang="fa"` attribute
 - Vazirmatn self-hosted font preloaded
 - Material Symbols CDN link
-- Title: `معامله‌یار`
-- No Chakra/Emotion — pure SCSS
+- Kavenegar Webpush SDK (`<script defer>`)
+- Full SEO metadata: title, description, keywords, OpenGraph, Twitter card, JSON-LD `SoftwareApplication` schema
+- Google Search Console verification tag
+- `<AppLayout>` wraps all children (sidebar + routing)
 
 ### Design System (`src/app/variables.scss`, `src/app/globals.scss`)
 - Full SCSS variable token set: `$surface`, `$primary`, `$error`, `$on-surface`, `$outline-variant`, etc.
 - Dark theme throughout
 - Shared across all component stylesheets via `@use '../app/variables' as *`
 
-### Trades Page (`src/app/trades/page.tsx`)
-- Fetches trades from `GET /api/trades?limit=200&offset=0` (via `NEXT_PUBLIC_API_BASE_URL` or `http://127.0.0.1:3000`)
-- Falls back to rich mock data (8 sample trades) if API is unreachable or returns 0 records
-- Maps API response fields to frontend `Trade` interface (calculates pips, rMultiple if missing)
-- Fetches live USD→Toman exchange rate from `/api/exchange-rate` on mount (default fallback: 90,000)
-- Passes `initialUsdToToman` and all CRUD callbacks down to `TradesTable`
+### Authentication (`src/lib/auth.ts`, `src/app/(auth)/`)
+- `useAuthStore` (Zustand) with full lifecycle: `login`, `register`, `logout`, `refresh`, `initialize`
+- **OTP flow:** `sendOtp(phone)` → `verifyOtp(phone, code)` → `registerOtp(registerToken, name, email, password)`
+- Token: access token in memory, refresh token in HttpOnly cookie
+- Auto-refresh via `useAuthStore.initialize()` on app mount
+- Login page: `src/app/(auth)/login/page.tsx`
+- Register page: `src/app/(auth)/register/page.tsx`
+- Shared auth styles: `src/app/(auth)/auth.scss`
 
-#### API Integration in `page.tsx`
-| Callback | API call |
-|----------|----------|
-| `onRefresh` | Re-fetches `GET /api/trades` |
-| `onUpdateTrade` | `PUT /api/trades/:id` — sends `notes`, `emotion`, `stopLoss`, `takeProfit`, `tags` |
-| `onDeleteTrade` | `DELETE /api/trades/:id` |
-| `onDeleteMultipleTrades` | `POST /api/trades/bulk-delete` — bulk delete multiple trades |
-| `onImportMT4` | Triggers file upload and import modal |
-| `onAddManualTrade` | Opens manual trade creator modal |
+### HTTP Client (`src/lib/api.ts`)
+- Axios instance with base URL from `NEXT_PUBLIC_API_BASE_URL`
+- Request interceptor: attaches `Authorization: Bearer <accessToken>`
+- Response interceptor: on 401, calls `useAuthStore.refresh()` and retries original request once
+
+### Zustand Stores (`src/store/`)
+- `useAuthStore` — lives in `src/lib/auth.ts` (Zustand store for auth state)
+- `useAppStore` — accounts list, selected account, `usdToToman` rate, timezone, modal open states, active trade ID
+- `useTradeStore` — trade list, pagination, loading state, CRUD operations
+- `useNotificationStore` — toast queue (type, message, auto-dismiss)
+
+### Notification System (`src/components/ui/Toaster.tsx`)
+- `<Toaster>` component rendering stacked toasts
+- `useNotificationStore` with `notify.ts` helper: `notifySuccess()`, `notifyError()`, `notifyInfo()`
+- Styled via `toaster.scss`
+
+### Trades Page (`src/app/trades/page.tsx`)
+- Fetches trades from `GET /api/trades` (paginated)
+- Falls back to rich mock data if API is unreachable
+- Live USD→Toman exchange rate from `/api/exchange-rate` (Navasan, 6h cache)
+- All CRUD callbacks: `onRefresh`, `onUpdateTrade`, `onDeleteTrade`, `onDeleteMultipleTrades`, `onImportMT4`, `onAddManualTrade`
 
 ### Exchange Rate API Route (`src/app/api/exchange-rate/route.ts`)
 - Next.js Route Handler: `GET /api/exchange-rate`
-- Fetches USD→Toman open-market rate from Navasan API (`api.navasan.tech`)
-- Cached for 6 hours (`revalidate = 21600`) — stays within 120 req/month free quota
-- Requires `NAVASAN_API_KEY` env var; falls back to 90,000 Toman/USD if missing or on error
-- Response: `{ usdToToman: number, source: 'navasan' | 'fallback', cachedAt: string }`
+- Fetches USD→Toman open-market rate from Navasan API
+- Cached 6 hours (`revalidate = 21600`) — fits 120 req/month free quota
+- Falls back to 90,000 Toman/USD if `NAVASAN_API_KEY` is missing or on error
 
-### Manual Trade Entry Modal (`src/components/ManualTradeModal.tsx`)
-- Form-based creation dialog including input fields for ticket, symbol, direction, open/close details (price/time), lot size, SL, TP, profit, commission, swap, emotion, tags, and notes.
-- Submits directly to the backend API via `POST /api/trades`.
+### TradesTable Component (`src/components/trades/TradesTable.tsx`)
+Full-featured trades workspace:
+- **FilterBar** — search, symbol group dropdown, direction dropdown, status tabs, account switcher, date filter badge from calendar
+- **SummaryBar** — trade count, win rate, total P&L (USD + Toman), filtered
+- **Desktop:** paginated table (10 rows/page), date, session badge, symbol, direction, lot, R-multiple, P&L with Toman sub-value
+- **Mobile:** infinite scroll card list via `IntersectionObserver`
+- **Detail Panel (slide-out aside):** P&L box, execution grid, account selector, trade tags, emotion tags, journal notes, screenshot upload/delete
 
-### Import MT4/MT5 statement Modal (`src/components/ImportMT4Modal.tsx`)
-- Drag-and-drop or file pick area for HTML or CSV statements.
-- Performs multipart uploads to the backend server endpoint `POST /api/trades/import-mt4` and handles parsing statistics (found, imported, skipped).
+### Trade Sub-components (`src/components/trades/`)
+- `DesktopTable.tsx` — paginated desktop table
+- `MobileCardsList.tsx` — infinite scroll mobile cards
+- `DetailPanel.tsx` — slide-out right panel with all trade editing
+- `FilterBar.tsx` — search + dropdowns + tabs
+- `SummaryBar.tsx` — aggregated stats row
+- `TradeChart.tsx` — per-trade TradingView candlestick chart
 
-### TradesTable Component (`src/components/TradesTable.tsx`)
-Full-featured trades workspace split into:
+### Modals (`src/components/modals/`)
+- `ManualTradeModal.tsx` — full form: ticket, symbol, direction, open/close price/time, lot, SL, TP, profit, commission, swap, emotion, tags, notes. Submits to `POST /api/trades`
+- `ImportMT4Modal.tsx` — drag-and-drop or file pick for HTML/CSV statements. Uploads to `POST /api/trades/import-mt4`. Shows parsed stats (found, imported, skipped)
 
-**Left/Main area:**
-- Page header with "واردات MT4/MT5" and "ثبت معامله دستی" action buttons.
-- Filter bar: search, symbol group dropdown, direction dropdown, status tabs (All, Open, Closed, Missed), refresh buttons, and toggleable account switcher. Supports a clearable active date filter badge that displays when navigating from the trading calendar with date queries.
-- Summary bar: trade count, win rate, total P&L in USD + Toman equivalent (filtered).
-- Desktop view: Paginated data table (10 rows/page) with date, day session badge, symbol, direction badge (buy/sell), lot size, R-multiple, P&L (color-coded) with Toman sub-value, open/closed status icon.
-- Mobile view: Infinite scroll card list layout displaying crucial transaction parameters.
-- Reusable Modal Confirm alerts for warning dialogs.
+### Tag Library System
+- Database-backed `Tag` model (`@@unique([user_id, name])`) with `is_ignored` and `show_first` flags
+- API: `GET /api/trades/tags`, `POST /api/trades/tags`, `DELETE /api/trades/tags/:name`, `PATCH /api/trades/tags/:name`
+- Ignore-from-stats tags (`فرصت از دست رفته`, `Missed`, `ignore`, `Ignore`, `نادیده گرفتن`) exclude trades from all dashboard metrics, calendar P&L, equity curve
 
-**Right/Detail panel (slide-out aside drawer):**
-- Triggered by clicking any table row or mobile card.
-- Shows: symbol + direction header, P&L financial box (profit/loss colored + Toman), execution details grid (entry time/price, SL, TP, exit time/price, account selector dropdown).
-- **Trade tags** — selected = green highlight; add custom tag via input; tag pool is additive.
-- **Emotion tags** — all 5 emotions always shown as chips; click to select/deselect.
-- **Journal notes** — free-text textarea.
-- Screenshot attachments view with drag-and-drop upload/delete directly connected to backend storage.
-
-### Responsive Optimization & Infinite Scroll
-- Implemented desktop header actions vs mobile Floating Action Button (FAB) Speed Dial speed dial menus.
-- Mobile view uses an IntersectionObserver-based infinite scroll in `MobileCardsList.tsx` instead of page links; page selectors are dynamically hidden via SCSS under 768px.
-- Polished emotion chips and card layout rendering on mobile layouts.
-
-### Main and Sub-pair Grouping Filter
-- Created `getMainPair` helper to extract the base prefix (e.g. `XAUUSD` from `XAUUSD_O`).
-- Created `getSymbolFilterOptions` grouping unique items in the Filter Bar. Choosing a main pair automatically filters for all its children.
-
-### Persistent Tag Library & Trade Ignoring System
-- Created database-backed `Tag` model (`@@unique([user_id, name])`) with cascade delete behavior.
-- Implemented API tag CRUD endpoints (`GET /api/trades/tags`, `POST /api/trades/tags`, `DELETE /api/trades/tags/:name`).
-- Removed standard hardcoded default tags pool, keeping choices pool clean and reserved for user-created custom tags.
-- Enabled special ignore-from-stats tags (`فرصت از دست رفته`, `Missed`, `ignore`, `Ignore`, `نادیده گرفتن`) to hide trades from summary metrics and exclude them from calendar P&L, statistics tables, weekday charts, and the cumulative equity curve.
-
-### Select Component (`src/components/Select.tsx` + `select.scss`)
+### Select Component (`src/components/ui/Select.tsx`)
 - Custom accessible dropdown (`role="combobox"` + `role="listbox"`)
-- Full keyboard navigation: Arrow keys, Enter/Space to select, Escape to close, Tab to dismiss
-- Stable-width trigger (invisible sizer prevents reflow on selection change)
-- Close on outside click
-- Scroll focused item into view
-- Used by TradesTable for filter dropdowns
+- Full keyboard navigation: Arrow keys, Enter/Space, Escape, Tab
+- Stable-width trigger, close on outside click, scroll focused item into view
 
-### Utilities (`src/utils/farsi.ts`, `src/utils/tradeHelpers.ts`)
-- `toPersianDigits(val)` — converts ASCII digits to Persian (۰-۹)
-- `formatPersianNumber(val, decimals?)` — formats with thousand separators + Persian digits
-- `formatPersianCurrency(val)` — formats USD P&L with sign prefix (`+$۳۷۵.۰۰`)
-- `formatToman(usd, usdToToman)` — converts USD to Tomans with abbreviated display (میلیون / هزار / ت)
-- `formatDate` — Gregorian ISO → Persian display string (e.g. `۱۴۰۵/۰۳/۲۵ - ۱۳:۳۰`) + day-of-week name
-- `getTradingSession` — NY/London/Asian session parsing.
+### Journal Components (`src/components/journal/`)
+- `TradingCalendar.tsx` — Jalali calendar with month/year nav, daily trade frequency + P&L overlay, multi-date selection, floating action banner
+- `EquityChart.tsx` — TradingView lightweight-charts equity curve (zoom, pan, Persian crosshairs, custom tooltips)
+- `WeekdayPnlChart.tsx` — custom SVG bar chart, Saturday→Friday, responsive, single-char abbreviations on mobile
+- `JournalEditor.tsx` — free-text journal entry editor for a selected date
 
-### Dashboard & Analytics (Journal Page - Overview & Charts Tabs)
-- **Overview (Tier 1):** Real-time performance summary showing Net P&L (USD + Toman), Win Rate (gauge + Buy/Sell breakdown), Profit Factor, Expectancy, Risk (Planned vs Achieved R-multiples), Max Drawdown, and Loss Streaks.
-- **Patterns (Tier 2):** Breakdown stats by Session (New York, London, Tokyo Badges), Emotions impact (Confident, Revenge, FOMO etc.), main Symbol win rates, Strategy tags, Weekday performance list, and 24-hour Tehran-timezone Heatmap.
-- **Equity Curve Chart (`EquityChart.tsx`):** Interactive financial chart powered by TradingView `lightweight-charts`, supporting zooming, panning, Persian crosshairs, and custom tooltips.
-- **Weekday P&L Bar Chart (`WeekdayPnlChart.tsx`):** Responsive custom SVG bar chart displaying weekday performance from Saturday to Friday. Features dynamic width scaling (no margins on desktop/mobile), single-character abbreviations on mobile (`ش`, `ی`, `د`...) to prevent text overlap, and floating HTML tooltips.
-- **Trading Calendar (`TradingCalendar.tsx`):** Modular Jalali calendar component with month/year navigation controls (`<` and `>`). Automatically adjusts day counts dynamically via browser `Intl` (handles leap years/366 days and 30-day Esfand correctly), displaying daily trade frequencies, P&L counts, and hover metrics. Supports selecting multiple dates to view cumulative trades on the Trades page via a bottom floating action banner.
+### Dashboard Page (`src/app/dashboard/page.tsx`)
+- Net P&L (USD + Toman), Win Rate gauge + Buy/Sell breakdown
+- Profit Factor, Expectancy, R-multiple (Planned vs Achieved), Max Drawdown, Loss Streaks
+- Session breakdown (NY, London, Tokyo), Emotion impact, Symbol win rates, Strategy tags, Weekday performance, 24h Tehran heatmap
+
+### Analytics Page (`src/app/analytics/page.tsx`)
+- Deep statistics: risk/reward analysis, equity curve, session breakdown, symbol performance
+
+### Journal Page (`src/app/journal/page.tsx`)
+- `TradingCalendar` + `JournalEditor` + `EquityChart` + `WeekdayPnlChart` integrated
+- Jalali month navigation with Gregorian↔Jalali conversion via browser `Intl`
+
+### Settings Page (`src/app/settings/page.tsx`)
+- Full settings UI: profile info, avatar, accounts management, broker connection, tag library, emotion library, password change, display currency, subscription status
+
+### Admin Page (`src/app/admin/page.tsx`)
+- User management, subscription management, manual receipt review, coupon/discount codes, system stats
+
+### Payments Page (`src/app/payments/`)
+- Subscription plan selection (FREE, STANDARD, PRO)
+- ZarinPal + PayPing gateway integration
+- Manual receipt upload flow
+- Callback handler: `src/app/payments/callback/`
+
+### Landing Page (`src/app/page.tsx`)
+- Full marketing landing page (~35KB, extensive sections)
+- `landing.scss` (~32KB) for dedicated landing styles
+- Links to `/help/ea-setup`, `/login`, `/register`
+
+### Namad Page (`src/app/namad/page.tsx`)
+- Iranian e-trust badge display page (namad-e-etemad)
+
+### Help Page (`src/app/help/ea-setup/`)
+- EA installation guide page
+
+### Contact Page (`src/app/contact/`)
+- Contact form page
+
+### SEO (`src/app/sitemap.ts`, `src/app/robots.ts`)
+- XML sitemap with all public routes
+- robots.txt with proper crawl directives
+
+### Utilities
+- `src/utils/farsi.ts` — `toPersianDigits()`, `formatPersianNumber()`, `formatPersianCurrency()`, `formatToman()`
+- `src/utils/tradeHelpers.ts` — `formatDate()` (Gregorian→Persian), `getTradingSession()`, `getMainPair()`, `getSymbolFilterOptions()`
+- `src/lib/notify.ts` — `notifySuccess()`, `notifyError()`, `notifyInfo()` wrappers
+
+### Layout Components (`src/components/layout/`)
+- `AppLayout.tsx` — root layout shell (sidebar + content area)
+- `SideNavBar.tsx` — desktop sidebar with plan badge
+- `BottomNavBar.tsx` — mobile bottom tab bar
 
 ---
 
 ## ❌ Not Done (Next Steps)
 
 ### High Priority
-- **Strategy/setup persistence** — `setupName` exists in the UI as a text input but is not sent to API (backend `Setup` model was removed). Needs a decision: re-add as a model, use tags, or store as a string field on Trade
+- **Jalali date picker** for the filter bar (currently only free-text / calendar navigation)
+- **Column sorting** — clicking table headers should sort the trade list
 
 ### Medium Priority
-- Jalali (Shamsi) calendar date picker for the filter bar
-- Sorting: clicking table column headers should sort the data
-- Auth pages (Login, Register) — currently no auth at all
-- Error/success toast notifications instead of `alert()`
-- Remove unused Chakra UI / Emotion dependencies from `package.json`
+- **`setupName` / Strategy field** — `Setup` model was fully removed. Decision: use tags (simplest, already works), or add a `setup_name: String?` field on `Trade`
+- **Error/success feedback** — some flows still use `alert()` instead of the `Toaster` system
+- **Remove stale deps** — `@chakra-ui/react`, `@emotion/react`, `@emotion/styled` may still be listed in `package.json` but are unused
 
 ### Low Priority
-- Settings page (account info, broker connection)
-- i18n abstraction (currently hardcoded Persian strings throughout)
 - Dark/light theme toggle
+- i18n abstraction (Persian strings are currently hardcoded throughout)
+- `GET /api/trades/:id` — single trade detail endpoint missing on backend
