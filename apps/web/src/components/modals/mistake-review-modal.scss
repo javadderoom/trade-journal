@@ -1,0 +1,369 @@
+@import "../../app/variables";
+
+// ─── Mistake Review Modal ────────────────────────────────────────────────────
+
+.mistake-review-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1100;
+  padding: 16px;
+  animation: fadeIn 0.15s ease;
+}
+
+.mistake-review-modal {
+  background: linear-gradient(145deg, #1a1f2e, #141824);
+  border: 1px solid rgba(245, 158, 11, 0.2);
+  border-radius: 16px;
+  padding: 24px;
+  width: 100%;
+  max-width: 540px;
+  max-height: 85vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.04);
+  animation: slideUp 0.2s ease;
+  direction: rtl;
+
+  @keyframes slideUp {
+    from { transform: translateY(16px); opacity: 0; }
+    to   { transform: translateY(0);    opacity: 1; }
+  }
+
+  .modal-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+
+    .header-text {
+      h3 {
+        font-size: 16px;
+        font-weight: 700;
+        color: #f1f5f9;
+        margin: 0 0 4px 0;
+      }
+      p {
+        font-size: 12px;
+        color: #64748b;
+        margin: 0;
+      }
+    }
+
+    .close-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #64748b;
+      padding: 4px;
+      border-radius: 6px;
+      transition: color 0.15s, background 0.15s;
+      &:hover { color: #f1f5f9; background: rgba(255,255,255,0.06); }
+      .material-symbols-outlined { font-size: 20px; }
+    }
+  }
+
+  // Trade summary strip
+  .trade-summary-strip {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-size: 13px;
+
+    .symbol { font-weight: 700; color: #f1f5f9; }
+
+    .direction-badge {
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      &.buy  { background: rgba(16, 185, 129, 0.15); color: #10b981; }
+      &.sell { background: rgba(239, 68, 68, 0.15);  color: #ef4444; }
+    }
+
+    .pnl {
+      margin-right: auto;
+      font-weight: 700;
+      font-size: 14px;
+      &.loss { color: #ef4444; }
+    }
+  }
+
+  // Chip list
+  .mistakes-section {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+
+    .section-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+  }
+
+  .mistake-chip {
+    border-radius: 10px;
+    border: 1px solid rgba(245, 158, 11, 0.25);
+    background: rgba(245, 158, 11, 0.05);
+    padding: 12px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    transition: border-color 0.2s, background 0.2s;
+
+    &.confirmed {
+      border-color: rgba(16, 185, 129, 0.4);
+      background: rgba(16, 185, 129, 0.05);
+    }
+    &.dismissed {
+      border-color: rgba(255, 255, 255, 0.07);
+      background: rgba(255, 255, 255, 0.02);
+      opacity: 0.55;
+    }
+
+    .chip-top {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      .robot-badge {
+        font-size: 14px;
+        flex-shrink: 0;
+      }
+
+      .chip-label {
+        font-weight: 600;
+        font-size: 13px;
+        color: #f1f5f9;
+        flex: 1;
+      }
+
+      .chip-actions {
+        display: flex;
+        gap: 6px;
+        flex-shrink: 0;
+
+        button {
+          padding: 4px 10px;
+          border-radius: 6px;
+          border: 1px solid;
+          font-size: 11px;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.15s;
+
+          &.btn-confirm {
+            border-color: rgba(16, 185, 129, 0.4);
+            color: #10b981;
+            background: rgba(16, 185, 129, 0.08);
+            &:hover, &.active {
+              background: rgba(16, 185, 129, 0.2);
+              border-color: #10b981;
+            }
+          }
+
+          &.btn-dismiss {
+            border-color: rgba(255, 255, 255, 0.12);
+            color: #64748b;
+            background: transparent;
+            &:hover, &.active {
+              background: rgba(255, 255, 255, 0.06);
+              color: #94a3b8;
+            }
+          }
+        }
+      }
+    }
+
+    .recurrence-msg {
+      font-size: 11px;
+      color: #f59e0b;
+      background: rgba(245, 158, 11, 0.08);
+      border-radius: 6px;
+      padding: 6px 10px;
+      border-right: 2px solid #f59e0b;
+    }
+
+    .chip-reason {
+      font-size: 11px;
+      color: #64748b;
+      line-height: 1.5;
+    }
+  }
+
+  .modal-footer {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    padding-top: 4px;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+
+    .btn-submit {
+      padding: 8px 20px;
+      border-radius: 8px;
+      border: none;
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      color: #000;
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+      transition: opacity 0.15s, transform 0.15s;
+      &:hover { opacity: 0.9; transform: translateY(-1px); }
+      &:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+    }
+
+    .btn-skip {
+      padding: 8px 16px;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.1);
+      background: transparent;
+      color: #64748b;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.15s;
+      &:hover { color: #94a3b8; border-color: rgba(255,255,255,0.2); }
+    }
+  }
+}
+
+// ─── Import Mistake Summary Modal ────────────────────────────────────────────
+
+.import-mistake-modal {
+  max-width: 600px;
+  max-height: 80vh;
+
+  .import-mistake-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+
+    .warning-icon {
+      color: #f59e0b;
+      font-size: 22px;
+    }
+
+    h3 {
+      font-size: 15px;
+      font-weight: 700;
+      color: #f1f5f9;
+      margin: 0;
+    }
+    p {
+      font-size: 12px;
+      color: #64748b;
+      margin: 0;
+    }
+  }
+
+  .rule-group-card {
+    border: 1px solid rgba(245, 158, 11, 0.2);
+    border-radius: 10px;
+    background: rgba(245, 158, 11, 0.04);
+    overflow: hidden;
+
+    .rule-group-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 14px;
+      cursor: pointer;
+      user-select: none;
+
+      .rule-label { font-weight: 600; font-size: 13px; color: #f1f5f9; flex: 1; }
+
+      .rule-meta {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+
+        .count-badge {
+          padding: 2px 8px;
+          border-radius: 4px;
+          background: rgba(245, 158, 11, 0.15);
+          color: #f59e0b;
+          font-size: 11px;
+          font-weight: 700;
+        }
+        .cost-badge {
+          font-size: 12px;
+          font-weight: 600;
+          color: #ef4444;
+        }
+      }
+
+      .expand-icon {
+        color: #64748b;
+        font-size: 18px;
+        transition: transform 0.2s;
+        &.open { transform: rotate(180deg); }
+      }
+    }
+
+    .ticket-list {
+      padding: 0 14px 12px 14px;
+      border-top: 1px solid rgba(255,255,255,0.05);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      padding-top: 10px;
+
+      .ticket-chip {
+        padding: 2px 8px;
+        border-radius: 4px;
+        background: rgba(255,255,255,0.05);
+        color: #94a3b8;
+        font-size: 11px;
+        font-family: monospace;
+      }
+    }
+  }
+
+  .import-mistake-footer {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    border-top: 1px solid rgba(255,255,255,0.06);
+    padding-top: 16px;
+
+    .btn-confirm-all {
+      padding: 8px 20px;
+      border-radius: 8px;
+      border: none;
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      color: #000;
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+      transition: opacity 0.15s, transform 0.15s;
+      &:hover { opacity: 0.9; transform: translateY(-1px); }
+    }
+
+    .btn-dismiss-all {
+      padding: 8px 16px;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.1);
+      background: transparent;
+      color: #64748b;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.15s;
+      &:hover { color: #94a3b8; }
+    }
+  }
+}

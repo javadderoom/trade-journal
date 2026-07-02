@@ -2,11 +2,12 @@
 
 import React, { useState } from 'react';
 import { api } from '../../lib/api';
+import { SuggestedMistake } from './MistakeReviewModal';
 
 interface ManualTradeModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSuccess: (newTrade: any) => void;
+  onSuccess: (newTrade: any, suggestedMistakes?: SuggestedMistake[]) => void;
 }
 
 export default function ManualTradeModal({ isOpen, onClose, onSuccess }: ManualTradeModalProps) {
@@ -100,7 +101,7 @@ export default function ManualTradeModal({ isOpen, onClose, onSuccess }: ManualT
       const res = await api.post('/api/trades', payload);
 
       const newTrade = res.data;
-      onSuccess(newTrade);
+      onSuccess(newTrade, res.data.suggestedMistakes);
       resetForm();
       onClose();
     } catch (err: any) {

@@ -99,11 +99,21 @@ export async function syncTradesFromEA(
       // Prepare UPDATE operation for active (open) trades
       operations.push(async () => {
         try {
+          // MT5 strips SL/TP from the payload when a trade closes.
+          // Only overwrite stop_loss / take_profit when the incoming value is a real
+          // positive number — otherwise keep whatever was recorded while trade was open.
+          const slUpdate = (trade.stopLoss && trade.stopLoss > 0)
+            ? { stop_loss: trade.stopLoss }
+            : {};
+          const tpUpdate = (trade.takeProfit && trade.takeProfit > 0)
+            ? { take_profit: trade.takeProfit }
+            : {};
+
           await prisma.trade.update({
             where: { id: existing.id },
             data: {
-              stop_loss: trade.stopLoss ?? null,
-              take_profit: trade.takeProfit ?? null,
+              ...slUpdate,
+              ...tpUpdate,
               profit_usd: trade.profitUsd,
               commission: trade.commission,
               swap: trade.swap,

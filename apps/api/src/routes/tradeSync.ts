@@ -1,5 +1,6 @@
 import { Router, Response } from 'express';
 import { getTradesForAccount, syncTradesFromEA, prisma } from '../services/tradeSync';
+import { detectMistakes } from '../services/mistakeDetector';
 import multer from 'multer';
 import path from 'node:path';
 import fs from 'node:fs';
@@ -244,7 +245,10 @@ router.post('/', authenticate, checkTradeLimit, async (req: AuthRequest, res: Re
       },
     });
 
-    res.status(201).json(newTrade);
+    // 5. Run mistake detection on closed losing trades
+    const suggestedMistakes = await detectMistakes(newTrade as any, prisma);
+
+    res.status(201).json({ ...newTrade, suggestedMistakes });
   } catch (err: any) {
     console.error('Create manual trade error:', err);
     res.status(500).json({ error: err.message || 'Internal server error' });
@@ -753,6 +757,99 @@ router.post('/emotions/bulk', authenticate, async (req: AuthRequest, res: Respon
 
 
 /**
+ * POST /api/trades/mistakes/confirm
+ * Stores confirmed mistake incidents; silently ignores dismissed ones.
+ * Body: { incidents: [{ tradeId, ruleKey, label, costUsd, confirmed }] }
+ */
+router.post('/mistakes/confirm', authenticate, async (req: AuthRequest, res: Response) => {
+  try {
+    const userId = req.user!.userId;
+    const { incidents } = req.body as {
+      incidents: Array<{
+        tradeId: string;
+        ruleKey: string;
+        label: string;
+        costUsd: number;
+        confirmed: boolean;
+      }>;
+    };
+
+    if (!Array.isArray(incidents) || incidents.length === 0) {
+      res.status(400).json({ error: 'incidents array is required' });
+      return;
+    }
+
+    for (const inc of incidents) {
+      if (!inc.confirmed) continue; // dismissed — never stored
+
+      // Verify trade belongs to user
+      const trade = await prisma.trade.findFirst({
+        where: { id: inc.tradeId, user_id: userId },
+      });
+      if (!trade) continue;
+
+      await (prisma as any).mistakeIncident.upsert({
+        where: { trade_id_rule_key: { trade_id: inc.tradeId, rule_key: inc.ruleKey } },
+        create: {
+          user_id: userId,
+          trade_id: inc.tradeId,
+          rule_key: inc.ruleKey,
+          label: inc.label,
+          cost_usd: inc.costUsd,
+        },
+        update: {
+          label: inc.label,
+          cost_usd: inc.costUsd,
+        },
+      });
+    }
+
+    res.status(200).json({ success: true });
+  } catch (err: any) {
+    console.error('Mistake confirm error:', err);
+    res.status(500).json({ error: err.message || 'Internal server error' });
+  }
+});
+
+/**
+ * GET /api/trades/mistakes/stats
+ * Returns per-rule aggregated recurrence stats for the current user.
+ */
+router.get('/mistakes/stats', authenticate, async (req: AuthRequest, res: Response) => {
+  try {
+    const userId = req.user!.userId;
+
+    const incidents = await (prisma as any).mistakeIncident.findMany({
+      where: { user_id: userId },
+      select: { rule_key: true, label: true, cost_usd: true },
+    });
+
+    // Group by rule_key
+    const grouped: Record<string, { label: string; count: number; totalCostUsd: number }> = {};
+    for (const inc of incidents) {
+      if (!grouped[inc.rule_key]) {
+        grouped[inc.rule_key] = { label: inc.label, count: 0, totalCostUsd: 0 };
+      }
+      grouped[inc.rule_key].count += 1;
+      grouped[inc.rule_key].totalCostUsd += inc.cost_usd;
+    }
+
+    const stats = Object.entries(grouped).map(([ruleKey, data]) => ({
+      ruleKey,
+      label: data.label,
+      count: data.count,
+      totalCostUsd: Math.round(data.totalCostUsd * 100) / 100,
+    }));
+
+    res.status(200).json(stats);
+  } catch (err: any) {
+    console.error('Mistake stats error:', err);
+    res.status(500).json({ error: err.message || 'Internal server error' });
+  }
+});
+
+
+/**
  * DELETE /api/trades/:id
  * Deletes a trade by ID.
  */
@@ -1220,6 +1317,7 @@ router.post('/import-mt4', authenticate, checkImportPermission, uploadMemory.sin
 
     let imported = 0;
     let skipped = 0;
+    const newLosingTrades: any[] = []; // for mistake detection
 
     // Detect file source (MT4 report vs MT5 report)
     const fileSource = htmlContent.toLowerCase().includes('metatrader 5') ? 'MT5_CSV' : 'MT4_HTM';
@@ -1238,7 +1336,7 @@ router.post('/import-mt4', authenticate, checkImportPermission, uploadMemory.sin
           continue;
         }
 
-        await prisma.trade.create({
+        const newTrade = await prisma.trade.create({
           data: {
             account_id: accountId,
             user_id: userId,
@@ -1261,6 +1359,11 @@ router.post('/import-mt4', authenticate, checkImportPermission, uploadMemory.sin
           },
         });
         imported++;
+
+        // Collect closed losing trades for batch mistake detection
+        if (trade.profitUsd < 0 && trade.closeTime !== null) {
+          newLosingTrades.push(newTrade);
+        }
       } catch (err: any) {
         console.error(`Failed to insert trade ticket ${trade.ticket}:`, err.message);
       }
@@ -1282,11 +1385,28 @@ router.post('/import-mt4', authenticate, checkImportPermission, uploadMemory.sin
       console.error('Failed to log import job:', err);
     }
 
+    // Run mistake detection on newly imported losing trades (batch)
+    const mistakeSummary: Array<{ tradeId: string; ticket: number | null; symbol: string; suggestedMistakes: any[] }> = [];
+    for (const lossTrade of newLosingTrades) {
+      try {
+        const suggestions = await detectMistakes(lossTrade as any, prisma);
+        if (suggestions.length > 0) {
+          mistakeSummary.push({
+            tradeId: lossTrade.id,
+            ticket: lossTrade.ticket,
+            symbol: lossTrade.symbol,
+            suggestedMistakes: suggestions,
+          });
+        }
+      } catch { /* non-critical — don't break import response */ }
+    }
+
     res.status(200).json({
       message: `Successfully processed statement.`,
       found: parsedTrades.length,
       imported,
       skipped,
+      mistakeSummary,
     });
   } catch (err: any) {
     console.error('MT4/MT5 import error:', err);

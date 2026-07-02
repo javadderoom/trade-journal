@@ -6,6 +6,8 @@ import { useAppStore } from '../../store/useAppStore';
 import { useTradeStore } from '../../store/useTradeStore';
 import ManualTradeModal from '../../components/modals/ManualTradeModal';
 import ImportMT4Modal from '../../components/modals/ImportMT4Modal';
+import MistakeReviewModal, { SuggestedMistake } from '../../components/modals/MistakeReviewModal';
+import ImportMistakeSummaryModal, { ImportMistakeEntry } from '../../components/modals/ImportMistakeSummaryModal';
 import { api } from '../../lib/api';
 import { notify } from '../../lib/notify';
 import Link from 'next/link';
@@ -15,6 +17,15 @@ export default function TradesPage() {
   const [dateFilter, setDateFilter] = useState<string | null>(null);
   const [subStatus, setSubStatus] = useState<any>(null);
   const [dismissedRejectionId, setDismissedRejectionId] = useState<string | null>(null);
+
+  // Mistake detection state
+  const [mistakeReview, setMistakeReview] = useState<{
+    tradeId: string;
+    tradeSummary: { symbol: string; direction: 'BUY' | 'SELL'; profitUsd: number };
+    suggestions: SuggestedMistake[];
+  } | null>(null);
+  const [importMistakeSummary, setImportMistakeSummary] = useState<ImportMistakeEntry[]>([]);
+  const [isImportMistakeOpen, setIsImportMistakeOpen] = useState(false);
 
   const fetchSubStatus = async () => {
     try {
@@ -102,23 +113,37 @@ export default function TradesPage() {
     notify.success(`واردات فایل با موفقیت انجام شد:\nتعداد معامله یافت شده: ${result.found}\nتعداد وارد شده: ${result.imported}\nتعداد تکراری (نادیده گرفته شده): ${result.skipped}`);
     await fetchTrades(true, selectedAccountId);
     fetchSubStatus();
+    // Open batch mistake summary if any were detected
+    if (result.mistakeSummary && result.mistakeSummary.length > 0) {
+      setImportMistakeSummary(result.mistakeSummary);
+      setIsImportMistakeOpen(true);
+    }
   };
 
   const handleAddManualTrade = () => {
     setManualTradeModalOpen(true);
   };
 
-  const handleManualTradeSuccess = async (newTrade: any) => {
+  const handleManualTradeSuccess = async (newTrade: any, suggestedMistakes?: SuggestedMistake[]) => {
     // 1. Re-fetch trades from database
     await fetchTrades(true);
     fetchSubStatus();
     // 2. Set newly created trade to open in sidebar automatically
     if (newTrade && newTrade.id) {
       setAutoOpenTradeId(newTrade.id);
-      // Clear it after a short timeout so that subsequent row clicks work normally
-      setTimeout(() => {
-        setAutoOpenTradeId(null);
-      }, 500);
+      setTimeout(() => { setAutoOpenTradeId(null); }, 500);
+    }
+    // 3. Open mistake review modal if any mistakes were detected
+    if (suggestedMistakes && suggestedMistakes.length > 0 && newTrade?.id) {
+      setMistakeReview({
+        tradeId: newTrade.id,
+        tradeSummary: {
+          symbol: newTrade.symbol,
+          direction: newTrade.direction,
+          profitUsd: newTrade.profit_usd ?? 0,
+        },
+        suggestions: suggestedMistakes,
+      });
     }
   };
 
@@ -241,6 +266,22 @@ export default function TradesPage() {
         onClose={() => setImportMT4ModalOpen(false)}
         onSuccess={handleImportSuccess}
         accounts={accounts}
+      />
+      {/* Mistake Review Modal — shown after manual trade save */}
+      {mistakeReview && (
+        <MistakeReviewModal
+          isOpen={!!mistakeReview}
+          onClose={() => setMistakeReview(null)}
+          tradeId={mistakeReview.tradeId}
+          tradeSummary={mistakeReview.tradeSummary}
+          suggestions={mistakeReview.suggestions}
+        />
+      )}
+      {/* Import Mistake Summary Modal — shown after bulk MT4/MT5 import */}
+      <ImportMistakeSummaryModal
+        isOpen={isImportMistakeOpen}
+        onClose={() => { setIsImportMistakeOpen(false); setImportMistakeSummary([]); }}
+        mistakeSummary={importMistakeSummary}
       />
 
     </main>

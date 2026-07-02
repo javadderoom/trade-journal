@@ -32,6 +32,7 @@ model User {
   refresh_tokens   RefreshToken[]
   userDiscounts    UserDiscount[]
   manualReceipts   ManualReceipt[]
+  mistakeIncidents MistakeIncident[]
 }
 
 model Account {
@@ -104,6 +105,23 @@ model Trade {
   @@unique([account_id, ticket])
   @@index([user_id])
   @@index([account_id])
+  mistakeIncidents MistakeIncident[]
+}
+
+model MistakeIncident {
+  id         String   @id @default(uuid())
+  user_id    String
+  trade_id   String
+  rule_key   String   // "NO_SL" | "SL_NOT_RESPECTED" | "REVENGE_TRADE" | "UNUSUAL_SIZE" | "WEAK_STRATEGY" | "WEAK_HOUR"
+  label      String   // user-visible Persian label
+  cost_usd   Float    // abs(profit_usd) of this trade
+  created_at DateTime @default(now())
+
+  user  User  @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  trade Trade @relation(fields: [trade_id], references: [id], onDelete: Cascade)
+
+  @@unique([trade_id, rule_key])
+  @@index([user_id])
 }
 
 model JournalEntry {
