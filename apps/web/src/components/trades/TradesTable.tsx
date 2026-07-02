@@ -933,6 +933,19 @@ export default function TradesTable({
               <span className="material-symbols-outlined">cloud_download</span>
             </div>
           </button>
+          <button
+            className="fab-sub-btn"
+            onClick={() => {
+              handleExportData();
+              setIsFabOpen(false);
+            }}
+            title="خروجی داده"
+          >
+            <span className="fab-label">خروجی داده</span>
+            <div className="fab-icon-wrapper">
+              <span className="material-symbols-outlined">download</span>
+            </div>
+          </button>
         </div>
         <button
           className="fab-main-btn"
