@@ -675,6 +675,13 @@
               color: $on-surface-variant;
               white-space: nowrap;
               font-family: $font-primary;
+
+              &.important {
+                background-color: rgba(#f59e0b, 0.15);
+                border-color: rgba(#f59e0b, 0.4);
+                color: #f59e0b;
+                font-weight: 600;
+              }
             }
 
             .tag-mini-more {
@@ -2856,15 +2863,22 @@ input[type="checkbox"] {
          }
        }
 
-       .tag-mini-pill {
-         font-size: 10px;
-         padding: 2px 6px;
-         border-radius: 4px;
-         background-color: rgba($surface-variant, 0.4);
-         border: 1px solid rgba($outline-variant, 0.3);
-         color: $on-surface-variant;
-       }
-     }
+        .tag-mini-pill {
+          font-size: 10px;
+          padding: 2px 6px;
+          border-radius: 4px;
+          background-color: rgba($surface-variant, 0.4);
+          border: 1px solid rgba($outline-variant, 0.3);
+          color: $on-surface-variant;
+
+          &.important {
+            background-color: rgba(#f59e0b, 0.15);
+            border-color: rgba(#f59e0b, 0.4);
+            color: #f59e0b;
+            font-weight: 600;
+          }
+        }
+      }
    }
 
    .no-trades-card {

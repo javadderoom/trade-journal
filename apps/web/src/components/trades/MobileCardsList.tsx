@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
-import { Trade } from './TradesTable';
+import { Trade, TagObject } from './TradesTable';
 import { toPersianDigits, formatPersianCurrency, formatToman } from '../../utils/farsi';
 import {
   getEmotionEmoji,
@@ -24,6 +24,7 @@ interface MobileCardsListProps {
   setCurrentPage: React.Dispatch<React.SetStateAction<number>>;
   itemsPerPage: number;
   ignoredTags: Set<string>;
+  allTags: TagObject[];
 }
 
 export default function MobileCardsList({
@@ -40,6 +41,7 @@ export default function MobileCardsList({
   setCurrentPage,
   itemsPerPage,
   ignoredTags,
+  allTags,
 }: MobileCardsListProps) {
   const formatCurrency = (val: number) => {
     return formatPersianCurrency(val);
@@ -216,20 +218,36 @@ export default function MobileCardsList({
               </div>
 
               {/* Tags & Emotions Row */}
-              {(trade.emotion || (trade.tags && trade.tags.length > 0)) && (
-                <div className="card-tags-row">
-                  {trade.emotion && (
-                    <span className={`emotion-mini-badge emotion-${trade.emotion.toLowerCase()}`} title={`احساس: ${getEmotionLabel(trade.emotion, allEmotions)}`}>
-                      {getEmotionEmoji(trade.emotion, allEmotions)} {getEmotionLabel(trade.emotion, allEmotions)}
-                    </span>
-                  )}
-                  {trade.tags && trade.tags.map(tag => (
-                    <span key={tag} className="tag-mini-pill">
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-              )}
+              {(() => {
+                const importantTagNames = new Set(
+                  (allTags || []).filter(t => t.show_first).map(t => t.name)
+                );
+                const sortedTags = [...(trade.tags || [])].sort((a, b) => {
+                  const aImp = importantTagNames.has(a);
+                  const bImp = importantTagNames.has(b);
+                  if (aImp && !bImp) return -1;
+                  if (!aImp && bImp) return 1;
+                  return 0;
+                });
+
+                return (trade.emotion || (sortedTags.length > 0)) && (
+                  <div className="card-tags-row">
+                    {trade.emotion && (
+                      <span className={`emotion-mini-badge emotion-${trade.emotion.toLowerCase()}`} title={`احساس: ${getEmotionLabel(trade.emotion, allEmotions)}`}>
+                        {getEmotionEmoji(trade.emotion, allEmotions)} {getEmotionLabel(trade.emotion, allEmotions)}
+                      </span>
+                    )}
+                    {sortedTags.map(tag => {
+                      const isImportant = importantTagNames.has(tag);
+                      return (
+                        <span key={tag} className={`tag-mini-pill ${isImportant ? 'important' : ''}`}>
+                          {isImportant ? '⭐ ' : ''}{tag}
+                        </span>
+                      );
+                    })}
+                  </div>
+                );
+              })()}
             </div>
           );
         })}

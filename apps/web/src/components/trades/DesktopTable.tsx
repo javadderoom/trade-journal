@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Trade } from './TradesTable';
+import { Trade, TagObject } from './TradesTable';
 import { toPersianDigits, formatPersianCurrency, formatToman } from '../../utils/farsi';
 import {
   getEmotionEmoji,
@@ -22,6 +22,7 @@ interface DesktopTableProps {
   allEmotions: { value: string; label: string; emoji?: string }[];
   accounts?: any[];
   ignoredTags: Set<string>;
+  allTags: TagObject[];
 }
 
 export default function DesktopTable({
@@ -36,6 +37,7 @@ export default function DesktopTable({
   allEmotions,
   accounts = [],
   ignoredTags,
+  allTags,
 }: DesktopTableProps) {
   const formatCurrency = (val: number) => {
     return formatPersianCurrency(val);
@@ -84,6 +86,18 @@ export default function DesktopTable({
               if (!isClosed) profitClass = 'profit-open';
               if (isMissed) profitClass = 'profit-missed';
 
+              // Sort tags to show show_first (important) ones first
+              const importantTagNames = new Set(
+                (allTags || []).filter(t => t.show_first).map(t => t.name)
+              );
+              const sortedTags = [...(trade.tags || [])].sort((a, b) => {
+                const aImp = importantTagNames.has(a);
+                const bImp = importantTagNames.has(b);
+                if (aImp && !bImp) return -1;
+                if (!aImp && bImp) return 1;
+                return 0;
+              });
+
               return (
                 <tr
                   key={trade.id}
@@ -122,21 +136,24 @@ export default function DesktopTable({
                   <td className="col-symbol">
                     <div className="symbol-cell-content">
                       <span className="symbol-name">{trade.symbol}</span>
-                      {(trade.emotion || (trade.tags && trade.tags.length > 0)) && (
+                      {(trade.emotion || (sortedTags.length > 0)) && (
                         <div className="symbol-metadata">
                           {trade.emotion && (
                             <span className={`emotion-mini-badge emotion-${trade.emotion.toLowerCase()}`} title={`احساس: ${getEmotionLabel(trade.emotion, allEmotions)}`}>
                               {getEmotionEmoji(trade.emotion, allEmotions)} {getEmotionLabel(trade.emotion, allEmotions)}
                             </span>
                           )}
-                          {trade.tags && trade.tags.slice(0, 2).map(tag => (
-                            <span key={tag} className="tag-mini-pill">
-                              {tag}
-                            </span>
-                          ))}
-                          {trade.tags && trade.tags.length > 2 && (
-                            <span className="tag-mini-more" title={trade.tags.slice(2).join('، ')}>
-                              +{toPersianDigits(trade.tags.length - 2)}
+                          {sortedTags.slice(0, 2).map(tag => {
+                            const isImportant = importantTagNames.has(tag);
+                            return (
+                              <span key={tag} className={`tag-mini-pill ${isImportant ? 'important' : ''}`}>
+                                {isImportant ? '⭐ ' : ''}{tag}
+                              </span>
+                            );
+                          })}
+                          {sortedTags.length > 2 && (
+                            <span className="tag-mini-more" title={sortedTags.slice(2).join('، ')}>
+                              +{toPersianDigits(sortedTags.length - 2)}
                             </span>
                           )}
                         </div>

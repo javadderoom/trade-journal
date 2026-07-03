@@ -806,6 +806,7 @@ export default function TradesTable({
             allEmotions={allEmotions}
             accounts={accounts}
             ignoredTags={ignoredTagsSet}
+            allTags={allTags}
           />
         </div>
 
@@ -824,6 +825,7 @@ export default function TradesTable({
           setCurrentPage={setCurrentPage}
           itemsPerPage={itemsPerPage}
           ignoredTags={ignoredTagsSet}
+          allTags={allTags}
         />
 
         {/* 6. Pagination */}
