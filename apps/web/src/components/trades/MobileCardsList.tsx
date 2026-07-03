@@ -248,6 +248,20 @@ export default function MobileCardsList({
                   </div>
                 );
               })()}
+              {(trade.analysisTimeframe || trade.entryTimeframe) && (
+                <div className="card-tags-row">
+                  {trade.analysisTimeframe && (
+                    <span className="timeframe-badge analysis" title="تایم‌فریم تحلیل">
+                      📊 {trade.analysisTimeframe}
+                    </span>
+                  )}
+                  {trade.entryTimeframe && (
+                    <span className="timeframe-badge entry" title="تایم‌فریم ورود">
+                      🎯 {trade.entryTimeframe}
+                    </span>
+                  )}
+                </div>
+              )}
             </div>
           );
         })}

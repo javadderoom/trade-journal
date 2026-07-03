@@ -144,6 +144,8 @@ router.post('/', authenticate, checkTradeLimit, async (req: AuthRequest, res: Re
       commission,
       swap,
       accountId,
+      analysisTimeframe,
+      entryTimeframe,
     } = req.body;
 
     const userId = req.user!.userId;
@@ -242,6 +244,8 @@ router.post('/', authenticate, checkTradeLimit, async (req: AuthRequest, res: Re
         r_multiple: rMultiple,
         import_source: 'MANUAL',
         ticket: null,
+        analysis_timeframe: analysisTimeframe || null,
+        entry_timeframe: entryTimeframe || null,
       },
     });
 
@@ -267,6 +271,7 @@ router.put('/:id', authenticate, async (req: AuthRequest, res: Response) => {
       notes, emotion, stopLoss, takeProfit, tags, accountId,
       closeTime, closePrice, profitUsd, commission, swap,
       symbol, direction, lotSize, openPrice, openTime,
+      analysisTimeframe, entryTimeframe,
     } = req.body;
 
     const existing = await prisma.trade.findFirst({
@@ -347,6 +352,8 @@ router.put('/:id', authenticate, async (req: AuthRequest, res: Response) => {
         take_profit: takeProfit !== undefined ? (takeProfit === null ? null : parseFloat(takeProfit)) : undefined,
         tags: tags !== undefined ? tags : undefined,
         r_multiple: rMultipleUpdate !== undefined ? rMultipleUpdate : undefined,
+        analysis_timeframe: analysisTimeframe !== undefined ? analysisTimeframe : undefined,
+        entry_timeframe: entryTimeframe !== undefined ? entryTimeframe : undefined,
         // Core trade fields
         symbol: symbol !== undefined ? symbol : undefined,
         direction: direction !== undefined ? direction : undefined,

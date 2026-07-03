@@ -131,6 +131,20 @@ export default function DesktopTable({
                           </span>
                         );
                       })()}
+                      {(trade.analysisTimeframe || trade.entryTimeframe) && (
+                        <div className="timeframe-badges">
+                          {trade.analysisTimeframe && (
+                            <span className="timeframe-badge analysis" title="تایم‌فریم تحلیل">
+                              📊 {trade.analysisTimeframe}
+                            </span>
+                          )}
+                          {trade.entryTimeframe && (
+                            <span className="timeframe-badge entry" title="تایم‌فریم ورود">
+                              🎯 {trade.entryTimeframe}
+                            </span>
+                          )}
+                        </div>
+                      )}
                     </div>
                   </td>
                   <td className="col-symbol">

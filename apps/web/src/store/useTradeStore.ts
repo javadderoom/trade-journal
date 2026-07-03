@@ -250,6 +250,8 @@ export const useTradeStore = create<TradeState>((set, get) => ({
             notes: item.notes ?? null,
             screenshots: item.screenshots ?? [],
             chartData: item.chartData ?? null,
+            analysisTimeframe: item.analysisTimeframe ?? null,
+            entryTimeframe: item.entryTimeframe ?? null,
           };
         });
         set({ trades: mapped });
@@ -292,6 +294,8 @@ export const useTradeStore = create<TradeState>((set, get) => ({
         lotSize: updatedTrade.lotSize,
         openPrice: updatedTrade.openPrice,
         openTime: updatedTrade.openTime,
+        analysisTimeframe: updatedTrade.analysisTimeframe,
+        entryTimeframe: updatedTrade.entryTimeframe,
       });
 
       return res.status >= 200 && res.status < 300;

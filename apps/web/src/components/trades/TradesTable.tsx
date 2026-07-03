@@ -36,6 +36,8 @@ export interface Trade {
   notes: string | null;
   screenshots?: string[];
   chartData?: any;
+  analysisTimeframe?: string | null;
+  entryTimeframe?: string | null;
 }
 
 interface TradesTableProps {
@@ -177,6 +179,7 @@ export default function TradesTable({
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedSymbol, setSelectedSymbol] = useState('همه نمادها');
   const [selectedDirection, setSelectedDirection] = useState('همه جهت‌ها');
+  const [selectedTimeframe, setSelectedTimeframe] = useState('ALL');
   const [selectedStatus, setSelectedStatus] = useState<'ALL' | 'OPEN' | 'CLOSED' | 'MISSED'>('ALL');
   const [isAdvancedFiltersOpen, setIsAdvancedFiltersOpen] = useState(false);
   const [allEmotions, setAllEmotions] = useState<{ value: string; label: string; emoji?: string }[]>(DEFAULT_EMOTIONS);
@@ -377,6 +380,11 @@ export default function TradesTable({
         const dir = selectedDirection === 'خرید (Buy)' ? 'BUY' : 'SELL';
         if (trade.direction !== dir) return false;
       }
+      if (selectedTimeframe !== 'ALL') {
+        const matchAnalysis = trade.analysisTimeframe === selectedTimeframe;
+        const matchEntry = trade.entryTimeframe === selectedTimeframe;
+        if (!matchAnalysis && !matchEntry) return false;
+      }
       if (searchQuery) {
         const query = searchQuery.toLowerCase().trim();
         const symbolMatch = trade.symbol.toLowerCase().includes(query);
@@ -393,7 +401,7 @@ export default function TradesTable({
       if (selectedStatus === 'MISSED' && !isMissed) return false;
       return true;
     });
-  }, [trades, selectedSymbol, selectedDirection, searchQuery, selectedStatus, filterDatesArray, selectedTimezone, ignoredTagsSet]);
+  }, [trades, selectedSymbol, selectedDirection, selectedTimeframe, searchQuery, selectedStatus, filterDatesArray, selectedTimezone, ignoredTagsSet]);
 
   // Summary Metrics
   const summary = useMemo(() => {
@@ -775,6 +783,8 @@ export default function TradesTable({
           symbolOptions={symbolOptions}
           selectedDirection={selectedDirection}
           setSelectedDirection={setSelectedDirection}
+          selectedTimeframe={selectedTimeframe}
+          setSelectedTimeframe={setSelectedTimeframe}
           selectedTimezone={selectedTimezone}
           setSelectedTimezone={setSelectedTimezone}
           usdToToman={usdToToman}

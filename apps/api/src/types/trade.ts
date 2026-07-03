@@ -26,6 +26,8 @@ export interface TradeData {
   pips?: number;
   rMultiple: number;
   chartData?: any;
+  analysisTimeframe?: string;
+  entryTimeframe?: string;
 }
 
 /** Result from a sync/import operation */

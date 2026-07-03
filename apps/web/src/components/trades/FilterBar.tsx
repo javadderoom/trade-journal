@@ -18,6 +18,8 @@ interface FilterBarProps {
   symbolOptions: string[];
   selectedDirection: string;
   setSelectedDirection: (val: string) => void;
+  selectedTimeframe: string;
+  setSelectedTimeframe: (val: string) => void;
   selectedTimezone: string;
   setSelectedTimezone: (val: string) => void;
   usdToToman: number;
@@ -41,6 +43,8 @@ export default function FilterBar({
   symbolOptions,
   selectedDirection,
   setSelectedDirection,
+  selectedTimeframe,
+  setSelectedTimeframe,
   selectedTimezone,
   setSelectedTimezone,
   usdToToman,
@@ -179,6 +183,29 @@ export default function FilterBar({
             </div>
 
             <div className="advanced-field">
+              <label>تایم‌فریم</label>
+              <Select
+                value={selectedTimeframe}
+                onChange={(val) => {
+                  setSelectedTimeframe(val);
+                  setCurrentPage(1);
+                }}
+                options={[
+                  { value: 'ALL', label: 'همه تایم‌فریم‌ها' },
+                  { value: 'M1',  label: '۱ دقیقه (M1)' },
+                  { value: 'M5',  label: '۵ دقیقه (M5)' },
+                  { value: 'M15', label: '۱۵ دقیقه (M15)' },
+                  { value: 'M30', label: '۳۰ دقیقه (M30)' },
+                  { value: 'H1',  label: '۱ ساعته (H1)' },
+                  { value: 'H4',  label: '۴ ساعته (H4)' },
+                  { value: 'D1',  label: 'روزانه (D1)' },
+                  { value: 'W1',  label: 'هفتگی (W1)' },
+                  { value: 'MN',  label: 'ماهانه (MN)' },
+                ]}
+              />
+            </div>
+
+            <div className="advanced-field">
               <label>منطقه زمانی</label>
               <Select
                 value={selectedTimezone}
@@ -219,6 +246,7 @@ export default function FilterBar({
                 setSearchQuery('');
                 setSelectedSymbol('همه نمادها');
                 setSelectedDirection('همه جهت‌ها');
+                setSelectedTimeframe('ALL');
                 setSelectedStatus('ALL');
                 setCurrentPage(1);
               }}

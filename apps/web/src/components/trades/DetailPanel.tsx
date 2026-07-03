@@ -331,19 +331,61 @@ export default function DetailPanel({
                    />
                  </span>
 
-                 <span className="grid-label">سشن ورود:</span>
-                 <span className="grid-value">
-                   {(() => {
-                     const sess = getTradingSession(activeTrade.openTime);
-                     return (
-                       <span className={`session-badge ${sess.className}`}>
-                         {sess.emoji} {sess.label}
-                       </span>
-                     );
-                   })()}
-                 </span>
+<span className="grid-label">سشن ورود:</span>
+                  <span className="grid-value">
+                    {(() => {
+                      const sess = getTradingSession(activeTrade.openTime);
+                      return (
+                        <span className={`session-badge ${sess.className}`}>
+                          {sess.emoji} {sess.label}
+                        </span>
+                      );
+                    })()}
+                  </span>
 
-                 <span className="grid-label">قیمت ورود:</span>
+                  <span className="grid-label">تایم‌فریم تحلیل:</span>
+                  <span className="grid-value">
+                    <select
+                      className="grid-input"
+                      value={activeTrade.analysisTimeframe || ''}
+                      onChange={e => updateActiveTradeField('analysisTimeframe', e.target.value || null)}
+                      style={inputStyle}
+                    >
+                      <option value="" style={{ backgroundColor: '#1e222b', color: '#fff' }}>—</option>
+                      <option value="M1" style={{ backgroundColor: '#1e222b', color: '#fff' }}>۱ دقیقه (M1)</option>
+                      <option value="M5" style={{ backgroundColor: '#1e222b', color: '#fff' }}>۵ دقیقه (M5)</option>
+                      <option value="M15" style={{ backgroundColor: '#1e222b', color: '#fff' }}>۱۵ دقیقه (M15)</option>
+                      <option value="M30" style={{ backgroundColor: '#1e222b', color: '#fff' }}>۳۰ دقیقه (M30)</option>
+                      <option value="H1" style={{ backgroundColor: '#1e222b', color: '#fff' }}>۱ ساعته (H1)</option>
+                      <option value="H4" style={{ backgroundColor: '#1e222b', color: '#fff' }}>۴ ساعته (H4)</option>
+                      <option value="D1" style={{ backgroundColor: '#1e222b', color: '#fff' }}>روزانه (D1)</option>
+                      <option value="W1" style={{ backgroundColor: '#1e222b', color: '#fff' }}>هفتگی (W1)</option>
+                      <option value="MN" style={{ backgroundColor: '#1e222b', color: '#fff' }}>ماهانه (MN)</option>
+                    </select>
+                  </span>
+
+                  <span className="grid-label">تایم‌فریم ورود:</span>
+                  <span className="grid-value">
+                    <select
+                      className="grid-input"
+                      value={activeTrade.entryTimeframe || ''}
+                      onChange={e => updateActiveTradeField('entryTimeframe', e.target.value || null)}
+                      style={inputStyle}
+                    >
+                      <option value="" style={{ backgroundColor: '#1e222b', color: '#fff' }}>—</option>
+                      <option value="M1" style={{ backgroundColor: '#1e222b', color: '#fff' }}>۱ دقیقه (M1)</option>
+                      <option value="M5" style={{ backgroundColor: '#1e222b', color: '#fff' }}>۵ دقیقه (M5)</option>
+                      <option value="M15" style={{ backgroundColor: '#1e222b', color: '#fff' }}>۱۵ دقیقه (M15)</option>
+                      <option value="M30" style={{ backgroundColor: '#1e222b', color: '#fff' }}>۳۰ دقیقه (M30)</option>
+                      <option value="H1" style={{ backgroundColor: '#1e222b', color: '#fff' }}>۱ ساعته (H1)</option>
+                      <option value="H4" style={{ backgroundColor: '#1e222b', color: '#fff' }}>۴ ساعته (H4)</option>
+                      <option value="D1" style={{ backgroundColor: '#1e222b', color: '#fff' }}>روزانه (D1)</option>
+                      <option value="W1" style={{ backgroundColor: '#1e222b', color: '#fff' }}>هفتگی (W1)</option>
+                      <option value="MN" style={{ backgroundColor: '#1e222b', color: '#fff' }}>ماهانه (MN)</option>
+                    </select>
+                  </span>
+
+                  <span className="grid-label">قیمت ورود:</span>
                  <span className="grid-value font-mono direction-ltr">
                    <input
                      type="number"
