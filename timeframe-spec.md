@@ -311,7 +311,9 @@ Update the `useMemo` dependency array:
 
 **File:** `apps/web/src/components/trades/DetailPanel.tsx`
 
-Add two `<select>` dropdowns in the **"جزئیات اجرا" (Execution Details)** section, after the session row (~line 334–344):
+**Tab rename:** The first tab label `تحلیل و آمار` is renamed to `مشخصات`.
+
+**Timeframe selectors location:** The two `<select>` dropdowns are placed at the **top of the second tab** (`یادداشت و مستندات`), above the tags/emotions section. This keeps the stats tab focused on numeric execution data, while the notes tab holds the qualitative trade context (timeframes, tags, emotions, notes, screenshots).
 
 ```tsx
 {/* Analysis Timeframe */}

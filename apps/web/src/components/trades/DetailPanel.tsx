@@ -198,7 +198,7 @@ export default function DetailPanel({
           onClick={() => setActiveTab('stats')}
         >
           <span className="material-symbols-outlined tab-icon">analytics</span>
-          تحلیل و آمار
+          مشخصات
         </button>
         <button
           className={`tab-btn ${activeTab === 'journal' ? 'active' : ''}`}
@@ -525,6 +525,54 @@ export default function DetailPanel({
             </>
          ) : (
           <>
+            {/* Timeframe Selectors */}
+            <div className="form-group">
+              <label>تایم‌فریم</label>
+              <div className="details-grid" style={{ marginTop: '6px' }}>
+                <span className="grid-label">تایم‌فریم تحلیل:</span>
+                <span className="grid-value">
+                  <select
+                    className="grid-input"
+                    value={activeTrade.analysisTimeframe || ''}
+                    onChange={e => updateActiveTradeField('analysisTimeframe', e.target.value || null)}
+                    style={inputStyle}
+                  >
+                    <option value="" style={{ backgroundColor: '#1e222b', color: '#fff' }}>—</option>
+                    <option value="M1" style={{ backgroundColor: '#1e222b', color: '#fff' }}>۱ دقیقه (M1)</option>
+                    <option value="M5" style={{ backgroundColor: '#1e222b', color: '#fff' }}>۵ دقیقه (M5)</option>
+                    <option value="M15" style={{ backgroundColor: '#1e222b', color: '#fff' }}>۱۵ دقیقه (M15)</option>
+                    <option value="M30" style={{ backgroundColor: '#1e222b', color: '#fff' }}>۳۰ دقیقه (M30)</option>
+                    <option value="H1" style={{ backgroundColor: '#1e222b', color: '#fff' }}>۱ ساعته (H1)</option>
+                    <option value="H4" style={{ backgroundColor: '#1e222b', color: '#fff' }}>۴ ساعته (H4)</option>
+                    <option value="D1" style={{ backgroundColor: '#1e222b', color: '#fff' }}>روزانه (D1)</option>
+                    <option value="W1" style={{ backgroundColor: '#1e222b', color: '#fff' }}>هفتگی (W1)</option>
+                    <option value="MN" style={{ backgroundColor: '#1e222b', color: '#fff' }}>ماهانه (MN)</option>
+                  </select>
+                </span>
+
+                <span className="grid-label">تایم‌فریم ورود:</span>
+                <span className="grid-value">
+                  <select
+                    className="grid-input"
+                    value={activeTrade.entryTimeframe || ''}
+                    onChange={e => updateActiveTradeField('entryTimeframe', e.target.value || null)}
+                    style={inputStyle}
+                  >
+                    <option value="" style={{ backgroundColor: '#1e222b', color: '#fff' }}>—</option>
+                    <option value="M1" style={{ backgroundColor: '#1e222b', color: '#fff' }}>۱ دقیقه (M1)</option>
+                    <option value="M5" style={{ backgroundColor: '#1e222b', color: '#fff' }}>۵ دقیقه (M5)</option>
+                    <option value="M15" style={{ backgroundColor: '#1e222b', color: '#fff' }}>۱۵ دقیقه (M15)</option>
+                    <option value="M30" style={{ backgroundColor: '#1e222b', color: '#fff' }}>۳۰ دقیقه (M30)</option>
+                    <option value="H1" style={{ backgroundColor: '#1e222b', color: '#fff' }}>۱ ساعته (H1)</option>
+                    <option value="H4" style={{ backgroundColor: '#1e222b', color: '#fff' }}>۴ ساعته (H4)</option>
+                    <option value="D1" style={{ backgroundColor: '#1e222b', color: '#fff' }}>روزانه (D1)</option>
+                    <option value="W1" style={{ backgroundColor: '#1e222b', color: '#fff' }}>هفتگی (W1)</option>
+                    <option value="MN" style={{ backgroundColor: '#1e222b', color: '#fff' }}>ماهانه (MN)</option>
+                  </select>
+                </span>
+              </div>
+            </div>
+
             {/* Strategy & Emotions / Tags */}
             <div className="form-group">
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
