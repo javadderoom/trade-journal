@@ -617,4 +617,25 @@ router.get('/card-details', async (req, res) => {
   }
 });
 
+/**
+ * GET /api/settings/exchange-rate
+ * Retrieve custom USD -> Toman exchange rate
+ */
+router.get('/exchange-rate', async (req, res) => {
+  try {
+    const setting = await prisma.systemSetting.findUnique({
+      where: { key: 'EXCHANGE_RATE' },
+    });
+
+    if (setting && setting.value) {
+      return res.status(200).json(setting.value);
+    }
+
+    return res.status(200).json({ rate: null });
+  } catch (err: any) {
+    console.error('Fetch exchange rate error:', err);
+    return res.status(500).json({ error: 'خطا در دریافت نرخ ارز' });
+  }
+});
+
 export default router;

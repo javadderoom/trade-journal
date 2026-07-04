@@ -100,6 +100,7 @@ export default function AdminPage() {
     bankName: '',
     ownerName: '',
   });
+  const [exchangeRate, setExchangeRate] = useState<number | string>('');
 
   // Modal states
   const [selectedReceipt, setSelectedReceipt] = useState<AdminReceipt | null>(null);
@@ -157,6 +158,19 @@ export default function AdminPage() {
     }
   }, []);
 
+  const fetchExchangeRateSetting = useCallback(async () => {
+    try {
+      const res = await api.get('/api/settings/exchange-rate');
+      if (res.data && res.data.rate) {
+        setExchangeRate(res.data.rate);
+      } else {
+        setExchangeRate('');
+      }
+    } catch (err) {
+      console.error('Failed to fetch exchange rate config:', err);
+    }
+  }, []);
+
   const fetchContactSetting = useCallback(async () => {
     try {
       const res = await api.get('/api/settings/contact');
@@ -195,12 +209,15 @@ export default function AdminPage() {
     if (activeTab === 'users') fetchUsers();
     if (activeTab === 'receipts') fetchReceipts();
     if (activeTab === 'coupons') fetchCoupons();
-    if (activeTab === 'pricing') fetchPricesSetting();
+    if (activeTab === 'pricing') {
+      fetchPricesSetting();
+      fetchExchangeRateSetting();
+    }
     if (activeTab === 'contact') {
       fetchContactSetting();
       fetchCardSetting();
     }
-  }, [activeTab, user, fetchStats, fetchUsers, fetchReceipts, fetchCoupons, fetchPricesSetting, fetchContactSetting, fetchCardSetting]);
+  }, [activeTab, user, fetchStats, fetchUsers, fetchReceipts, fetchCoupons, fetchPricesSetting, fetchExchangeRateSetting, fetchContactSetting, fetchCardSetting]);
 
   // Actions
   const handleVerifyReceipt = async (id: string, status: 'APPROVED' | 'REJECTED', inlineReason?: string) => {
@@ -279,6 +296,20 @@ export default function AdminPage() {
       notify.success('تنظیمات قیمت‌گذاری با موفقیت بروز شد');
     } catch (err: any) {
       notify.error(err.response?.data?.error || 'خطا در ذخیره‌سازی قیمت‌ها');
+    }
+  };
+
+  const handleUpdateExchangeRate = async () => {
+    try {
+      const res = await api.put('/api/admin/settings/exchange-rate', { rate: exchangeRate });
+      if (res.data && res.data.rate === null) {
+        setExchangeRate('');
+        notify.success('تنظیمات نرخ دلار حذف شد. نرخ زنده اعمال می‌شود.');
+      } else {
+        notify.success('نرخ دلار به تومان با موفقیت بروزرسانی شد');
+      }
+    } catch (err: any) {
+      notify.error(err.response?.data?.error || 'خطا در ذخیره‌سازی نرخ دلار');
     }
   };
 
@@ -716,6 +747,28 @@ export default function AdminPage() {
 
             <div>
               <button className="admin-btn" onClick={handleUpdatePrices}>ذخیره تغییرات قیمت</button>
+            </div>
+
+            <div style={{ marginTop: '20px', paddingTop: '20px', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
+              <h4 style={{ color: '#ffb300', marginBottom: '12px' }}>نرخ دستی دلار به تومان (تعیین پشتیبان در صورت عدم بروزرسانی خودکار)</h4>
+              <div style={{ display: 'flex', gap: '16px', alignItems: 'flex-end' }}>
+                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                  <label style={{ fontSize: '0.8rem', color: '#a0aec0' }}>نرخ معادل ۱ دلار (تومان)</label>
+                  <input
+                    type="number"
+                    placeholder="مثال: 90000"
+                    style={{ background: '#0b0d19', border: '1px solid rgba(255,255,255,0.1)', padding: '10px', color: '#fff', borderRadius: '6px' }}
+                    value={exchangeRate}
+                    onChange={(e) => setExchangeRate(e.target.value)}
+                  />
+                </div>
+                <button className="admin-btn" style={{ margin: 0, height: '42px' }} onClick={handleUpdateExchangeRate}>
+                  ذخیره نرخ دلار
+                </button>
+              </div>
+              <p style={{ color: '#a0aec0', fontSize: '0.8rem', marginTop: '8px' }}>
+                در صورت ذخیره‌سازی، این نرخ جایگزین دریافت قیمت زنده خواهد شد. برای بازگشت به قیمت زنده، نرخ را خالی یا ۰ گذاشته و دکمه را بزنید.
+              </p>
             </div>
           </div>
         </div>

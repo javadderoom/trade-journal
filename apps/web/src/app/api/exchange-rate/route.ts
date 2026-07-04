@@ -19,6 +19,25 @@ const FALLBACK_RATE = 90_000; // Tomans per USD
 
 export async function GET() {
   try {
+    // 1. Try to fetch manual override from backend DB first
+    const backendUrl = process.env.NEXT_PUBLIC_API_BASE_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+    try {
+      const dbRes = await fetch(`${backendUrl}/api/settings/exchange-rate`, { next: { revalidate: 300 } });
+      if (dbRes.ok) {
+        const dbData = await dbRes.json();
+        if (dbData && dbData.rate && Number(dbData.rate) > 0) {
+          return NextResponse.json({
+            usdToToman: Number(dbData.rate),
+            source: 'admin_override',
+            cachedAt: new Date().toISOString(),
+          });
+        }
+      }
+    } catch (dbErr: any) {
+      console.warn('[exchange-rate] Database override check failed:', dbErr.message);
+    }
+
+    // 2. Fallback to Navasan API
     const apiKey = process.env.NAVASAN_API_KEY;
 
     if (!apiKey) {

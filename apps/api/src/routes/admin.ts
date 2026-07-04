@@ -406,4 +406,38 @@ router.put('/settings/card-details', async (req: AuthRequest, res: Response) => 
   }
 });
 
+/**
+ * PUT /api/admin/settings/exchange-rate
+ * Update manual USD -> Toman exchange rate
+ */
+router.put('/settings/exchange-rate', async (req: AuthRequest, res: Response) => {
+  try {
+    const { rate } = req.body;
+    const rateNum = parseInt(rate, 10);
+    
+    if (!rate || isNaN(rateNum) || rateNum <= 0) {
+      await prisma.systemSetting.deleteMany({
+        where: { key: 'EXCHANGE_RATE' },
+      });
+      return res.status(200).json({ message: 'تنظیمات نرخ دلار حذف شد. نرخ زنده اعمال می‌شود.', rate: null });
+    }
+
+    await prisma.systemSetting.upsert({
+      where: { key: 'EXCHANGE_RATE' },
+      create: {
+        key: 'EXCHANGE_RATE',
+        value: { rate: rateNum },
+      },
+      update: {
+        value: { rate: rateNum },
+      },
+    });
+
+    return res.status(200).json({ message: 'نرخ دلار با موفقیت بروزرسانی شد', rate: rateNum });
+  } catch (err: any) {
+    console.error('Admin update exchange rate error:', err);
+    return res.status(500).json({ error: 'خطا در ذخیره‌سازی تنظیمات نرخ ارز' });
+  }
+});
+
 export default router;
