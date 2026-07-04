@@ -39,7 +39,7 @@ Instead of generic "icon + title + text" cards (Spec C) or long screenshot rows 
 Spec C risks looking like every other SaaS landing page (Vercel/Linear clone). Spec B is beautiful but risky — if the Persian copy isn't exceptional, it falls flat. Spec A is unique: no other Iranian trading product has a dashboard-as-hero landing page.
 
 **5. The edge detection card is your secret weapon.**
-The "لبه معاملاتی" (Your Edge) feature is genuinely novel — no competitor has it. Making it a prominent bento cell turns your unique feature into a marketing asset.
+The "برتری معاملاتی" (Your Edge) feature is genuinely novel — no competitor has it. Making it a prominent bento cell turns your unique feature into a marketing asset.
 
 ### What to steal from the other specs
 

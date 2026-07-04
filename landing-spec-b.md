@@ -95,7 +95,7 @@ Three steps in a vertical list (not cards), each with a number and description:
 امتیاز موفقیت، ضریب سود، منحنی سرمایه و الگوهای معاملاتیت به صورت خودکار محاسبه می‌شن. بدون اکسل، بدون دردسر.
 
 **۳. بهبود بده**
-ژورنال روزانه بنویس، هیجاناتت رو ثبت کن، و لبه معاملاتیت رو پیدا کن — اون چیزی که تو رو از بقیه متمایز می‌کنه.
+ژورنال روزانه بنویس، هیجاناتت رو ثبت کن، و برتری معاملاتیت رو پیدا کن — اون چیزی که تو رو از بقیه متمایز می‌کنه.
 
 **Design:** No card backgrounds. Just text with a left-border number. Like reading a well-formatted article.
 

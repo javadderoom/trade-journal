@@ -116,6 +116,7 @@ export default function JournalPage() {
         weekdays: [],
         hours: Array.from({ length: 24 }, (_, i) => ({ hour: i, pnl: 0, count: 0, className: '' })),
         emotions: [],
+        timeframeMatrix: {},
       };
     }
 
@@ -219,6 +220,15 @@ export default function JournalPage() {
     const hoursPnl = Array.from({ length: 24 }, () => ({ pnl: 0, count: 0 }));
     const emotionsGroup: { [key: string]: { pnl: number; wins: number; total: number } } = {};
 
+    const TIMEFRAMES = ['M1', 'M5', 'M15', 'M30', 'H1', 'H4', 'D1', 'W1', 'MN'];
+    const timeframeMatrix: Record<string, Record<string, { wins: number; total: number; pnl: number }>> = {};
+    TIMEFRAMES.forEach(a => {
+      timeframeMatrix[a] = {};
+      TIMEFRAMES.forEach(e => {
+        timeframeMatrix[a][e] = { wins: 0, total: 0, pnl: 0 };
+      });
+    });
+
     closedTrades.forEach((t) => {
       const isWin = t.profitUsd > 0;
       const net = t.profitUsd + (t.commission ?? 0) + (t.swap ?? 0);
@@ -291,6 +301,15 @@ export default function JournalPage() {
       emotionsGroup[emo].pnl += net;
       emotionsGroup[emo].total += 1;
       if (isWin) emotionsGroup[emo].wins += 1;
+
+      // G. Timeframes
+      const aTf = t.analysisTimeframe;
+      const eTf = t.entryTimeframe;
+      if (aTf && eTf && timeframeMatrix[aTf] && timeframeMatrix[aTf][eTf]) {
+        timeframeMatrix[aTf][eTf].total += 1;
+        timeframeMatrix[aTf][eTf].pnl += net;
+        if (isWin) timeframeMatrix[aTf][eTf].wins += 1;
+      }
     });
 
     // Format Session lists
@@ -385,6 +404,7 @@ export default function JournalPage() {
       weekdays: weekdaysList,
       hours: hoursList,
       emotions: emotionsList,
+      timeframeMatrix,
     };
   }, [trades]);
 
@@ -723,6 +743,99 @@ export default function JournalPage() {
                   </div>
                 );
               })}
+            </div>
+          </div>
+
+          {/* Row A.2: Heatmap Timeframe Grid */}
+          <div className="journal-card timeframe-heatmap-container">
+            <div className="card-header">
+              <span className="card-title">توزیع عملکرد بر اساس تایم‌فریم (تایم‌فریم تحلیل × تایم‌فریم ورود)</span>
+              <span className="material-symbols-outlined card-icon">grid_on</span>
+            </div>
+            <div className="journal-table-wrapper" style={{ overflowX: 'auto', marginTop: '12px' }}>
+              <table className="timeframe-heatmap-table" style={{ width: '100%', borderCollapse: 'collapse', fontFamily: 'Vazirmatn' }}>
+                <thead>
+                  <tr>
+                    <th style={{ padding: '8px', fontSize: '12px', color: '#8898aa', borderBottom: '1px solid rgba(255,255,255,0.05)', textAlign: 'right' }}>
+                      تحلیل \ ورود
+                    </th>
+                    {['M1', 'M5', 'M15', 'M30', 'H1', 'H4', 'D1', 'W1', 'MN'].map(tf => (
+                      <th key={tf} style={{ padding: '8px', fontSize: '12px', color: '#8898aa', borderBottom: '1px solid rgba(255,255,255,0.05)', textAlign: 'center', minWidth: '60px' }}>
+                        {tf}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {['M1', 'M5', 'M15', 'M30', 'H1', 'H4', 'D1', 'W1', 'MN'].map(aTf => (
+                    <tr key={aTf}>
+                      <td style={{ padding: '8px', fontSize: '13px', fontWeight: 'bold', color: '#8898aa', borderBottom: '1px solid rgba(255,255,255,0.02)', textAlign: 'right' }}>
+                        {aTf}
+                      </td>
+                      {['M1', 'M5', 'M15', 'M30', 'H1', 'H4', 'D1', 'W1', 'MN'].map(eTf => {
+                        const cell = stats.timeframeMatrix?.[aTf]?.[eTf] || { wins: 0, total: 0, pnl: 0 };
+                        const hasFewerThan10 = cell.total < 10;
+                        const winRate = cell.total > 0 ? Math.round((cell.wins / cell.total) * 100) : 0;
+                        const pnlVal = Math.round(cell.pnl);
+
+                        // Color scaling
+                        let bgColor = 'rgba(255, 255, 255, 0.02)';
+                        let textColor = 'rgba(255, 255, 255, 0.3)';
+                        if (!hasFewerThan10 && cell.total > 0) {
+                          if (winRate >= 50) {
+                            const opacity = Math.min(0.05 + ((winRate - 50) / 50) * 0.4, 0.45);
+                            bgColor = `rgba(97, 249, 177, ${opacity})`;
+                            textColor = '#61f9b1';
+                          } else {
+                            const opacity = Math.min(0.05 + ((50 - winRate) / 50) * 0.4, 0.45);
+                            bgColor = `rgba(255, 180, 171, ${opacity})`;
+                            textColor = '#ffb4ab';
+                          }
+                        }
+
+                        return (
+                          <td
+                            key={eTf}
+                            style={{
+                              padding: '8px',
+                              textAlign: 'center',
+                              borderBottom: '1px solid rgba(255,255,255,0.02)',
+                              backgroundColor: bgColor,
+                              color: textColor,
+                              fontSize: '12px',
+                              transition: 'all 0.2s',
+                              position: 'relative'
+                            }}
+                            title={
+                              hasFewerThan10
+                                ? `داده ناکافی (${cell.total} معامله). برای نمایش الگو حداقل ۱۰ معامله نیاز است.`
+                                : `تعداد: ${cell.total} | سود/زیان: $${pnlVal}`
+                            }
+                          >
+                            {hasFewerThan10 ? (
+                              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '2px', color: 'rgba(255,255,255,0.12)' }}>
+                                <span className="material-symbols-outlined" style={{ fontSize: '13px' }}>lock</span>
+                                <span>-</span>
+                              </div>
+                            ) : (
+                              <div>
+                                <div style={{ fontWeight: 'bold' }}>%{toPersianDigits(winRate.toString())}</div>
+                                <div style={{ fontSize: '10px', opacity: 0.8 }}>({toPersianDigits(cell.total)} معامله)</div>
+                              </div>
+                            )}
+                          </td>
+                        );
+                      })}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '12px', padding: '8px 12px', background: 'rgba(255, 180, 171, 0.04)', borderRadius: '6px', border: '1px solid rgba(255, 180, 171, 0.12)' }}>
+              <span className="material-symbols-outlined" style={{ color: '#ffb4ab', fontSize: '18px' }}>warning</span>
+              <span style={{ fontSize: '11px', color: '#bbcabe', fontFamily: 'Vazirmatn' }}>
+                تایم‌فریم‌هایی که تعداد معاملات آن‌ها کمتر از ۱۰ مورد است، جهت جلوگیری از سوگیری‌های آماری غیردقیق و نادرست قفل شده و نمایش داده نمی‌شوند.
+              </span>
             </div>
           </div>
 

@@ -114,7 +114,7 @@ export default function DashboardPage() {
       .then((d) => {
         if (d?.usdToToman && d.usdToToman > 0) setUsdToToman(d.usdToToman);
       })
-      .catch(() => {});
+      .catch(() => { });
   }, [setUsdToToman]);
 
   // Persian today date string
@@ -416,7 +416,7 @@ export default function DashboardPage() {
       )}
 
       {/* ─── Section 3: Edge Insight ─── */}
-      <div className="dash-section-label">لبه معاملاتی</div>
+      <div className="dash-section-label">برتری معاملاتی</div>
       <div className="dash-edge-card">
         <button
           className={`edge-refresh ${edgeRefreshSpin ? 'spinning' : ''}`}
@@ -427,7 +427,7 @@ export default function DashboardPage() {
             refresh
           </span>
         </button>
-        <div className="edge-label">لبه معاملاتی شما</div>
+        <div className="edge-label">برتری معاملاتی شما</div>
         <div className="edge-sentence">{edge.insight}</div>
         <div className="edge-sub">
           بر اساس ۳۰ روز گذشته
@@ -492,14 +492,14 @@ export default function DashboardPage() {
                   {recent.journalEntry.mood === 'HAPPY'
                     ? '😄'
                     : recent.journalEntry.mood === 'NEUTRAL'
-                    ? '😐'
-                    : recent.journalEntry.mood === 'STRESSED'
-                    ? '😣'
-                    : recent.journalEntry.mood === 'ANXIOUS'
-                    ? '😰'
-                    : recent.journalEntry.mood === 'FRUSTRATED'
-                    ? '😤'
-                    : '📝'}
+                      ? '😐'
+                      : recent.journalEntry.mood === 'STRESSED'
+                        ? '😣'
+                        : recent.journalEntry.mood === 'ANXIOUS'
+                          ? '😰'
+                          : recent.journalEntry.mood === 'FRUSTRATED'
+                            ? '😤'
+                            : '📝'}
                 </span>
                 <span className="journal-date">
                   {(() => {
@@ -568,8 +568,8 @@ function EquityCurveSVG({ points }: { points: { date: string; cumPnl: number }[]
   const areaPath =
     coords.length > 0
       ? `M ${coords[0].x},${zeroY} ` +
-        coords.map((c) => `L ${c.x},${c.y}`).join(' ') +
-        ` L ${coords[coords.length - 1].x},${zeroY} Z`
+      coords.map((c) => `L ${c.x},${c.y}`).join(' ') +
+      ` L ${coords[coords.length - 1].x},${zeroY} Z`
       : '';
 
   // Drawdown shading: from peak to curve

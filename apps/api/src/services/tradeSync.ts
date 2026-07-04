@@ -183,6 +183,8 @@ export type TradeListRow = {
   notes: string | null;
   screenshots: string[];
   chartData?: any;
+  analysisTimeframe: string | null;
+  entryTimeframe: string | null;
 };
 
 export async function getTradesForAccount(params: {
@@ -245,6 +247,8 @@ export async function getTradesForAccount(params: {
       notes: true,
       screenshots: true,
       chart_data: true,
+      analysis_timeframe: true,
+      entry_timeframe: true,
     },
   });
 
@@ -271,5 +275,7 @@ export async function getTradesForAccount(params: {
     notes: t.notes,
     screenshots: t.screenshots,
     chartData: t.chart_data,
+    analysisTimeframe: t.analysis_timeframe,
+    entryTimeframe: t.entry_timeframe,
   }));
 }

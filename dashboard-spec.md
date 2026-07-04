@@ -31,7 +31,7 @@ Every element either informs the trader about **today**, or gives them a reason 
 │  SECTION 2 — THIS MONTH (این ماه)                        │
 │  Equity curve + 4 KPI cards                              │
 ├─────────────────────────────────────────────────────────┤
-│  SECTION 3 — YOUR EDGE (لبه معاملاتی)                    │
+│  SECTION 3 — YOUR EDGE (برتری معاملاتی)                    │
 │  Auto-generated insight card                             │
 ├─────────────────────────────────────────────────────────┤
 │  SECTION 4 — RECENT ACTIVITY (فعالیت اخیر)               │
@@ -101,7 +101,7 @@ Each card:
 
 ---
 
-## Section 3 — Your Edge (لبه معاملاتی)
+## Section 3 — Your Edge (برتری معاملاتی)
 
 This is the most differentiated element on the dashboard.
 A single auto-generated insight sentence based on the user's last 30 days of trades.
@@ -109,7 +109,7 @@ A single auto-generated insight sentence based on the user's last 30 days of tra
 ### Card design:
 - Full width, slightly taller than KPI cards
 - Left border accent in emerald green
-- Small label: "لبه معاملاتی شما"
+- Small label: "برتری معاملاتی شما"
 - Large sentence in the center
 - Sub-label: "بر اساس ۳۰ روز گذشته"
 - Refresh icon to regenerate (recalculates, not AI)
@@ -141,7 +141,7 @@ Session = the emotion tag or time-of-day grouping with highest win rate.
 
 **5. Fallback (not enough data):**
 ```
-"بعد از [N] معامله بیشتر، لبه معاملاتیت رو بهت نشون می‌دیم"
+"بعد از [N] معامله بیشتر، برتری معاملاتیت رو بهت نشون می‌دیم"
 ```
 
 ### Backend query (Express):
