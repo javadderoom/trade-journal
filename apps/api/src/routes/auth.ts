@@ -52,14 +52,15 @@ router.post('/register', async (req: Request, res: Response) => {
       where: {
         OR: [
           { email },
-          { phone },
+          ...(phone ? [{ phone }] : []),
         ],
       },
     });
 
     if (existing) {
+      const isEmail = existing.email === email;
       return res.status(409).json({
-        error: 'این ایمیل یا شماره موبایل قبلاً ثبت شده است',
+        error: isEmail ? 'این ایمیل قبلاً ثبت شده است' : 'این شماره موبایل قبلاً ثبت شده است',
       });
     }
 
@@ -68,7 +69,7 @@ router.post('/register', async (req: Request, res: Response) => {
       data: {
         name,
         email,
-        phone,
+        phone: phone || null,
         password_hash: passwordHash,
       },
     });

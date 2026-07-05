@@ -539,3 +539,30 @@
     }
   }
 }
+
+/* LTR layout alignment overrides for SideNavBar */
+.app-container[dir="ltr"] {
+  .sidenav-container {
+    right: auto;
+    left: 16px;
+    direction: ltr;
+
+    .sidenav-link-item {
+      &::before {
+        right: auto;
+        left: 0;
+        border-radius: 0 4px 4px 0;
+      }
+      &:hover {
+        transform: translateX(2px);
+      }
+    }
+
+    .logout-link {
+      .label {
+        margin-right: 0 !important;
+        margin-left: 12px !important;
+      }
+    }
+  }
+}

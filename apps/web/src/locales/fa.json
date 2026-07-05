@@ -1,0 +1,71 @@
+{
+  "common": {
+    "appName": "تریدکاو",
+    "farsi": "فارسی",
+    "english": "English",
+    "logout": "خروج",
+    "cancel": "انصراف",
+    "save": "ذخیره",
+    "loading": "در حال بارگذاری..."
+  },
+  "nav": {
+    "dashboard": "داشبورد",
+    "trades": "معاملات",
+    "journal": "دفترچه معاملات",
+    "analytics": "گزارش عملکرد",
+    "settings": "تنظیمات",
+    "admin": "مدیریت",
+    "contact": "ارتباط با ما",
+    "help": "راهنما"
+  },
+  "landing": {
+    "metaTitle": "تریدکاو | ژورنال معاملاتی هوشمند",
+    "metaDesc": "ثبت خودکار و تحلیل معاملات متاتریدر ۴ و ۵، بهبود مستمر عملکرد معاملاتی با ژورنال هوشمند تریدکاو.",
+    "ctaStart": "شروع رایگان",
+    "ctaDashboard": "ورود به پنل کاربری",
+    "contactUs": "تماس با ما"
+  },
+  "dashboard": {
+    "welcome": "خوش آمدید",
+    "edgeTitle": "برتری معاملاتی شما",
+    "todayPnl": "سود امروز",
+    "monthPnl": "سود این ماه",
+    "winRate": "نسبت برد",
+    "recentActivity": "فعالیت اخیر"
+  },
+  "auth": {
+    "loginTitle": "ورود به حساب کاربری",
+    "registerTitle": "ثبت نام در تریدکاو",
+    "nameLabel": "نام و نام خانوادگی",
+    "namePlaceholder": "علی رضایی",
+    "emailLabel": "پست الکترونیکی (ایمیل)",
+    "emailPlaceholder": "example@mail.com",
+    "phoneLabel": "شماره تلفن همراه",
+    "phonePlaceholder": "09123456789",
+    "passwordLabel": "رمز عبور",
+    "confirmPasswordLabel": "تایید رمز عبور",
+    "submitLogin": "ورود به سیستم",
+    "submitRegister": "تکمیل ثبت نام و ایجاد حساب",
+    "loginMethodPassword": "ورود با رمز عبور",
+    "loginMethodOtp": "ورود با کد یکبار مصرف (SMS)",
+    "otpVerifyTitle": "تایید شماره موبایل جهت ایجاد حساب کاربری",
+    "otpSendBtn": "ارسال کد تایید",
+    "otpCodeLabel": "کد تایید",
+    "otpCodePlaceholder": "کد ۵ رقمی",
+    "otpVerifyBtn": "تایید شماره موبایل",
+    "otpTimerText": "ارسال مجدد کد پس از: ",
+    "otpResendBtn": "ارسال مجدد کد تایید",
+    "changePhoneBtn": "تغییر شماره موبایل",
+    "gotoRegister": "ثبت نام و ایجاد حساب جدید",
+    "gotoLogin": "ورود به سیستم",
+    "haveAccount": "قبلاً ثبت نام کرده‌اید؟",
+    "noAccount": "هنوز حساب کاربری ندارید؟",
+    "requiredFields": "لطفاً تمامی فیلدها را پر کنید",
+    "passwordMismatch": "رمز عبور و تایید آن مطابقت ندارند",
+    "loginSuccess": "ورود با موفقیت انجام شد",
+    "otpSentSuccess": "کد تایید با موفقیت ارسال شد",
+    "registerSuccess": "عضویت شما با موفقیت تکمیل شد",
+    "directEmailRegister": "ثبت نام مستقیم با ایمیل (بدون نیاز به موبایل)",
+    "or": "یا"
+  }
+}

@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { create } from 'zustand';
 
 export interface TradingAccount {
@@ -29,6 +30,17 @@ interface AppState {
   setManualTradeModalOpen: (isOpen: boolean) => void;
   isImportMT4ModalOpen: boolean;
   setImportMT4ModalOpen: (isOpen: boolean) => void;
+
+  // Language i18n
+  language: 'fa' | 'en';
+  setLanguage: (lang: 'fa' | 'en') => void;
+}
+
+function setCookie(name: string, value: string, days = 365) {
+  if (typeof document === 'undefined') return;
+  const date = new Date();
+  date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+  document.cookie = `${name}=${value};expires=${date.toUTCString()};path=/`;
 }
 
 export const useAppStore = create<AppState>((set) => ({
@@ -40,6 +52,7 @@ export const useAppStore = create<AppState>((set) => ({
   activeTradeId: null,
   isManualTradeModalOpen: false,
   isImportMT4ModalOpen: false,
+  language: 'fa', // Default to fa for SSR hydration safety
 
   // Setters
   setAccounts: (accounts) => set({ accounts }),
@@ -49,4 +62,46 @@ export const useAppStore = create<AppState>((set) => ({
   setActiveTradeId: (activeTradeId) => set({ activeTradeId }),
   setManualTradeModalOpen: (isOpen) => set({ isManualTradeModalOpen: isOpen }),
   setImportMT4ModalOpen: (isOpen) => set({ isImportMT4ModalOpen: isOpen }),
+  setLanguage: (language) => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('language', language);
+      setCookie('locale', language);
+    }
+    set({ language });
+  },
 }));
+
+import faTranslations from '../locales/fa.json';
+import enTranslations from '../locales/en.json';
+
+export function useTranslation() {
+  const language = useAppStore((state) => state.language);
+  const setLanguage = useAppStore((state) => state.setLanguage);
+
+  useEffect(() => {
+    // Client-side synchronization of saved locale on mount
+    const saved = localStorage.getItem('language') as 'fa' | 'en' | null;
+    if (saved && saved !== language) {
+      setLanguage(saved);
+    } else if (!saved) {
+      // Sync cookie if empty
+      setCookie('locale', language);
+    }
+  }, []);
+
+  const t = (key: string): string => {
+    const dict = language === 'fa' ? faTranslations : enTranslations;
+    const parts = key.split('.');
+    let current: any = dict;
+    for (const part of parts) {
+      if (current && typeof current === 'object' && part in current) {
+        current = current[part];
+      } else {
+        return key;
+      }
+    }
+    return typeof current === 'string' ? current : key;
+  };
+
+  return { t, language, setLanguage, dir: language === 'fa' ? 'rtl' : 'ltr' };
+}

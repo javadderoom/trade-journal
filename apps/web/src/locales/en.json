@@ -1,0 +1,71 @@
+{
+  "common": {
+    "appName": "TradeKav",
+    "farsi": "فارسی",
+    "english": "English",
+    "logout": "Log Out",
+    "cancel": "Cancel",
+    "save": "Save Changes",
+    "loading": "Loading..."
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "trades": "Trades",
+    "journal": "Trading Journal",
+    "analytics": "Performance",
+    "settings": "Settings",
+    "admin": "Admin",
+    "contact": "Contact Us",
+    "help": "Help"
+  },
+  "landing": {
+    "metaTitle": "TradeKav | Smart Trading Journal",
+    "metaDesc": "Automatic MT4/5 sync, advanced performance reports, daily heatmaps, risk management, and psychology journal.",
+    "ctaStart": "Start Free",
+    "ctaDashboard": "Go to Dashboard",
+    "contactUs": "Contact Us"
+  },
+  "dashboard": {
+    "welcome": "Welcome back",
+    "edgeTitle": "Your Trading Edge",
+    "todayPnl": "Today's P&L",
+    "monthPnl": "This Month's P&L",
+    "winRate": "Win Rate",
+    "recentActivity": "Recent Activity"
+  },
+  "auth": {
+    "loginTitle": "Sign In to Your Account",
+    "registerTitle": "Create Your Account",
+    "nameLabel": "Full Name",
+    "namePlaceholder": "John Doe",
+    "emailLabel": "Email Address",
+    "emailPlaceholder": "example@mail.com",
+    "phoneLabel": "Phone Number",
+    "phonePlaceholder": "+1234567890",
+    "passwordLabel": "Password",
+    "confirmPasswordLabel": "Confirm Password",
+    "submitLogin": "Sign In",
+    "submitRegister": "Complete Registration",
+    "loginMethodPassword": "Sign In with Password",
+    "loginMethodOtp": "Sign In with OTP (SMS)",
+    "otpVerifyTitle": "Verify Mobile Number to Register",
+    "otpSendBtn": "Send Verification Code",
+    "otpCodeLabel": "Verification Code",
+    "otpCodePlaceholder": "5-digit code",
+    "otpVerifyBtn": "Verify Mobile Number",
+    "otpTimerText": "Resend code in: ",
+    "otpResendBtn": "Resend Verification Code",
+    "changePhoneBtn": "Change Phone Number",
+    "gotoRegister": "Create a new account",
+    "gotoLogin": "Sign In here",
+    "haveAccount": "Already have an account?",
+    "noAccount": "Don't have an account yet?",
+    "requiredFields": "Please fill in all required fields",
+    "passwordMismatch": "Passwords do not match",
+    "loginSuccess": "Logged in successfully",
+    "otpSentSuccess": "Verification code sent successfully",
+    "registerSuccess": "Registration completed successfully",
+    "directEmailRegister": "Register directly with Email (No Phone required)",
+    "or": "or"
+  }
+}

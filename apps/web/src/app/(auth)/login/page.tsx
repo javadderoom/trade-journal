@@ -4,10 +4,12 @@ import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '../../../lib/auth';
+import { useTranslation } from '../../../store/useAppStore';
 import { notify } from '../../../lib/notify';
 import '../auth.scss';
 
 export default function LoginPage() {
+  const { t, language, dir } = useTranslation();
   const router = useRouter();
   const login = useAuthStore((state) => state.login);
   const sendOtp = useAuthStore((state) => state.sendOtp);
@@ -30,6 +32,13 @@ export default function LoginPage() {
   const [timerActive, setTimerActive] = useState(false);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
+  // Reset method to password in English
+  useEffect(() => {
+    if (language === 'en') {
+      setLoginMethod('password');
+    }
+  }, [language]);
+
   // Manage timer countdown
   useEffect(() => {
     if (timerActive && timer > 0) {
@@ -48,7 +57,7 @@ export default function LoginPage() {
   const handlePasswordSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email || !password) {
-      const msg = 'لطفاً تمامی فیلدها را پر کنید';
+      const msg = t('auth.requiredFields');
       setError(msg);
       notify.error(msg);
       return;
@@ -59,10 +68,10 @@ export default function LoginPage() {
 
     try {
       await login(email, password);
-      notify.success('ورود با موفقیت انجام شد');
+      notify.success(t('auth.loginSuccess'));
       router.replace('/trades');
     } catch (err: any) {
-      const msg = err.message || 'خطا در ورود به سیستم';
+      const msg = err.message || (language === 'fa' ? 'خطا در ورود به سیستم' : 'Error signing in');
       setError(msg);
       notify.error(msg);
     } finally {
@@ -73,7 +82,7 @@ export default function LoginPage() {
   const handleSendOtp = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!phone) {
-      const msg = 'لطفاً شماره موبایل خود را وارد کنید';
+      const msg = language === 'fa' ? 'لطفاً شماره موبایل خود را وارد کنید' : 'Please enter your mobile number';
       setError(msg);
       notify.error(msg);
       return;
@@ -84,12 +93,12 @@ export default function LoginPage() {
 
     try {
       await sendOtp(phone);
-      notify.success('کد تایید با موفقیت ارسال شد');
+      notify.success(t('auth.otpSentSuccess'));
       setOtpStep(2);
       setTimer(120);
       setTimerActive(true);
     } catch (err: any) {
-      const msg = err.message || 'خطا در ارسال کد تایید';
+      const msg = err.message || (language === 'fa' ? 'خطا در ارسال کد تایید' : 'Error sending verification code');
       setError(msg);
       notify.error(msg);
     } finally {
@@ -100,7 +109,7 @@ export default function LoginPage() {
   const handleVerifyOtp = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!phone || !code) {
-      const msg = 'لطفاً کد تایید را وارد کنید';
+      const msg = language === 'fa' ? 'لطفاً کد تایید را وارد کنید' : 'Please enter the verification code';
       setError(msg);
       notify.error(msg);
       return;
@@ -112,14 +121,14 @@ export default function LoginPage() {
     try {
       const res = await verifyOtp(phone, code);
       if (res.isNewUser) {
-        notify.success('شماره موبایل تایید شد. لطفاً ثبت نام خود را کامل کنید.');
+        notify.success(language === 'fa' ? 'شماره موبایل تایید شد. لطفاً ثبت نام خود را کامل کنید.' : 'Phone number verified. Please complete your registration.');
         router.replace(`/register?token=${res.registerToken}&phone=${phone}`);
       } else {
-        notify.success('ورود با موفقیت انجام شد');
+        notify.success(t('auth.loginSuccess'));
         router.replace('/trades');
       }
     } catch (err: any) {
-      const msg = err.message || 'کد تایید نامعتبر یا منقضی شده است';
+      const msg = err.message || (language === 'fa' ? 'کد تایید نامعتبر یا منقضی شده است' : 'Invalid or expired verification code');
       setError(msg);
       notify.error(msg);
     } finally {
@@ -133,12 +142,12 @@ export default function LoginPage() {
     setLoading(true);
     try {
       await sendOtp(phone);
-      notify.success('کد تایید مجدداً ارسال شد');
+      notify.success(t('auth.otpSentSuccess'));
       setTimer(120);
       setTimerActive(true);
       setCode('');
     } catch (err: any) {
-      const msg = err.message || 'خطا در ارسال مجدد کد تایید';
+      const msg = err.message || (language === 'fa' ? 'خطا در ارسال مجدد کد تایید' : 'Error resending verification code');
       setError(msg);
       notify.error(msg);
     } finally {
@@ -153,43 +162,45 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="auth-page">
+    <div className="auth-page" dir={dir}>
       <div className="auth-card">
         <Link href="/" className="auth-back-link">
-          <span className="material-symbols-outlined">arrow_forward</span>
-          <span>بازگشت</span>
+          <span className="material-symbols-outlined">{language === 'fa' ? 'arrow_forward' : 'arrow_back'}</span>
+          <span>{language === 'fa' ? 'بازگشت' : 'Back'}</span>
         </Link>
         <div className="auth-header">
           <div className="auth-logo">
             <span className="material-symbols-outlined">analytics</span>
           </div>
-          <h2>ورود به تریدکاو</h2>
-          <p>ژورنال تخصصی و هوشمند تحلیل معاملات</p>
+          <h2>{t('auth.loginTitle')}</h2>
+          <p>{language === 'fa' ? 'ژورنال تخصصی و هوشمند تحلیل معاملات' : 'Smart Trading Journal Dashboard'}</p>
         </div>
 
         {/* Tab Selector */}
-        <div className="method-tabs">
-          <button
-            type="button"
-            className={loginMethod === 'password' ? 'active' : ''}
-            onClick={() => {
-              setLoginMethod('password');
-              setError(null);
-            }}
-          >
-            ورود با ایمیل و رمز
-          </button>
-          <button
-            type="button"
-            className={loginMethod === 'otp' ? 'active' : ''}
-            onClick={() => {
-              setLoginMethod('otp');
-              setError(null);
-            }}
-          >
-            ورود با رمز پیامکی
-          </button>
-        </div>
+        {language === 'fa' && (
+          <div className="method-tabs">
+            <button
+              type="button"
+              className={loginMethod === 'password' ? 'active' : ''}
+              onClick={() => {
+                setLoginMethod('password');
+                setError(null);
+              }}
+            >
+              {t('auth.loginMethodPassword')}
+            </button>
+            <button
+              type="button"
+              className={loginMethod === 'otp' ? 'active' : ''}
+              onClick={() => {
+                setLoginMethod('otp');
+                setError(null);
+              }}
+            >
+              {t('auth.loginMethodOtp')}
+            </button>
+          </div>
+        )}
 
         {error && (
           <div className="error-alert">
@@ -202,13 +213,13 @@ export default function LoginPage() {
         {loginMethod === 'password' && (
           <form className="auth-form" onSubmit={handlePasswordSubmit}>
             <div className="form-group">
-              <label htmlFor="email">پست الکترونیکی (ایمیل)</label>
+              <label htmlFor="email">{t('auth.emailLabel')}</label>
               <div className="input-wrapper">
                 <span className="material-symbols-outlined input-icon">mail</span>
                 <input
                   id="email"
                   type="email"
-                  placeholder="example@mail.com"
+                  placeholder={t('auth.emailPlaceholder')}
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   disabled={loading}
@@ -217,7 +228,7 @@ export default function LoginPage() {
             </div>
 
             <div className="form-group">
-              <label htmlFor="password">رمز عبور</label>
+              <label htmlFor="password">{t('auth.passwordLabel')}</label>
               <div className="input-wrapper">
                 <span className="material-symbols-outlined input-icon">lock</span>
                 <input
@@ -235,10 +246,10 @@ export default function LoginPage() {
               {loading ? (
                 <>
                   <div className="spinner"></div>
-                  <span>در حال ورود...</span>
+                  <span>{language === 'fa' ? 'در حال ورود...' : 'Signing In...'}</span>
                 </>
               ) : (
-                <span>ورود به حساب کاربری</span>
+                <span>{t('auth.submitLogin')}</span>
               )}
             </button>
           </form>
@@ -250,17 +261,17 @@ export default function LoginPage() {
             {otpStep === 1 ? (
               <form className="auth-form" onSubmit={handleSendOtp}>
                 <div className="form-group">
-                  <label htmlFor="phone">شماره موبایل</label>
+                  <label htmlFor="phone">{t('auth.phoneLabel')}</label>
                   <div className="input-wrapper">
                     <span className="material-symbols-outlined input-icon">phone_android</span>
                     <input
                       id="phone"
                       type="tel"
-                      placeholder="09123456789"
+                      placeholder={t('auth.phonePlaceholder')}
                       value={phone}
                       onChange={(e) => setPhone(e.target.value)}
                       disabled={loading}
-                      style={{ direction: 'ltr', textAlign: 'right' }}
+                      style={{ direction: 'ltr', textAlign: language === 'fa' ? 'right' : 'left' }}
                     />
                   </div>
                 </div>
@@ -269,23 +280,25 @@ export default function LoginPage() {
                   {loading ? (
                     <>
                       <div className="spinner"></div>
-                      <span>در حال ارسال...</span>
+                      <span>{language === 'fa' ? 'در حال ارسال...' : 'Sending...'}</span>
                     </>
                   ) : (
-                    <span>ارسال کد تایید</span>
+                    <span>{t('auth.otpSendBtn')}</span>
                   )}
                 </button>
               </form>
             ) : (
               <form className="auth-form" onSubmit={handleVerifyOtp}>
                 <div className="form-group">
-                  <label htmlFor="code">کد تایید پیامک شده به {phone}</label>
+                  <label htmlFor="code">
+                    {language === 'fa' ? `کد تایید پیامک شده به ${phone}` : `Code sent to ${phone}`}
+                  </label>
                   <div className="input-wrapper">
                     <span className="material-symbols-outlined input-icon">vpn_key</span>
                     <input
                       id="code"
                       type="text"
-                      placeholder="کد ۵ رقمی"
+                      placeholder={t('auth.otpCodePlaceholder')}
                       value={code}
                       onChange={(e) => setCode(e.target.value)}
                       disabled={loading}
@@ -299,16 +312,16 @@ export default function LoginPage() {
                   {loading ? (
                     <>
                       <div className="spinner"></div>
-                      <span>در حال تایید...</span>
+                      <span>{language === 'fa' ? 'در حال تایید...' : 'Verifying...'}</span>
                     </>
                   ) : (
-                    <span>تایید و ورود</span>
+                    <span>{t('auth.submitLogin')}</span>
                   )}
                 </button>
 
                 <div className="otp-timer-text">
                   {timerActive ? (
-                    <span>ارسال مجدد کد پس از: {formatTimer(timer)}</span>
+                    <span>{t('auth.otpTimerText')}{formatTimer(timer)}</span>
                   ) : (
                     <button
                       type="button"
@@ -316,7 +329,7 @@ export default function LoginPage() {
                       onClick={handleResendOtp}
                       disabled={loading}
                     >
-                      ارسال مجدد کد تایید
+                      {t('auth.otpResendBtn')}
                     </button>
                   )}
                 </div>
@@ -336,7 +349,7 @@ export default function LoginPage() {
                   }}
                   disabled={loading}
                 >
-                  تغییر شماره موبایل
+                  {t('auth.changePhoneBtn')}
                 </button>
               </form>
             )}
@@ -345,7 +358,7 @@ export default function LoginPage() {
 
         <div className="auth-footer">
           <p>
-            حساب کاربری ندارید؟ <Link href="/register">ثبت نام کنید</Link>
+            {t('auth.noAccount')} <Link href="/register">{t('auth.gotoRegister')}</Link>
           </p>
         </div>
       </div>

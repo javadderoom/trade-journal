@@ -5,7 +5,8 @@ export const registerSchema = z.object({
   email: z.string().email('ایمیل معتبر نیست'),
   phone: z
     .string()
-    .regex(/^09[0-9]{9}$/, 'شماره موبایل معتبر نیست'),
+    .regex(/^09[0-9]{9}$/, 'شماره موبایل معتبر نیست')
+    .optional(),
   password: z
     .string()
     .min(8, 'رمز عبور باید حداقل ۸ کاراکتر باشد')

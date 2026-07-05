@@ -155,3 +155,23 @@ label.small {
     padding-bottom: 96px;
   }
 }
+
+/* LTR main content layout overrides */
+.app-container[dir="ltr"] {
+  direction: ltr;
+
+  .main-content-wrapper {
+    margin-right: 0;
+    margin-left: 288px;
+    width: calc(100% - 288px);
+  }
+}
+
+@media (max-width: 1024px) {
+  .app-container[dir="ltr"] {
+    .main-content-wrapper {
+      margin-left: 0;
+      width: 100%;
+    }
+  }
+}

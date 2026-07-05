@@ -1,5 +1,7 @@
 import { Metadata } from "next";
 import "./globals.scss";
+import "./landing.scss";
+import "./contact/contact.scss";
 import AppLayout from "../components/layout/AppLayout";
 
 export const metadata: Metadata = {
@@ -73,7 +75,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   };
 
   return (
-    <html dir="rtl" lang="fa" suppressHydrationWarning>
+    <html suppressHydrationWarning>
       <head>
         {/* Vazirmatn — self-hosted, no CDN (Google Fonts is blocked in Iran) */}
         <link rel="stylesheet" href="/fonts/vazirmatn.css" />

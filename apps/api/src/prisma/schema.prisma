@@ -13,7 +13,7 @@ generator client {
 model User {
   id               String           @id @default(uuid())
   email            String           @unique
-  phone            String           @unique
+  phone            String?          @unique
   password_hash    String
   name             String?
   plan             Plan             @default(FREE)

@@ -5,6 +5,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import SideNavBar from './SideNavBar';
 import BottomNavBar from './BottomNavBar';
 import { useAuthStore } from '../../lib/auth';
+import { useTranslation } from '../../store/useAppStore';
 import Toaster from '../ui/Toaster';
 import { Agentation } from 'agentation';
 
@@ -12,6 +13,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const { user, isInitialized, initialize } = useAuthStore();
+  const { language, setLanguage, dir } = useTranslation();
+  const fontClass = language === 'fa' ? 'font-vazir' : 'font-inter';
 
   useEffect(() => {
     // 1. Wrap global fetch to automatically attach access token and handle refresh on 401
@@ -84,10 +87,17 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     };
   }, [initialize]);
 
-  const isAuthPage = pathname ? (pathname.startsWith('/login') || pathname.startsWith('/register')) : false;
-  const isLandingPage = pathname === '/' || pathname === '/namad';
-  const isHelpPage = pathname ? pathname.startsWith('/help') : false;
-  const isContactPage = pathname === '/contact';
+  const getCleanPath = (path: string) => {
+    if (!path) return '';
+    const cleaned = path.replace(/^\/(fa|en)($|\/)/, '$2');
+    return cleaned === '' ? '/' : cleaned;
+  };
+  const cleanPath = getCleanPath(pathname || '');
+
+  const isAuthPage = cleanPath.startsWith('/login') || cleanPath.startsWith('/register');
+  const isLandingPage = cleanPath === '/' || cleanPath === '/namad';
+  const isHelpPage = cleanPath.startsWith('/help');
+  const isContactPage = cleanPath === '/contact';
   const isPublicPage = isLandingPage || isHelpPage || isContactPage;
 
   useEffect(() => {
@@ -101,6 +111,25 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     // Logged-in users on the landing page are redirected to /dashboard by the
     // LandingPage component itself.
   }, [user, isInitialized, isAuthPage, isPublicPage, pathname, router]);
+
+  useEffect(() => {
+    if (pathname) {
+      const isEnglishPath = pathname.startsWith('/en/') || pathname === '/en';
+      const isPersianPath = pathname.startsWith('/fa/') || pathname === '/fa';
+      if (isEnglishPath && language !== 'en') {
+        setLanguage('en');
+      } else if (isPersianPath && language !== 'fa') {
+        setLanguage('fa');
+      }
+    }
+  }, [pathname, language, setLanguage]);
+
+  useEffect(() => {
+    if (typeof document !== 'undefined') {
+      document.documentElement.dir = dir;
+      document.documentElement.lang = language;
+    }
+  }, [dir, language]);
 
   if (!isInitialized || !pathname) {
     return (
@@ -134,6 +163,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     );
   }
 
+
   // Prevent flash of protected page content while redirecting to login
   if (!user && !isAuthPage && !isPublicPage) {
     return null;
@@ -147,17 +177,17 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   // Public pages (landing) render full-bleed, no app chrome
   if (isPublicPage) {
     return (
-      <>
+      <div className={fontClass}>
         <Toaster />
         {children}
         {process.env.NODE_ENV === 'development' && <Agentation />}
-      </>
+      </div>
     );
   }
 
   if (isAuthPage) {
     return (
-      <div className="auth-wrapper">
+      <div className={`auth-wrapper ${fontClass}`}>
         <Toaster />
         {children}
         {process.env.NODE_ENV === 'development' && <Agentation />}
@@ -166,7 +196,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div className="app-container">
+    <div className={`app-container ${fontClass}`} dir={dir}>
       <SideNavBar />
       <div className="main-content-wrapper">{children}</div>
       <BottomNavBar />

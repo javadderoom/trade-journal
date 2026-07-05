@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuthStore } from '../../lib/auth';
+import { useTranslation } from '../../store/useAppStore';
 
 export default function SideNavBar() {
   const pathname = usePathname();
@@ -12,42 +13,61 @@ export default function SideNavBar() {
   const logout = useAuthStore(state => state.logout);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
-  const planLabel = user?.plan === 'PRO' 
-    ? 'نسخه حرفه‌ای' 
-    : user?.plan === 'STANDARD' 
-    ? 'نسخه استاندارد' 
-    : 'نسخه رایگان';
+  const { t, language, setLanguage } = useTranslation();
+
+  const planLabel = language === 'fa'
+    ? (user?.plan === 'PRO' ? 'نسخه حرفه‌ای' : user?.plan === 'STANDARD' ? 'نسخه استاندارد' : 'نسخه رایگان')
+    : (user?.plan === 'PRO' ? 'PRO Edition' : user?.plan === 'STANDARD' ? 'Standard Edition' : 'Free Edition');
 
   const navItems = [
-    { href: '/dashboard', label: 'داشبورد', icon: 'dashboard' },
-    { href: '/trades', label: 'معاملات', icon: 'analytics', fillIcon: true },
-    { href: '/analytics', label: 'گزارش عملکرد', icon: 'bar_chart' },
-    { href: '/journal', label: 'ژورنال', icon: 'sticky_note_2' },
-    { href: '/settings', label: 'تنظیمات', icon: 'settings' },
+    { href: '/dashboard', label: t('nav.dashboard'), icon: 'dashboard' },
+    { href: '/trades', label: t('nav.trades'), icon: 'analytics', fillIcon: true },
+    { href: '/analytics', label: t('nav.analytics'), icon: 'bar_chart' },
+    { href: '/journal', label: t('nav.journal'), icon: 'sticky_note_2' },
+    { href: '/settings', label: t('nav.settings'), icon: 'settings' },
   ];
 
   if (user?.role === 'ADMIN') {
-    navItems.push({ href: '/admin', label: 'پنل مدیریت', icon: 'admin_panel_settings' });
+    navItems.push({ href: '/admin', label: t('nav.admin'), icon: 'admin_panel_settings' });
   }
 
   return (
     <nav className="sidenav-container">
       <div className="sidenav-inner">
         {/* Header */}
-        <div className="sidenav-header">
-          <div className="logo-box">
-            <img
-              src="/logo.png?v=2"
-              alt="تریدکاو"
-              width={40}
-              height={40}
-              className="logo-img"
-            />
+        <div className="sidenav-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div className="logo-box">
+              <img
+                src="/logo.png?v=2"
+                alt="TradeKav"
+                width={40}
+                height={40}
+                className="logo-img"
+              />
+            </div>
+            <div className="title-group">
+              <span className="title-text">{language === 'fa' ? 'پنل معامله‌گر' : 'Trader Panel'}</span>
+              <span className="subtitle-text">{planLabel}</span>
+            </div>
           </div>
-          <div className="title-group">
-            <span className="title-text">پنل معامله‌گر</span>
-            <span className="subtitle-text">{planLabel}</span>
-          </div>
+          <button
+            onClick={() => setLanguage(language === 'fa' ? 'en' : 'fa')}
+            style={{
+              background: 'rgba(255,255,255,0.06)',
+              border: '1px solid rgba(255,255,255,0.1)',
+              borderRadius: '6px',
+              color: 'rgba(255,255,255,0.6)',
+              padding: '4px 8px',
+              fontSize: '11px',
+              fontWeight: '700',
+              cursor: 'pointer',
+              outline: 'none',
+              fontFamily: 'inherit'
+            }}
+          >
+            {language === 'fa' ? 'EN' : 'FA'}
+          </button>
         </div>
 
         {/* Navigation Links */}
@@ -76,15 +96,21 @@ export default function SideNavBar() {
         {user?.plan !== 'PRO' && (
           <div className="sidenav-cta-box">
             <span className="cta-title">
-              {user?.plan === 'STANDARD' ? 'ارتقا به حساب حرفه‌ای' : 'حساب حرفه‌ای'}
+              {language === 'fa' 
+                ? (user?.plan === 'STANDARD' ? 'ارتقا به حساب حرفه‌ای' : 'حساب حرفه‌ای')
+                : (user?.plan === 'STANDARD' ? 'Upgrade to PRO' : 'PRO Account')}
             </span>
             <span className="cta-desc">
-              {user?.plan === 'STANDARD'
-                ? 'دسترسی به تحلیل‌های پیشرفته‌تر و امکان اتصال نامحدود حساب‌ها'
-                : 'دسترسی به تمامی ابزارها و گزارش‌های پیشرفته معاملات'}
+              {language === 'fa'
+                ? (user?.plan === 'STANDARD'
+                  ? 'دسترسی به تحلیل‌های پیشرفته‌تر و امکان اتصال نامحدود حساب‌ها'
+                  : 'دسترسی به تمامی ابزارها و گزارش‌های پیشرفته معاملات')
+                : (user?.plan === 'STANDARD'
+                  ? 'Get advanced analytics and link unlimited trading accounts.'
+                  : 'Get access to premium metrics and advanced trading logs.')}
             </span>
             <button className="upgrade-btn" onClick={() => router.push('/settings?tab=subscription')}>
-              ارتقاء حساب
+              {language === 'fa' ? 'ارتقاء حساب' : 'Upgrade Now'}
             </button>
           </div>
         )}
@@ -103,7 +129,7 @@ export default function SideNavBar() {
             }}
           >
             <span className="material-symbols-outlined icon">contact_support</span>
-            <span className="label" style={{ marginRight: '12px' }}>ارتباط با ما</span>
+            <span className="label" style={{ marginInlineStart: '12px' }}>{t('nav.contact')}</span>
           </Link>
 
           <button
@@ -122,7 +148,7 @@ export default function SideNavBar() {
             }}
           >
             <span className="material-symbols-outlined icon">logout</span>
-            <span className="label" style={{ marginRight: '12px' }}>خروج</span>
+            <span className="label" style={{ marginInlineStart: '12px' }}>{t('common.logout')}</span>
           </button>
         </div>
       </div>
@@ -132,9 +158,13 @@ export default function SideNavBar() {
           <div className="logout-confirm-modal" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <span className="material-symbols-outlined modal-icon">logout</span>
-              <h3>خروج از حساب کاربری</h3>
+              <h3>{language === 'fa' ? 'خروج از حساب کاربری' : 'Log Out of Account'}</h3>
             </div>
-            <p className="modal-desc">آیا برای خروج از حساب کاربری خود اطمینان دارید؟</p>
+            <p className="modal-desc">
+              {language === 'fa' 
+                ? 'آیا برای خروج از حساب کاربری خود اطمینان دارید؟' 
+                : 'Are you sure you want to log out of your account?'}
+            </p>
             <div className="modal-actions">
               <button
                 className="confirm-btn"
@@ -143,13 +173,13 @@ export default function SideNavBar() {
                   await logout();
                 }}
               >
-                خروج
+                {t('common.logout')}
               </button>
               <button
                 className="cancel-btn"
                 onClick={() => setShowLogoutConfirm(false)}
               >
-                انصراف
+                {t('common.cancel')}
               </button>
             </div>
           </div>
