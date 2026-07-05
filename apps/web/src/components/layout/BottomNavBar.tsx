@@ -3,9 +3,11 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useTranslation } from '../../store/useAppStore';
 
 export default function BottomNavBar() {
   const pathname = usePathname();
+  const { t } = useTranslation();
 
   const isTradesActive = pathname === '/trades' || pathname.startsWith('/trades');
   const isAnalyticsActive = pathname === '/analytics';
@@ -21,7 +23,7 @@ export default function BottomNavBar() {
             analytics
           </span>
         </div>
-        <span className="label">معاملات</span>
+        <span className="label">{t('nav.trades')}</span>
       </Link>
 
       {/* 2. Analytics */}
@@ -31,7 +33,7 @@ export default function BottomNavBar() {
             bar_chart
           </span>
         </div>
-        <span className="label">گزارش عملکرد</span>
+        <span className="label">{t('nav.analytics')}</span>
       </Link>
 
       {/* 3. Dashboard (Raised Middle Button) */}
@@ -41,7 +43,7 @@ export default function BottomNavBar() {
             dashboard
           </span>
         </Link>
-        <span className="raised-label">داشبورد</span>
+        <span className="raised-label">{t('nav.dashboard')}</span>
       </div>
 
       {/* 4. Journal */}
@@ -51,7 +53,7 @@ export default function BottomNavBar() {
             sticky_note_2
           </span>
         </div>
-        <span className="label">ژورنال</span>
+        <span className="label">{t('nav.journal')}</span>
       </Link>
 
       {/* 5. Settings */}
@@ -61,7 +63,7 @@ export default function BottomNavBar() {
             settings
           </span>
         </div>
-        <span className="label">تنظیمات</span>
+        <span className="label">{t('nav.settings')}</span>
       </Link>
     </div>
   );

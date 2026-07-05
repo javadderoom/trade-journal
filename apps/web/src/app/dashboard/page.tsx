@@ -4,7 +4,7 @@ import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { api } from '../../lib/api';
 import { useAuthStore } from '../../lib/auth';
-import { useAppStore } from '../../store/useAppStore';
+import { useAppStore, useTranslation } from '../../store/useAppStore';
 import { toPersianDigits, formatPersianCurrency, formatToman } from '../../utils/farsi';
 import Select from '../../components/ui/Select';
 import Link from 'next/link';
@@ -46,12 +46,11 @@ interface DashboardData {
   totalTrades: number;
 }
 
-const WEEKDAY_FULL = ['یکشنبه', 'دوشنبه', 'سه‌شنبه', 'چهارشنبه', 'پنج‌شنبه', 'جمعه', 'شنبه'];
-
 export default function DashboardPage() {
   const router = useRouter();
   const user = useAuthStore((s) => s.user);
   const { accounts, selectedAccountId, setSelectedAccountId, usdToToman, setUsdToToman } = useAppStore();
+  const { t, language } = useTranslation();
 
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -97,11 +96,11 @@ export default function DashboardPage() {
       setData(res.data);
     } catch (err: any) {
       console.error('Dashboard fetch error:', err);
-      setError(err.message || 'خطا در دریافت اطلاعات داشبورد');
+      setError(err.message || t('dashboard.errorOccurred'));
     } finally {
       setLoading(false);
     }
-  }, [selectedAccountId]);
+  }, [selectedAccountId, t]);
 
   useEffect(() => {
     fetchDashboard();
@@ -117,10 +116,11 @@ export default function DashboardPage() {
       .catch(() => { });
   }, [setUsdToToman]);
 
-  // Persian today date string
-  const todayJalali = useMemo(() => {
+  // Date string based on selected language
+  const todayDateStr = useMemo(() => {
     try {
-      return new Intl.DateTimeFormat('fa-IR', {
+      const locale = language === 'fa' ? 'fa-IR' : 'en-US';
+      return new Intl.DateTimeFormat(locale, {
         weekday: 'long',
         year: 'numeric',
         month: 'long',
@@ -129,15 +129,15 @@ export default function DashboardPage() {
     } catch {
       return '';
     }
-  }, []);
+  }, [language]);
 
   const accountOptions = useMemo(() => {
     const list = accounts.map((acc: any) => ({
       value: acc.id,
       label: `${acc.broker_name || 'MT5'}${acc.account_number ? ` (${acc.account_number})` : ''}`,
     }));
-    return [{ value: 'all', label: 'همه حساب‌ها' }, ...list];
-  }, [accounts]);
+    return [{ value: 'all', label: t('dashboard.allAccounts') }, ...list];
+  }, [accounts, t]);
 
   const handleRefreshEdge = () => {
     setEdgeRefreshSpin(true);
@@ -151,7 +151,7 @@ export default function DashboardPage() {
       <main className="dashboard-page">
         <div className="dash-loading">
           <div className="dash-spinner" />
-          <span>در حال بارگذاری داشبورد...</span>
+          <span>{t('dashboard.loadingDashboard')}</span>
         </div>
       </main>
     );
@@ -161,9 +161,9 @@ export default function DashboardPage() {
     return (
       <main className="dashboard-page">
         <div className="dash-loading">
-          <span style={{ color: '#ff5370' }}>{error || 'خطای ناشناخته'}</span>
+          <span style={{ color: '#ff5370' }}>{error || t('dashboard.errorOccurred')}</span>
           <button className="dash-empty-cta-btn" onClick={fetchDashboard}>
-            تلاش مجدد
+            {t('dashboard.retry')}
           </button>
         </div>
       </main>
@@ -171,7 +171,7 @@ export default function DashboardPage() {
   }
 
   const { today, month, edge, recent, totalTrades } = data;
-  const userName = user?.name || 'کاربر';
+  const userName = user?.name || (language === 'fa' ? 'کاربر' : 'User');
   const isNewUser = totalTrades === 0;
 
   return (
@@ -188,13 +188,13 @@ export default function DashboardPage() {
           alignItems: 'center',
           gap: '10px',
           fontSize: '0.9rem',
-          fontFamily: 'Vazirmatn'
+          fontFamily: language === 'fa' ? 'Vazirmatn' : 'inherit'
         }}>
           <span className="material-symbols-outlined">pending_actions</span>
           <span>
-            فیش پرداخت شما برای ارتقا به پلن{' '}
-            <strong>{subStatus.pendingReceipt.plan === 'STANDARD' ? 'استاندارد' : 'حرفه‌ای'}</strong> (دوره{' '}
-            {subStatus.pendingReceipt.period === 'annual' ? 'سالانه' : 'ماهانه'}) ثبت شده و در حال بررسی توسط مدیریت است.
+            {t('dashboard.pendingReceiptBanner')
+              .replace('{plan}', subStatus.pendingReceipt.plan === 'STANDARD' ? t('dashboard.planStandard') : t('dashboard.planPro'))
+              .replace('{period}', subStatus.pendingReceipt.period === 'annual' ? t('dashboard.periodAnnual') : t('dashboard.periodMonthly'))}
           </span>
         </div>
       )}
@@ -211,20 +211,13 @@ export default function DashboardPage() {
           alignItems: 'center',
           gap: '10px',
           fontSize: '0.9rem',
-          fontFamily: 'Vazirmatn'
+          fontFamily: language === 'fa' ? 'Vazirmatn' : 'inherit'
         }}>
           <span className="material-symbols-outlined">cancel</span>
           <span style={{ flex: 1 }}>
-            آخرین فیش واریزی شما برای پلن{' '}
-            <strong>{subStatus.pendingReceipt.plan === 'STANDARD' ? 'استاندارد' : 'حرفه‌ای'}</strong>{' '}
-            توسط مدیریت رد شد.
-            {subStatus.pendingReceipt.rejectionReason && (
-              <>
-                <br />
-                <span style={{ color: '#a0aec0' }}>علت رد شدن: </span>
-                <strong style={{ color: '#f8fafc' }}>{subStatus.pendingReceipt.rejectionReason}</strong>
-              </>
-            )}
+            {t('dashboard.rejectedReceiptBanner')
+              .replace('{plan}', subStatus.pendingReceipt.plan === 'STANDARD' ? t('dashboard.planStandard') : t('dashboard.planPro'))
+              .replace('{reason}', subStatus.pendingReceipt.rejectionReason || '')}
           </span>
           <button
             onClick={() => setDismissedRejectionId(subStatus.pendingReceipt.id)}
@@ -242,7 +235,7 @@ export default function DashboardPage() {
           padding: '12px 20px',
           textAlign: 'center',
           fontWeight: 'bold',
-          fontFamily: 'Vazirmatn',
+          fontFamily: language === 'fa' ? 'Vazirmatn' : 'inherit',
           fontSize: '0.9rem',
           borderRadius: '8px',
           marginBottom: '20px',
@@ -254,20 +247,21 @@ export default function DashboardPage() {
           <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>warning</span>
           <span>
             {subStatus.usage.monthlyTrades >= 30
-              ? 'سقف ثبت ۳۰ معامله در ماه برای پلن رایگان به پایان رسیده است. برای ثبت معامله جدید یا واردات فایل، لطفاً اشتراک خود را ارتقا دهید.'
-              : `شما ${subStatus.usage.monthlyTrades} معامله از سقف ۳۰ معامله مجاز در ماه برای پلن رایگان را ثبت کرده‌اید. برای ثبت معامله بیشتر، لطفاً اشتراک خود را ارتقا دهید.`
+              ? t('dashboard.limitWarning')
+              : t('dashboard.limitWarningNear').replace('{count}', toPersianDigits(subStatus.usage.monthlyTrades))
             }
           </span>
           <Link href="/settings?tab=subscription" style={{ color: '#111319', textDecoration: 'underline', marginRight: '15px' }}>
-            ارتقای اشتراک
+            {t('dashboard.upgradeSubscription')}
           </Link>
         </div>
       )}
+
       {/* ─── Top Bar ─── */}
       <div className="dash-topbar">
         <div className="dash-greeting">
-          <h1>سلام، {userName} 👋</h1>
-          <span className="dash-date">{todayJalali}</span>
+          <h1>{t('dashboard.greeting').replace('{name}', userName)}</h1>
+          <span className="dash-date">{todayDateStr}</span>
         </div>
         {accounts.length > 0 && (
           <div className="dash-account-selector">
@@ -275,52 +269,54 @@ export default function DashboardPage() {
               options={accountOptions}
               value={selectedAccountId}
               onChange={setSelectedAccountId}
-              placeholder="انتخاب حساب"
+              placeholder={t('dashboard.selectAccount')}
             />
           </div>
         )}
       </div>
 
       {/* ─── Section 1: Today ─── */}
-      <div className="dash-section-label">امروز</div>
+      <div className="dash-section-label">{t('dashboard.today')}</div>
       <div className="dash-today-grid">
         {/* Card 1: Today's P&L */}
         <div className={`dash-card ${!today.hasTradedToday ? 'empty' : ''}`}>
-          <div className="dash-card-label">سود/زیان امروز</div>
+          <div className="dash-card-label">{t('dashboard.todayPnlLabel')}</div>
           {today.hasTradedToday ? (
             <>
               <div className={`dash-card-value ${today.pnl >= 0 ? 'positive' : 'negative'}`}>
                 {today.pnl >= 0 ? '+' : ''}
                 {formatPersianCurrency(today.pnl)}
               </div>
-              <div className="dash-card-sub">{formatToman(today.pnl, usdToToman)}</div>
+              {language === 'fa' && (
+                <div className="dash-card-sub">{formatToman(today.pnl, usdToToman)}</div>
+              )}
             </>
           ) : (
-            <div className="dash-card-value muted">امروز معامله‌ای ندارید</div>
+            <div className="dash-card-value muted">{t('dashboard.noTradesToday')}</div>
           )}
         </div>
 
         {/* Card 2: Today's Trades */}
         <div className={`dash-card ${!today.hasTradedToday ? 'empty' : ''}`}>
-          <div className="dash-card-label">معاملات امروز</div>
+          <div className="dash-card-label">{t('dashboard.todayTrades')}</div>
           {today.hasTradedToday ? (
             <>
               <div className="dash-card-value white">{toPersianDigits(today.tradeCount)}</div>
               <div className="dash-card-sub">
                 <div className="win-loss-split">
-                  <span className="w">{toPersianDigits(today.wins)} برنده</span>
-                  <span className="l">{toPersianDigits(today.losses)} بازنده</span>
+                  <span className="w">{toPersianDigits(today.wins)} {t('dashboard.win')}</span>
+                  <span className="l">{toPersianDigits(today.losses)} {t('dashboard.loss')}</span>
                 </div>
               </div>
             </>
           ) : (
-            <div className="dash-card-value muted">۰</div>
+            <div className="dash-card-value muted">{toPersianDigits(0)}</div>
           )}
         </div>
 
         {/* Card 3: Current Streak */}
         <div className="dash-card">
-          <div className="dash-card-label">استریک فعلی</div>
+          <div className="dash-card-label">{t('dashboard.currentStreak')}</div>
           {today.streak.type === 'none' ? (
             <div className="dash-card-value muted">—</div>
           ) : (
@@ -330,7 +326,7 @@ export default function DashboardPage() {
               </span>
               <span className={`streak-text ${today.streak.type}`}>
                 {toPersianDigits(today.streak.count)}{' '}
-                {today.streak.type === 'win' ? 'برد' : 'باخت'} پشت سر هم
+                {today.streak.type === 'win' ? t('dashboard.streakWin') : t('dashboard.streakLoss')}
               </span>
             </div>
           )}
@@ -338,23 +334,23 @@ export default function DashboardPage() {
 
         {/* Card 4: Journal Status */}
         <div className="dash-card">
-          <div className="dash-card-label">ژورنال امروز</div>
+          <div className="dash-card-label">{t('dashboard.todayJournal')}</div>
           <div className="dash-journal-status">
             {today.journal.written ? (
               <>
-                <span className="journal-status-text written">نوشته شده ✓</span>
+                <span className="journal-status-text written">{t('dashboard.written')}</span>
                 {today.journal.preview && (
                   <span className="journal-preview">{today.journal.preview}</span>
                 )}
               </>
             ) : (
               <>
-                <span className="journal-status-text not-written">هنوز ننوشتی</span>
+                <span className="journal-status-text not-written">{t('dashboard.notWritten')}</span>
                 <button className="journal-cta" onClick={() => router.push('/journal')}>
                   <span className="material-symbols-outlined" style={{ fontSize: 16 }}>
                     edit_note
                   </span>
-                  بنویس
+                  {t('dashboard.writeBtn')}
                 </button>
               </>
             )}
@@ -363,10 +359,10 @@ export default function DashboardPage() {
       </div>
 
       {/* ─── Section 2: This Month ─── */}
-      <div className="dash-section-label">این ماه</div>
+      <div className="dash-section-label">{t('dashboard.thisMonth')}</div>
       <div className="dash-equity-card">
         <div className="equity-header">
-          <h3>منحنی سرمایه</h3>
+          <h3>{t('dashboard.equityCurve')}</h3>
           {month.monthName && <span className="equity-month-name">{month.monthName}</span>}
         </div>
         <div className="equity-chart-wrapper">
@@ -375,7 +371,7 @@ export default function DashboardPage() {
           ) : (
             <div className="dash-equity-empty">
               <div className="empty-illustration">📈</div>
-              <p>اولین معاملاتت رو وارد کن تا منحنی سرمایه‌ات رو ببینی</p>
+              <p>{t('dashboard.equityEmpty')}</p>
             </div>
           )}
         </div>
@@ -385,62 +381,62 @@ export default function DashboardPage() {
       {month.kpis.totalTrades >= 10 && (
         <div className="dash-kpi-grid">
           <KPICard
-            label="نرخ موفقیت"
+            label={t('dashboard.winRateLabel')}
             value={`${toPersianDigits(month.kpis.winRate)}٪`}
             colorClass={month.kpis.winRate >= 50 ? 'gold' : 'red'}
-            tooltip="درصد معاملات برنده از کل معاملات"
+            tooltip={t('dashboard.winRateTooltip')}
             points={month.equityCurve}
           />
           <KPICard
-            label="ضریب سود"
+            label={t('dashboard.profitFactorLabel')}
             value={toPersianDigits(month.kpis.profitFactor.toFixed(2))}
             colorClass={month.kpis.profitFactor >= 1.5 ? 'green' : 'red'}
-            tooltip="نسبت کل سود به کل ضرر"
+            tooltip={t('dashboard.profitFactorTooltip')}
             points={month.equityCurve}
           />
           <KPICard
-            label="میانگین R:R"
+            label={t('dashboard.avgRLabel')}
             value={toPersianDigits(month.kpis.avgR.toFixed(2))}
             colorClass="white"
-            tooltip="میانگین نسبت ریسک به ریوارد کسب‌شده"
+            tooltip={t('dashboard.avgRTooltip')}
             points={month.equityCurve}
           />
           <KPICard
-            label="حداکثر افت"
+            label={t('dashboard.maxDrawdownLabel')}
             value={`$${toPersianDigits(month.kpis.maxDrawdown.toFixed(0))}`}
             colorClass="red"
-            tooltip="بیشترین سقوط از قله سرمایه در این ماه"
+            tooltip={t('dashboard.maxDrawdownTooltip')}
             points={month.equityCurve}
           />
         </div>
       )}
 
       {/* ─── Section 3: Edge Insight ─── */}
-      <div className="dash-section-label">برتری معاملاتی</div>
+      <div className="dash-section-label">{t('dashboard.tradingEdge')}</div>
       <div className="dash-edge-card">
         <button
           className={`edge-refresh ${edgeRefreshSpin ? 'spinning' : ''}`}
           onClick={handleRefreshEdge}
-          title="محاسبه مجدد"
+          title={t('dashboard.recalculate')}
         >
           <span className="material-symbols-outlined" style={{ fontSize: 18 }}>
             refresh
           </span>
         </button>
-        <div className="edge-label">برتری معاملاتی شما</div>
+        <div className="edge-label">{t('dashboard.edgeTitle')}</div>
         <div className="edge-sentence">{edge.insight}</div>
         <div className="edge-sub">
-          بر اساس ۳۰ روز گذشته
-          {edge.type !== 'fallback' && ` · ${toPersianDigits(edge.sampleSize)} معامله`}
+          {t('dashboard.basedOn30Days')}
+          {edge.type !== 'fallback' && ` · ${toPersianDigits(edge.sampleSize)} ${t('dashboard.tradesCount')}`}
         </div>
       </div>
 
       {/* ─── Section 4: Recent Activity ─── */}
-      <div className="dash-section-label">فعالیت اخیر</div>
+      <div className="dash-section-label">{t('dashboard.recentActivity')}</div>
       <div className="dash-recent-grid">
         {/* Left: Last 5 trades */}
         <div className="dash-recent-card">
-          <h3>آخرین معاملات</h3>
+          <h3>{t('dashboard.recentTrades')}</h3>
           {recent.trades.length > 0 ? (
             <>
               {recent.trades.map((t) => {
@@ -459,24 +455,24 @@ export default function DashboardPage() {
                       <span className="trade-r">R {toPersianDigits(r.toFixed(1))}</span>
                     )}
                     <span className={`trade-pnl ${net >= 0 ? 'positive' : 'negative'}`}>
-                      {isOpen ? 'باز' : `${net >= 0 ? '+' : ''}$${toPersianDigits(Math.abs(net).toFixed(0))}`}
+                      {isOpen ? (language === 'fa' ? 'باز' : 'Open') : `${net >= 0 ? '+' : ''}$${toPersianDigits(Math.abs(net).toFixed(0))}`}
                     </span>
                   </div>
                 );
               })}
               <a className="dash-see-all" onClick={() => router.push('/trades')}>
-                مشاهده همه معاملات ←
+                {t('dashboard.seeAllTrades')}
               </a>
             </>
           ) : (
             <div className="dash-empty-cta">
               <span className="material-symbols-outlined empty-icon">show_chart</span>
-              <p>هنوز معامله‌ای ندارید</p>
+              <p>{t('dashboard.noTrades')}</p>
               <button className="empty-btn" onClick={() => router.push('/trades')}>
                 <span className="material-symbols-outlined" style={{ fontSize: 16 }}>
                   add
                 </span>
-                وارد کردن معامله
+                {t('dashboard.importTrades')}
               </button>
             </div>
           )}
@@ -484,7 +480,7 @@ export default function DashboardPage() {
 
         {/* Right: Last journal entry */}
         <div className="dash-recent-card">
-          <h3>آخرین یادداشت</h3>
+          <h3>{t('dashboard.recentJournal')}</h3>
           {recent.journalEntry ? (
             <div className="dash-journal-preview">
               <div className="journal-date-row">
@@ -504,7 +500,8 @@ export default function DashboardPage() {
                 <span className="journal-date">
                   {(() => {
                     try {
-                      return new Intl.DateTimeFormat('fa-IR', {
+                      const locale = language === 'fa' ? 'fa-IR' : 'en-US';
+                      return new Intl.DateTimeFormat(locale, {
                         month: 'long',
                         day: 'numeric',
                       }).format(new Date(recent.journalEntry.date));
@@ -516,18 +513,18 @@ export default function DashboardPage() {
               </div>
               <div className="journal-text">{recent.journalEntry.preview}</div>
               <a className="journal-read-more" onClick={() => router.push('/journal')}>
-                ادامه مطلب ←
+                {t('dashboard.readMore')}
               </a>
             </div>
           ) : (
             <div className="dash-empty-cta">
               <span className="material-symbols-outlined empty-icon">sticky_note_2</span>
-              <p>هنوز یادداشتی ننوشتی</p>
+              <p>{t('dashboard.noJournal')}</p>
               <button className="empty-btn" onClick={() => router.push('/journal')}>
                 <span className="material-symbols-outlined" style={{ fontSize: 16 }}>
                   edit_note
                 </span>
-                نوشتن ژورنال
+                {t('dashboard.writeJournalBtn')}
               </button>
             </div>
           )}
@@ -571,17 +568,6 @@ function EquityCurveSVG({ points }: { points: { date: string; cumPnl: number }[]
       coords.map((c) => `L ${c.x},${c.y}`).join(' ') +
       ` L ${coords[coords.length - 1].x},${zeroY} Z`
       : '';
-
-  // Drawdown shading: from peak to curve
-  let peak = -Infinity;
-  const drawdownSegments: string[] = [];
-  coords.forEach((c) => {
-    if (c.y < peak) {
-      // y is inverted (smaller y = higher value); peak tracks the highest value (lowest y)
-    } else {
-      peak = c.y;
-    }
-  });
 
   // X-axis labels (every nth date)
   const labelInterval = Math.max(1, Math.floor(points.length / 6));
@@ -637,7 +623,9 @@ function EquityCurveSVG({ points }: { points: { date: string; cumPnl: number }[]
         if (i % labelInterval !== 0 && i !== coords.length - 1) return null;
         const dateLabel = (() => {
           try {
-            return new Intl.DateTimeFormat('fa-IR', { day: 'numeric' }).format(
+            const lang = useAppStore.getState().language;
+            const locale = lang === 'fa' ? 'fa-IR' : 'en-US';
+            return new Intl.DateTimeFormat(locale, { day: 'numeric' }).format(
               new Date(c.date)
             );
           } catch {

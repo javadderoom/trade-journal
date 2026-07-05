@@ -151,7 +151,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             borderRadius: '50%',
             animation: 'spin 1s linear infinite'
           }}></div>
-          <span style={{ fontSize: '0.9rem', color: '#94A3B8' }}>در حال بارگذاری تریدکاو...</span>
+          <span style={{ fontSize: '0.9rem', color: '#94A3B8' }}>{language === 'en' ? 'Loading TradeKav...' : 'در حال بارگذاری تریدکاو...'}</span>
           <style>{`
             @keyframes spin {
               0% { transform: rotate(0deg); }

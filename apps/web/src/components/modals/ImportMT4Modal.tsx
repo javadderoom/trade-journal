@@ -2,6 +2,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { api } from '../../lib/api';
+import { useTranslation } from '../../store/useAppStore';
 
 interface ImportMT4ModalProps {
   isOpen: boolean;
@@ -24,6 +25,9 @@ type ImportUiState = 'READY' | 'IMPORTING';
 type ImportStep = 'FILE' | 'ACCOUNT';
 
 export default function ImportMT4Modal({ isOpen, onClose, onSuccess, accounts }: ImportMT4ModalProps) {
+  const { t, language } = useTranslation();
+  const isEn = language === 'en';
+
   const [dragActive, setDragActive] = useState(false);
   const [file, setFile] = useState<File | null>(null);
   const [step, setStep] = useState<ImportStep>('FILE');
@@ -31,27 +35,25 @@ export default function ImportMT4Modal({ isOpen, onClose, onSuccess, accounts }:
 
   const [uiState, setUiState] = useState<ImportUiState>('READY');
   const [progressPct, setProgressPct] = useState(0);
-  const [progressLabel, setProgressLabel] = useState('در حال آماده‌سازی...');
+  const [progressLabel, setProgressLabel] = useState(isEn ? 'Preparing...' : 'در حال آماده‌سازی...');
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    // Reset modal state when opening/closing.
     if (!isOpen) {
       setStep('FILE');
       setUiState('READY');
       setProgressPct(0);
-      setProgressLabel('در حال آماده‌سازی...');
+      setProgressLabel(isEn ? 'Preparing...' : 'در حال آماده‌سازی...');
       setIsSubmitting(false);
       setErrorMsg('');
       setDragActive(false);
-      // Note: keep file=null to avoid importing old file on next open
       setFile(null);
       setImportAccountId('');
     }
-  }, [isOpen]);
+  }, [isOpen, isEn]);
 
   if (!isOpen) return null;
 
@@ -78,7 +80,7 @@ export default function ImportMT4Modal({ isOpen, onClose, onSuccess, accounts }:
         setErrorMsg('');
         setStep('FILE');
       } else {
-        setErrorMsg('لطفا فقط فایل گزارش متاتریدر ۴ یا ۵ با پسوند .html یا .htm را انتخاب کنید.');
+        setErrorMsg(isEn ? 'Please select a MetaTrader 4/5 HTML report file (.html or .htm).' : 'لطفا فقط فایل گزارش متاتریدر ۴ یا ۵ با پسوند .html یا .htm را انتخاب کنید.');
       }
     }
   };
@@ -93,7 +95,7 @@ export default function ImportMT4Modal({ isOpen, onClose, onSuccess, accounts }:
         setErrorMsg('');
         setStep('FILE');
       } else {
-        setErrorMsg('لطفا فقط فایل گزارش متاتریدر ۴ یا ۵ با پسوند .html یا .htm را انتخاب کنید.');
+        setErrorMsg(isEn ? 'Please select a MetaTrader 4/5 HTML report file (.html or .htm).' : 'لطفا فقط فایل گزارش متاتریدر ۴ یا ۵ با پسوند .html یا .htm را انتخاب کنید.');
       }
     }
   };
@@ -113,7 +115,7 @@ export default function ImportMT4Modal({ isOpen, onClose, onSuccess, accounts }:
     e.preventDefault();
 
     if (!file) {
-      setErrorMsg('لطفا ابتدا یک فایل گزارش انتخاب کنید.');
+      setErrorMsg(isEn ? 'Please select a file first.' : 'لطفا ابتدا یک فایل گزارش انتخاب کنید.');
       return;
     }
 
@@ -124,7 +126,7 @@ export default function ImportMT4Modal({ isOpen, onClose, onSuccess, accounts }:
     }
 
     if (!importAccountId) {
-      setErrorMsg('لطفا ابتدا یک حساب معاملاتی انتخاب کنید.');
+      setErrorMsg(isEn ? 'Please select an account first.' : 'لطفا ابتدا یک حساب معاملاتی انتخاب کنید.');
       return;
     }
 
@@ -132,15 +134,13 @@ export default function ImportMT4Modal({ isOpen, onClose, onSuccess, accounts }:
     setErrorMsg('');
     setUiState('IMPORTING');
     setProgressPct(8);
-    setProgressLabel('در حال آپلود فایل...');
+    setProgressLabel(isEn ? 'Uploading file...' : 'در حال آپلود فایل...');
 
     const formData = new FormData();
     formData.append('file', file);
     formData.append('accountId', importAccountId);
 
     try {
-      // Axios supports onUploadProgress, but we don't know if it's enabled in this env.
-      // We still show a responsive progress bar with a best-effort approach.
       const res = await api.post(
         '/api/trades/import-mt4',
         formData,
@@ -149,19 +149,19 @@ export default function ImportMT4Modal({ isOpen, onClose, onSuccess, accounts }:
             const total = evt.total ?? 0;
             const loaded = evt.loaded ?? 0;
             if (total > 0) {
-              const pct = Math.round((loaded / total) * 55); // map upload to 0..55%
+              const pct = Math.round((loaded / total) * 55);
               setProgressPct(pct);
-              setProgressLabel('در حال آپلود فایل...');
+              setProgressLabel(isEn ? 'Uploading file...' : 'در حال آپلود فایل...');
             }
           },
         } as any
       );
 
-      bumpProgress(75, 'در حال پردازش معاملات...');
+      bumpProgress(75, isEn ? 'Processing trades...' : 'در حال پردازش معاملات...');
 
       const result = res.data;
       setProgressPct(100);
-      setProgressLabel('انجام شد ✅');
+      setProgressLabel(isEn ? 'Done ✅' : 'انجام شد ✅');
 
       onSuccess(result);
       setFile(null);
@@ -171,8 +171,8 @@ export default function ImportMT4Modal({ isOpen, onClose, onSuccess, accounts }:
       console.error('Failed to import MT4 statement:', err);
       setUiState('READY');
       setProgressPct(0);
-      setProgressLabel('در حال آماده‌سازی...');
-      setErrorMsg(err.response?.data?.error || err.message || 'خطا در ارتباط با سرور. لطفا دوباره تلاش کنید.');
+      setProgressLabel(isEn ? 'Preparing...' : 'در حال آماده‌سازی...');
+      setErrorMsg(err.response?.data?.error || err.message || (isEn ? 'Server connection error. Please try again.' : 'خطا در ارتباط با سرور. لطفا دوباره تلاش کنید.'));
     } finally {
       setIsSubmitting(false);
     }
@@ -182,11 +182,27 @@ export default function ImportMT4Modal({ isOpen, onClose, onSuccess, accounts }:
     fileInputRef.current?.click();
   };
 
+  const p = {
+    title: isEn ? 'Import MetaTrader Trades' : 'واردات معاملات از متاتریدر (MT4 / MT5)',
+    step1: isEn ? 'Select File' : 'انتخاب فایل',
+    step2: isEn ? 'Select Account' : 'انتخاب حساب',
+    fileDesc: isEn ? 'Drag and drop your HTML statement file here or click to browse.' : 'فایل گزارش خروجی معاملات خود را از متاتریدر ۴ یا ۵ (با فرمت .html یا .htm) در کادر زیر رها کرده یا فایل را انتخاب کنید.',
+    promptText: isEn ? 'Drag report file here or click to browse' : 'فایل گزارش را به اینجا بکشید یا کلیک کنید',
+    allowedFormats: isEn ? 'Allowed formats: HTML, HTM' : 'فرمت‌های مجاز: HTML, HTM',
+    accountDesc: isEn ? 'Select the trading account associated with this file to import trades to.' : 'حساب معاملاتی مربوط به این فایل را انتخاب کنید تا معاملات در همان حساب ثبت شوند.',
+    noAccountError: isEn ? 'No trading accounts found.' : 'هیچ حساب معاملاتی برای انتخاب پیدا نشد.',
+    back: isEn ? 'Back' : 'بازگشت',
+    cancel: isEn ? 'Cancel' : 'انصراف',
+    next: isEn ? 'Next Step' : 'مرحله بعد',
+    import: isEn ? 'Start Import' : 'شروع واردات معاملات',
+    processing: isEn ? 'Processing...' : 'در حال پردازش...',
+  };
+
   return (
     <div className="lightbox-overlay" style={{ display: 'flex' }} onClick={() => !isSubmitting && onClose()}>
       <div className="manual-trade-modal import-mt4-modal" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
-          <h3>واردات معاملات از متاتریدر (MT4 / MT5)</h3>
+          <h3>{p.title}</h3>
           <button className="close-btn" onClick={onClose} disabled={isSubmitting}>
             <span className="material-symbols-outlined">close</span>
           </button>
@@ -222,14 +238,14 @@ export default function ImportMT4Modal({ isOpen, onClose, onSuccess, accounts }:
         )}
 
         <form onSubmit={handleSubmit} className="modal-form">
-          <div className="import-steps" aria-label="مراحل واردات">
+          <div className="import-steps" aria-label="mراحل واردات">
             <div className={`import-step ${step === 'FILE' ? 'active' : ''} ${file ? 'complete' : ''}`}>
               <span>1</span>
-              <p>انتخاب فایل</p>
+              <p>{p.step1}</p>
             </div>
             <div className={`import-step ${step === 'ACCOUNT' ? 'active' : ''} ${importAccountId ? 'complete' : ''}`}>
               <span>2</span>
-              <p>انتخاب حساب</p>
+              <p>{p.step2}</p>
             </div>
           </div>
 
@@ -238,7 +254,7 @@ export default function ImportMT4Modal({ isOpen, onClose, onSuccess, accounts }:
           {step === 'FILE' ? (
             <>
               <div className="import-description">
-                فایل گزارش خروجی معاملات خود را از متاتریدر ۴ یا ۵ (با فرمت <code>.html</code> یا <code>.htm</code>) در کادر زیر رها کرده یا فایل را انتخاب کنید.
+                {p.fileDesc}
               </div>
 
               <div 
@@ -260,8 +276,8 @@ export default function ImportMT4Modal({ isOpen, onClose, onSuccess, accounts }:
                 {!file ? (
                   <div className="dropzone-prompt" onClick={onButtonClick}>
                     <span className="material-symbols-outlined upload-icon">cloud_upload</span>
-                    <p className="primary-text">فایل گزارش را به اینجا بکشید یا کلیک کنید</p>
-                    <p className="secondary-text">فرمت‌های مجاز: HTML, HTM</p>
+                    <p className="primary-text">{p.promptText}</p>
+                    <p className="secondary-text">{p.allowedFormats}</p>
                   </div>
                 ) : (
                   <div className="dropzone-file-info">
@@ -288,7 +304,7 @@ export default function ImportMT4Modal({ isOpen, onClose, onSuccess, accounts }:
           ) : (
             <div className="import-account-step">
               <div className="import-description">
-                حساب معاملاتی مربوط به این فایل را انتخاب کنید تا معاملات در همان حساب ثبت شوند.
+                {p.accountDesc}
               </div>
 
               {accounts.length > 0 ? (
@@ -316,7 +332,7 @@ export default function ImportMT4Modal({ isOpen, onClose, onSuccess, accounts }:
                   ))}
                 </div>
               ) : (
-                <div className="form-error-alert">هیچ حساب معاملاتی برای انتخاب پیدا نشد.</div>
+                <div className="form-error-alert">{p.noAccountError}</div>
               )}
             </div>
           )}
@@ -335,14 +351,14 @@ export default function ImportMT4Modal({ isOpen, onClose, onSuccess, accounts }:
               }}
               disabled={isSubmitting}
             >
-              {step === 'ACCOUNT' ? 'بازگشت' : 'انصراف'}
+              {step === 'ACCOUNT' ? p.back : p.cancel}
             </button>
             <button
               type="submit"
               className="btn btn-primary"
               disabled={!file || isSubmitting || (step === 'ACCOUNT' && (!importAccountId || accounts.length === 0))}
             >
-              {isSubmitting ? 'در حال پردازش...' : step === 'FILE' ? 'مرحله بعد' : 'شروع واردات معاملات'}
+              {isSubmitting ? p.processing : step === 'FILE' ? p.next : p.import}
             </button>
           </div>
         </form>

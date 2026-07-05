@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import { toPersianDigits } from '../../utils/farsi';
+import { useTranslation, useAppStore } from '../../store/useAppStore';
 import { api } from '../../lib/api';
 import { notify } from '../../lib/notify';
 import SummaryBar from './SummaryBar';
@@ -63,20 +64,20 @@ export interface TagObject {
   show_first: boolean;
 }
 
-const DEFAULT_SYSTEM_TAGS: TagObject[] = [
-  { name: 'فرصت از دست رفته', is_ignored: true, show_first: false },
+const getDefaultSystemTags = (isEn: boolean): TagObject[] => [
+  { name: isEn ? 'Missed' : 'فرصت از دست رفته', is_ignored: true, show_first: false },
   { name: 'Missed', is_ignored: true, show_first: false },
   { name: 'ignore', is_ignored: true, show_first: false },
   { name: 'Ignore', is_ignored: true, show_first: false },
-  { name: 'نادیده گرفتن', is_ignored: true, show_first: false },
+  { name: isEn ? 'Ignore' : 'نادیده گرفتن', is_ignored: true, show_first: false },
 ];
 
-const DEFAULT_EMOTIONS = [
-  { value: 'CONFIDENT', label: 'با اطمینان', emoji: '😌' },
-  { value: 'NEUTRAL', label: 'آرام/خنثی', emoji: '😐' },
-  { value: 'ANXIOUS', label: 'مضطرب', emoji: '😰' },
+const getDefaultEmotions = (isEn: boolean) => [
+  { value: 'CONFIDENT', label: isEn ? 'Confident' : 'با اطمینان', emoji: '😌' },
+  { value: 'NEUTRAL', label: isEn ? 'Neutral/Calm' : 'آرام/خنثی', emoji: '😐' },
+  { value: 'ANXIOUS', label: isEn ? 'Anxious' : 'مضطرب', emoji: '😰' },
   { value: 'FOMO', label: 'FOMO', emoji: '🎯' },
-  { value: 'REVENGE', label: 'انتقام', emoji: '😡' },
+  { value: 'REVENGE', label: isEn ? 'Revenge' : 'انتقام', emoji: '😡' },
 ];
 
 const getJalaliDisplayDate = (gregorianDateStr: string) => {
@@ -128,6 +129,24 @@ export default function TradesTable({
   selectedAccountId = 'all',
   onAccountIdChange,
 }: TradesTableProps) {
+  const { t, language } = useTranslation();
+  const isEn = language === 'en';
+
+  const p = {
+    trades: isEn ? 'Trades' : 'معاملات',
+    exportLabel: isEn ? 'Export Excel/CSV' : 'خروجی اکسل/CSV',
+    importLabel: isEn ? 'Import MT4/5' : 'واردات MT4/MT5',
+    manualLabel: isEn ? 'Record Manual Trade' : 'ثبت معامله دستی',
+    proFeature: isEn ? 'Pro Feature Only' : 'قابلیت مخصوص کاربران حرفه‌ای',
+    proFeatureMsg: isEn 
+      ? 'Exporting data is only available for Pro users. Please upgrade your account to access this and other advanced features.'
+      : 'خروجی داده فقط برای کاربران حرفه‌ای در دسترس است. برای دسترسی به این قابلیت و امکانات پیشرفته دیگر، لطفاً حساب خود را به حرفه‌ای ارتقا دهید.',
+    upgradeAccount: isEn ? 'Upgrade Account' : 'ارتقای حساب',
+    close: isEn ? 'Close' : 'بستن',
+    dateLabel: isEn ? 'Date:' : 'تاریخ:',
+    daysSelected: isEn ? 'days selected' : 'روز انتخاب شده',
+  };
+
   const [trades, setTrades] = useState<Trade[]>([]);
   const [selectedTrades, setSelectedTrades] = useState<Set<string>>(new Set());
   const [activeTradeId, setActiveTradeId] = useState<string | null>(null);
@@ -177,12 +196,12 @@ export default function TradesTable({
 
   // Filter states
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedSymbol, setSelectedSymbol] = useState('همه نمادها');
-  const [selectedDirection, setSelectedDirection] = useState('همه جهت‌ها');
+  const [selectedSymbol, setSelectedSymbol] = useState(isEn ? 'All Symbols' : 'همه نمادها');
+  const [selectedDirection, setSelectedDirection] = useState(isEn ? 'All Directions' : 'همه جهت‌ها');
   const [selectedTimeframe, setSelectedTimeframe] = useState('ALL');
   const [selectedStatus, setSelectedStatus] = useState<'ALL' | 'OPEN' | 'CLOSED' | 'MISSED'>('ALL');
   const [isAdvancedFiltersOpen, setIsAdvancedFiltersOpen] = useState(false);
-  const [allEmotions, setAllEmotions] = useState<{ value: string; label: string; emoji?: string }[]>(DEFAULT_EMOTIONS);
+  const [allEmotions, setAllEmotions] = useState<{ value: string; label: string; emoji?: string }[]>(() => getDefaultEmotions(isEn));
   const [selectedTimezone, setSelectedTimezone] = useState('Asia/Tehran');
 
   // USD → Toman exchange rate
@@ -206,7 +225,7 @@ export default function TradesTable({
   const symbolOptions = useMemo(() => {
     const symbols = new Set<string>();
     trades.forEach(t => symbols.add(t.symbol));
-    return ['همه نمادها', ...Array.from(symbols)];
+    return [isEn ? 'All Symbols' : 'همه نمادها', ...Array.from(symbols)];
   }, [trades]);
 
   const [allTags, setAllTags] = useState<TagObject[]>([]);
@@ -366,7 +385,7 @@ export default function TradesTable({
           return false;
         }
       }
-      if (selectedSymbol !== 'همه نمادها') {
+      if (selectedSymbol !== 'همه نمادها' && selectedSymbol !== 'All Symbols') {
         if (selectedSymbol.startsWith('main:')) {
           const mainPair = selectedSymbol.substring(5);
           if (getMainPair(trade.symbol) !== mainPair) {
@@ -376,8 +395,8 @@ export default function TradesTable({
           return false;
         }
       }
-      if (selectedDirection !== 'همه جهت‌ها') {
-        const dir = selectedDirection === 'خرید (Buy)' ? 'BUY' : 'SELL';
+      if (selectedDirection !== 'همه جهت‌ها' && selectedDirection !== 'All Directions') {
+        const dir = (selectedDirection === 'خرید (Buy)' || selectedDirection === 'Buy') ? 'BUY' : 'SELL';
         if (trade.direction !== dir) return false;
       }
       if (selectedTimeframe !== 'ALL') {
@@ -456,10 +475,10 @@ export default function TradesTable({
     if (onUpdateTrade) {
       const success = await onUpdateTrade(activeTrade);
       if (success) {
-        notify.success('تغییرات با موفقیت ذخیره شد.');
+        notify.success(isEn ? 'Changes saved successfully.' : 'تغییرات با موفقیت ذخیره شد.');
       }
     } else {
-      notify.info('تغییرات به صورت محلی ذخیره شد.');
+      notify.info(isEn ? 'Changes saved locally.' : 'تغییرات به صورت محلی ذخیره شد.');
     }
   };
 
@@ -467,9 +486,10 @@ export default function TradesTable({
     if (!activeTradeId) return;
 
     const ok = await notify.confirm({
-      title: 'تایید حذف معامله',
-      message: 'آیا از حذف این معامله اطمینان دارید؟ این عمل غیرقابل بازگشت است.',
-      confirmLabel: 'حذف معامله',
+      title: isEn ? 'Delete Trade Confirmation' : 'تایید حذف معامله',
+      message: isEn ? 'Are you sure you want to delete this trade? This action cannot be undone.' : 'آیا از حذف این معامله اطمینان دارید؟ این عمل غیرقابل بازگشت است.',
+      confirmLabel: isEn ? 'Delete Trade' : 'حذف معامله',
+      cancelLabel: isEn ? 'Cancel' : 'انصراف',
       danger: true,
     });
     if (!ok) return;
@@ -494,9 +514,12 @@ export default function TradesTable({
     if (selectedTrades.size === 0) return;
 
     const ok = await notify.confirm({
-      title: 'تایید حذف گروهی',
-      message: `آیا از حذف ${toPersianDigits(selectedTrades.size)} معامله انتخاب شده اطمینان دارید؟ این عمل غیرقابل بازگشت است.`,
-      confirmLabel: 'حذف گروهی',
+      title: isEn ? 'Delete Selected Confirmation' : 'تایید حذف گروهی',
+      message: isEn 
+        ? `Are you sure you want to delete ${selectedTrades.size} selected trades? This action cannot be undone.` 
+        : `آیا از حذف ${toPersianDigits(selectedTrades.size)} معامله انتخاب شده اطمینان دارید؟ این عمل غیرقابل بازگشت است.`,
+      confirmLabel: isEn ? 'Delete Selected' : 'حذف گروهی',
+      cancelLabel: isEn ? 'Cancel' : 'انصراف',
       danger: true,
     });
     if (!ok) return;
@@ -535,7 +558,7 @@ export default function TradesTable({
       }
     } catch (err) {
       console.error('Failed to upload screenshot:', err);
-      notify.error('خطا در بارگذاری تصویر. لطفا دوباره تلاش کنید.');
+      notify.error(isEn ? 'Failed to upload screenshot. Please try again.' : 'خطا در بارگذاری تصویر. لطفا دوباره تلاش کنید.');
     } finally {
       setIsUploading(false);
       e.target.value = '';
@@ -546,9 +569,10 @@ export default function TradesTable({
     if (!activeTrade) return;
 
     const ok = await notify.confirm({
-      title: 'تایید حذف تصویر',
-      message: 'آیا از حذف این تصویر اطمینان دارید؟',
-      confirmLabel: 'حذف تصویر',
+      title: isEn ? 'Delete Screenshot Confirmation' : 'تایید حذف تصویر',
+      message: isEn ? 'Are you sure you want to delete this screenshot?' : 'آیا از حذف این تصویر اطمینان دارید؟',
+      confirmLabel: isEn ? 'Delete Screenshot' : 'حذف تصویر',
+      cancelLabel: isEn ? 'Cancel' : 'انصراف',
       danger: true,
     });
     if (!ok) return;
@@ -563,7 +587,7 @@ export default function TradesTable({
       }
     } catch (err) {
       console.error('Failed to delete screenshot:', err);
-      notify.error('خطا در حذف تصویر. لطفا دوباره تلاش کنید.');
+      notify.error(isEn ? 'Failed to delete screenshot. Please try again.' : 'خطا در حذف تصویر. لطفا دوباره تلاش کنید.');
     }
   };
 
@@ -612,26 +636,26 @@ export default function TradesTable({
       <div className="trades-main-content">
         {/* 1. Header */}
         <header className="trades-page-header">
-          <h1>معاملات</h1>
+          <h1>{p.trades}</h1>
           <div className="header-actions">
             <button className="btn btn-secondary btn-export" onClick={handleExportData}>
               <span className="material-symbols-outlined">download</span>
-              خروجی اکسل/CSV
+              {p.exportLabel}
               <span className="pro-badge-mini">PRO</span>
             </button>
             <button className="btn btn-secondary" onClick={onImportMT4}>
               <span className="material-symbols-outlined">cloud_download</span>
-              واردات MT4/MT5
+              {p.importLabel}
             </button>
             <button className="btn btn-primary" onClick={onAddManualTrade}>
               <span className="material-symbols-outlined">edit_note</span>
-              ثبت معامله دستی
+              {p.manualLabel}
             </button>
           </div>
         </header>
 
         {/* Active Filter Badges */}
-        {(dateFilter || searchQuery || selectedSymbol !== 'همه نمادها' || selectedDirection !== 'همه جهت‌ها' || selectedStatus !== 'ALL' || (selectedAccountId && selectedAccountId !== 'all')) && (
+        {(dateFilter || searchQuery || selectedSymbol !== (isEn ? 'All Symbols' : 'همه نمادها') || selectedDirection !== (isEn ? 'All Directions' : 'همه جهت‌ها') || selectedStatus !== 'ALL' || (selectedAccountId && selectedAccountId !== 'all')) && (
           <div className="active-filters-container animate-fade-in">
             {/* Date Filter */}
             {dateFilter && (
@@ -639,8 +663,10 @@ export default function TradesTable({
                 <span className="material-symbols-outlined badge-icon-lead">calendar_month</span>
                 <span className="badge-text">
                   {filterDatesArray.length === 1 
-                    ? `تاریخ: ${getJalaliDisplayDate(filterDatesArray[0])}` 
-                    : `${toPersianDigits(filterDatesArray.length)} روز انتخاب شده`
+                    ? `${p.dateLabel} ${getJalaliDisplayDate(filterDatesArray[0])}` 
+                    : isEn 
+                      ? `${filterDatesArray.length} ${p.daysSelected}`
+                      : `${toPersianDigits(filterDatesArray.length)} روز انتخاب شده`
                   }
                 </span>
                 <button 

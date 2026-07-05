@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { toPersianDigits } from '../../utils/farsi';
+import { useTranslation, useAppStore } from '../../store/useAppStore';
 
 interface Trade {
   closeTime: string | null;
@@ -19,7 +20,11 @@ const JALALI_MONTH_NAMES = [
   'فروردین', 'اردیبهشت', 'خرداد', 'تیر', 'مرداد', 'شهریور',
   'مهر', 'آبان', 'آذر', 'دی', 'بهمن', 'اسفند'
 ];
-const WEEKDAY_NAMES_CALENDAR = ['شنبه', 'یکشنبه', 'دوشنبه', 'سه‌شنبه', 'چهارشنبه', 'پنج‌شنبه', 'جمعه'];
+
+const GREGORIAN_MONTH_NAMES = [
+  'January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December'
+];
 
 // Utility to convert Gregorian date to Jalali
 const getJalaliDate = (date: Date) => {
@@ -45,16 +50,26 @@ const getJalaliDate = (date: Date) => {
 
 export default function TradingCalendar({ closedTrades }: TradingCalendarProps) {
   const router = useRouter();
+  const { t, language } = useTranslation();
+  const isEn = language === 'en';
+
   const [calendarYear, setCalendarYear] = useState<number>(1405);
   const [calendarMonth, setCalendarMonth] = useState<number>(4);
   const [selectedDates, setSelectedDates] = useState<string[]>([]);
 
-  // Initialize with today's Jalali date on mount
+  // Sync / Reset calendar viewport when language changes
   useEffect(() => {
-    const todayJ = getJalaliDate(new Date());
-    setCalendarYear(todayJ.year);
-    setCalendarMonth(todayJ.month);
-  }, []);
+    if (isEn) {
+      const today = new Date();
+      setCalendarYear(today.getFullYear());
+      setCalendarMonth(today.getMonth() + 1);
+    } else {
+      const todayJ = getJalaliDate(new Date());
+      setCalendarYear(todayJ.year);
+      setCalendarMonth(todayJ.month);
+    }
+    setSelectedDates([]);
+  }, [isEn]);
 
   const handleDayClick = (dateStr: string) => {
     setSelectedDates((prev) => {
@@ -84,64 +99,88 @@ export default function TradingCalendar({ closedTrades }: TradingCalendarProps) 
     }
   };
 
-  const jalaliCalendarData = useMemo(() => {
-    // 1. Approximate search start: Jalali year roughly maps to gregYear = targetYear + 621
-    const gregYear = calendarYear + 621;
-    const gregMonth = (calendarMonth + 1) % 12; // approximate Month matching (March is month 2)
-    
-    let current = new Date(gregYear, gregMonth, 15);
-    let jDate = getJalaliDate(current);
-    
-    // Adjust Gregorian date to match calendarYear and calendarMonth
-    let limit = 0;
-    while ((jDate.year !== calendarYear || jDate.month !== calendarMonth) && limit < 100) {
-      limit++;
-      const diffYears = calendarYear - jDate.year;
-      const diffMonths = calendarMonth - jDate.month;
-      
-      if (diffYears !== 0) {
-        current.setDate(current.getDate() + diffYears * 365);
-      } else if (diffMonths !== 0) {
-        current.setDate(current.getDate() + diffMonths * 30);
+  const calendarData = useMemo(() => {
+    let days: { date: Date; jDay: number; dayOfWeek: number; dateStr: string }[] = [];
+    let targetYear = calendarYear;
+    let targetMonth = calendarMonth;
+    let monthName = '';
+
+    if (isEn) {
+      // ─── Gregorian Calendar Calculation ───
+      monthName = GREGORIAN_MONTH_NAMES[calendarMonth - 1] || 'Unknown';
+      const firstDay = new Date(calendarYear, calendarMonth - 1, 1);
+      const totalDays = new Date(calendarYear, calendarMonth, 0).getDate();
+
+      for (let dayNum = 1; dayNum <= totalDays; dayNum++) {
+        const current = new Date(calendarYear, calendarMonth - 1, dayNum);
+        const yearStr = current.getFullYear();
+        const monthStr = String(current.getMonth() + 1).padStart(2, '0');
+        const dayStr = String(current.getDate()).padStart(2, '0');
+        const dateStr = `${yearStr}-${monthStr}-${dayStr}`;
+
+        days.push({
+          date: current,
+          jDay: dayNum,
+          dayOfWeek: current.getDay(), // 0 = Sunday, 1 = Monday, etc.
+          dateStr
+        });
       }
-      jDate = getJalaliDate(current);
-    }
-    
-    // Adjust precisely to Day 1 of the target month
-    limit = 0;
-    while (jDate.day > 1 && limit < 40) {
-      limit++;
-      current.setDate(current.getDate() - 1);
-      jDate = getJalaliDate(current);
-    }
-    limit = 0;
-    while (jDate.month !== calendarMonth && limit < 40) {
-      limit++;
-      current.setDate(current.getDate() + 1);
-      jDate = getJalaliDate(current);
-    }
+    } else {
+      // ─── Jalali Calendar Calculation ───
+      const gregYear = calendarYear + 621;
+      const gregMonth = (calendarMonth + 1) % 12;
+      
+      let current = new Date(gregYear, gregMonth, 15);
+      let jDate = getJalaliDate(current);
+      
+      let limit = 0;
+      while ((jDate.year !== calendarYear || jDate.month !== calendarMonth) && limit < 100) {
+        limit++;
+        const diffYears = calendarYear - jDate.year;
+        const diffMonths = calendarMonth - jDate.month;
+        
+        if (diffYears !== 0) {
+          current.setDate(current.getDate() + diffYears * 365);
+        } else if (diffMonths !== 0) {
+          current.setDate(current.getDate() + diffMonths * 30);
+        }
+        jDate = getJalaliDate(current);
+      }
+      
+      limit = 0;
+      while (jDate.day > 1 && limit < 40) {
+        limit++;
+        current.setDate(current.getDate() - 1);
+        jDate = getJalaliDate(current);
+      }
+      limit = 0;
+      while (jDate.month !== calendarMonth && limit < 40) {
+        limit++;
+        current.setDate(current.getDate() + 1);
+        jDate = getJalaliDate(current);
+      }
 
-    const targetMonth = jDate.month;
-    const targetYear = jDate.year;
-    const days: { date: Date; jDay: number; dayOfWeek: number; dateStr: string }[] = [];
+      targetMonth = jDate.month;
+      targetYear = jDate.year;
+      monthName = JALALI_MONTH_NAMES[targetMonth - 1] || 'نامشخص';
 
-    // Collect all days of the Jalali month (correctly handles 31, 30, and 29/30 day months)
-    limit = 0;
-    while (jDate.month === targetMonth && limit < 35) {
-      limit++;
-      const yearStr = current.getFullYear();
-      const monthStr = String(current.getMonth() + 1).padStart(2, '0');
-      const dayStr = String(current.getDate()).padStart(2, '0');
-      const dateStr = `${yearStr}-${monthStr}-${dayStr}`;
+      limit = 0;
+      while (jDate.month === targetMonth && limit < 35) {
+        limit++;
+        const yearStr = current.getFullYear();
+        const monthStr = String(current.getMonth() + 1).padStart(2, '0');
+        const dayStr = String(current.getDate()).padStart(2, '0');
+        const dateStr = `${yearStr}-${monthStr}-${dayStr}`;
 
-      days.push({
-        date: new Date(current),
-        jDay: jDate.day,
-        dayOfWeek: (current.getDay() + 1) % 7, // align to Persian Saturday (0) to Friday (6)
-        dateStr
-      });
-      current.setDate(current.getDate() + 1);
-      jDate = getJalaliDate(current);
+        days.push({
+          date: new Date(current),
+          jDay: jDate.day,
+          dayOfWeek: (current.getDay() + 1) % 7, // 0 = Saturday, 1 = Sunday, etc.
+          dateStr
+        });
+        current.setDate(current.getDate() + 1);
+        jDate = getJalaliDate(current);
+      }
     }
 
     // Map closed trades' pnl to the days of this calendar month
@@ -188,18 +227,45 @@ export default function TradingCalendar({ closedTrades }: TradingCalendarProps) 
     return {
       year: targetYear,
       month: targetMonth,
-      monthName: JALALI_MONTH_NAMES[targetMonth - 1] || 'نامشخص',
+      monthName,
       days: daysWithStats,
       maxMonthAbsVal
     };
-  }, [closedTrades, calendarYear, calendarMonth]);
+  }, [closedTrades, calendarYear, calendarMonth, isEn]);
+
+  const weekdays = useMemo(() => {
+    return isEn 
+      ? ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+      : ['شنبه', 'یکشنبه', 'دوشنبه', 'سه‌شنبه', 'چهارشنبه', 'پنج‌شنبه', 'جمعه'];
+  }, [isEn]);
+
+  const uiLabels = {
+    title: isEn ? 'Trading Calendar' : 'تقویم معاملاتی',
+    prevMonth: isEn ? 'Previous Month' : 'ماه قبل',
+    nextMonth: isEn ? 'Next Month' : 'ماه بعد',
+    noTrades: isEn ? 'No trades' : 'بدون معامله',
+    lightLoss: isEn ? 'Light Loss' : 'ضرر جزئی',
+    heavyLoss: isEn ? 'Heavy Loss' : 'ضرر سنگین',
+    lightProfit: isEn ? 'Light Profit' : 'سود جزئی',
+    heavyProfit: isEn ? 'Heavy Profit' : 'سود سنگین',
+    selectedDays: isEn ? 'selected days' : 'روز انتخاب شده است',
+    selectedDay: isEn ? 'selected day' : 'روز انتخاب شده است',
+    cancelSelection: isEn ? 'Cancel' : 'لغو انتخاب',
+    viewTrades: isEn ? 'View Trades' : 'مشاهده معاملات',
+    dateLabel: isEn ? 'Date' : 'تاریخ',
+    tradesCount: isEn ? 'Trades' : 'تعداد معاملات',
+    winCount: isEn ? 'Wins' : 'سود ناخالص',
+    lossCount: isEn ? 'Losses' : 'زیان ناخالص',
+    netPnl: isEn ? 'Net P&L' : 'سود و زیان خالص',
+    noTradesRecorded: isEn ? 'No trades recorded' : 'بدون معامله ثبت شده'
+  };
 
   return (
     <div className="journal-card calendar-heatmap-container" style={{ flex: 1 }}>
       {/* Calendar Navigation Header */}
       <div className="calendar-header-row" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', marginBottom: '16px' }}>
         <span className="calendar-title-month" style={{ fontSize: '15px', fontWeight: '700' }}>
-          تقویم معاملاتی: {jalaliCalendarData.monthName} {toPersianDigits(jalaliCalendarData.year)}
+          {uiLabels.title}: {calendarData.monthName} {toPersianDigits(calendarData.year)}
         </span>
         <div className="calendar-nav-buttons" style={{ display: 'flex', gap: '8px', direction: 'ltr' }}>
           <button 
@@ -217,7 +283,7 @@ export default function TradingCalendar({ closedTrades }: TradingCalendarProps) 
               cursor: 'pointer',
               transition: 'all 0.2s'
             }}
-            title="ماه قبل"
+            title={uiLabels.prevMonth}
           >
             <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>chevron_left</span>
           </button>
@@ -236,7 +302,7 @@ export default function TradingCalendar({ closedTrades }: TradingCalendarProps) 
               cursor: 'pointer',
               transition: 'all 0.2s'
             }}
-            title="ماه بعد"
+            title={uiLabels.nextMonth}
           >
             <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>chevron_right</span>
           </button>
@@ -245,33 +311,33 @@ export default function TradingCalendar({ closedTrades }: TradingCalendarProps) 
 
       <div className="calendar-grid-wrapper">
         <div className="calendar-weekdays-grid">
-          {WEEKDAY_NAMES_CALENDAR.map((day) => (
+          {weekdays.map((day) => (
             <div key={day}>{day}</div>
           ))}
         </div>
         
         <div className="calendar-days-grid">
           {/* Empty cells before start of month */}
-          {jalaliCalendarData.days.length > 0 && Array.from({ length: jalaliCalendarData.days[0].dayOfWeek }).map((_, idx) => (
+          {calendarData.days.length > 0 && Array.from({ length: calendarData.days[0].dayOfWeek }).map((_, idx) => (
             <div key={`empty-${idx}`} className="calendar-day-cell calendar-cell-placeholder" />
           ))}
 
           {/* Day cells */}
-          {jalaliCalendarData.days.map((day) => {
+          {calendarData.days.map((day) => {
             const isSelected = selectedDates.includes(day.dateStr);
             const cellClass = day.count === 0 
               ? 'calendar-cell-empty'
               : day.netPnl > 0 
-                ? `calendar-cell-profit-${Math.min(Math.ceil((day.netPnl / jalaliCalendarData.maxMonthAbsVal) * 4), 4)}`
-                : `calendar-cell-loss-${Math.min(Math.ceil((Math.abs(day.netPnl) / jalaliCalendarData.maxMonthAbsVal) * 4), 4)}`;
+                ? `calendar-cell-profit-${Math.min(Math.ceil((day.netPnl / calendarData.maxMonthAbsVal) * 4), 4)}`
+                : `calendar-cell-loss-${Math.min(Math.ceil((Math.abs(day.netPnl) / calendarData.maxMonthAbsVal) * 4), 4)}`;
 
             const tooltipText = day.count > 0 
-              ? `تاریخ: ${toPersianDigits(day.dateStr)}
-تعداد معاملات: ${toPersianDigits(day.count)}
-سود ناخالص: ${toPersianDigits(day.winners.toString())} معامله برد
-زیان ناخالص: ${toPersianDigits(day.losers.toString())} معامله باخت
-سود و زیان خالص: ${day.netPnl >= 0 ? '+' : '-'}$${toPersianDigits(Math.abs(day.netPnl).toFixed(2))}`
-              : `تاریخ: ${toPersianDigits(day.dateStr)}\nبدون معامله ثبت شده`;
+              ? `${uiLabels.dateLabel}: ${toPersianDigits(day.dateStr)}
+${uiLabels.tradesCount}: ${toPersianDigits(day.count)}
+${uiLabels.winCount}: ${toPersianDigits(day.winners.toString())}
+${uiLabels.lossCount}: ${toPersianDigits(day.losers.toString())}
+${uiLabels.netPnl}: ${day.netPnl >= 0 ? '+' : '-'}$${toPersianDigits(Math.abs(day.netPnl).toFixed(2))}`
+              : `${uiLabels.dateLabel}: ${toPersianDigits(day.dateStr)}\n${uiLabels.noTradesRecorded}`;
 
             return (
               <div 
@@ -297,23 +363,23 @@ export default function TradingCalendar({ closedTrades }: TradingCalendarProps) 
       <div className="calendar-legend-bottom">
         <div className="legend-item">
           <div className="legend-box empty" />
-          <span>بدون معامله</span>
+          <span>{uiLabels.noTrades}</span>
         </div>
         <div className="legend-item">
           <div className="legend-box loss-light" />
-          <span>ضرر جزئی</span>
+          <span>{uiLabels.lightLoss}</span>
         </div>
         <div className="legend-item">
           <div className="legend-box loss-dark" />
-          <span>ضرر سنگین</span>
+          <span>{uiLabels.heavyLoss}</span>
         </div>
         <div className="legend-item">
           <div className="legend-box profit-light" />
-          <span>سود جزئی</span>
+          <span>{uiLabels.lightProfit}</span>
         </div>
         <div className="legend-item">
           <div className="legend-box profit-dark" />
-          <span>سود سنگین</span>
+          <span>{uiLabels.heavyProfit}</span>
         </div>
       </div>
 
@@ -321,7 +387,7 @@ export default function TradingCalendar({ closedTrades }: TradingCalendarProps) 
       {selectedDates.length > 0 && (
         <div className="calendar-action-bar" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(97, 249, 177, 0.08)', border: '1px solid rgba(97, 249, 177, 0.25)', borderRadius: '12px', padding: '12px 16px', marginTop: '20px' }}>
           <span style={{ fontSize: '13px', fontWeight: '500', color: '#e2e2eb' }}>
-            {toPersianDigits(selectedDates.length)} روز انتخاب شده است
+            {toPersianDigits(selectedDates.length)} {selectedDates.length === 1 ? uiLabels.selectedDay : uiLabels.selectedDays}
           </span>
           <div style={{ display: 'flex', gap: '8px' }}>
             <button 
@@ -329,7 +395,7 @@ export default function TradingCalendar({ closedTrades }: TradingCalendarProps) 
               className="btn btn-secondary" 
               style={{ padding: '6px 12px', fontSize: '12px', height: 'auto', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: '#bbcabe' }}
             >
-              لغو انتخاب
+              {uiLabels.cancelSelection}
             </button>
             <button 
               onClick={() => {
@@ -338,7 +404,7 @@ export default function TradingCalendar({ closedTrades }: TradingCalendarProps) 
               className="btn btn-primary" 
               style={{ padding: '6px 12px', fontSize: '12px', height: 'auto', background: '#61f9b1', border: 'none', color: '#003822', fontWeight: '700' }}
             >
-              مشاهده معاملات
+              {uiLabels.viewTrades}
             </button>
           </div>
         </div>

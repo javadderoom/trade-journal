@@ -1,4 +1,5 @@
 import { toPersianDigits } from './farsi';
+import { useAppStore } from '../store/useAppStore';
 
 export const getEmotionEmoji = (emotion: string | null, emotionsList?: { value: string; label: string; emoji?: string }[]): string => {
   if (!emotion) return '💭';
@@ -30,7 +31,10 @@ export const formatDate = (dateStr: string, timezone: string): { date: string; d
     const d = new Date(dateStr);
     if (isNaN(d.getTime())) return { date: dateStr, day: '' };
 
-    const formatter = new Intl.DateTimeFormat('fa-IR', {
+    const lang = useAppStore.getState().language;
+    const locale = lang === 'fa' ? 'fa-IR' : 'en-US';
+
+    const formatter = new Intl.DateTimeFormat(locale, {
       timeZone: timezone,
       year: 'numeric',
       month: '2-digit',
@@ -43,7 +47,7 @@ export const formatDate = (dateStr: string, timezone: string): { date: string; d
     const formatted = formatter.format(d);
     const cleanedDate = formatted.replace('،', ' -').replace(',', ' -');
 
-    const dayFormatter = new Intl.DateTimeFormat('fa-IR', {
+    const dayFormatter = new Intl.DateTimeFormat(locale, {
       timeZone: timezone,
       weekday: 'long'
     });
@@ -66,10 +70,23 @@ export interface TradingSessionInfo {
 }
 
 export const getTradingSession = (dateStr: string): TradingSessionInfo => {
+  const lang = useAppStore.getState().language;
+  const isEn = lang === 'en';
+
+  const labels = {
+    UNKNOWN: isEn ? 'Unknown' : 'نامشخص',
+    WEEKEND: isEn ? 'Weekend (Closed)' : 'آخر هفته (بسته)',
+    OVERLAP: isEn ? 'London+NY Overlap' : 'لندن+نیویورک',
+    LONDON: isEn ? 'London' : 'لندن',
+    NEW_YORK: isEn ? 'New York' : 'نیویورک',
+    ASIAN: isEn ? 'Tokyo' : 'توکیو',
+    SYDNEY: isEn ? 'Sydney' : 'سیدنی',
+  };
+
   try {
     const d = new Date(dateStr);
     if (isNaN(d.getTime())) {
-      return { name: 'UNKNOWN', label: 'نامشخص', emoji: '❓', className: 'session-unknown' };
+      return { name: 'UNKNOWN', label: labels.UNKNOWN, emoji: '❓', className: 'session-unknown' };
     }
 
     const getNYDateTime = (date: Date) => {
@@ -91,7 +108,7 @@ export const getTradingSession = (dateStr: string): TradingSessionInfo => {
       nyInfo.weekday === 'Sat' ||
       (nyInfo.weekday === 'Sun' && nyInfo.hour < 17)
     ) {
-      return { name: 'WEEKEND', label: 'آخر هفته (بسته)', emoji: '💤', className: 'session-weekend' };
+      return { name: 'WEEKEND', label: labels.WEEKEND, emoji: '💤', className: 'session-weekend' };
     }
 
     const getHourInTimezone = (tz: string): number => {
@@ -109,44 +126,40 @@ export const getTradingSession = (dateStr: string): TradingSessionInfo => {
     const sydneyHour = getHourInTimezone('Australia/Sydney');
 
     if (londonHour >= 8 && londonHour < 17 && nyHour >= 8 && nyHour < 17) {
-      return { name: 'OVERLAP', label: 'لندن+نیویورک', emoji: '🤝', className: 'session-overlap' };
+      return { name: 'OVERLAP', label: labels.OVERLAP, emoji: '🤝', className: 'session-overlap' };
     }
     if (londonHour >= 8 && londonHour < 17) {
-      return { name: 'LONDON', label: 'لندن', emoji: '🇬🇧', className: 'session-london' };
+      return { name: 'LONDON', label: labels.LONDON, emoji: '🇬🇧', className: 'session-london' };
     }
     if (nyHour >= 8 && nyHour < 17) {
-      return { name: 'NEW_YORK', label: 'نیویورک', emoji: '🇺🇸', className: 'session-ny' };
+      return { name: 'NEW_YORK', label: labels.NEW_YORK, emoji: '🇺🇸', className: 'session-ny' };
     }
     if (tokyoHour >= 9 && tokyoHour < 18) {
-      return { name: 'ASIAN', label: 'توکیو', emoji: '🇯🇵', className: 'session-asian' };
+      return { name: 'ASIAN', label: labels.ASIAN, emoji: '🇯🇵', className: 'session-asian' };
     }
     if (sydneyHour >= 7 && sydneyHour < 16) {
-      return { name: 'SYDNEY', label: 'سیدنی', emoji: '🇦🇺', className: 'session-sydney' };
+      return { name: 'SYDNEY', label: labels.SYDNEY, emoji: '🇦🇺', className: 'session-sydney' };
     }
     if (sydneyHour >= 16 || sydneyHour < 7) {
-      return { name: 'SYDNEY', label: 'سیدنی', emoji: '🇦🇺', className: 'session-sydney' };
+      return { name: 'SYDNEY', label: labels.SYDNEY, emoji: '🇦🇺', className: 'session-sydney' };
     }
 
-    return { name: 'UNKNOWN', label: 'نامشخص', emoji: '❓', className: 'session-unknown' };
+    return { name: 'UNKNOWN', label: labels.UNKNOWN, emoji: '❓', className: 'session-unknown' };
   } catch {
-    return { name: 'UNKNOWN', label: 'نامشخص', emoji: '❓', className: 'session-unknown' };
+    return { name: 'UNKNOWN', label: labels.UNKNOWN, emoji: '❓', className: 'session-unknown' };
   }
 };
 
 export const getMainPair = (symbol: string): string => {
   if (!symbol) return '';
   const clean = symbol.trim();
-  // Split by common separators: ., _, +, -
   const base = clean.split(/[\._\+-]/)[0];
   
-  // If the base ends with lowercase suffix (e.g. EURUSDpro, XAUUSDraw), strip trailing lowercase/numeric characters
-  // Forex/Commodities bases are typically 6 uppercase letters (e.g. EURUSD).
   const matchForex = base.match(/^([A-Z]{6})[a-z0-9]*$/);
   if (matchForex) {
     return matchForex[1];
   }
   
-  // Default to just the uppercase base
   return base.toUpperCase();
 };
 
@@ -165,6 +178,7 @@ export const getSymbolFilterOptions = (uniqueSymbols: string[]): { value: string
 
   const options: { value: string; label: string }[] = [];
   const mainPairs = Object.keys(groups).sort();
+  const allText = useAppStore.getState().language === 'en' ? 'All' : 'همه';
 
   mainPairs.forEach(main => {
     const syms = groups[main];
@@ -174,12 +188,10 @@ export const getSymbolFilterOptions = (uniqueSymbols: string[]): { value: string
         label: syms[0],
       });
     } else {
-      // Main pair group
       options.push({
         value: `main:${main}`,
-        label: `${main} (همه)`,
+        label: `${main} (${allText})`,
       });
-      // Indented sub-pairs using non-breaking spaces
       syms.sort().forEach(sym => {
         options.push({
           value: sym,
@@ -191,4 +203,3 @@ export const getSymbolFilterOptions = (uniqueSymbols: string[]): { value: string
 
   return options;
 };
-

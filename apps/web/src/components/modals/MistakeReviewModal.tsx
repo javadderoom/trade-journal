@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { api } from '../../lib/api';
 import { notify } from '../../lib/notify';
+import { useTranslation } from '../../store/useAppStore';
 import './mistake-review-modal.scss';
 
 export interface SuggestedMistake {
@@ -38,12 +39,20 @@ interface MistakeReviewModalProps {
   suggestions: SuggestedMistake[];
 }
 
-function ordinalFa(n: number): string {
-  const ordinals: Record<number, string> = {
-    1: 'اول', 2: 'دوم', 3: 'سوم', 4: 'چهارم', 5: 'پنجم',
-    6: 'ششم', 7: 'هفتم', 8: 'هشتم', 9: 'نهم', 10: 'دهم',
-  };
-  return ordinals[n] ?? `${n}م`;
+function ordinalFa(n: number, isEn: boolean): string {
+  if (isEn) {
+    const ordinals: Record<number, string> = {
+      1: 'first', 2: 'second', 3: 'third', 4: 'fourth', 5: 'fifth',
+      6: 'sixth', 7: 'seventh', 8: 'eighth', 9: 'ninth', 10: 'tenth',
+    };
+    return ordinals[n] ?? `${n}th`;
+  } else {
+    const ordinals: Record<number, string> = {
+      1: 'اول', 2: 'دوم', 3: 'سوم', 4: 'چهارم', 5: 'پنجم',
+      6: 'ششم', 7: 'هفتم', 8: 'هشتم', 9: 'نهم', 10: 'دهم',
+    };
+    return ordinals[n] ?? `${n}م`;
+  }
 }
 
 export default function MistakeReviewModal({
@@ -53,6 +62,9 @@ export default function MistakeReviewModal({
   tradeSummary,
   suggestions,
 }: MistakeReviewModalProps) {
+  const { t, language } = useTranslation();
+  const isEn = language === 'en';
+
   const [decisions, setDecisions] = useState<ChipDecision[]>([]);
   const [stats, setStats] = useState<MistakeStat[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -85,7 +97,6 @@ export default function MistakeReviewModal({
   };
 
   const handleSubmit = async () => {
-    // All undecided chips are treated as confirmed by default
     const incidents = decisions.map(d => ({
       tradeId,
       ruleKey: d.ruleKey,
@@ -98,7 +109,7 @@ export default function MistakeReviewModal({
     try {
       await api.post('/api/trades/mistakes/confirm', { incidents });
     } catch (err) {
-      notify.error('خطا در ذخیره تصمیم‌ها');
+      notify.error(isEn ? 'Error saving decisions.' : 'خطا در ذخیره تصمیم‌ها');
     } finally {
       setIsSubmitting(false);
       onClose();
@@ -106,7 +117,21 @@ export default function MistakeReviewModal({
   };
 
   const handleSkip = () => {
-    onClose(); // No API call — dismissed
+    onClose();
+  };
+
+  const p = {
+    title: isEn ? '🔍 Auto Mistake Detection' : '🔍 تشخیص خودکار اشتباه',
+    desc: isEn ? 'Simple rules checked on your actual trade details' : 'هوش مصنوعی نشد، قوانین ساده روی داده‌های خودت',
+    potentialMistakes: isEn ? 'Potential mistakes identified:' : 'اشتباهات احتمالی شناسایی شده:',
+    confirm: isEn ? 'Confirm' : '✅ تأیید',
+    confirmTitle: isEn ? 'Confirm this mistake' : 'تأیید این اشتباه',
+    reject: isEn ? 'Reject' : '✕ رد',
+    rejectTitle: isEn ? 'Reject suggestion' : 'رد این پیشنهاد',
+    more: isEn ? '... (more)' : '... (بیشتر)',
+    rejectAll: isEn ? 'Reject All' : 'رد کردن همه',
+    save: isEn ? 'Save Decisions' : 'ذخیره تصمیم‌ها',
+    saving: isEn ? 'Saving...' : 'در حال ذخیره...',
   };
 
   return (
@@ -116,8 +141,8 @@ export default function MistakeReviewModal({
         {/* Header */}
         <div className="modal-header">
           <div className="header-text">
-            <h3>🔍 تشخیص خودکار اشتباه</h3>
-            <p>هوش مصنوعی نشد، قوانین ساده روی داده‌های خودت</p>
+            <h3>{p.title}</h3>
+            <p>{p.desc}</p>
           </div>
           <button className="close-btn" onClick={onClose}>
             <span className="material-symbols-outlined">close</span>
@@ -128,7 +153,7 @@ export default function MistakeReviewModal({
         <div className="trade-summary-strip">
           <span className="symbol">{tradeSummary.symbol}</span>
           <span className={`direction-badge ${tradeSummary.direction.toLowerCase()}`}>
-            {tradeSummary.direction === 'BUY' ? 'خرید' : 'فروش'}
+            {tradeSummary.direction === 'BUY' ? (isEn ? 'Buy' : 'خرید') : (isEn ? 'Sell' : 'فروش')}
           </span>
           <span className="pnl loss">
             {tradeSummary.profitUsd.toFixed(2)}$
@@ -137,7 +162,7 @@ export default function MistakeReviewModal({
 
         {/* Mistake Chips */}
         <div className="mistakes-section">
-          <span className="section-label">اشتباهات احتمالی شناسایی شده:</span>
+          <span className="section-label">{p.potentialMistakes}</span>
           {suggestions.map(s => {
             const d = decisions.find(dec => dec.ruleKey === s.ruleKey);
             const existingStat = stats.find(st => st.ruleKey === s.ruleKey);
@@ -157,16 +182,16 @@ export default function MistakeReviewModal({
                     <button
                       className={`btn-confirm ${isConfirmed ? 'active' : ''}`}
                       onClick={() => setDecision(s.ruleKey, true)}
-                      title="تأیید این اشتباه"
+                      title={p.confirmTitle}
                     >
-                      ✅ تأیید
+                      {p.confirm}
                     </button>
                     <button
                       className={`btn-dismiss ${isDismissed ? 'active' : ''}`}
                       onClick={() => setDecision(s.ruleKey, false)}
-                      title="رد این پیشنهاد"
+                      title={p.rejectTitle}
                     >
-                      ✕ رد
+                      {p.reject}
                     </button>
                   </div>
                 </div>
@@ -174,18 +199,20 @@ export default function MistakeReviewModal({
                 {/* Recurrence message */}
                 {existingStat && existingStat.count > 0 && (
                   <div className="recurrence-msg">
-                    این {ordinalFa(existingStat.count + 1)}مین باره که این اشتباه رو تکرار میکنی
-                    {' '}— تا الان ${existingStat.totalCostUsd.toFixed(0)} برات هزینه داشته
+                    {isEn 
+                      ? `This is the ${ordinalFa(existingStat.count + 1, true)} time you repeat this mistake — cost you $${existingStat.totalCostUsd.toFixed(0)} so far` 
+                      : `این ${ordinalFa(existingStat.count + 1, false)}مین باره که این اشتباه رو تکرار میکنی — تا الان $${existingStat.totalCostUsd.toFixed(0)} برات هزینه داشته`
+                    }
                   </div>
                 )}
 
                 {/* Reason toggle */}
                 <button
-                  style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, textAlign: 'right' }}
+                  style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, textAlign: isEn ? 'left' : 'right', width: '100%' }}
                   onClick={() => toggleReason(s.ruleKey)}
                 >
                   <span className="chip-reason">
-                    {showReason ? s.reason : `${s.reason.slice(0, 80)}${s.reason.length > 80 ? '... (بیشتر)' : ''}`}
+                    {showReason ? s.reason : `${s.reason.slice(0, 80)}${s.reason.length > 80 ? p.more : ''}`}
                   </span>
                 </button>
               </div>
@@ -196,14 +223,14 @@ export default function MistakeReviewModal({
         {/* Footer */}
         <div className="modal-footer">
           <button className="btn-skip" onClick={handleSkip}>
-            رد کردن همه
+            {p.rejectAll}
           </button>
           <button
             className="btn-submit"
             onClick={handleSubmit}
             disabled={isSubmitting}
           >
-            {isSubmitting ? 'در حال ذخیره...' : 'ذخیره تصمیم‌ها'}
+            {isSubmitting ? p.saving : p.save}
           </button>
         </div>
       </div>

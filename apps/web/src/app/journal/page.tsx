@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { api } from '../../lib/api';
+import { useTranslation } from '../../store/useAppStore';
 import { useTradeStore } from '../../store/useTradeStore';
 import JournalEditor from '../../components/journal/JournalEditor';
 import { toPersianDigits, formatToman } from '../../utils/farsi';
@@ -65,6 +66,33 @@ function getMonthLength(jy: number, jm: number): number {
 }
 
 export default function JournalPage() {
+  const { t, language } = useTranslation();
+  const isEn = language === 'en';
+
+  const p = {
+    prevDay: isEn ? 'Previous Day' : 'روز قبل',
+    nextDay: isEn ? 'Next Day' : 'روز بعد',
+    today: isEn ? 'Today' : 'امروز',
+    loadingNote: isEn ? 'Loading journal entry...' : 'در حال بارگذاری یادداشت روز...',
+    moodLabel: isEn ? 'Mood Today:' : 'وضعیت روحی امروز:',
+    moodHappy: isEn ? 'Happy/Great' : 'عالی/شاد',
+    moodNeutral: isEn ? 'Neutral/Calm' : 'خنثی/آرام',
+    moodStressed: isEn ? 'Stressed' : 'تحت فشار',
+    moodAnxious: isEn ? 'Anxious' : 'نگران/مضطرب',
+    moodFrustrated: isEn ? 'Frustrated/Angry' : 'کلافه/عصبانی',
+    dayTradesHeader: isEn ? 'Trades Recorded Today' : 'معاملات ثبت شده امروز',
+    emptyTrades: isEn ? 'No trades recorded for this day.' : 'هیچ معامله‌ای برای تاریخ امروز ثبت نشده است.',
+    symbol: isEn ? 'Symbol' : 'نماد',
+    direction: isEn ? 'Direction' : 'جهت',
+    volume: isEn ? 'Volume (Lot)' : 'حجم (Lot)',
+    openPrice: isEn ? 'Open Price' : 'قیمت ورود',
+    closePrice: isEn ? 'Close Price' : 'قیمت خروج',
+    netPnl: isEn ? 'Net Profit/Loss' : 'سود/زیان خالص',
+    entryTime: isEn ? 'Entry Time' : 'ساعت ورود',
+    buy: isEn ? 'Buy' : 'خرید (Buy)',
+    sell: isEn ? 'Sell' : 'فروش (Sell)'
+  };
+
   const [selectedDate, setSelectedDate] = useState<Date>(() => {
     const d = new Date();
     d.setHours(0, 0, 0, 0);
@@ -246,10 +274,10 @@ export default function JournalPage() {
     setCalendarYear(nextY);
   };
 
-  // Format Jalali selected date string (e.g. شنبه، ۲۵ خرداد ۱۴۰۵)
-  const formatJalaliFullDate = () => {
+  // Format selected date string (e.g. Saturday, June 25, 2026 or شنبه، ۲۵ خرداد ۱۴۰۵)
+  const formatSelectedDateFull = () => {
     try {
-      const formatter = new Intl.DateTimeFormat('fa-IR', {
+      const formatter = new Intl.DateTimeFormat(isEn ? 'en-US' : 'fa-IR', {
         weekday: 'long',
         year: 'numeric',
         month: 'long',
@@ -257,7 +285,9 @@ export default function JournalPage() {
       });
       return formatter.format(selectedDate);
     } catch {
-      return `${jalaliSelected.day} ${MONTH_NAMES[jalaliSelected.month - 1]} ${jalaliSelected.year}`;
+      return isEn 
+        ? selectedDate.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
+        : `${jalaliSelected.day} ${MONTH_NAMES[jalaliSelected.month - 1]} ${jalaliSelected.year}`;
     }
   };
 
@@ -266,8 +296,8 @@ export default function JournalPage() {
       {/* Date Header Controller */}
       <header className="journal-date-header">
         <div className="navigation-controls">
-          <button className="nav-arrow-btn" onClick={() => navigateDay(-1)} title="روز قبل">
-            <span className="material-symbols-outlined">chevron_right</span>
+          <button className="nav-arrow-btn" onClick={() => navigateDay(isEn ? 1 : -1)} title={p.prevDay}>
+            <span className="material-symbols-outlined">{isEn ? 'chevron_left' : 'chevron_right'}</span>
           </button>
           
           <div className="date-picker-trigger-box">
@@ -276,7 +306,7 @@ export default function JournalPage() {
               onClick={() => setShowDatePicker(!showDatePicker)}
             >
               <span className="material-symbols-outlined calendar-icon">calendar_month</span>
-              <span className="date-text">{formatJalaliFullDate()}</span>
+              <span className="date-text">{formatSelectedDateFull()}</span>
               <span className="material-symbols-outlined arrow-icon">keyboard_arrow_down</span>
             </button>
 

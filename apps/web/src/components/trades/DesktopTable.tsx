@@ -3,6 +3,7 @@
 import React from 'react';
 import { Trade, TagObject } from './TradesTable';
 import { toPersianDigits, formatPersianCurrency, formatToman } from '../../utils/farsi';
+import { useTranslation } from '../../store/useAppStore';
 import {
   getEmotionEmoji,
   getEmotionLabel,
@@ -39,6 +40,8 @@ export default function DesktopTable({
   ignoredTags,
   allTags,
 }: DesktopTableProps) {
+  const { t, language } = useTranslation();
+
   const formatCurrency = (val: number) => {
     return formatPersianCurrency(val);
   };
@@ -60,16 +63,16 @@ export default function DesktopTable({
                 />
               </th>
               <th className="sortable-th">
-                تاریخ <span className="material-symbols-outlined sort-icon">arrow_downward</span>
+                {t('trades.date')} <span className="material-symbols-outlined sort-icon">arrow_downward</span>
               </th>
-              <th>روز</th>
-              <th>نماد</th>
-              <th>حساب</th>
-              <th>جهت</th>
-              <th>حجم</th>
-              <th>R:R</th>
-              <th style={{ textAlign: 'left' }}>سود/زیان</th>
-              <th style={{ textAlign: 'center' }}>وضعیت</th>
+              <th>{t('trades.day')}</th>
+              <th>{t('trades.symbol')}</th>
+              <th>{t('trades.account')}</th>
+              <th>{t('trades.direction')}</th>
+              <th>{t('trades.volume')}</th>
+              <th>{t('trades.rr')}</th>
+              <th style={{ textAlign: 'left' }}>{t('trades.pnl')}</th>
+              <th style={{ textAlign: 'center' }}>{t('trades.status')}</th>
             </tr>
           </thead>
           <tbody>
@@ -116,7 +119,7 @@ export default function DesktopTable({
                     {trade.closeTime && (
                       <div style={{ fontSize: '11px', color: 'rgba(255, 255, 255, 0.4)', marginTop: '4px', display: 'flex', alignItems: 'center', gap: '2px' }}>
                         <span className="material-symbols-outlined" style={{ fontSize: '12px' }}>logout</span>
-                        خروج: {formatDate(trade.closeTime, selectedTimezone).date}
+                        {t('trades.exit')}: {formatDate(trade.closeTime, selectedTimezone).date}
                       </div>
                     )}
                   </td>
@@ -134,12 +137,12 @@ export default function DesktopTable({
                       {(trade.analysisTimeframe || trade.entryTimeframe) && (
                         <div className="timeframe-badges">
                           {trade.analysisTimeframe && (
-                            <span className="timeframe-badge analysis" title="تایم‌فریم تحلیل">
+                            <span className="timeframe-badge analysis" title={t('trades.analysisTimeframe')}>
                               📊 {trade.analysisTimeframe}
                             </span>
                           )}
                           {trade.entryTimeframe && (
-                            <span className="timeframe-badge entry" title="تایم‌فریم ورود">
+                            <span className="timeframe-badge entry" title={t('trades.entryTimeframe')}>
                               🎯 {trade.entryTimeframe}
                             </span>
                           )}
@@ -153,7 +156,7 @@ export default function DesktopTable({
                       {(trade.emotion || (sortedTags.length > 0)) && (
                         <div className="symbol-metadata">
                           {trade.emotion && (
-                            <span className={`emotion-mini-badge emotion-${trade.emotion.toLowerCase()}`} title={`احساس: ${getEmotionLabel(trade.emotion, allEmotions)}`}>
+                            <span className={`emotion-mini-badge emotion-${trade.emotion.toLowerCase()}`} title={`${t('trades.emotion')}: ${getEmotionLabel(trade.emotion, allEmotions)}`}>
                               {getEmotionEmoji(trade.emotion, allEmotions)} {getEmotionLabel(trade.emotion, allEmotions)}
                             </span>
                           )}
@@ -166,7 +169,7 @@ export default function DesktopTable({
                             );
                           })}
                           {sortedTags.length > 2 && (
-                            <span className="tag-mini-more" title={sortedTags.slice(2).join('، ')}>
+                            <span className="tag-mini-more" title={sortedTags.slice(2).join(', ')}>
                               +{toPersianDigits(sortedTags.length - 2)}
                             </span>
                           )}
@@ -179,7 +182,7 @@ export default function DesktopTable({
                       const account = accounts.find(a => a.id === trade.accountId);
                       return account
                         ? `${account.broker_name || 'MT5'} (${account.account_number || account.id})`
-                        : (trade.accountId === 'dev-account' ? 'حساب پیش‌فرض' : '-');
+                        : (trade.accountId === 'dev-account' ? t('trades.defaultAccount') : '-');
                     })()}
                   </td>
                   <td>
@@ -187,7 +190,7 @@ export default function DesktopTable({
                       <span className="material-symbols-outlined badge-icon">
                         {isBuy ? 'trending_up' : 'trending_down'}
                       </span>
-                      {isBuy ? 'خرید' : 'فروش'}
+                      {isBuy ? t('trades.buy') : t('trades.sell')}
                     </span>
                   </td>
                   <td className="col-number">{toPersianDigits(trade.lotSize)}</td>
@@ -200,13 +203,15 @@ export default function DesktopTable({
                   </td>
                   <td className={`col-profit ${profitClass}`}>
                     <span className="profit-usd">{formatCurrency(trade.profitUsd)}</span>
-                    <span className="profit-toman">{formatToman(trade.profitUsd, usdToToman)}</span>
+                    {language === 'fa' && (
+                      <span className="profit-toman">{formatToman(trade.profitUsd, usdToToman)}</span>
+                    )}
                   </td>
                   <td style={{ textAlign: 'center' }}>
                     {isMissed ? (
                       <span
                         className="material-symbols-outlined status-icon status-missed"
-                        title="فرصت از دست رفته"
+                        title={t('trades.statusMissed')}
                         style={{ color: '#9ca3af' }}
                       >
                         block
@@ -215,7 +220,7 @@ export default function DesktopTable({
                       <span
                         className={`material-symbols-outlined status-icon ${isClosed ? 'status-closed' : 'status-open'
                           }`}
-                        title={isClosed ? 'بسته شده' : 'باز'}
+                        title={isClosed ? t('trades.statusClosed') : t('trades.statusOpen')}
                       >
                         {isClosed ? 'check_circle' : 'sync'}
                       </span>
@@ -227,7 +232,7 @@ export default function DesktopTable({
             {paginatedTrades.length === 0 && (
               <tr>
                 <td colSpan={10} style={{ textAlign: 'center', padding: '48px', color: '#94a3b8' }}>
-                  معامله‌ای یافت نشد.
+                  {t('trades.searchNoResults')}
                 </td>
               </tr>
             )}

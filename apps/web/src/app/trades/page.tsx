@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import TradesTable, { Trade } from '../../components/trades/TradesTable';
-import { useAppStore } from '../../store/useAppStore';
+import { useAppStore, useTranslation } from '../../store/useAppStore';
 import { useTradeStore } from '../../store/useTradeStore';
 import ManualTradeModal from '../../components/modals/ManualTradeModal';
 import ImportMT4Modal from '../../components/modals/ImportMT4Modal';
@@ -13,6 +13,9 @@ import { notify } from '../../lib/notify';
 import Link from 'next/link';
 
 export default function TradesPage() {
+  const { t, language } = useTranslation();
+  const isEn = language === 'en';
+
   const [autoOpenTradeId, setAutoOpenTradeId] = useState<string | null>(null);
   const [dateFilter, setDateFilter] = useState<string | null>(null);
   const [subStatus, setSubStatus] = useState<any>(null);
@@ -110,7 +113,11 @@ export default function TradesPage() {
   }, [trades]);
 
   const handleImportSuccess = async (result: any) => {
-    notify.success(`واردات فایل با موفقیت انجام شد:\nتعداد معامله یافت شده: ${result.found}\nتعداد وارد شده: ${result.imported}\nتعداد تکراری (نادیده گرفته شده): ${result.skipped}`);
+    notify.success(
+      isEn 
+        ? `Import completed successfully:\nFound trades: ${result.found}\nImported: ${result.imported}\nDuplicate (ignored): ${result.skipped}`
+        : `واردات فایل با موفقیت انجام شد:\nتعداد معامله یافت شده: ${result.found}\nتعداد وارد شده: ${result.imported}\nتعداد تکراری (نادیده گرفته شده): ${result.skipped}`
+    );
     await fetchTrades(true, selectedAccountId);
     fetchSubStatus();
     // Open batch mistake summary if any were detected
@@ -150,7 +157,9 @@ export default function TradesPage() {
   if (loading) {
     return (
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', backgroundColor: '#111319', color: '#61f9b1' }}>
-        <div style={{ fontSize: '20px', fontFamily: 'Vazirmatn' }}>در حال دریافت اطلاعات معاملات...</div>
+        <div style={{ fontSize: '20px', fontFamily: isEn ? 'inherit' : 'Vazirmatn' }}>
+          {isEn ? 'Loading trades data...' : 'در حال دریافت اطلاعات معاملات...'}
+        </div>
       </div>
     );
   }
@@ -163,7 +172,7 @@ export default function TradesPage() {
           color: '#ffb300',
           padding: '12px 20px',
           textAlign: 'center',
-          fontFamily: 'Vazirmatn',
+          fontFamily: isEn ? 'inherit' : 'Vazirmatn',
           fontSize: '0.9rem',
           display: 'flex',
           justifyContent: 'center',
@@ -172,9 +181,18 @@ export default function TradesPage() {
         }}>
           <span className="material-symbols-outlined">pending_actions</span>
           <span>
-            فیش پرداخت شما برای ارتقا به پلن{' '}
-            <strong>{subStatus.pendingReceipt.plan === 'STANDARD' ? 'استاندارد' : 'حرفه‌ای'}</strong> (دوره{' '}
-            {subStatus.pendingReceipt.period === 'annual' ? 'سالانه' : 'ماهانه'}) ثبت شده و در حال بررسی توسط مدیریت است.
+            {isEn ? (
+              <>
+                Your payment receipt to upgrade to plan{' '}
+                <strong>{subStatus.pendingReceipt.plan === 'STANDARD' ? 'Standard' : 'Pro'}</strong> ({subStatus.pendingReceipt.period === 'annual' ? 'Annual' : 'Monthly'}) is submitted and is being reviewed by administration.
+              </>
+            ) : (
+              <>
+                فیش پرداخت شما برای ارتقا به پلن{' '}
+                <strong>{subStatus.pendingReceipt.plan === 'STANDARD' ? 'استاندارد' : 'حرفه‌ای'}</strong> (دوره{' '}
+                {subStatus.pendingReceipt.period === 'annual' ? 'سالانه' : 'ماهانه'}) ثبت شده و در حال بررسی توسط مدیریت است.
+              </>
+            )}
           </span>
         </div>
       )}
@@ -186,7 +204,7 @@ export default function TradesPage() {
           color: '#ff5370',
           padding: '12px 20px',
           textAlign: 'center',
-          fontFamily: 'Vazirmatn',
+          fontFamily: isEn ? 'inherit' : 'Vazirmatn',
           fontSize: '0.9rem',
           display: 'flex',
           justifyContent: 'center',
@@ -194,15 +212,32 @@ export default function TradesPage() {
           gap: '10px'
         }}>
           <span className="material-symbols-outlined">cancel</span>
-          <span style={{ flex: 1, textAlign: 'right' }}>
-            آخرین فیش واریزی شما برای پلن{' '}
-            <strong>{subStatus.pendingReceipt.plan === 'STANDARD' ? 'استاندارد' : 'حرفه‌ای'}</strong>{' '}
-            توسط مدیریت رد شد.
-            {subStatus.pendingReceipt.rejectionReason && (
+          <span style={{ flex: 1, textAlign: isEn ? 'left' : 'right' }}>
+            {isEn ? (
               <>
-                <br />
-                <span style={{ color: '#a0aec0' }}>علت رد شدن: </span>
-                <strong style={{ color: '#f8fafc' }}>{subStatus.pendingReceipt.rejectionReason}</strong>
+                Your last payment receipt for plan{' '}
+                <strong>{subStatus.pendingReceipt.plan === 'STANDARD' ? 'Standard' : 'Pro'}</strong>{' '}
+                was rejected by administration.
+                {subStatus.pendingReceipt.rejectionReason && (
+                  <>
+                    <br />
+                    <span style={{ color: '#a0aec0' }}>Reason: </span>
+                    <strong style={{ color: '#f8fafc' }}>{subStatus.pendingReceipt.rejectionReason}</strong>
+                  </>
+                )}
+              </>
+            ) : (
+              <>
+                آخرین فیش واریزی شما برای پلن{' '}
+                <strong>{subStatus.pendingReceipt.plan === 'STANDARD' ? 'استاندارد' : 'حرفه‌ای'}</strong>{' '}
+                توسط مدیریت رد شد.
+                {subStatus.pendingReceipt.rejectionReason && (
+                  <>
+                    <br />
+                    <span style={{ color: '#a0aec0' }}>علت رد شدن: </span>
+                    <strong style={{ color: '#f8fafc' }}>{subStatus.pendingReceipt.rejectionReason}</strong>
+                  </>
+                )}
               </>
             )}
           </span>
@@ -222,7 +257,7 @@ export default function TradesPage() {
           padding: '12px 20px',
           textAlign: 'center',
           fontWeight: 'bold',
-          fontFamily: 'Vazirmatn',
+          fontFamily: isEn ? 'inherit' : 'Vazirmatn',
           fontSize: '0.9rem',
           display: 'flex',
           justifyContent: 'center',
@@ -231,13 +266,18 @@ export default function TradesPage() {
         }}>
           <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>warning</span>
           <span>
-            {subStatus.usage.monthlyTrades >= 30
-              ? 'سقف ثبت ۳۰ معامله در ماه برای پلن رایگان به پایان رسیده است. برای ثبت معامله جدید یا واردات فایل، لطفاً اشتراک خود را ارتقا دهید.'
-              : `شما ${subStatus.usage.monthlyTrades} معامله از سقف ۳۰ معامله مجاز در ماه برای پلن رایگان را ثبت کرده‌اید. برای ثبت معامله بیشتر، لطفاً اشتراک خود را ارتقا دهید.`
-            }
+            {isEn ? (
+              subStatus.usage.monthlyTrades >= 30
+                ? 'The limit of 30 trades per month for the free plan has been reached. Please upgrade your subscription to add or import more trades.'
+                : `You have recorded ${subStatus.usage.monthlyTrades} out of the 30 allowed monthly trades in the free plan. Please upgrade your subscription to add more.`
+            ) : (
+              subStatus.usage.monthlyTrades >= 30
+                ? 'سقف ثبت ۳۰ معامله در ماه برای پلن رایگان به پایان رسیده است. برای ثبت معامله جدید یا واردات فایل، لطفاً اشتراک خود را ارتقا دهید.'
+                : `شما ${subStatus.usage.monthlyTrades} معامله از سقف ۳۰ معامله مجاز در ماه برای پلن رایگان را ثبت کرده‌اید. برای ثبت معامله بیشتر، لطفاً اشتراک خود را ارتقا دهید.`
+            )}
           </span>
-          <Link href="/settings?tab=subscription" style={{ color: '#111319', textDecoration: 'underline', marginRight: '15px' }}>
-            ارتقای اشتراک
+          <Link href="/settings?tab=subscription" style={{ color: '#111319', textDecoration: 'underline', marginRight: isEn ? '0px' : '15px', marginLeft: isEn ? '15px' : '0px' }}>
+            {isEn ? 'Upgrade Subscription' : 'ارتقای اشتراک'}
           </Link>
         </div>
       )}

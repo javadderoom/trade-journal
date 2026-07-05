@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { Trade, TagObject } from './TradesTable';
 import TradeChart from './TradeChart';
 import { toPersianDigits, formatPersianCurrency, formatToman } from '../../utils/farsi';
+import { useTranslation } from '../../store/useAppStore';
 import {
   getEmotionEmoji,
   getEmotionLabel,
@@ -33,19 +34,6 @@ interface DetailPanelProps {
   onSaveEmotionConfigurations?: (emotions: { value: string; label: string; emoji: string }[], deletes: string[]) => Promise<void>;
 }
 
-const inputStyle: React.CSSProperties = {
-  backgroundColor: 'transparent',
-  border: '1px solid rgba(255, 255, 255, 0.1)',
-  color: '#fff',
-  borderRadius: '4px',
-  padding: '2px 8px',
-  width: '100%',
-  fontFamily: 'Vazirmatn',
-  fontSize: '13px',
-  outline: 'none',
-  height: '32px',
-};
-
 export default function DetailPanel({
   activeTrade,
   setActiveTradeId,
@@ -67,6 +55,76 @@ export default function DetailPanel({
   onSaveTagConfigurations,
   onSaveEmotionConfigurations,
 }: DetailPanelProps) {
+  const { t, language } = useTranslation();
+  const isEn = language === 'en';
+
+  const inputStyle: React.CSSProperties = {
+    backgroundColor: 'transparent',
+    border: '1px solid rgba(255, 255, 255, 0.1)',
+    color: '#fff',
+    borderRadius: '4px',
+    padding: '2px 8px',
+    width: '100%',
+    fontFamily: language === 'fa' ? 'Vazirmatn' : 'inherit',
+    fontSize: '13px',
+    outline: 'none',
+    height: '32px',
+  };
+
+  const p = {
+    details: isEn ? 'Details' : 'مشخصات',
+    notesTab: isEn ? 'Notes & Documents' : 'یادداشت و مستندات',
+    netProfit: isEn ? 'Net Profit (P&L)' : '{p.netProfit}',
+    closed: isEn ? 'Closed' : 'بسته شده',
+    open: isEn ? 'Open' : 'باز',
+    pips: isEn ? 'Pips' : 'پیپ',
+    riskReward: isEn ? 'Risk to Reward' : 'ریسک به ریوارد',
+    chartTitle: isEn ? 'Trade Price Chart' : 'نمودار قیمت معامله',
+    executionDetails: isEn ? 'Execution Details' : 'جزئیات اجرا',
+    account: isEn ? 'Trading Account:' : '{p.account}',
+    symbol: isEn ? 'Symbol:' : '{p.symbol}',
+    direction: isEn ? 'Direction:' : '{p.direction}',
+    volume: isEn ? 'Volume (Lot):' : '{p.volume}',
+    openTime: isEn ? 'Open Time:' : '{p.openTime}',
+    openSession: isEn ? 'Entry Session:' : '{p.openSession}',
+    analysisTimeframe: isEn ? 'Analysis Timeframe:' : '{p.analysisTimeframe}',
+    entryTimeframe: isEn ? 'Entry Timeframe:' : '{p.entryTimeframe}',
+    openPrice: isEn ? 'Open Price:' : '{p.openPrice}',
+    sl: isEn ? 'Stop Loss (SL):' : '{p.sl}',
+    tp: isEn ? 'Take Profit (TP):' : '{p.tp}',
+    closeTime: isEn ? 'Close Time:' : '{p.closeTime}',
+    closePrice: isEn ? 'Close Price:' : '{p.closePrice}',
+    profitUsd: isEn ? 'Profit/Loss (USD):' : '{p.profitUsd}',
+    commission: isEn ? 'Commission:' : '{p.commission}',
+    swap: isEn ? 'Swap:' : '{p.swap}',
+    closeTrade: isEn ? 'Close Trade' : '{p.closeTrade}',
+    reopenTrade: isEn ? 'Reopen Trade' : '{p.reopenTrade}',
+    timeframe: isEn ? 'Timeframe' : 'تایم‌فریم',
+    tradeEmotion: isEn ? 'Trade Emotion' : 'احساس معاملاتی',
+    manageProps: isEn ? 'Manage Properties' : 'مدیریت ویژگی‌ها',
+    confirmSettings: isEn ? 'Confirm Settings' : 'تأیید تنظیمات',
+    emoji: isEn ? 'Emoji' : 'اموجی',
+    emotionName: isEn ? 'Emotion name...' : 'نام احساس...',
+    deleteEmotionTitle: isEn ? 'Delete emotion from library' : 'حذف احساس از کل کتابخانه',
+    addEmotion: isEn ? 'Add Emotion' : 'افزودن احساس',
+    journalNotes: isEn ? 'Journal Notes' : 'یادداشت‌های ژورنال',
+    notesPlaceholder: isEn ? 'What was the reason for entering this trade? How were the market conditions...?' : 'دلیل ورود به این معامله چه بود؟ شرایط بازار چگونه بود...؟',
+    screenshots: isEn ? 'Trade Screenshots (Visual Proof)' : 'تصاویر معامله (سند تصویری)',
+    uploading: isEn ? 'Uploading...' : 'بارگذاری...',
+    addImage: isEn ? 'Add Image' : 'افزودن تصویر',
+    saveChanges: isEn ? 'Save Changes' : 'ذخیره تغییرات',
+    deleteTrade: isEn ? 'Delete Trade' : 'حذف معامله',
+    tagPlaceholder: isEn ? 'Tag...' : 'برچسب...',
+    addTag: isEn ? 'Add Tag' : 'افزودن برچسب',
+    tagNamePlaceholder: isEn ? 'Tag name...' : 'نام برچسب...',
+    deleteTagTitle: isEn ? 'Delete tag from library' : 'حذف برچسب از کل کتابخانه',
+    showFirst: isEn ? 'Show first' : 'نمایش اول صف',
+    ignoreTag: isEn ? 'Ignore in stats' : 'نادیده گرفتن در گزارش',
+    defaultAccount: isEn ? 'Default Account' : 'حساب پیش‌فرض',
+    buy: isEn ? 'Buy' : 'خرید',
+    sell: isEn ? 'Sell' : 'فروش',
+  };
+
   const [activeTab, setActiveTab] = useState<'stats' | 'journal'>('stats');
   const [isAddingTag, setIsAddingTag] = useState(false);
   const [isAddingEmotion, setIsAddingEmotion] = useState(false);
@@ -182,7 +240,7 @@ export default function DetailPanel({
           <div className="title-text">
             <h2>{activeTrade.symbol}</h2>
             <p dir="ltr">
-              {activeTrade.direction === 'BUY' ? 'Buy' : 'Sell'} {toPersianDigits(activeTrade.lotSize)} Lots
+              {activeTrade.direction === 'BUY' ? p.buy : p.sell} {toPersianDigits(activeTrade.lotSize)} Lots
             </p>
           </div>
         </div>
@@ -198,14 +256,14 @@ export default function DetailPanel({
           onClick={() => setActiveTab('stats')}
         >
           <span className="material-symbols-outlined tab-icon">analytics</span>
-          مشخصات
+          {p.details}
         </button>
         <button
           className={`tab-btn ${activeTab === 'journal' ? 'active' : ''}`}
           onClick={() => setActiveTab('journal')}
         >
           <span className="material-symbols-outlined tab-icon">rate_review</span>
-          یادداشت و مستندات
+          {p.notesTab}
         </button>
       </div>
 
@@ -217,9 +275,9 @@ export default function DetailPanel({
             <div className={`financial-box ${activeTrade.profitUsd < 0 ? 'loss-box' : ''}`}>
               <div className="box-bar"></div>
               <div className="box-header">
-                <span className="label">سود خالص (P&L)</span>
+                <span className="label">{p.netProfit}</span>
                 <span className="status">
-                  {activeTrade.closeTime ? 'بسته شده' : 'باز'}
+                  {activeTrade.closeTime ? p.closed : p.open}
                 </span>
               </div>
               <div className="pnl-value">
@@ -230,7 +288,7 @@ export default function DetailPanel({
               </div>
               <div className="metrics-grid">
                 <div className="metric-item">
-                  <span className="stat-label">پیپ</span>
+                  <span className="stat-label">{p.pips}</span>
                   <span className="stat-value">
                     {activeTrade.pips > 0 ? '+' : ''}
                     {toPersianDigits(activeTrade.pips.toFixed(1))}
@@ -238,7 +296,7 @@ export default function DetailPanel({
                 </div>
                 <div className="divider"></div>
                 <div className="metric-item">
-                  <span className="stat-label">ریسک به ریوارد</span>
+                  <span className="stat-label">{p.riskReward}</span>
                   <span className="stat-value">
                     {activeTrade.rMultiple > 0 ? '+' : ''}
                     {toPersianDigits(activeTrade.rMultiple.toFixed(1))}R
@@ -250,7 +308,7 @@ export default function DetailPanel({
             {/* Trade Candlestick Chart */}
             {activeTrade.chartData && Array.isArray(activeTrade.chartData) && activeTrade.chartData.length > 0 && (
               <div className="trade-chart-section">
-                <label className="section-label">نمودار قیمت معامله</label>
+                <label className="section-label">{p.chartTitle}</label>
                 <TradeChart 
                   candlesticks={activeTrade.chartData}
                   direction={activeTrade.direction}
@@ -266,9 +324,9 @@ export default function DetailPanel({
 
             {/* Execution Details */}
             <div className="details-section">
-              <h3>جزئیات اجرا</h3>
+              <h3>{p.executionDetails}</h3>
               <div className="details-grid">
-                 <span className="grid-label">حساب معاملاتی:</span>
+                 <span className="grid-label">{p.account}</span>
                  <span className="grid-value">
                     <select
                       className="grid-input"
@@ -284,7 +342,7 @@ export default function DetailPanel({
                     </select>
                   </span>
 
-                 <span className="grid-label">نماد:</span>
+                 <span className="grid-label">{p.symbol}</span>
                  <span className="grid-value">
                    <input
                      type="text"
@@ -295,7 +353,7 @@ export default function DetailPanel({
                    />
                  </span>
 
-                 <span className="grid-label">جهت:</span>
+                 <span className="grid-label">{p.direction}</span>
                  <span className="grid-value">
                    <select
                      className="grid-input"
@@ -308,7 +366,7 @@ export default function DetailPanel({
                    </select>
                  </span>
 
-                 <span className="grid-label">حجم (Lot):</span>
+                 <span className="grid-label">{p.volume}</span>
                  <span className="grid-value">
                    <input
                      type="number"
@@ -320,7 +378,7 @@ export default function DetailPanel({
                    />
                  </span>
 
-                 <span className="grid-label">زمان ورود:</span>
+                 <span className="grid-label">{p.openTime}</span>
                  <span className="grid-value">
                    <input
                      type="datetime-local"
@@ -331,7 +389,7 @@ export default function DetailPanel({
                    />
                  </span>
 
-<span className="grid-label">سشن ورود:</span>
+<span className="grid-label">{p.openSession}</span>
                   <span className="grid-value">
                     {(() => {
                       const sess = getTradingSession(activeTrade.openTime);
@@ -343,7 +401,7 @@ export default function DetailPanel({
                     })()}
                   </span>
 
-                  <span className="grid-label">تایم‌فریم تحلیل:</span>
+                  <span className="grid-label">{p.analysisTimeframe}</span>
                   <span className="grid-value">
                     <select
                       className="grid-input"
@@ -352,19 +410,19 @@ export default function DetailPanel({
                       style={inputStyle}
                     >
                       <option value="" style={{ backgroundColor: '#1e222b', color: '#fff' }}>—</option>
-                      <option value="M1" style={{ backgroundColor: '#1e222b', color: '#fff' }}>۱ دقیقه (M1)</option>
-                      <option value="M5" style={{ backgroundColor: '#1e222b', color: '#fff' }}>۵ دقیقه (M5)</option>
-                      <option value="M15" style={{ backgroundColor: '#1e222b', color: '#fff' }}>۱۵ دقیقه (M15)</option>
-                      <option value="M30" style={{ backgroundColor: '#1e222b', color: '#fff' }}>۳۰ دقیقه (M30)</option>
-                      <option value="H1" style={{ backgroundColor: '#1e222b', color: '#fff' }}>۱ ساعته (H1)</option>
-                      <option value="H4" style={{ backgroundColor: '#1e222b', color: '#fff' }}>۴ ساعته (H4)</option>
-                      <option value="D1" style={{ backgroundColor: '#1e222b', color: '#fff' }}>روزانه (D1)</option>
-                      <option value="W1" style={{ backgroundColor: '#1e222b', color: '#fff' }}>هفتگی (W1)</option>
-                      <option value="MN" style={{ backgroundColor: '#1e222b', color: '#fff' }}>ماهانه (MN)</option>
+                      <option value="M1" style={{ backgroundColor: '#1e222b', color: '#fff' }}>{language === 'fa' ? '۱ دقیقه (M1)' : '1 Minute (M1)'}</option>
+                      <option value="M5" style={{ backgroundColor: '#1e222b', color: '#fff' }}>{language === 'fa' ? '۵ دقیقه (M5)' : '5 Minutes (M5)'}</option>
+                      <option value="M15" style={{ backgroundColor: '#1e222b', color: '#fff' }}>{language === 'fa' ? '۱۵ دقیقه (M15)' : '15 Minutes (M15)'}</option>
+                      <option value="M30" style={{ backgroundColor: '#1e222b', color: '#fff' }}>{language === 'fa' ? '۳۰ دقیقه (M30)' : '30 Minutes (M30)'}</option>
+                      <option value="H1" style={{ backgroundColor: '#1e222b', color: '#fff' }}>{language === 'fa' ? '۱ ساعته (H1)' : '1 Hour (H1)'}</option>
+                      <option value="H4" style={{ backgroundColor: '#1e222b', color: '#fff' }}>{language === 'fa' ? '۴ ساعته (H4)' : '4 Hours (H4)'}</option>
+                      <option value="D1" style={{ backgroundColor: '#1e222b', color: '#fff' }}>{language === 'fa' ? 'روزانه (D1)' : 'Daily (D1)'}</option>
+                      <option value="W1" style={{ backgroundColor: '#1e222b', color: '#fff' }}>{language === 'fa' ? 'هفتگی (W1)' : 'Weekly (W1)'}</option>
+                      <option value="MN" style={{ backgroundColor: '#1e222b', color: '#fff' }}>{language === 'fa' ? 'ماهانه (MN)' : 'Monthly (MN)'}</option>
                     </select>
                   </span>
 
-                  <span className="grid-label">تایم‌فریم ورود:</span>
+                  <span className="grid-label">{p.entryTimeframe}</span>
                   <span className="grid-value">
                     <select
                       className="grid-input"
@@ -373,19 +431,19 @@ export default function DetailPanel({
                       style={inputStyle}
                     >
                       <option value="" style={{ backgroundColor: '#1e222b', color: '#fff' }}>—</option>
-                      <option value="M1" style={{ backgroundColor: '#1e222b', color: '#fff' }}>۱ دقیقه (M1)</option>
-                      <option value="M5" style={{ backgroundColor: '#1e222b', color: '#fff' }}>۵ دقیقه (M5)</option>
-                      <option value="M15" style={{ backgroundColor: '#1e222b', color: '#fff' }}>۱۵ دقیقه (M15)</option>
-                      <option value="M30" style={{ backgroundColor: '#1e222b', color: '#fff' }}>۳۰ دقیقه (M30)</option>
-                      <option value="H1" style={{ backgroundColor: '#1e222b', color: '#fff' }}>۱ ساعته (H1)</option>
-                      <option value="H4" style={{ backgroundColor: '#1e222b', color: '#fff' }}>۴ ساعته (H4)</option>
-                      <option value="D1" style={{ backgroundColor: '#1e222b', color: '#fff' }}>روزانه (D1)</option>
-                      <option value="W1" style={{ backgroundColor: '#1e222b', color: '#fff' }}>هفتگی (W1)</option>
-                      <option value="MN" style={{ backgroundColor: '#1e222b', color: '#fff' }}>ماهانه (MN)</option>
+                      <option value="M1" style={{ backgroundColor: '#1e222b', color: '#fff' }}>{language === 'fa' ? '۱ دقیقه (M1)' : '1 Minute (M1)'}</option>
+                      <option value="M5" style={{ backgroundColor: '#1e222b', color: '#fff' }}>{language === 'fa' ? '۵ دقیقه (M5)' : '5 Minutes (M5)'}</option>
+                      <option value="M15" style={{ backgroundColor: '#1e222b', color: '#fff' }}>{language === 'fa' ? '۱۵ دقیقه (M15)' : '15 Minutes (M15)'}</option>
+                      <option value="M30" style={{ backgroundColor: '#1e222b', color: '#fff' }}>{language === 'fa' ? '۳۰ دقیقه (M30)' : '30 Minutes (M30)'}</option>
+                      <option value="H1" style={{ backgroundColor: '#1e222b', color: '#fff' }}>{language === 'fa' ? '۱ ساعته (H1)' : '1 Hour (H1)'}</option>
+                      <option value="H4" style={{ backgroundColor: '#1e222b', color: '#fff' }}>{language === 'fa' ? '۴ ساعته (H4)' : '4 Hours (H4)'}</option>
+                      <option value="D1" style={{ backgroundColor: '#1e222b', color: '#fff' }}>{language === 'fa' ? 'روزانه (D1)' : 'Daily (D1)'}</option>
+                      <option value="W1" style={{ backgroundColor: '#1e222b', color: '#fff' }}>{language === 'fa' ? 'هفتگی (W1)' : 'Weekly (W1)'}</option>
+                      <option value="MN" style={{ backgroundColor: '#1e222b', color: '#fff' }}>{language === 'fa' ? 'ماهانه (MN)' : 'Monthly (MN)'}</option>
                     </select>
                   </span>
 
-                  <span className="grid-label">قیمت ورود:</span>
+                  <span className="grid-label">{p.openPrice}</span>
                  <span className="grid-value font-mono direction-ltr">
                    <input
                      type="number"
@@ -397,7 +455,7 @@ export default function DetailPanel({
                    />
                  </span>
 
-                 <span className="grid-label">حد ضرر (SL):</span>
+                 <span className="grid-label">{p.sl}</span>
                  <span className="grid-value">
                    <input
                      type="number"
@@ -412,7 +470,7 @@ export default function DetailPanel({
                    />
                  </span>
 
-                 <span className="grid-label">حد سود (TP):</span>
+                 <span className="grid-label">{p.tp}</span>
                  <span className="grid-value">
                    <input
                      type="number"
@@ -427,7 +485,7 @@ export default function DetailPanel({
                    />
                  </span>
 
-                 <span className="grid-label">زمان خروج:</span>
+                 <span className="grid-label">{p.closeTime}</span>
                  <span className="grid-value">
                    <input
                      type="datetime-local"
@@ -438,7 +496,7 @@ export default function DetailPanel({
                    />
                  </span>
 
-                 <span className="grid-label">قیمت خروج:</span>
+                 <span className="grid-label">{p.closePrice}</span>
                  <span className="grid-value font-mono direction-ltr">
                    <input
                      type="number"
@@ -454,7 +512,7 @@ export default function DetailPanel({
                    />
                  </span>
 
-                 <span className="grid-label">سود/زیان (USD):</span>
+                 <span className="grid-label">{p.profitUsd}</span>
                  <span className="grid-value">
                    <input
                      type="number"
@@ -466,7 +524,7 @@ export default function DetailPanel({
                    />
                  </span>
 
-                 <span className="grid-label">کمیسیون:</span>
+                 <span className="grid-label">{p.commission}</span>
                  <span className="grid-value">
                    <input
                      type="number"
@@ -478,7 +536,7 @@ export default function DetailPanel({
                    />
                  </span>
 
-                 <span className="grid-label">سوآپ:</span>
+                 <span className="grid-label">{p.swap}</span>
                  <span className="grid-value">
                    <input
                      type="number"
@@ -505,20 +563,20 @@ export default function DetailPanel({
                    }}
                  >
                    <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>check_circle</span>
-                   بستن معامله
+                   {p.closeTrade}
                  </button>
                ) : (
                  <button
                    type="button"
                    className="btn-ghost"
-                   style={{ marginTop: '12px', width: '100%', justifyContent: 'center', display: 'flex', alignItems: 'center', gap: '6px', background: 'transparent', border: '1px solid rgba(255,255,255,0.15)', color: '#8898aa', borderRadius: '8px', padding: '8px 16px', cursor: 'pointer', fontFamily: 'Vazirmatn', fontSize: '13px' }}
+                   style={{ marginTop: '12px', width: '100%', justifyContent: 'center', display: 'flex', alignItems: 'center', gap: '6px', background: 'transparent', border: '1px solid rgba(255,255,255,0.15)', color: '#8898aa', borderRadius: '8px', padding: '8px 16px', cursor: 'pointer', fontFamily: language === 'fa' ? 'Vazirmatn' : 'inherit', fontSize: '13px' }}
                    onClick={() => {
                      updateActiveTradeField('closeTime', null);
                      updateActiveTradeField('closePrice', null);
                    }}
                  >
                    <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>undo</span>
-                   بازگشایی معامله
+                   {p.reopenTrade}
                  </button>
                )}
               </div>
@@ -527,9 +585,9 @@ export default function DetailPanel({
           <>
             {/* Timeframe Selectors */}
             <div className="form-group">
-              <label>تایم‌فریم</label>
+              <label>{p.timeframe}</label>
               <div className="details-grid" style={{ marginTop: '6px' }}>
-                <span className="grid-label">تایم‌فریم تحلیل:</span>
+                <span className="grid-label">{p.analysisTimeframe}</span>
                 <span className="grid-value">
                   <select
                     className="grid-input"
@@ -538,19 +596,19 @@ export default function DetailPanel({
                     style={inputStyle}
                   >
                     <option value="" style={{ backgroundColor: '#1e222b', color: '#fff' }}>—</option>
-                    <option value="M1" style={{ backgroundColor: '#1e222b', color: '#fff' }}>۱ دقیقه (M1)</option>
-                    <option value="M5" style={{ backgroundColor: '#1e222b', color: '#fff' }}>۵ دقیقه (M5)</option>
-                    <option value="M15" style={{ backgroundColor: '#1e222b', color: '#fff' }}>۱۵ دقیقه (M15)</option>
-                    <option value="M30" style={{ backgroundColor: '#1e222b', color: '#fff' }}>۳۰ دقیقه (M30)</option>
-                    <option value="H1" style={{ backgroundColor: '#1e222b', color: '#fff' }}>۱ ساعته (H1)</option>
-                    <option value="H4" style={{ backgroundColor: '#1e222b', color: '#fff' }}>۴ ساعته (H4)</option>
-                    <option value="D1" style={{ backgroundColor: '#1e222b', color: '#fff' }}>روزانه (D1)</option>
-                    <option value="W1" style={{ backgroundColor: '#1e222b', color: '#fff' }}>هفتگی (W1)</option>
-                    <option value="MN" style={{ backgroundColor: '#1e222b', color: '#fff' }}>ماهانه (MN)</option>
+                    <option value="M1" style={{ backgroundColor: '#1e222b', color: '#fff' }}>{language === 'fa' ? '۱ دقیقه (M1)' : '1 Minute (M1)'}</option>
+                    <option value="M5" style={{ backgroundColor: '#1e222b', color: '#fff' }}>{language === 'fa' ? '۵ دقیقه (M5)' : '5 Minutes (M5)'}</option>
+                    <option value="M15" style={{ backgroundColor: '#1e222b', color: '#fff' }}>{language === 'fa' ? '۱۵ دقیقه (M15)' : '15 Minutes (M15)'}</option>
+                    <option value="M30" style={{ backgroundColor: '#1e222b', color: '#fff' }}>{language === 'fa' ? '۳۰ دقیقه (M30)' : '30 Minutes (M30)'}</option>
+                    <option value="H1" style={{ backgroundColor: '#1e222b', color: '#fff' }}>{language === 'fa' ? '۱ ساعته (H1)' : '1 Hour (H1)'}</option>
+                    <option value="H4" style={{ backgroundColor: '#1e222b', color: '#fff' }}>{language === 'fa' ? '۴ ساعته (H4)' : '4 Hours (H4)'}</option>
+                    <option value="D1" style={{ backgroundColor: '#1e222b', color: '#fff' }}>{language === 'fa' ? 'روزانه (D1)' : 'Daily (D1)'}</option>
+                    <option value="W1" style={{ backgroundColor: '#1e222b', color: '#fff' }}>{language === 'fa' ? 'هفتگی (W1)' : 'Weekly (W1)'}</option>
+                    <option value="MN" style={{ backgroundColor: '#1e222b', color: '#fff' }}>{language === 'fa' ? 'ماهانه (MN)' : 'Monthly (MN)'}</option>
                   </select>
                 </span>
 
-                <span className="grid-label">تایم‌فریم ورود:</span>
+                <span className="grid-label">{p.entryTimeframe}</span>
                 <span className="grid-value">
                   <select
                     className="grid-input"
@@ -559,15 +617,15 @@ export default function DetailPanel({
                     style={inputStyle}
                   >
                     <option value="" style={{ backgroundColor: '#1e222b', color: '#fff' }}>—</option>
-                    <option value="M1" style={{ backgroundColor: '#1e222b', color: '#fff' }}>۱ دقیقه (M1)</option>
-                    <option value="M5" style={{ backgroundColor: '#1e222b', color: '#fff' }}>۵ دقیقه (M5)</option>
-                    <option value="M15" style={{ backgroundColor: '#1e222b', color: '#fff' }}>۱۵ دقیقه (M15)</option>
-                    <option value="M30" style={{ backgroundColor: '#1e222b', color: '#fff' }}>۳۰ دقیقه (M30)</option>
-                    <option value="H1" style={{ backgroundColor: '#1e222b', color: '#fff' }}>۱ ساعته (H1)</option>
-                    <option value="H4" style={{ backgroundColor: '#1e222b', color: '#fff' }}>۴ ساعته (H4)</option>
-                    <option value="D1" style={{ backgroundColor: '#1e222b', color: '#fff' }}>روزانه (D1)</option>
-                    <option value="W1" style={{ backgroundColor: '#1e222b', color: '#fff' }}>هفتگی (W1)</option>
-                    <option value="MN" style={{ backgroundColor: '#1e222b', color: '#fff' }}>ماهانه (MN)</option>
+                    <option value="M1" style={{ backgroundColor: '#1e222b', color: '#fff' }}>{language === 'fa' ? '۱ دقیقه (M1)' : '1 Minute (M1)'}</option>
+                    <option value="M5" style={{ backgroundColor: '#1e222b', color: '#fff' }}>{language === 'fa' ? '۵ دقیقه (M5)' : '5 Minutes (M5)'}</option>
+                    <option value="M15" style={{ backgroundColor: '#1e222b', color: '#fff' }}>{language === 'fa' ? '۱۵ دقیقه (M15)' : '15 Minutes (M15)'}</option>
+                    <option value="M30" style={{ backgroundColor: '#1e222b', color: '#fff' }}>{language === 'fa' ? '۳۰ دقیقه (M30)' : '30 Minutes (M30)'}</option>
+                    <option value="H1" style={{ backgroundColor: '#1e222b', color: '#fff' }}>{language === 'fa' ? '۱ ساعته (H1)' : '1 Hour (H1)'}</option>
+                    <option value="H4" style={{ backgroundColor: '#1e222b', color: '#fff' }}>{language === 'fa' ? '۴ ساعته (H4)' : '4 Hours (H4)'}</option>
+                    <option value="D1" style={{ backgroundColor: '#1e222b', color: '#fff' }}>{language === 'fa' ? 'روزانه (D1)' : 'Daily (D1)'}</option>
+                    <option value="W1" style={{ backgroundColor: '#1e222b', color: '#fff' }}>{language === 'fa' ? 'هفتگی (W1)' : 'Weekly (W1)'}</option>
+                    <option value="MN" style={{ backgroundColor: '#1e222b', color: '#fff' }}>{language === 'fa' ? 'ماهانه (MN)' : 'Monthly (MN)'}</option>
                   </select>
                 </span>
               </div>
@@ -589,7 +647,7 @@ export default function DetailPanel({
                     alignItems: 'center',
                     gap: '4px',
                     fontSize: '12px',
-                    fontFamily: 'Vazirmatn',
+                    fontFamily: language === 'fa' ? 'Vazirmatn' : 'inherit',
                     outline: 'none',
                   }}
                 >
@@ -624,7 +682,7 @@ export default function DetailPanel({
                             display: 'inline-flex',
                             alignItems: 'center',
                             gap: '2px',
-                            fontFamily: 'Vazirmatn',
+                            fontFamily: language === 'fa' ? 'Vazirmatn' : 'inherit',
                           }}
                           title="نادیده گرفتن از آمار"
                         >
@@ -649,7 +707,7 @@ export default function DetailPanel({
                             display: 'inline-flex',
                             alignItems: 'center',
                             gap: '2px',
-                            fontFamily: 'Vazirmatn',
+                            fontFamily: language === 'fa' ? 'Vazirmatn' : 'inherit',
                           }}
                           title="نمایش در ابتدای لیست"
                         >
@@ -676,7 +734,7 @@ export default function DetailPanel({
                             display: 'inline-flex',
                             alignItems: 'center',
                           }}
-                          title="حذف برچسب از کل کتابخانه"
+                          title={p.deleteTagTitle}
                         >
                           <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>delete</span>
                         </button>
@@ -721,7 +779,7 @@ export default function DetailPanel({
                           )}
                           {tag.name}
                           {tag.is_ignored && (
-                            <span className="material-symbols-outlined" style={{ fontSize: '10px', color: '#ffb4ab' }} title="نادیده گرفته شده از آمار">block</span>
+                            <span className="material-symbols-outlined" style={{ fontSize: '10px', color: '#ffb4ab' }} title={p.ignoreTag}>block</span>
                           )}
                         </span>
                       );
@@ -730,7 +788,7 @@ export default function DetailPanel({
                     <input
                       type="text"
                       autoFocus
-                      placeholder="برچسب..."
+                      placeholder={p.tagPlaceholder}
                       onBlur={() => setIsAddingTag(false)}
                       onKeyDown={e => {
                         if (e.key === 'Enter') {
@@ -759,7 +817,7 @@ export default function DetailPanel({
                         border: '1px dashed rgba(97, 249, 177, 0.5)',
                         outline: 'none',
                         width: '100px',
-                        fontFamily: 'Vazirmatn'
+                        fontFamily: language === 'fa' ? 'Vazirmatn' : 'inherit'
                       }}
                     />
                   ) : (
@@ -768,7 +826,7 @@ export default function DetailPanel({
                       onClick={() => setIsAddingTag(true)}
                     >
                       <span className="material-symbols-outlined btn-icon" style={{ fontSize: '14px' }}>add</span>
-                      افزودن برچسب
+                      {p.addTag}
                     </span>
                   )}
                 </div>
@@ -777,7 +835,7 @@ export default function DetailPanel({
 
             <div className="form-group">
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                <label style={{ marginBottom: 0 }}>برچسب‌های احساسی</label>
+                <label style={{ marginBottom: 0 }}>{p.tradeEmotion}</label>
                 <button
                   type="button"
                   onClick={handleToggleEmotionsConfigMode}
@@ -790,14 +848,14 @@ export default function DetailPanel({
                     alignItems: 'center',
                     gap: '4px',
                     fontSize: '12px',
-                    fontFamily: 'Vazirmatn',
+                    fontFamily: language === 'fa' ? 'Vazirmatn' : 'inherit',
                     outline: 'none',
                   }}
                 >
                   <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>
                     {isConfiguringEmotions ? 'check' : 'settings'}
                   </span>
-                  {isConfiguringEmotions ? 'تأیید تنظیمات' : 'مدیریت ویژگی‌ها'}
+                  {isConfiguringEmotions ? p.confirmSettings : p.manageProps}
                 </button>
               </div>
 
@@ -843,9 +901,9 @@ export default function DetailPanel({
                             color: '#fff',
                             fontSize: '13px',
                             outline: 'none',
-                            fontFamily: 'Vazirmatn'
+                            fontFamily: language === 'fa' ? 'Vazirmatn' : 'inherit'
                           }}
-                          placeholder="نام احساس..."
+                          placeholder={p.emotionName}
                         />
                         {/* Delete Emotion */}
                         <button
@@ -861,7 +919,7 @@ export default function DetailPanel({
                             alignItems: 'center',
                             outline: 'none',
                           }}
-                          title="حذف احساس از کل کتابخانه"
+                          title={p.deleteEmotionTitle}
                         >
                           <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>delete</span>
                         </button>
@@ -903,7 +961,7 @@ export default function DetailPanel({
                     <input
                       type="text"
                       autoFocus
-                      placeholder="احساس..."
+                      placeholder={p.emoji}
                       onBlur={() => setIsAddingEmotion(false)}
                       onKeyDown={e => {
                         if (e.key === 'Enter') {
@@ -941,7 +999,7 @@ export default function DetailPanel({
                         border: '1px dashed rgba(97, 249, 177, 0.5)',
                         outline: 'none',
                         width: '100px',
-                        fontFamily: 'Vazirmatn'
+                        fontFamily: language === 'fa' ? 'Vazirmatn' : 'inherit'
                       }}
                     />
                   ) : (
@@ -950,7 +1008,7 @@ export default function DetailPanel({
                       onClick={() => setIsAddingEmotion(true)}
                     >
                       <span className="material-symbols-outlined btn-icon" style={{ fontSize: '14px' }}>add</span>
-                      افزودن احساس
+                      {p.addEmotion}
                     </span>
                   )}
                 </div>
@@ -959,9 +1017,9 @@ export default function DetailPanel({
 
             {/* Notes Area */}
             <div className="form-group" style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-              <label>یادداشت‌های ژورنال</label>
+              <label>{p.journalNotes}</label>
               <textarea
-                placeholder="دلیل ورود به این معامله چه بود؟ شرایط بازار چگونه بود...؟"
+                placeholder={p.notesPlaceholder}
                 value={activeTrade.notes || ''}
                 onChange={e => updateActiveTradeField('notes', e.target.value)}
               />
@@ -969,7 +1027,7 @@ export default function DetailPanel({
 
             {/* Screenshots Group */}
             <div className="form-group screenshots-group">
-              <label>تصاویر معامله (سند تصویری)</label>
+              <label>{p.screenshots}</label>
               
               <div className="screenshots-grid">
                 {activeTrade.screenshots && activeTrade.screenshots.map((url, idx) => {
@@ -995,12 +1053,12 @@ export default function DetailPanel({
                   {isUploading ? (
                     <div className="upload-loader">
                       <span className="material-symbols-outlined spinner-icon">sync</span>
-                      <p>بارگذاری...</p>
+                      <p>{p.uploading}</p>
                     </div>
                   ) : (
                     <div className="upload-prompt">
                       <span className="material-symbols-outlined upload-icon">add_photo_alternate</span>
-                      <p>افزودن تصویر</p>
+                      <p>{p.addImage}</p>
                     </div>
                   )}
                 </label>
@@ -1013,9 +1071,9 @@ export default function DetailPanel({
       {/* Panel Footer Actions */}
       <div className="panel-footer">
         <button className="btn-save" onClick={handleSaveDetails}>
-          ذخیره تغییرات
+          {p.saveChanges}
         </button>
-        <button className="btn-delete" onClick={handleDeleteClick} title="حذف معامله">
+        <button className="btn-delete" onClick={handleDeleteClick} title={p.deleteTrade}>
           <span className="material-symbols-outlined">delete</span>
         </button>
       </div>

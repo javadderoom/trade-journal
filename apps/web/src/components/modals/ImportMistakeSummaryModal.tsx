@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { api } from '../../lib/api';
 import { notify } from '../../lib/notify';
 import { SuggestedMistake } from './MistakeReviewModal';
+import { useTranslation } from '../../store/useAppStore';
 import './mistake-review-modal.scss';
 
 export interface ImportMistakeEntry {
@@ -50,6 +51,9 @@ export default function ImportMistakeSummaryModal({
   onClose,
   mistakeSummary,
 }: ImportMistakeSummaryModalProps) {
+  const { t, language } = useTranslation();
+  const isEn = language === 'en';
+
   const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -82,9 +86,9 @@ export default function ImportMistakeSummaryModal({
     setIsSubmitting(true);
     try {
       await api.post('/api/trades/mistakes/confirm', { incidents: buildIncidents(true) });
-      notify.success('همه اشتباهات ثبت شدند.');
+      notify.success(isEn ? 'All mistakes recorded successfully.' : 'همه اشتباهات ثبت شدند.');
     } catch {
-      notify.error('خطا در ذخیره اشتباهات');
+      notify.error(isEn ? 'Error saving mistakes.' : 'خطا در ذخیره اشتباهات');
     } finally {
       setIsSubmitting(false);
       onClose();
@@ -92,8 +96,18 @@ export default function ImportMistakeSummaryModal({
   };
 
   const handleDismissAll = () => {
-    // No API call — just close
     onClose();
+  };
+
+  const p = {
+    title: isEn ? 'Losing Trade Patterns Detected' : 'الگوهای اشتباه در واردات',
+    desc: isEn 
+      ? `In this import, ${totalAffected} losing trades were identified with the following mistake patterns:`
+      : `در این واردات، ${totalAffected} معامله ضررده با الگوهای زیر شناسایی شد:`,
+    tradesCount: isEn ? 'trades' : 'معامله',
+    rejectAll: isEn ? 'Dismiss All' : 'رد همه',
+    confirmAll: isEn ? 'Confirm All' : 'تأیید همه',
+    saving: isEn ? 'Saving...' : 'در حال ذخیره...',
   };
 
   return (
@@ -106,10 +120,8 @@ export default function ImportMistakeSummaryModal({
         <div className="import-mistake-header">
           <span className="material-symbols-outlined warning-icon">warning</span>
           <div>
-            <h3>الگوهای اشتباه در واردات</h3>
-            <p>
-              در این واردات، {totalAffected} معامله ضررده با الگوهای زیر شناسایی شد:
-            </p>
+            <h3>{p.title}</h3>
+            <p>{p.desc}</p>
           </div>
         </div>
 
@@ -122,7 +134,7 @@ export default function ImportMistakeSummaryModal({
                 <div className="rule-group-header" onClick={() => toggleGroup(group.ruleKey)}>
                   <span className="rule-label">🤖 {group.label}</span>
                   <div className="rule-meta">
-                    <span className="count-badge">{group.entries.length} معامله</span>
+                    <span className="count-badge">{group.entries.length} {p.tradesCount}</span>
                     <span className="cost-badge">-${group.totalCostUsd.toFixed(0)}</span>
                   </div>
                   <span className={`material-symbols-outlined expand-icon ${isExpanded ? 'open' : ''}`}>
@@ -150,14 +162,14 @@ export default function ImportMistakeSummaryModal({
             onClick={handleDismissAll}
             disabled={isSubmitting}
           >
-            رد همه
+            {p.rejectAll}
           </button>
           <button
             className="btn-confirm-all"
             onClick={handleConfirmAll}
             disabled={isSubmitting}
           >
-            {isSubmitting ? 'در حال ذخیره...' : 'تأیید همه'}
+            {isSubmitting ? p.saving : p.confirmAll}
           </button>
         </div>
       </div>

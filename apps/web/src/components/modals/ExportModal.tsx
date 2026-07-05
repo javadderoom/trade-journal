@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { api } from '../../lib/api';
 import { notify } from '../../lib/notify';
+import { useTranslation } from '../../store/useAppStore';
 import './export-modal.scss';
 
 interface ExportModalProps {
@@ -27,6 +28,9 @@ export default function ExportModal({
   totalCount,
   activeFilters,
 }: ExportModalProps) {
+  const { t, language } = useTranslation();
+  const isEn = language === 'en';
+
   const [format, setFormat] = useState<'csv' | 'xlsx' | 'pdf'>('csv');
   const [scope, setScope] = useState<'all' | 'filtered'>('filtered');
   const [isDownloading, setIsDownloading] = useState(false);
@@ -50,10 +54,6 @@ export default function ExportModal({
         if (activeFilters.dateFilter) params.append('dates', activeFilters.dateFilter);
       }
 
-      // We trigger browser download using a token-authenticated link or direct window open
-      // Since it's a GET file download, window.open or window.location is standard.
-      // To pass JWT, we request a brief download token, or we fetch the file as a Blob using the axios client.
-      // Fetching as Blob is safer as it uses the Axios client which handles auth headers and refresh tokens.
       const response = await api.get(`/api/trades/export/export?${params.toString()}`, {
         responseType: 'blob',
       });
@@ -64,7 +64,6 @@ export default function ExportModal({
       const link = document.createElement('a');
       link.href = window.URL.createObjectURL(blob);
 
-      // Extract filename from header or use default
       let filename = `tradekav-trades-${new Date().toISOString().substring(0, 10)}`;
       const disposition = response.headers['content-disposition'];
       if (disposition && disposition.indexOf('attachment') !== -1) {
@@ -82,21 +81,38 @@ export default function ExportModal({
       link.click();
       document.body.removeChild(link);
 
-      notify.success('خروجی داده با موفقیت دریافت شد.');
+      notify.success(isEn ? 'Export downloaded successfully.' : 'خروجی داده با موفقیت دریافت شد.');
       onClose();
     } catch (err: any) {
       console.error('Download export failed:', err);
-      notify.error('خطا در دریافت فایل خروجی. لطفا مجددا تلاش کنید.');
+      notify.error(isEn ? 'Error downloading export file. Please try again.' : 'خطا در دریافت فایل خروجی. لطفا مجددا تلاش کنید.');
     } finally {
       setIsDownloading(false);
     }
+  };
+
+  const p = {
+    title: isEn ? 'Export Data' : 'خروجی داده‌ها (Export)',
+    formatTitle: isEn ? 'Output File Format:' : 'فرمت فایل خروجی:',
+    csvName: isEn ? 'CSV File' : 'فایل CSV',
+    csvDesc: isEn ? 'Best for analysis in Excel or Google Sheets' : 'مناسب جهت تحلیل در اکسل یا گوگل شیتز',
+    xlsxName: isEn ? 'Excel File (XLSX)' : 'فایل Excel (XLSX)',
+    xlsxDesc: isEn ? 'Styled Excel file with structured format' : 'فایل رنگ‌بندی شده اکسل با ساختار مرتب',
+    pdfName: isEn ? 'PDF Report' : 'گزارش PDF',
+    pdfDesc: isEn ? 'Summary performance report' : 'گزارش خلاصه عملکرد مشابه متاتریدر',
+    scopeTitle: isEn ? 'Trades Scope:' : 'محدوده معاملات:',
+    scopeFiltered: isEn ? `Current filtered trades (${filteredCount} trades)` : `معاملات فیلتر شده جاری (${filteredCount} معامله)`,
+    scopeAll: isEn ? `All account trades (${totalCount} trades)` : `همه معاملات حساب (${totalCount} معامله)`,
+    preparing: isEn ? 'Preparing file...' : 'در حال آماده‌سازی فایل...',
+    downloadLabel: isEn ? 'Download Export' : 'دریافت خروجی داده',
+    cancel: isEn ? 'Cancel' : 'انصراف',
   };
 
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="export-modal-container" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
-          <h2>خروجی داده‌ها (Export)</h2>
+          <h2>{p.title}</h2>
           <button className="close-btn" onClick={onClose}>
             <span className="material-symbols-outlined">close</span>
           </button>
@@ -104,7 +120,7 @@ export default function ExportModal({
 
         <div className="modal-body">
           {/* Format selection */}
-          <div className="section-title">فرمت فایل خروجی:</div>
+          <div className="section-title">{p.formatTitle}</div>
           <div className="format-options-grid">
             <label className={`format-option-card ${format === 'csv' ? 'active' : ''}`}>
               <input
@@ -115,8 +131,8 @@ export default function ExportModal({
                 onChange={() => setFormat('csv')}
               />
               <span className="material-symbols-outlined format-icon">csv</span>
-              <span className="format-name">فایل CSV</span>
-              <span className="format-desc">مناسب جهت تحلیل در اکسل یا گوگل شیتز</span>
+              <span className="format-name">{p.csvName}</span>
+              <span className="format-desc">{p.csvDesc}</span>
             </label>
 
             <label className={`format-option-card ${format === 'xlsx' ? 'active' : ''}`}>
@@ -128,8 +144,8 @@ export default function ExportModal({
                 onChange={() => setFormat('xlsx')}
               />
               <span className="material-symbols-outlined format-icon">table_chart</span>
-              <span className="format-name">فایل Excel (XLSX)</span>
-              <span className="format-desc">فایل رنگ‌بندی شده اکسل با ساختار مرتب</span>
+              <span className="format-name">{p.xlsxName}</span>
+              <span className="format-desc">{p.xlsxDesc}</span>
             </label>
 
             <label className={`format-option-card ${format === 'pdf' ? 'active' : ''}`}>
@@ -141,14 +157,14 @@ export default function ExportModal({
                 onChange={() => setFormat('pdf')}
               />
               <span className="material-symbols-outlined format-icon">picture_as_pdf</span>
-              <span className="format-name">گزارش PDF</span>
-              <span className="format-desc">گزارش خلاصه عملکرد مشابه متاتریدر</span>
+              <span className="format-name">{p.pdfName}</span>
+              <span className="format-desc">{p.pdfDesc}</span>
             </label>
           </div>
 
           {/* Scope selection */}
           <div className="scope-selection-section">
-            <div className="section-title">محدوده معاملات:</div>
+            <div className="section-title">{p.scopeTitle}</div>
             <div className="scope-options">
               <label className="scope-radio-option">
                 <input
@@ -159,7 +175,7 @@ export default function ExportModal({
                   onChange={() => setScope('filtered')}
                 />
                 <span className="radio-label-text">
-                  معاملات فیلتر شده جاری ({filteredCount} معامله)
+                  {p.scopeFiltered}
                 </span>
               </label>
 
@@ -172,7 +188,7 @@ export default function ExportModal({
                   onChange={() => setScope('all')}
                 />
                 <span className="radio-label-text">
-                  همه معاملات حساب ({totalCount} معامله)
+                  {p.scopeAll}
                 </span>
               </label>
             </div>
@@ -188,17 +204,17 @@ export default function ExportModal({
             {isDownloading ? (
               <>
                 <span className="spinner"></span>
-                در حال آماده‌سازی فایل...
+                {p.preparing}
               </>
             ) : (
               <>
                 <span className="material-symbols-outlined">download</span>
-                دریافت خروجی داده
+                {p.downloadLabel}
               </>
             )}
           </button>
           <button className="btn btn-secondary" onClick={onClose} disabled={isDownloading}>
-            انصراف
+            {p.cancel}
           </button>
         </div>
       </div>

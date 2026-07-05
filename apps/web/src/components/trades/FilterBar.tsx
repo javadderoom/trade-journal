@@ -3,6 +3,7 @@
 import React from 'react';
 import Select from '../ui/Select';
 import { getSymbolFilterOptions } from '../../utils/tradeHelpers';
+import { useTranslation } from '../../store/useAppStore';
 
 interface FilterBarProps {
   searchQuery: string;
@@ -53,6 +54,8 @@ export default function FilterBar({
   selectedAccountId = 'all',
   onAccountIdChange,
 }: FilterBarProps) {
+  const { t, language } = useTranslation();
+
   return (
     <div className="filters-bar-container">
       <div className="filters-main-row">
@@ -61,7 +64,7 @@ export default function FilterBar({
           <span className="material-symbols-outlined filter-icon">search</span>
           <input
             type="text"
-            placeholder="جستجو نماد، تیکت، یادداشت..."
+            placeholder={t('filters.searchPlaceholder')}
             value={searchQuery}
             onChange={e => setSearchQuery(e.target.value)}
           />
@@ -77,7 +80,7 @@ export default function FilterBar({
               setCurrentPage(1);
             }}
           >
-            همه
+            {t('filters.statusAll')}
           </button>
           <button
             type="button"
@@ -87,7 +90,7 @@ export default function FilterBar({
               setCurrentPage(1);
             }}
           >
-            باز
+            {t('filters.statusOpen')}
           </button>
           <button
             type="button"
@@ -97,7 +100,7 @@ export default function FilterBar({
               setCurrentPage(1);
             }}
           >
-            بسته
+            {t('filters.statusClosed')}
           </button>
           <button
             type="button"
@@ -107,7 +110,7 @@ export default function FilterBar({
               setCurrentPage(1);
             }}
           >
-            فرصت سوخته
+            {t('filters.statusMissed')}
           </button>
         </div>
 
@@ -117,13 +120,13 @@ export default function FilterBar({
             type="button"
             className={`btn-toggle-advanced ${isAdvancedFiltersOpen ? 'active' : ''}`}
             onClick={() => setIsAdvancedFiltersOpen(!isAdvancedFiltersOpen)}
-            title="فیلترهای پیشرفته"
+            title={t('filters.advancedFilters')}
           >
             <span className="material-symbols-outlined">tune</span>
-            <span>فیلترهای پیشرفته</span>
+            <span>{t('filters.advancedFilters')}</span>
           </button>
           
-          <button className="icon-btn refresh-btn" title="بروزرسانی" onClick={onRefresh}>
+          <button className="icon-btn refresh-btn" title={t('filters.refresh')} onClick={onRefresh}>
             <span className="material-symbols-outlined">refresh</span>
           </button>
         </div>
@@ -134,7 +137,7 @@ export default function FilterBar({
         <div className="filters-advanced-panel animate-slide-down">
           <div className="advanced-fields-grid">
             <div className="advanced-field">
-              <label>حساب معاملاتی</label>
+              <label>{t('filters.tradingAccount')}</label>
               <Select
                 value={selectedAccountId || 'all'}
                 onChange={(val) => {
@@ -142,7 +145,7 @@ export default function FilterBar({
                   setCurrentPage(1);
                 }}
                 options={[
-                  { value: 'all', label: 'همه حساب‌ها' },
+                  { value: 'all', label: t('filters.allAccounts') },
                   ...accounts.map(acc => ({
                     value: acc.id,
                     label: `${acc.broker_name || 'MT5'} (${acc.account_number || acc.id})`,
@@ -152,7 +155,7 @@ export default function FilterBar({
             </div>
 
             <div className="advanced-field">
-              <label>نماد معاملاتی</label>
+              <label>{t('filters.tradingSymbol')}</label>
               <Select
                 value={selectedSymbol}
                 onChange={(val) => {
@@ -160,14 +163,14 @@ export default function FilterBar({
                   setCurrentPage(1);
                 }}
                 options={[
-                  { value: 'همه نمادها', label: 'همه نمادها' },
+                  { value: 'همه نمادها', label: t('filters.allSymbols') },
                   ...getSymbolFilterOptions(symbolOptions.filter(s => s !== 'همه نمادها'))
                 ]}
               />
             </div>
 
             <div className="advanced-field">
-              <label>جهت معامله</label>
+              <label>{t('filters.tradeDirection')}</label>
               <Select
                 value={selectedDirection}
                 onChange={(val) => {
@@ -175,15 +178,15 @@ export default function FilterBar({
                   setCurrentPage(1);
                 }}
                 options={[
-                  { value: 'همه جهت‌ها', label: 'همه جهت‌ها' },
-                  { value: 'خرید (Buy)', label: '↑ خرید' },
-                  { value: 'فروش (Sell)', label: '↓ فروش' },
+                  { value: 'همه جهت‌ها', label: t('filters.allDirections') },
+                  { value: 'خرید (Buy)', label: t('filters.buy') },
+                  { value: 'فروش (Sell)', label: t('filters.sell') },
                 ]}
               />
             </div>
 
             <div className="advanced-field">
-              <label>تایم‌فریم</label>
+              <label>{t('filters.timeframe')}</label>
               <Select
                 value={selectedTimeframe}
                 onChange={(val) => {
@@ -191,52 +194,55 @@ export default function FilterBar({
                   setCurrentPage(1);
                 }}
                 options={[
-                  { value: 'ALL', label: 'همه تایم‌فریم‌ها' },
-                  { value: 'M1',  label: '۱ دقیقه (M1)' },
-                  { value: 'M5',  label: '۵ دقیقه (M5)' },
-                  { value: 'M15', label: '۱۵ دقیقه (M15)' },
-                  { value: 'M30', label: '۳۰ دقیقه (M30)' },
-                  { value: 'H1',  label: '۱ ساعته (H1)' },
-                  { value: 'H4',  label: '۴ ساعته (H4)' },
-                  { value: 'D1',  label: 'روزانه (D1)' },
-                  { value: 'W1',  label: 'هفتگی (W1)' },
-                  { value: 'MN',  label: 'ماهانه (MN)' },
+                  { value: 'ALL', label: t('filters.allTimeframes') },
+                  { value: 'M1',  label: 'M1' },
+                  { value: 'M5',  label: 'M5' },
+                  { value: 'M15', label: 'M15' },
+                  { value: 'M30', label: 'M30' },
+                  { value: 'H1',  label: 'H1' },
+                  { value: 'H4',  label: 'H4' },
+                  { value: 'D1',  label: 'D1' },
+                  { value: 'W1',  label: 'W1' },
+                  { value: 'MN',  label: 'MN' },
                 ]}
               />
             </div>
 
             <div className="advanced-field">
-              <label>منطقه زمانی</label>
+              <label>{t('filters.timezone')}</label>
               <Select
                 value={selectedTimezone}
                 onChange={setSelectedTimezone}
                 options={[
-                  { value: 'Asia/Tehran',     label: '🇮🇷 تهران (GMT+۳:۳۰)' },
-                  { value: 'UTC',             label: '🌐 UTC (GMT+۰)' },
-                  { value: 'Europe/London',   label: '🇬🇧 لندن (GMT+۰ / تابستان +۱)' },
-                  { value: 'America/New_York',label: '🇺🇸 نیویورک (GMT−۵ / تابستان −۴)' },
+                  { value: 'Asia/Tehran',     label: language === 'fa' ? '🇮🇷 تهران (GMT+۳:۳۰)' : '🇮🇷 Tehran (GMT+3:30)' },
+                  { value: 'UTC',             label: '🌐 UTC (GMT+0)' },
+                  { value: 'Europe/London',   label: language === 'fa' ? '🇬🇧 لندن (GMT+۰ / تابستان +۱)' : '🇬🇧 London (GMT+0 / BST+1)' },
+                  { value: 'America/New_York',label: language === 'fa' ? '🇺🇸 نیویورک (GMT−۵ / تابستان −۴)' : '🇺🇸 New York (GMT-5 / EDT-4)' },
                 ]}
               />
             </div>
 
-            <div className="advanced-field">
-              <label>نرخ دلار به تومان</label>
-              <div className="rate-input-wrapper">
-                <span className="rate-label">$=</span>
-                <input
-                  type="number"
-                  className="rate-input"
-                  value={usdToToman}
-                  min={1}
-                  step={1000}
-                  onChange={e => {
-                    const v = parseInt(e.target.value, 10);
-                    if (!isNaN(v) && v > 0) setUsdToToman(v);
-                  }}
-                />
-                <span className="rate-label">ت</span>
+            {/* USD to Toman Rate Field - Only display if active language is Farsi (fa) */}
+            {language === 'fa' && (
+              <div className="advanced-field">
+                <label>{t('filters.usdToTomanRate')}</label>
+                <div className="rate-input-wrapper">
+                  <span className="rate-label">$=</span>
+                  <input
+                    type="number"
+                    className="rate-input"
+                    value={usdToToman}
+                    min={1}
+                    step={1000}
+                    onChange={e => {
+                      const v = parseInt(e.target.value, 10);
+                      if (!isNaN(v) && v > 0) setUsdToToman(v);
+                    }}
+                  />
+                  <span className="rate-label">ت</span>
+                </div>
               </div>
-            </div>
+            )}
           </div>
 
           <div className="advanced-panel-footer">
@@ -252,7 +258,7 @@ export default function FilterBar({
               }}
             >
               <span className="material-symbols-outlined">filter_alt_off</span>
-              پاک کردن فیلترها
+              {t('filters.clearFilters')}
             </button>
           </div>
         </div>

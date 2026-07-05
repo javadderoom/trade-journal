@@ -3,6 +3,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Trade, TagObject } from './TradesTable';
 import { toPersianDigits, formatPersianCurrency, formatToman } from '../../utils/farsi';
+import { useTranslation } from '../../store/useAppStore';
 import {
   getEmotionEmoji,
   getEmotionLabel,
@@ -43,6 +44,8 @@ export default function MobileCardsList({
   ignoredTags,
   allTags,
 }: MobileCardsListProps) {
+  const { t, language } = useTranslation();
+
   const formatCurrency = (val: number) => {
     return formatPersianCurrency(val);
   };
@@ -69,8 +72,6 @@ export default function MobileCardsList({
   const observerRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    // Ensure infinite scroll logic runs only for mobile.
-    // On desktop, pagination and this shared `currentPage` state must not conflict.
     if (!isMobile) return;
     if (!hasMore) return;
 
@@ -114,7 +115,7 @@ export default function MobileCardsList({
             displayedTrades.every(t => selectedTrades.has(t.id))
           }
         />
-        <label htmlFor="mobile-select-all">انتخاب همه معاملات بارگذاری شده</label>
+        <label htmlFor="mobile-select-all">{t('trades.selectLoadedTrades') || 'انتخاب همه معاملات بارگذاری شده'}</label>
       </div>
 
       {/* Mobile Cards List Layout */}
@@ -151,14 +152,14 @@ export default function MobileCardsList({
                     <span className="material-symbols-outlined badge-icon">
                       {isBuy ? 'trending_up' : 'trending_down'}
                     </span>
-                    {isBuy ? 'خرید' : 'فروش'}
+                    {isBuy ? t('trades.buy') : t('trades.sell')}
                   </span>
                 </div>
                 <div className="top-left-group">
                   {isMissed ? (
                     <span
                       className="material-symbols-outlined status-icon status-missed"
-                      title="فرصت از دست رفته"
+                      title={t('trades.statusMissed')}
                       style={{ color: '#9ca3af' }}
                     >
                       block
@@ -166,7 +167,7 @@ export default function MobileCardsList({
                   ) : (
                     <span
                       className={`material-symbols-outlined status-icon ${isClosed ? 'status-closed' : 'status-open'}`}
-                      title={isClosed ? 'بسته شده' : 'باز'}
+                      title={isClosed ? t('trades.statusClosed') : t('trades.statusOpen')}
                     >
                       {isClosed ? 'check_circle' : 'sync'}
                     </span>
@@ -177,11 +178,11 @@ export default function MobileCardsList({
               {/* Middle Row: Volume (Lots), R:R, Profit/Loss (USD & Toman) */}
               <div className="card-middle-row">
                 <div className="card-metric">
-                  <span className="metric-label">حجم:</span>
+                  <span className="metric-label">{t('trades.volume')}:</span>
                   <span className="metric-value">{toPersianDigits(trade.lotSize)}</span>
                 </div>
                 <div className="card-metric">
-                  <span className="metric-label">R:R:</span>
+                  <span className="metric-label">{t('trades.rr')}:</span>
                   <span className={`metric-value ${trade.rMultiple > 0 ? 'text-primary' : trade.rMultiple < 0 ? 'text-error' : ''}`}>
                     {trade.rMultiple > 0 ? '+' : ''}
                     {toPersianDigits(trade.rMultiple.toFixed(1))}R
@@ -189,7 +190,9 @@ export default function MobileCardsList({
                 </div>
                 <div className={`col-profit ${profitClass}`}>
                   <span className="profit-usd">{formatCurrency(trade.profitUsd)}</span>
-                  <span className="profit-toman">{formatToman(trade.profitUsd, usdToToman)}</span>
+                  {language === 'fa' && (
+                    <span className="profit-toman">{formatToman(trade.profitUsd, usdToToman)}</span>
+                  )}
                 </div>
               </div>
 
@@ -203,7 +206,7 @@ export default function MobileCardsList({
                   {trade.closeTime && (
                     <span className="date-value close-date-val">
                       <span className="material-symbols-outlined card-icon close-icon">logout</span>
-                      خروج: {formatDate(trade.closeTime, selectedTimezone).date}
+                      {t('trades.exit')}: {formatDate(trade.closeTime, selectedTimezone).date}
                     </span>
                   )}
                 </div>
@@ -233,7 +236,7 @@ export default function MobileCardsList({
                 return (trade.emotion || (sortedTags.length > 0)) && (
                   <div className="card-tags-row">
                     {trade.emotion && (
-                      <span className={`emotion-mini-badge emotion-${trade.emotion.toLowerCase()}`} title={`احساس: ${getEmotionLabel(trade.emotion, allEmotions)}`}>
+                      <span className={`emotion-mini-badge emotion-${trade.emotion.toLowerCase()}`} title={`${t('trades.emotion')}: ${getEmotionLabel(trade.emotion, allEmotions)}`}>
                         {getEmotionEmoji(trade.emotion, allEmotions)} {getEmotionLabel(trade.emotion, allEmotions)}
                       </span>
                     )}
@@ -251,12 +254,12 @@ export default function MobileCardsList({
               {(trade.analysisTimeframe || trade.entryTimeframe) && (
                 <div className="card-tags-row">
                   {trade.analysisTimeframe && (
-                    <span className="timeframe-badge analysis" title="تایم‌فریم تحلیل">
+                    <span className="timeframe-badge analysis" title={t('trades.analysisTimeframe')}>
                       📊 {trade.analysisTimeframe}
                     </span>
                   )}
                   {trade.entryTimeframe && (
-                    <span className="timeframe-badge entry" title="تایم‌فریم ورود">
+                    <span className="timeframe-badge entry" title={t('trades.entryTimeframe')}>
                       🎯 {trade.entryTimeframe}
                     </span>
                   )}
@@ -267,7 +270,7 @@ export default function MobileCardsList({
         })}
         {displayedTrades.length === 0 && (
           <div className="no-trades-card">
-            معامله‌ای یافت نشد.
+            {t('trades.searchNoResults')}
           </div>
         )}
       </div>
