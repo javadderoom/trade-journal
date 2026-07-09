@@ -85,7 +85,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           rel="stylesheet"
         />
         {/* Kavenegar Webpush SDK */}
-        <script src="https://cdn.kavenegar.com/sdk/page.js?appId=245422b2-eab2-4608-93ab-80526bd21f85" defer charSet="utf-8"></script>
+        {process.env.NODE_ENV !== 'development' && (
+          <script src="https://cdn.kavenegar.com/sdk/page.js?appId=245422b2-eab2-4608-93ab-80526bd21f85" defer charSet="utf-8"></script>
+        )}
         {/* Structured Data */}
         <script
           type="application/ld+json"

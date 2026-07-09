@@ -17,6 +17,13 @@ const MONTH_NAMES = [
 
 const WEEKDAY_NAMES_SHORT = ['ش', 'ی', 'د', 'س', 'چ', 'پ', 'ج'];
 
+const GREGORIAN_MONTH_NAMES = [
+  'January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December'
+];
+
+const GREGORIAN_WEEKDAY_NAMES_SHORT = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
+
 function getJalaliParts(date: Date) {
   const formatter = new Intl.DateTimeFormat('en-US-u-ca-persian', {
     year: 'numeric',
@@ -151,11 +158,16 @@ export default function JournalPage() {
     fetchTrades(false); // Reload all trades in store
   }, [selectedDate, fetchTrades]);
 
-  // Sync calendar picker header when selected date changes
+  // Sync calendar picker header when selected date or locale changes
   useEffect(() => {
-    setCalendarYear(jalaliSelected.year);
-    setCalendarMonth(jalaliSelected.month);
-  }, [selectedDate]);
+    if (isEn) {
+      setCalendarYear(selectedDate.getFullYear());
+      setCalendarMonth(selectedDate.getMonth() + 1);
+    } else {
+      setCalendarYear(jalaliSelected.year);
+      setCalendarMonth(jalaliSelected.month);
+    }
+  }, [selectedDate, isEn]);
 
   // Filter trades matching selected date
   useEffect(() => {
@@ -260,6 +272,48 @@ export default function JournalPage() {
     return dayBlocks;
   };
 
+  // Render Gregorian Date Picker Calendar Days
+  const renderGregorianCalendarDays = (gYear: number, gMonth: number) => {
+    // gMonth is 1-indexed (1 = Jan, 12 = Dec)
+    const daysInMonth = new Date(gYear, gMonth, 0).getDate();
+    const firstDayDate = new Date(gYear, gMonth - 1, 1);
+    
+    // First day of the month weekday index: 0 = Sun, 1 = Mon, ..., 6 = Sat
+    const firstDayOffset = firstDayDate.getDay();
+
+    const dayBlocks = [];
+
+    // Empty spaces for padding before the 1st of the month
+    for (let i = 0; i < firstDayOffset; i++) {
+      dayBlocks.push(<div key={`g-empty-${i}`} className="calendar-day-empty" />);
+    }
+
+    // Days of the month
+    for (let d = 1; d <= daysInMonth; d++) {
+      const isSelected = 
+        selectedDate.getFullYear() === gYear &&
+        (selectedDate.getMonth() + 1) === gMonth &&
+        selectedDate.getDate() === d;
+
+      dayBlocks.push(
+        <button
+          key={`g-day-${d}`}
+          type="button"
+          className={`calendar-day-btn ${isSelected ? 'active' : ''}`}
+          onClick={() => {
+            const target = new Date(gYear, gMonth - 1, d);
+            setSelectedDate(target);
+            setShowDatePicker(false);
+          }}
+        >
+          {d}
+        </button>
+      );
+    }
+
+    return dayBlocks;
+  };
+
   const changeCalendarMonth = (offset: number) => {
     let nextM = calendarMonth + offset;
     let nextY = calendarYear;
@@ -296,7 +350,7 @@ export default function JournalPage() {
       {/* Date Header Controller */}
       <header className="journal-date-header">
         <div className="navigation-controls">
-          <button className="nav-arrow-btn" onClick={() => navigateDay(isEn ? 1 : -1)} title={p.prevDay}>
+          <button className="nav-arrow-btn" onClick={() => navigateDay(isEn ? -1 : 1)} title={p.prevDay}>
             <span className="material-symbols-outlined">{isEn ? 'chevron_left' : 'chevron_right'}</span>
           </button>
           
@@ -310,41 +364,43 @@ export default function JournalPage() {
               <span className="material-symbols-outlined arrow-icon">keyboard_arrow_down</span>
             </button>
 
-            {/* Jalali Calendar Popover */}
+            {/* Calendar Popover (Gregorian for EN, Jalali for FA) */}
             {showDatePicker && (
               <div className="calendar-popover">
                 <div className="calendar-header">
-                  <button className="nav-month-btn" onClick={() => changeCalendarMonth(1)}>
-                    <span className="material-symbols-outlined">chevron_right</span>
+                  <button className="nav-month-btn" onClick={() => changeCalendarMonth(isEn ? -1 : 1)}>
+                    <span className="material-symbols-outlined">{isEn ? 'chevron_left' : 'chevron_right'}</span>
                   </button>
                   <span className="month-year-label">
-                    {MONTH_NAMES[calendarMonth - 1]} {toPersianDigits(calendarYear.toString())}
+                    {isEn 
+                      ? `${GREGORIAN_MONTH_NAMES[calendarMonth - 1]} ${calendarYear}` 
+                      : `${MONTH_NAMES[calendarMonth - 1]} ${toPersianDigits(calendarYear.toString())}`}
                   </span>
-                  <button className="nav-month-btn" onClick={() => changeCalendarMonth(-1)}>
-                    <span className="material-symbols-outlined">chevron_left</span>
+                  <button className="nav-month-btn" onClick={() => changeCalendarMonth(isEn ? 1 : -1)}>
+                    <span className="material-symbols-outlined">{isEn ? 'chevron_right' : 'chevron_left'}</span>
                   </button>
                 </div>
 
                 <div className="weekdays-grid">
-                  {WEEKDAY_NAMES_SHORT.map((w, idx) => (
+                  {(isEn ? GREGORIAN_WEEKDAY_NAMES_SHORT : WEEKDAY_NAMES_SHORT).map((w, idx) => (
                     <span key={idx} className="weekday-lbl">{w}</span>
                   ))}
                 </div>
 
                 <div className="days-grid">
-                  {renderCalendarDays()}
+                  {isEn ? renderGregorianCalendarDays(calendarYear, calendarMonth) : renderCalendarDays()}
                 </div>
               </div>
             )}
           </div>
 
-          <button className="nav-arrow-btn" onClick={() => navigateDay(1)} title="روز بعد">
-            <span className="material-symbols-outlined">chevron_left</span>
+          <button className="nav-arrow-btn" onClick={() => navigateDay(isEn ? 1 : -1)} title={p.nextDay}>
+            <span className="material-symbols-outlined">{isEn ? 'chevron_right' : 'chevron_left'}</span>
           </button>
         </div>
 
         <button className="today-jump-btn" onClick={jumpToToday}>
-          امروز
+          {p.today}
         </button>
       </header>
 
@@ -353,20 +409,20 @@ export default function JournalPage() {
         {loading ? (
           <div className="loading-card-state">
             <div className="spinner"></div>
-            <span>در حال بارگذاری یادداشت روز...</span>
+            <span>{p.loadingNote}</span>
           </div>
         ) : (
           <>
             {/* Mood selector */}
             <div className="mood-selection-bar">
-              <span className="lbl">وضعیت روحی امروز:</span>
+              <span className="lbl">{p.moodLabel}</span>
               <div className="mood-pills">
                 {[
-                  { value: 'HAPPY', label: 'عالی/شاد', emoji: '😊' },
-                  { value: 'NEUTRAL', label: 'خنثی/آرام', emoji: '😐' },
-                  { value: 'STRESSED', label: 'تحت فشار', emoji: '😰' },
-                  { value: 'ANXIOUS', label: 'نگران/مضطرب', emoji: '🥺' },
-                  { value: 'FRUSTRATED', label: 'کلافه/عصبانی', emoji: '😡' },
+                  { value: 'HAPPY', label: p.moodHappy, emoji: '😊' },
+                  { value: 'NEUTRAL', label: p.moodNeutral, emoji: '😐' },
+                  { value: 'STRESSED', label: p.moodStressed, emoji: '😰' },
+                  { value: 'ANXIOUS', label: p.moodAnxious, emoji: '🥺' },
+                  { value: 'FRUSTRATED', label: p.moodFrustrated, emoji: '😡' },
                 ].map((m) => {
                   const isActive = mood === m.value;
                   return (
@@ -396,34 +452,35 @@ export default function JournalPage() {
 
       {/* Trades of the day section */}
       <div className="day-trades-section">
-        <h3>معاملات ثبت شده امروز</h3>
+        <h3>{p.dayTradesHeader}</h3>
         
         {filteredTrades.length === 0 ? (
           <div className="empty-trades-state">
             <span className="material-symbols-outlined empty-icon">show_chart</span>
-            <p>هیچ معامله‌ای برای تاریخ امروز ثبت نشده است.</p>
+            <p>{p.emptyTrades}</p>
           </div>
         ) : (
           <div className="trades-table-wrapper">
             <table className="day-trades-table">
               <thead>
                 <tr>
-                  <th>نماد</th>
-                  <th>جهت</th>
-                  <th>حجم (Lot)</th>
-                  <th>قیمت ورود</th>
-                  <th>قیمت خروج</th>
-                  <th>سود/زیان خالص</th>
-                  <th>ساعت ورود</th>
+                  <th>{p.symbol}</th>
+                  <th>{p.direction}</th>
+                  <th>{p.volume}</th>
+                  <th>{p.openPrice}</th>
+                  <th>{p.closePrice}</th>
+                  <th>{p.netPnl}</th>
+                  <th>{p.entryTime}</th>
                 </tr>
               </thead>
               <tbody>
                 {filteredTrades.map((t) => {
                   const isBuy = t.direction === 'BUY';
                   const isProfit = t.profitUsd >= 0;
-                  const timeStr = new Date(t.openTime).toLocaleTimeString('fa-IR', {
+                  const timeStr = new Date(t.openTime).toLocaleTimeString(isEn ? 'en-US' : 'fa-IR', {
                     hour: '2-digit',
                     minute: '2-digit',
+                    hour12: isEn,
                     timeZone: 'Asia/Tehran'
                   });
 
@@ -432,16 +489,16 @@ export default function JournalPage() {
                       <td style={{ fontWeight: 700 }}>{t.symbol}</td>
                       <td>
                         <span className={`direction-badge ${isBuy ? 'buy' : 'sell'}`}>
-                          {isBuy ? 'خرید (Buy)' : 'فروش (Sell)'}
+                          {isBuy ? p.buy : p.sell}
                         </span>
                       </td>
-                      <td>{toPersianDigits(t.lotSize.toString())}</td>
-                      <td style={{ direction: 'ltr' }}>{toPersianDigits(t.openPrice.toString())}</td>
-                      <td style={{ direction: 'ltr' }}>{t.closePrice ? toPersianDigits(t.closePrice.toString()) : '—'}</td>
+                      <td>{isEn ? t.lotSize.toString() : toPersianDigits(t.lotSize.toString())}</td>
+                      <td style={{ direction: 'ltr' }}>{isEn ? t.openPrice.toString() : toPersianDigits(t.openPrice.toString())}</td>
+                      <td style={{ direction: 'ltr' }}>{t.closePrice ? (isEn ? t.closePrice.toString() : toPersianDigits(t.closePrice.toString())) : '—'}</td>
                       <td style={{ direction: 'ltr', fontWeight: 700 }} className={isProfit ? 'profit' : 'loss'}>
-                        {isProfit ? '+' : ''}${toPersianDigits(t.profitUsd.toFixed(2))}
+                        {isProfit ? '+' : ''}${isEn ? t.profitUsd.toFixed(2) : toPersianDigits(t.profitUsd.toFixed(2))}
                       </td>
-                      <td>{toPersianDigits(timeStr)}</td>
+                      <td>{isEn ? timeStr : toPersianDigits(timeStr)}</td>
                     </tr>
                   );
                 })}

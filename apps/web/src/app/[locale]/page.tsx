@@ -208,6 +208,17 @@ export default function LandingPage({ params }: PageProps) {
     }
   }, [user, isInitialized, router]);
 
+  // Dynamically update page title and meta description based on locale
+  useEffect(() => {
+    document.title = isEn ? 'TradeKav | Smart Trading Journal' : 'تریدکاو | ژورنال معاملاتی هوشمند';
+    document.querySelector('meta[name="description"]')?.setAttribute(
+      'content',
+      isEn
+        ? 'Automatic MT4/5 sync, advanced performance reports, daily heatmaps, risk management, and psychology journal.'
+        : 'تریدکاو اولین ژورنال معاملاتی هوشمند ایرانی؛ ثبت خودکار معاملات متاتریدر ۴ و ۵، تحلیل دقیق عملکرد، هیت‌مپ روزانه، مدیریت ریسک و روانشناسی معاملات.'
+    );
+  }, [isEn]);
+
   const [navScrolled, setNavScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [openFaq, setOpenFaq] = useState<number | null>(0);

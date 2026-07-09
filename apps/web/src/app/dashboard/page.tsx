@@ -91,7 +91,7 @@ export default function DashboardPage() {
       setLoading(true);
       setError(null);
       const res = await api.get(
-        `/api/dashboard/summary?accountId=${selectedAccountId}&t=${Date.now()}`
+        `/api/dashboard/summary?accountId=${selectedAccountId}&locale=${language}&t=${Date.now()}`
       );
       setData(res.data);
     } catch (err: any) {
@@ -100,7 +100,7 @@ export default function DashboardPage() {
     } finally {
       setLoading(false);
     }
-  }, [selectedAccountId, t]);
+  }, [selectedAccountId, language, t]);
 
   useEffect(() => {
     fetchDashboard();

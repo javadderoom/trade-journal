@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useRef, useEffect, useState } from 'react';
+import { useTranslation } from '../../store/useAppStore';
 
 interface JournalEditorProps {
   value: string;
@@ -12,6 +13,38 @@ interface JournalEditorProps {
 export default function JournalEditor({ value, onChange, onSave, saveStatus }: JournalEditorProps) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [showPreview, setShowPreview] = useState(false);
+  const { language } = useTranslation();
+  const isEn = language === 'en';
+
+  const p = {
+    emptyPreview: isEn ? 'Nothing written yet...' : 'چیزی نوشته نشده است...',
+    bold: isEn ? 'Bold' : 'ضخیم (Bold)',
+    boldPlaceholder: isEn ? 'bold text' : 'متن ضخیم',
+    italic: isEn ? 'Italic' : 'کج (Italic)',
+    italicPlaceholder: isEn ? 'italic text' : 'متن کج',
+    h2: isEn ? 'Large Heading (H2)' : 'عنوان بزرگ (H2)',
+    h2Placeholder: isEn ? 'Heading 2' : 'عنوان ۲',
+    h3: isEn ? 'Medium Heading (H3)' : 'عنوان متوسط (H3)',
+    h3Placeholder: isEn ? 'Heading 3' : 'عنوان ۳',
+    list: isEn ? 'Bulleted List (List)' : 'لیست نشانه‌دار (List)',
+    listPlaceholder: isEn ? 'item' : 'مورد',
+    numberedList: isEn ? 'Numbered List' : 'لیست عددی',
+    todo: isEn ? 'Todo List (Todo)' : 'لیست انجام کار (Todo)',
+    todoPlaceholder: isEn ? 'new task' : 'کار جدید',
+    quote: isEn ? 'Quote (Quote)' : 'نقل قول (Quote)',
+    quotePlaceholder: isEn ? 'quote text' : 'نقل قول',
+    codeBlock: isEn ? 'Code block' : 'بلوک کد',
+    codeBlockPlaceholder: isEn ? 'source code' : 'کد منبع',
+    editMode: isEn ? 'Edit' : 'ویرایش',
+    previewMode: isEn ? 'Preview' : 'پیش‌نمایش',
+    textareaPlaceholder: isEn 
+      ? 'Write your trading notes, market analysis, emotional and mental state here...'
+      : 'یادداشت‌های معاملاتی، تحلیل بازار، وضعیت روحی و فکری امروز را در اینجا بنویسید...',
+    saving: isEn ? 'Auto-saving...' : 'در حال ذخیره‌سازی خودکار...',
+    saved: isEn ? 'All changes saved' : 'تمام تغییرات ذخیره شد',
+    saveError: isEn ? 'Error auto-saving changes' : 'خطا در ذخیره‌سازی خودکار',
+    markdownSupported: isEn ? 'Supports Markdown formatting' : 'پشتیبانی از فرمت‌های Markdown',
+  };
 
   const insertMarkdown = (syntax: string, placeholder = '') => {
     const textarea = textareaRef.current;
@@ -38,7 +71,7 @@ export default function JournalEditor({ value, onChange, onSave, saveStatus }: J
 
   // Simple Markdown parser for client preview rendering
   const parseMarkdown = (md: string) => {
-    if (!md) return '<p style="color: #94a3b8; font-style: italic;">چیزی نوشته نشده است...</p>';
+    if (!md) return `<p style="color: #94a3b8; font-style: italic;">${p.emptyPreview}</p>`;
     
     let html = md
       .replace(/&/g, '&amp;')
@@ -90,16 +123,16 @@ export default function JournalEditor({ value, onChange, onSave, saveStatus }: J
         <div className="toolbar-actions">
           <button
             type="button"
-            onClick={() => insertMarkdown('**$1**', 'متن ضخیم')}
-            title="ضخیم (Bold)"
+            onClick={() => insertMarkdown('**$1**', p.boldPlaceholder)}
+            title={p.bold}
             disabled={showPreview}
           >
             <span className="material-symbols-outlined">format_bold</span>
           </button>
           <button
             type="button"
-            onClick={() => insertMarkdown('*$1*', 'متن کج')}
-            title="کج (Italic)"
+            onClick={() => insertMarkdown('*$1*', p.italicPlaceholder)}
+            title={p.italic}
             disabled={showPreview}
           >
             <span className="material-symbols-outlined">format_italic</span>
@@ -107,16 +140,16 @@ export default function JournalEditor({ value, onChange, onSave, saveStatus }: J
           <div className="divider" />
           <button
             type="button"
-            onClick={() => insertMarkdown('\n## $1\n', 'عنوان ۲')}
-            title="عنوان بزرگ (H2)"
+            onClick={() => insertMarkdown('\n## $1\n', p.h2Placeholder)}
+            title={p.h2}
             disabled={showPreview}
           >
             <span className="material-symbols-outlined">format_h2</span>
           </button>
           <button
             type="button"
-            onClick={() => insertMarkdown('\n### $1\n', 'عنوان ۳')}
-            title="عنوان متوسط (H3)"
+            onClick={() => insertMarkdown('\n### $1\n', p.h3Placeholder)}
+            title={p.h3}
             disabled={showPreview}
           >
             <span className="material-symbols-outlined">format_h3</span>
@@ -124,24 +157,24 @@ export default function JournalEditor({ value, onChange, onSave, saveStatus }: J
           <div className="divider" />
           <button
             type="button"
-            onClick={() => insertMarkdown('\n- $1', 'مورد')}
-            title="لیست نشانه‌دار (List)"
+            onClick={() => insertMarkdown('\n- $1', p.listPlaceholder)}
+            title={p.list}
             disabled={showPreview}
           >
             <span className="material-symbols-outlined">format_list_bulleted</span>
           </button>
           <button
             type="button"
-            onClick={() => insertMarkdown('\n1. $1', 'مورد')}
-            title="لیست عددی"
+            onClick={() => insertMarkdown('\n1. $1', p.listPlaceholder)}
+            title={p.numberedList}
             disabled={showPreview}
           >
             <span className="material-symbols-outlined">format_list_numbered</span>
           </button>
           <button
             type="button"
-            onClick={() => insertMarkdown('\n- [ ] $1', 'کار جدید')}
-            title="لیست انجام کار (Todo)"
+            onClick={() => insertMarkdown('\n- [ ] $1', p.todoPlaceholder)}
+            title={p.todo}
             disabled={showPreview}
           >
             <span className="material-symbols-outlined">checklist</span>
@@ -149,16 +182,16 @@ export default function JournalEditor({ value, onChange, onSave, saveStatus }: J
           <div className="divider" />
           <button
             type="button"
-            onClick={() => insertMarkdown('\n> $1\n', 'نقل قول')}
-            title="نقل قول (Quote)"
+            onClick={() => insertMarkdown('\n> $1\n', p.quotePlaceholder)}
+            title={p.quote}
             disabled={showPreview}
           >
             <span className="material-symbols-outlined">format_quote</span>
           </button>
           <button
             type="button"
-            onClick={() => insertMarkdown('\n```\n$1\n```\n', 'کد منبع')}
-            title="بلوک کد"
+            onClick={() => insertMarkdown('\n```\n$1\n```\n', p.codeBlockPlaceholder)}
+            title={p.codeBlock}
             disabled={showPreview}
           >
             <span className="material-symbols-outlined">code_blocks</span>
@@ -171,14 +204,14 @@ export default function JournalEditor({ value, onChange, onSave, saveStatus }: J
             className={`mode-btn ${!showPreview ? 'active' : ''}`}
             onClick={() => setShowPreview(false)}
           >
-            ویرایش
+            {p.editMode}
           </button>
           <button
             type="button"
             className={`mode-btn ${showPreview ? 'active' : ''}`}
             onClick={() => setShowPreview(true)}
           >
-            پیش‌نمایش
+            {p.previewMode}
           </button>
         </div>
       </div>
@@ -189,7 +222,7 @@ export default function JournalEditor({ value, onChange, onSave, saveStatus }: J
           <textarea
             ref={textareaRef}
             className="editor-textarea"
-            placeholder="یادداشت‌های معاملاتی، تحلیل بازار، وضعیت روحی و فکری امروز را در اینجا بنویسید..."
+            placeholder={p.textareaPlaceholder}
             value={value}
             onChange={(e) => onChange(e.target.value)}
           />
@@ -207,24 +240,24 @@ export default function JournalEditor({ value, onChange, onSave, saveStatus }: J
           {saveStatus === 'saving' && (
             <div className="status-item saving">
               <div className="spinner-micro"></div>
-              <span>در حال ذخیره‌سازی خودکار...</span>
+              <span>{p.saving}</span>
             </div>
           )}
           {saveStatus === 'saved' && (
             <div className="status-item saved">
               <span className="material-symbols-outlined">check_circle</span>
-              <span>تمام تغییرات ذخیره شد</span>
+              <span>{p.saved}</span>
             </div>
           )}
           {saveStatus === 'error' && (
             <div className="status-item error">
               <span className="material-symbols-outlined">error</span>
-              <span>خطا در ذخیره‌سازی خودکار</span>
+              <span>{p.saveError}</span>
             </div>
           )}
         </div>
         <div className="editor-tips">
-          <span>پشتیبانی از فرمت‌های Markdown</span>
+          <span>{p.markdownSupported}</span>
         </div>
       </div>
     </div>

@@ -120,14 +120,66 @@ interface EdgeInsight {
   sampleSize: number;
 }
 
-function generateEdgeInsight(recentTrades: any[]): EdgeInsight {
+function generateEdgeInsight(recentTrades: any[], locale = 'fa'): EdgeInsight {
   const MIN_TRADES = 5;
   const closedTrades = recentTrades.filter((t) => t.close_time !== null);
+  const isFa = locale === 'fa';
+
+  const getSessionName = (sess: string, isFa: boolean) => {
+    if (isFa) return sess;
+    const map: Record<string, string> = {
+      'آخر هفته': 'Weekend',
+      'لندن+نیویورک': 'London + New York',
+      'لندن': 'London',
+      'نیویورک': 'New York',
+      'توکیو': 'Tokyo',
+      'سیدنی': 'Sydney',
+      'نامشخص': 'Unknown',
+    };
+    return map[sess] || sess;
+  };
+
+  const getWeekdayName = (day: string, isFa: boolean) => {
+    if (isFa) return day;
+    const map: Record<string, string> = {
+      'یکشنبه': 'Sunday',
+      'دوشنبه': 'Monday',
+      'سه‌شنبه': 'Tuesday',
+      'چهارشنبه': 'Wednesday',
+      'پنج‌شنبه': 'Thursday',
+      'جمعه': 'Friday',
+      'شنبه': 'Saturday',
+    };
+    return map[day] || day;
+  };
+
+  const getEmotionName = (emoKey: string, isFa: boolean) => {
+    const faMap: Record<string, string> = {
+      CONFIDENT: 'با اعتماد به نفس',
+      NEUTRAL: 'بی‌تفاوت (خنثی)',
+      ANXIOUS: 'مضطرب',
+      FOMO: 'طمع‌کار (FOMO)',
+      REVENGE: 'خشمگین (انتقام‌جو)',
+      UNKNOWN: 'آرام / نامشخص'
+    };
+    const enMap: Record<string, string> = {
+      CONFIDENT: 'Confident',
+      NEUTRAL: 'Neutral',
+      ANXIOUS: 'Anxious',
+      FOMO: 'FOMO',
+      REVENGE: 'Revenge',
+      UNKNOWN: 'Calm / Unknown'
+    };
+    const map = isFa ? faMap : enMap;
+    return map[emoKey] || emoKey;
+  };
 
   if (closedTrades.length < MIN_TRADES) {
     return {
       type: 'fallback',
-      insight: `بعد از ${MIN_TRADES - closedTrades.length} معامله بیشتر، برتری معاملاتیت رو بهت نشون می‌دیم`,
+      insight: isFa
+        ? `بعد از ${MIN_TRADES - closedTrades.length} معامله بیشتر، برتری معاملاتیت رو بهت نشون می‌دیم`
+        : `We'll show your trading edge after ${MIN_TRADES - closedTrades.length} more trades`,
       winRate: 0,
       sampleSize: closedTrades.length,
     };
@@ -222,7 +274,9 @@ function generateEdgeInsight(recentTrades: any[]): EdgeInsight {
     const wr = Math.round((bestSession.wins / bestSession.total) * 100);
     return {
       type: 'session',
-      insight: `این ماه بهترین عملکردت رو تو سشن ${bestSession.label} داشتی — ${wr}٪ موفقیت`,
+      insight: isFa
+        ? `این ماه بهترین عملکردت رو تو سشن ${getSessionName(bestSession.label, true)} داشتی — ${wr}٪ موفقیت`
+        : `This month you had your best performance in the ${getSessionName(bestSession.label, false)} session — ${wr}% win rate`,
       winRate: wr,
       sampleSize: bestSession.total,
     };
@@ -234,7 +288,9 @@ function generateEdgeInsight(recentTrades: any[]): EdgeInsight {
     const wr = Math.round((bestStrategy.wins / bestStrategy.total) * 100);
     return {
       type: 'strategy',
-      insight: `استراتژی ${bestStrategy.label} با ${wr}٪ موفقیت بهترین setup توئه`,
+      insight: isFa
+        ? `استراتژی ${bestStrategy.label} با ${wr}٪ موفقیت بهترین setup توئه`
+        : `Strategy ${bestStrategy.label} is your best setup with a ${wr}% win rate`,
       winRate: wr,
       sampleSize: bestStrategy.total,
     };
@@ -247,7 +303,9 @@ function generateEdgeInsight(recentTrades: any[]): EdgeInsight {
     const wr = Math.round((bestAnalysisTf.wins / bestAnalysisTf.total) * 100);
     return {
       type: 'timeframe',
-      insight: `بیشترین سوددهی را در تایم‌فریم تحلیل ${bestAnalysisTf.label} با ${wr}٪ موفقیت داشته‌ای`,
+      insight: isFa
+        ? `بیشترین سوددهی را در تایم‌فریم تحلیل ${bestAnalysisTf.label} با ${wr}٪ موفقیت داشته‌ای`
+        : `You had the highest profitability using ${bestAnalysisTf.label} analysis timeframe with a ${wr}% win rate`,
       winRate: wr,
       sampleSize: bestAnalysisTf.total,
     };
@@ -255,7 +313,9 @@ function generateEdgeInsight(recentTrades: any[]): EdgeInsight {
     const wr = Math.round((bestEntryTf.wins / bestEntryTf.total) * 100);
     return {
       type: 'timeframe',
-      insight: `بهترین عملکردت برای ورود در تایم‌فریم ${bestEntryTf.label} با ${wr}٪ موفقیت بوده`,
+      insight: isFa
+        ? `بهترین عملکردت برای ورود در تایم‌فریم ${bestEntryTf.label} با ${wr}٪ موفقیت بوده`
+        : `Your best entry performance was in the ${bestEntryTf.label} timeframe with a ${wr}% win rate`,
       winRate: wr,
       sampleSize: bestEntryTf.total,
     };
@@ -268,7 +328,9 @@ function generateEdgeInsight(recentTrades: any[]): EdgeInsight {
     const sign = avgPnl >= 0 ? '+' : '';
     return {
       type: 'weekday',
-      insight: `${bestWeekday.label} بهترین روز تریدته — میانگین ${sign}$${Math.round(avgPnl)} سود`,
+      insight: isFa
+        ? `${getWeekdayName(bestWeekday.label, true)} بهترین روز تریدته — میانگین ${sign}$${Math.round(avgPnl)} سود`
+        : `${getWeekdayName(bestWeekday.label, false)} is your best trading day — average ${sign}$${Math.round(avgPnl)} profit`,
       winRate: Math.round((bestWeekday.wins / bestWeekday.total) * 100),
       sampleSize: bestWeekday.total,
     };
@@ -282,11 +344,13 @@ function generateEdgeInsight(recentTrades: any[]): EdgeInsight {
     const worst = emotionEntries[emotionEntries.length - 1][1];
     const bestWr = Math.round((best.wins / best.total) * 100);
     const worstWr = Math.round((worst.wins / worst.total) * 100);
-    const bestLabel = best.label === 'UNKNOWN' ? 'آرام' : best.label;
-    const worstLabel = worst.label === 'UNKNOWN' ? 'مضطرب' : worst.label;
+    const bestLabel = getEmotionName(best.label, isFa);
+    const worstLabel = getEmotionName(worst.label, isFa);
     return {
       type: 'emotion',
-      insight: `وقتی ${bestLabel} تریدی، ${bestWr}٪ موفقیتی. وقتی ${worstLabel}، ${worstWr}٪`,
+      insight: isFa
+        ? `وقتی ${bestLabel} تریدی، ${bestWr}٪ موفقیتی. وقتی ${worstLabel}، ${worstWr}٪`
+        : `When you are ${bestLabel}, you have a ${bestWr}% win rate. When ${worstLabel}, it is ${worstWr}%`,
       winRate: bestWr,
       sampleSize: best.total,
     };
@@ -294,7 +358,9 @@ function generateEdgeInsight(recentTrades: any[]): EdgeInsight {
 
   return {
     type: 'fallback',
-    insight: `بعد از ${MIN_TRADES} معامله بیشتر، برتری معاملاتیت رو بهت نشون می‌دیم`,
+    insight: isFa
+      ? `بعد از ${MIN_TRADES} معامله بیشتر، برتری معاملاتیت رو بهت نشون می‌دیم`
+      : `We'll show your trading edge after ${MIN_TRADES} more trades`,
     winRate: 0,
     sampleSize: closedTrades.length,
   };
@@ -310,6 +376,7 @@ router.get('/summary', authenticate, async (req: AuthRequest, res: Response) => 
   try {
     const userId = req.user!.userId;
     const accountId = (req.query.accountId as string | undefined) || 'all';
+    const locale = (req.query.locale as string) || 'fa';
 
     const user = await prisma.user.findUnique({
       where: { id: userId },
@@ -512,7 +579,7 @@ router.get('/summary', authenticate, async (req: AuthRequest, res: Response) => 
     const recent30 = allTrades.filter(
       (t) => new Date(t.open_time) >= thirtyDaysAgo
     );
-    const edge = generateEdgeInsight(recent30);
+    const edge = generateEdgeInsight(recent30, locale);
 
     // ─── SECTION 4: RECENT ACTIVITY ────────────────────────────────────────────
     // Last 5 trades (by close_time desc, then open_time for open trades)

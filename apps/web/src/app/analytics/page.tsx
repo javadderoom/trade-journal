@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useMemo, useState } from 'react';
-import { useAppStore } from '../../store/useAppStore';
+import { useAppStore, useTranslation } from '../../store/useAppStore';
 import { useTradeStore } from '../../store/useTradeStore';
 import { api } from '../../lib/api';
 import Select from '../../components/ui/Select';
@@ -28,6 +28,51 @@ const WEEKDAY_NAMES = ['یکشنبه', 'دوشنبه', 'سه‌شنبه', 'چه�
 
 export default function JournalPage() {
   const [activeTab, setActiveTab] = useState<'overview' | 'patterns' | 'charts'>('overview');
+  const { t, language } = useTranslation();
+
+  const formatNum = (num: number | string) => language === 'fa' ? toPersianDigits(num.toString()) : num.toString();
+
+  const formatCurrency = (val: number, decimals = 2, showPlus = false) => {
+    if (val === 0) return `$${formatNum('0' + (decimals > 0 ? '.' + '0'.repeat(decimals) : ''))}`;
+    const isNeg = val < 0;
+    const absVal = Math.abs(val).toFixed(decimals);
+    const formatted = formatNum(absVal);
+    const sign = isNeg ? '-' : (showPlus ? '+' : '');
+    return `${sign}$${formatted}`;
+  };
+
+  const getEmotionLabel = (key: string) => {
+    if (language === 'en') {
+      const enMap: { [key: string]: string } = {
+        CONFIDENT: 'Confident',
+        NEUTRAL: 'Neutral',
+        ANXIOUS: 'Anxious',
+        FOMO: 'FOMO',
+        REVENGE: 'Revenge',
+        UNKNOWN: 'Unknown'
+      };
+      return enMap[key] || key;
+    } else {
+      return EMOTION_MAP[key]?.label || key;
+    }
+  };
+
+  const getSessionLabel = (label: string) => {
+    if (language === 'en') {
+      const enSessMap: { [key: string]: string } = {
+        'سیدنی': 'Sydney',
+        'توکیو': 'Tokyo',
+        'لندن': 'London',
+        'نیویورک': 'New York',
+      };
+      return enSessMap[label] || label;
+    }
+    return label;
+  };
+
+  const weekdayNames = language === 'fa'
+    ? WEEKDAY_NAMES
+    : ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
   const {
     accounts,
@@ -338,7 +383,7 @@ export default function JournalPage() {
       const idx = parseInt(idxStr, 10);
       return {
         dayIndex: idx,
-        name: WEEKDAY_NAMES[idx],
+        name: weekdayNames[idx],
         ...weekdaysGroup[idx],
         winRate: (weekdaysGroup[idx].wins / weekdaysGroup[idx].total) * 100,
       };
@@ -349,7 +394,7 @@ export default function JournalPage() {
       const foundCustom = customEmotions.find(e => e.value === key);
       return {
         name: key,
-        label: foundCustom?.label || EMOTION_MAP[key]?.label || key,
+        label: foundCustom?.label || getEmotionLabel(key) || key,
         emoji: foundCustom?.emoji || EMOTION_MAP[key]?.emoji || '💭',
         ...emotionsGroup[key],
         winRate: (emotionsGroup[key].wins / emotionsGroup[key].total) * 100,
@@ -421,12 +466,18 @@ export default function JournalPage() {
 
 
   const rDistribution = useMemo(() => {
-    const bins = [
+    const bins = language === 'fa' ? [
       { key: 'loss', label: 'ضرر (R < 0)', count: 0, className: 'bin-loss' },
       { key: 'small-win', label: 'برد کوچک (0 ≤ R < 1)', count: 0, className: 'bin-small-win' },
       { key: 'med-win', label: 'برد متوسط (1 ≤ R < 2)', count: 0, className: 'bin-med-win' },
       { key: 'target-win', label: 'برد هدف (2 ≤ R < 3)', count: 0, className: 'bin-target-win' },
       { key: 'big-win', label: 'برد بزرگ (R ≥ 3)', count: 0, className: 'bin-big-win' },
+    ] : [
+      { key: 'loss', label: 'Loss (R < 0)', count: 0, className: 'bin-loss' },
+      { key: 'small-win', label: 'Small Win (0 ≤ R < 1)', count: 0, className: 'bin-small-win' },
+      { key: 'med-win', label: 'Medium Win (1 ≤ R < 2)', count: 0, className: 'bin-med-win' },
+      { key: 'target-win', label: 'Target Win (2 ≤ R < 3)', count: 0, className: 'bin-target-win' },
+      { key: 'big-win', label: 'Big Win (R ≥ 3)', count: 0, className: 'bin-big-win' },
     ];
 
     sortedClosedTrades.forEach((t) => {
@@ -495,8 +546,8 @@ export default function JournalPage() {
       value: acc.id,
       label: acc.name + (acc.accountNumber ? ` (${acc.accountNumber})` : ''),
     }));
-    return [{ value: 'all', label: 'همه حساب‌ها' }, ...list];
-  }, [accounts]);
+    return [{ value: 'all', label: language === 'fa' ? 'همه حساب‌ها' : 'All Accounts' }, ...list];
+  }, [accounts, language]);
 
   // Helper formatting values
   const isNetProfit = stats.netPnl >= 0;
@@ -505,7 +556,7 @@ export default function JournalPage() {
   if (loading) {
     return (
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', backgroundColor: '#111319', color: '#61f9b1' }}>
-        <div style={{ fontSize: '20px', fontFamily: 'Vazirmatn' }}>در حال بارگذاری گزارش عملکرد...</div>
+        <div style={{ fontSize: '20px', fontFamily: 'Vazirmatn' }}>{t('analytics.loading')}</div>
       </div>
     );
   }
@@ -514,13 +565,13 @@ export default function JournalPage() {
     <div className="journal-container">
       {/* Header */}
       <header className="journal-header">
-        <h1>گزارش عملکرد معاملات</h1>
+        <h1>{t('analytics.title')}</h1>
         <div className="header-actions">
           <Select
             options={accountOptions}
             value={selectedAccountId}
             onChange={setSelectedAccountId}
-            placeholder="انتخاب حساب"
+            placeholder={language === 'fa' ? 'انتخاب حساب' : 'Select Account'}
           />
         </div>
       </header>
@@ -528,9 +579,9 @@ export default function JournalPage() {
       {/* Tabs */}
       <div className="journal-tab-bar">
         {([
-          { key: 'overview' as const, label: 'خلاصه عملکرد', icon: 'analytics' },
-          { key: 'patterns' as const, label: 'شناسایی الگوها', icon: 'hub' },
-          { key: 'charts' as const, label: 'نمودارها و ریسک', icon: 'candlestick_chart' },
+          { key: 'overview' as const, label: t('analytics.overview'), icon: 'analytics' },
+          { key: 'patterns' as const, label: t('analytics.patterns'), icon: 'hub' },
+          { key: 'charts' as const, label: t('analytics.charts'), icon: 'candlestick_chart' },
         ]).map((tab) => (
           <button
             key={tab.key}
@@ -546,8 +597,8 @@ export default function JournalPage() {
       {stats.totalCount === 0 ? (
         <div className="journal-empty-state">
           <span className="material-symbols-outlined empty-icon">analytics</span>
-          <h3>داده‌ای یافت نشد</h3>
-          <p>هیچ معامله بسته‌شده‌ای در این حساب ثبت نشده است. برای مشاهده آمار، معاملات خود را ثبت یا فایل معاملاتی وارد کنید.</p>
+          <h3>{t('analytics.noDataTitle')}</h3>
+          <p>{t('analytics.noDataDesc')}</p>
         </div>
       ) : activeTab === 'overview' ? (
         /* Overview (Tier 1) Grid */
@@ -555,26 +606,28 @@ export default function JournalPage() {
           {/* 1. Net P&L Card */}
           <div className={`journal-card journal-card--pnl ${isNetProfit ? 'profit' : 'loss'}`}>
             <div className="card-header">
-              <span className="card-title">کل سود و زیان (P&L Net)</span>
+              <span className="card-title">{t('analytics.netPnl')}</span>
               <span className="material-symbols-outlined card-icon">payments</span>
             </div>
-            <div className={`pnl-value ${isNetProfit ? 'profit' : 'loss'}`}>
-              {isNetProfit ? '+' : ''}${toPersianDigits(stats.netPnl.toFixed(2))}
+            <div className={`pnl-value ${isNetProfit ? 'profit' : 'loss'}`} style={{ direction: 'ltr', display: 'inline-block' }}>
+              {formatCurrency(stats.netPnl, 2, true)}
             </div>
             <div className={`pnl-toman ${isNetProfit ? 'profit' : 'loss'}`}>
-              {formatToman(stats.netPnl, usdToToman)}
+              {language === 'fa' 
+                ? formatToman(stats.netPnl, usdToToman) 
+                : (stats.netPnl * usdToToman).toLocaleString('en-US') + ' Toman'}
             </div>
             <div className="pnl-subtext-grid">
               <div className="sub-item">
-                <span className="sub-label">ناخالص P&L</span>
-                <span className="sub-val" style={{ color: stats.grossPnl >= 0 ? '#61f9b1' : '#ffb4ab' }}>
-                  ${toPersianDigits(stats.grossPnl.toFixed(2))}
+                <span className="sub-label">{t('analytics.grossPnl')}</span>
+                <span className="sub-val" style={{ color: stats.grossPnl >= 0 ? '#61f9b1' : '#ffb4ab', direction: 'ltr', display: 'inline-block' }}>
+                  {formatCurrency(stats.grossPnl, 2)}
                 </span>
               </div>
               <div className="sub-item">
-                <span className="sub-label">کمیسیون و سواپ</span>
-                <span className="sub-val" style={{ color: '#ffb4ab' }}>
-                  ${toPersianDigits((stats.commissions + stats.swaps).toFixed(2))}
+                <span className="sub-label">{t('analytics.commissionAndSwap')}</span>
+                <span className="sub-val" style={{ color: '#ffb4ab', direction: 'ltr', display: 'inline-block' }}>
+                  {formatCurrency(stats.commissions + stats.swaps, 2)}
                 </span>
               </div>
             </div>
@@ -583,7 +636,7 @@ export default function JournalPage() {
           {/* 2. Win Rate Card */}
           <div className="journal-card">
             <div className="card-header">
-              <span className="card-title">نسبت برد (Win Rate)</span>
+              <span className="card-title">{t('analytics.winRate')}</span>
               <span className="material-symbols-outlined card-icon">emoji_events</span>
             </div>
             <div className="win-rate-container">
@@ -600,7 +653,7 @@ export default function JournalPage() {
                   />
                 </svg>
                 <div className="radial-label-val">
-                  %{toPersianDigits(Math.round(stats.winRateOverall).toString())}
+                  {language === 'fa' ? '%' + toPersianDigits(Math.round(stats.winRateOverall).toString()) : Math.round(stats.winRateOverall) + '%'}
                 </div>
               </div>
 
@@ -608,8 +661,8 @@ export default function JournalPage() {
               <div className="direction-progress-group">
                 <div className="progress-item">
                   <div className="progress-label-row">
-                    <span className="lbl">خرید (BUY)</span>
-                    <span className="val">%{toPersianDigits(Math.round(stats.winRateBuy).toString())}</span>
+                    <span className="lbl">{t('analytics.buy')}</span>
+                    <span className="val">{language === 'fa' ? '%' + toPersianDigits(Math.round(stats.winRateBuy).toString()) : Math.round(stats.winRateBuy) + '%'}</span>
                   </div>
                   <div className="progress-track">
                     <div className="progress-bar bar-buy" style={{ width: `${stats.winRateBuy}%` }} />
@@ -617,8 +670,8 @@ export default function JournalPage() {
                 </div>
                 <div className="progress-item">
                   <div className="progress-label-row">
-                    <span className="lbl">فروش (SELL)</span>
-                    <span className="val">%{toPersianDigits(Math.round(stats.winRateSell).toString())}</span>
+                    <span className="lbl">{t('analytics.sell')}</span>
+                    <span className="val">{language === 'fa' ? '%' + toPersianDigits(Math.round(stats.winRateSell).toString()) : Math.round(stats.winRateSell) + '%'}</span>
                   </div>
                   <div className="progress-track">
                     <div className="progress-bar bar-sell" style={{ width: `${stats.winRateSell}%` }} />
@@ -631,23 +684,23 @@ export default function JournalPage() {
           {/* 3. Profit Factor & Expectancy Card */}
           <div className="journal-card">
             <div className="card-header">
-              <span className="card-title">سودآوری و امید ریاضی</span>
+              <span className="card-title">{t('analytics.profitabilityAndExpectancy')}</span>
               <span className="material-symbols-outlined card-icon">insights</span>
             </div>
             <div className="gauge-metric-row">
               <div className="gauge-box">
-                <span className="gauge-label">فاکتور سود</span>
+                <span className="gauge-label">{t('analytics.profitFactor')}</span>
                 <span className={`gauge-val ${stats.profitFactor >= 1 ? 'positive' : 'negative'}`}>
-                  {stats.profitFactor === Infinity ? '∞' : toPersianDigits(stats.profitFactor.toFixed(2))}
+                  {stats.profitFactor === Infinity ? '∞' : formatNum(stats.profitFactor.toFixed(2))}
                 </span>
-                <span className="gauge-indicator-text">حاصل‌تقسیم سود بر ضرر</span>
+                <span className="gauge-indicator-text">{t('analytics.profitFactorDesc')}</span>
               </div>
               <div className="gauge-box">
-                <span className="gauge-label">امید ریاضی (Expectancy)</span>
-                <span className={`gauge-val ${stats.expectancyUsd >= 0 ? 'positive' : 'negative'}`}>
-                  ${toPersianDigits(stats.expectancyUsd.toFixed(2))}
+                <span className="gauge-label">{t('analytics.expectancy')}</span>
+                <span className={`gauge-val ${stats.expectancyUsd >= 0 ? 'positive' : 'negative'}`} style={{ direction: 'ltr', display: 'inline-block' }}>
+                  {formatCurrency(stats.expectancyUsd, 2)}
                 </span>
-                <span className="gauge-indicator-text">میانگین بازده هر معامله</span>
+                <span className="gauge-indicator-text">{t('analytics.expectancyDesc')}</span>
               </div>
             </div>
           </div>
@@ -655,15 +708,15 @@ export default function JournalPage() {
           {/* 4. R-Multiple Comparative Card */}
           <div className="journal-card">
             <div className="card-header">
-              <span className="card-title">ضریب ریسک به ریوارد (R)</span>
+              <span className="card-title">{t('analytics.riskRewardRatio')}</span>
               <span className="material-symbols-outlined card-icon">legend_toggle</span>
             </div>
             <div className="r-compare-container">
               {/* Planned R */}
               <div className="r-row">
                 <div className="r-label-row">
-                  <span className="lbl">میانگین ریوارد هدف (R Planned)</span>
-                  <span className="val">R {toPersianDigits(stats.avgRPlanned.toFixed(2))}</span>
+                  <span className="lbl">{t('analytics.rPlanned')}</span>
+                  <span className="val">R {formatNum(stats.avgRPlanned.toFixed(2))}</span>
                 </div>
                 <div className="compare-bar-track">
                   <div 
@@ -676,8 +729,8 @@ export default function JournalPage() {
               {/* Achieved R */}
               <div className="r-row">
                 <div className="r-label-row">
-                  <span className="lbl">میانگین ریوارد کسب‌شده (R Achieved)</span>
-                  <span className="val">R {toPersianDigits(stats.avgRAchieved.toFixed(2))}</span>
+                  <span className="lbl">{t('analytics.rAchieved')}</span>
+                  <span className="val">R {formatNum(stats.avgRAchieved.toFixed(2))}</span>
                 </div>
                 <div className="compare-bar-track">
                   <div 
@@ -689,8 +742,8 @@ export default function JournalPage() {
 
               <div className="r-footer-ratio">
                 {stats.avgRAchieved < stats.avgRPlanned 
-                  ? 'کسب سود کمتر از برنامه معاملاتی (خروج زودهنگام)' 
-                  : 'پایبندی عالی به برنامه کسب سود هدف'}
+                  ? t('analytics.rCompliancePoor') 
+                  : t('analytics.rComplianceGood')}
               </div>
             </div>
           </div>
@@ -698,23 +751,23 @@ export default function JournalPage() {
           {/* 5. Drawdown & Streak Card */}
           <div className="journal-card">
             <div className="card-header">
-              <span className="card-title">افت سرمایه و ضررهای متوالی</span>
+              <span className="card-title">{t('analytics.drawdownAndStreaks')}</span>
               <span className="material-symbols-outlined card-icon">warning</span>
             </div>
             <div className="drawdown-subgrid">
               <div className="sub-card">
-                <span className="sub-lbl">حداکثر افت سرمایه (MDD)</span>
-                <span className="sub-val warning">
-                  ${toPersianDigits(stats.maxDrawdown.toFixed(2))}
+                <span className="sub-lbl">{t('analytics.maxDrawdown')}</span>
+                <span className="sub-val warning" style={{ direction: 'ltr', display: 'inline-block' }}>
+                  {formatCurrency(stats.maxDrawdown, 2)}
                 </span>
-                <span className="sub-info">بیشترین سقوط از قله حساب</span>
+                <span className="sub-info">{t('analytics.maxDrawdownDesc')}</span>
               </div>
               <div className="sub-card">
-                <span className="sub-lbl">ضرر متوالی (Streak)</span>
+                <span className="sub-lbl">{t('analytics.consecutiveLosses')}</span>
                 <span className="sub-val" style={{ color: stats.maxConsecutiveLosses > 4 ? '#ffb4ab' : '#f8fafc' }}>
-                  {toPersianDigits(stats.maxConsecutiveLosses.toString())} معامله
+                  {formatNum(stats.maxConsecutiveLosses.toString())} {t('trades.tradeUnit')}
                 </span>
-                <span className="sub-info">طولانی‌ترین زنجیره باخت‌ها</span>
+                <span className="sub-info">{t('analytics.consecutiveLossesDesc')}</span>
               </div>
             </div>
           </div>
@@ -725,20 +778,22 @@ export default function JournalPage() {
           {/* Row A: Heatmap Hour Grid */}
           <div className="journal-card hour-heatmap-container">
             <div className="card-header">
-              <span className="card-title">توزیع زمانی سود و زیان (ساعت‌های شبانه‌روز به وقت تهران)</span>
+              <span className="card-title">{t('analytics.timeDistribution')}</span>
               <span className="material-symbols-outlined card-icon">schedule</span>
             </div>
             <div className="hour-grid">
               {stats.hours.map((h) => {
-                const hourFormatted = `${h.hour.toString().padStart(2, '0')}:۰۰`;
+                const hourFormatted = language === 'fa'
+                  ? `${h.hour.toString().padStart(2, '0')}:۰۰`
+                  : `${h.hour.toString().padStart(2, '0')}:00`;
                 const hasPnl = h.count > 0;
                 return (
-                  <div key={h.hour} className={`hour-block ${h.className}`} title={`تعداد معاملات: ${h.count}`}>
-                    <span className="hour-num">{toPersianDigits(hourFormatted)}</span>
-                    <span className={`hour-pnl ${h.pnl >= 0 ? 'positive' : 'negative'}`}>
+                  <div key={h.hour} className={`hour-block ${h.className}`} title={language === 'fa' ? `تعداد معاملات: ${h.count}` : `Trades: ${h.count}`}>
+                    <span className="hour-num">{formatNum(hourFormatted)}</span>
+                    <span className={`hour-pnl ${h.pnl >= 0 ? 'positive' : 'negative'}`} style={{ direction: 'ltr', display: 'inline-block' }}>
                       {hasPnl 
-                        ? `${h.pnl >= 0 ? '+' : ''}$${toPersianDigits(Math.round(h.pnl).toString())}`
-                        : toPersianDigits('۰')}
+                        ? formatCurrency(h.pnl, 0, true)
+                        : formatNum('0')}
                     </span>
                   </div>
                 );
@@ -749,15 +804,15 @@ export default function JournalPage() {
           {/* Row A.2: Heatmap Timeframe Grid */}
           <div className="journal-card timeframe-heatmap-container">
             <div className="card-header">
-              <span className="card-title">توزیع عملکرد بر اساس تایم‌فریم (تایم‌فریم تحلیل × تایم‌فریم ورود)</span>
+              <span className="card-title">{t('analytics.timeframeDistribution')}</span>
               <span className="material-symbols-outlined card-icon">grid_on</span>
             </div>
             <div className="journal-table-wrapper" style={{ overflowX: 'auto', marginTop: '12px' }}>
               <table className="timeframe-heatmap-table" style={{ width: '100%', borderCollapse: 'collapse', fontFamily: 'Vazirmatn' }}>
                 <thead>
                   <tr>
-                    <th style={{ padding: '8px', fontSize: '12px', color: '#8898aa', borderBottom: '1px solid rgba(255,255,255,0.05)', textAlign: 'right' }}>
-                      تحلیل \ ورود
+                    <th style={{ padding: '8px', fontSize: '12px', color: '#8898aa', borderBottom: '1px solid rgba(255,255,255,0.05)', textAlign: language === 'fa' ? 'right' : 'left' }}>
+                      {language === 'fa' ? 'تحلیل \\ ورود' : 'Analysis \\ Entry'}
                     </th>
                     {['M1', 'M5', 'M15', 'M30', 'H1', 'H4', 'D1', 'W1', 'MN'].map(tf => (
                       <th key={tf} style={{ padding: '8px', fontSize: '12px', color: '#8898aa', borderBottom: '1px solid rgba(255,255,255,0.05)', textAlign: 'center', minWidth: '60px' }}>
@@ -769,7 +824,7 @@ export default function JournalPage() {
                 <tbody>
                   {['M1', 'M5', 'M15', 'M30', 'H1', 'H4', 'D1', 'W1', 'MN'].map(aTf => (
                     <tr key={aTf}>
-                      <td style={{ padding: '8px', fontSize: '13px', fontWeight: 'bold', color: '#8898aa', borderBottom: '1px solid rgba(255,255,255,0.02)', textAlign: 'right' }}>
+                      <td style={{ padding: '8px', fontSize: '13px', fontWeight: 'bold', color: '#8898aa', borderBottom: '1px solid rgba(255,255,255,0.02)', textAlign: language === 'fa' ? 'right' : 'left' }}>
                         {aTf}
                       </td>
                       {['M1', 'M5', 'M15', 'M30', 'H1', 'H4', 'D1', 'W1', 'MN'].map(eTf => {
@@ -808,8 +863,12 @@ export default function JournalPage() {
                             }}
                             title={
                               hasFewerThan10
-                                ? `داده ناکافی (${cell.total} معامله). برای نمایش الگو حداقل ۱۰ معامله نیاز است.`
-                                : `تعداد: ${cell.total} | سود/زیان: $${pnlVal}`
+                                ? (language === 'fa' 
+                                    ? `داده ناکافی (${cell.total} معامله). برای نمایش الگو حداقل ۱۰ معامله نیاز است.` 
+                                    : `Insufficient data (${cell.total} trades). At least 10 trades are needed to determine patterns.`)
+                                : (language === 'fa' 
+                                    ? `تعداد: ${cell.total} | سود/زیان: $${pnlVal}` 
+                                    : `Count: ${cell.total} | P&L: $${pnlVal}`)
                             }
                           >
                             {hasFewerThan10 ? (
@@ -819,8 +878,10 @@ export default function JournalPage() {
                               </div>
                             ) : (
                               <div>
-                                <div style={{ fontWeight: 'bold' }}>%{toPersianDigits(winRate.toString())}</div>
-                                <div style={{ fontSize: '10px', opacity: 0.8 }}>({toPersianDigits(cell.total)} معامله)</div>
+                                <div style={{ fontWeight: 'bold' }}>{language === 'fa' ? '%' + toPersianDigits(winRate.toString()) : winRate + '%'}</div>
+                                <div style={{ fontSize: '10px', opacity: 0.8 }}>
+                                  {language === 'fa' ? `(${toPersianDigits(cell.total)} معامله)` : `(${cell.total} trades)`}
+                                </div>
                               </div>
                             )}
                           </td>
@@ -834,7 +895,9 @@ export default function JournalPage() {
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '12px', padding: '8px 12px', background: 'rgba(255, 180, 171, 0.04)', borderRadius: '6px', border: '1px solid rgba(255, 180, 171, 0.12)' }}>
               <span className="material-symbols-outlined" style={{ color: '#ffb4ab', fontSize: '18px' }}>warning</span>
               <span style={{ fontSize: '11px', color: '#bbcabe', fontFamily: 'Vazirmatn' }}>
-                تایم‌فریم‌هایی که تعداد معاملات آن‌ها کمتر از ۱۰ مورد است، جهت جلوگیری از سوگیری‌های آماری غیردقیق و نادرست قفل شده و نمایش داده نمی‌شوند.
+                {language === 'fa'
+                  ? 'تایم‌فریم‌هایی که تعداد معاملات آن‌ها کمتر از ۱۰ مورد است، جهت جلوگیری از سوگیری‌های آماری غیردقیق و نادرست قفل شده و نمایش داده نمی‌شوند.'
+                  : 'Timeframes with fewer than 10 trades are locked and hidden to prevent inaccurate statistical biases.'}
               </span>
             </div>
           </div>
@@ -844,7 +907,7 @@ export default function JournalPage() {
             {/* Session Card */}
             <div className="journal-card">
               <div className="card-header">
-                <span className="card-title">عملکرد بر اساس جلسات معاملاتی (Sessions)</span>
+                <span className="card-title">{language === 'fa' ? 'عملکرد بر اساس جلسات معاملاتی (Sessions)' : 'Performance by Trading Session'}</span>
                 <span className="material-symbols-outlined card-icon">public</span>
               </div>
               <div className="stats-list">
@@ -852,15 +915,19 @@ export default function JournalPage() {
                   <div key={sess.name} className="stats-list-item">
                     <div className="item-meta">
                       <span className="item-emoji">{sess.emoji}</span>
-                      <span className="item-label">{sess.label}</span>
-                      <span className="item-count">({toPersianDigits(sess.total)} معامله)</span>
+                      <span className="item-label">{getSessionLabel(sess.label)}</span>
+                      <span className="item-count">
+                        {language === 'fa' ? `(${toPersianDigits(sess.total)} معامله)` : `(${sess.total} trades)`}
+                      </span>
                     </div>
                     <div className="item-stats">
                       <span className={`item-winrate ${sess.winRate >= 50 ? '' : 'losing'}`}>
-                        %{toPersianDigits(Math.round(sess.winRate).toString())} برد
+                        {language === 'fa'
+                          ? `%${toPersianDigits(Math.round(sess.winRate).toString())} برد`
+                          : `${Math.round(sess.winRate)}% Win`}
                       </span>
-                      <span className={`item-pnl ${sess.pnl >= 0 ? 'positive' : 'negative'}`}>
-                        {sess.pnl >= 0 ? '+' : ''}${toPersianDigits(sess.pnl.toFixed(0))}
+                      <span className={`item-pnl ${sess.pnl >= 0 ? 'positive' : 'negative'}`} style={{ direction: 'ltr' }}>
+                        {formatCurrency(sess.pnl, 0, true)}
                       </span>
                     </div>
                   </div>
@@ -871,7 +938,7 @@ export default function JournalPage() {
             {/* Emotion Impact Card */}
             <div className="journal-card">
               <div className="card-header">
-                <span className="card-title">تأثیر هیجانات بر نتیجه معامله (Emotions)</span>
+                <span className="card-title">{language === 'fa' ? 'تأثیر هیجانات بر نتیجه معامله (Emotions)' : 'Impact of Emotions on Trading'}</span>
                 <span className="material-symbols-outlined card-icon">psychology</span>
               </div>
               <div className="stats-list">
@@ -880,14 +947,18 @@ export default function JournalPage() {
                     <div className="item-meta">
                       <span className="item-emoji">{emo.emoji}</span>
                       <span className="item-label">{emo.label}</span>
-                      <span className="item-count">({toPersianDigits(emo.total)} معامله)</span>
+                      <span className="item-count">
+                        {language === 'fa' ? `(${toPersianDigits(emo.total)} معامله)` : `(${emo.total} trades)`}
+                      </span>
                     </div>
                     <div className="item-stats">
                       <span className={`item-winrate ${emo.winRate >= 50 ? '' : 'losing'}`}>
-                        %{toPersianDigits(Math.round(emo.winRate).toString())} برد
+                        {language === 'fa'
+                          ? `%${toPersianDigits(Math.round(emo.winRate).toString())} برد`
+                          : `${Math.round(emo.winRate)}% Win`}
                       </span>
-                      <span className={`item-pnl ${emo.pnl >= 0 ? 'positive' : 'negative'}`}>
-                        {emo.pnl >= 0 ? '+' : ''}${toPersianDigits(emo.pnl.toFixed(0))}
+                      <span className={`item-pnl ${emo.pnl >= 0 ? 'positive' : 'negative'}`} style={{ direction: 'ltr' }}>
+                        {formatCurrency(emo.pnl, 0, true)}
                       </span>
                     </div>
                   </div>
@@ -901,29 +972,29 @@ export default function JournalPage() {
             {/* Symbol Table */}
             <div className="journal-card">
               <div className="card-header">
-                <span className="card-title">سودده‌ترین نمادها (Main Symbols)</span>
+                <span className="card-title">{language === 'fa' ? 'سودده‌ترین نمادها (Main Symbols)' : 'Most Profitable Symbols'}</span>
                 <span className="material-symbols-outlined card-icon">toll</span>
               </div>
               <div className="journal-table-wrapper">
                 <table className="journal-data-table">
                   <thead>
                     <tr>
-                      <th>نماد</th>
-                      <th>تعداد معامله</th>
-                      <th>نسبت برد</th>
-                      <th>خالص سود و زیان</th>
+                      <th>{language === 'fa' ? 'نماد' : 'Symbol'}</th>
+                      <th>{language === 'fa' ? 'تعداد معامله' : 'Trades'}</th>
+                      <th>{language === 'fa' ? 'نسبت برد' : 'Win Rate'}</th>
+                      <th>{language === 'fa' ? 'خالص سود و زیان' : 'Net P&L'}</th>
                     </tr>
                   </thead>
                   <tbody>
                     {stats.symbols.map((sym) => (
                       <tr key={sym.symbol}>
                         <td style={{ fontWeight: '700' }}>{sym.symbol}</td>
-                        <td>{toPersianDigits(sym.total)}</td>
+                        <td>{formatNum(sym.total)}</td>
                         <td style={{ color: sym.winRate >= 50 ? '#61f9b1' : '#ffb4ab', fontWeight: '600' }}>
-                          %{toPersianDigits(Math.round(sym.winRate).toString())}
+                          {language === 'fa' ? '%' + toPersianDigits(Math.round(sym.winRate).toString()) : Math.round(sym.winRate) + '%'}
                         </td>
                         <td style={{ color: sym.pnl >= 0 ? '#61f9b1' : '#ffb4ab', fontWeight: '700', direction: 'ltr' }}>
-                          {sym.pnl >= 0 ? '+' : ''}${toPersianDigits(sym.pnl.toFixed(2))}
+                          {formatCurrency(sym.pnl, 2, true)}
                         </td>
                       </tr>
                     ))}
@@ -937,27 +1008,31 @@ export default function JournalPage() {
               {/* Strategies Card */}
               <div className="journal-card" style={{ flex: 1 }}>
                 <div className="card-header">
-                  <span className="card-title">عملکرد بر اساس استراتژی (Strategy tags)</span>
+                  <span className="card-title">{language === 'fa' ? 'عملکرد بر اساس استراتژی (Strategy tags)' : 'Performance by Strategy'}</span>
                   <span className="material-symbols-outlined card-icon">label</span>
                 </div>
                 <div className="stats-list">
                   {stats.strategies.length === 0 ? (
                     <span style={{ fontSize: '13px', color: '#bbcabe', textAlign: 'center', padding: '16px' }}>
-                      استراتژی یا برچسبی یافت نشد.
+                      {language === 'fa' ? 'استراتژی یا برچسبی یافت نشد.' : 'No strategy tags found.'}
                     </span>
                   ) : (
                     stats.strategies.slice(0, 4).map((strat) => (
                       <div key={strat.tag} className="stats-list-item">
                         <div className="item-meta">
                           <span className="item-label">#{strat.tag}</span>
-                          <span className="item-count">({toPersianDigits(strat.total)} معامله)</span>
+                          <span className="item-count">
+                            {language === 'fa' ? `(${toPersianDigits(strat.total)} معامله)` : `(${strat.total} trades)`}
+                          </span>
                         </div>
                         <div className="item-stats">
                           <span className={`item-winrate ${strat.winRate >= 50 ? '' : 'losing'}`}>
-                            %{toPersianDigits(Math.round(strat.winRate).toString())} برد
+                            {language === 'fa'
+                              ? `%${toPersianDigits(Math.round(strat.winRate).toString())} برد`
+                              : `${Math.round(strat.winRate)}% Win`}
                           </span>
-                          <span className={`item-pnl ${strat.pnl >= 0 ? 'positive' : 'negative'}`}>
-                            {strat.pnl >= 0 ? '+' : ''}${toPersianDigits(strat.pnl.toFixed(0))}
+                          <span className={`item-pnl ${strat.pnl >= 0 ? 'positive' : 'negative'}`} style={{ direction: 'ltr' }}>
+                            {formatCurrency(strat.pnl, 0, true)}
                           </span>
                         </div>
                       </div>
@@ -969,7 +1044,7 @@ export default function JournalPage() {
               {/* Day of week Card */}
               <div className="journal-card" style={{ flex: 1 }}>
                 <div className="card-header">
-                  <span className="card-title">عملکرد بر اساس روزهای هفته</span>
+                  <span className="card-title">{language === 'fa' ? 'عملکرد بر اساس روزهای هفته' : 'Performance by Weekday'}</span>
                   <span className="material-symbols-outlined card-icon">calendar_today</span>
                 </div>
                 <div className="stats-list">
@@ -977,14 +1052,18 @@ export default function JournalPage() {
                     <div key={day.dayIndex} className="stats-list-item">
                       <div className="item-meta">
                         <span className="item-label">{day.name}</span>
-                        <span className="item-count">({toPersianDigits(day.total)} معامله)</span>
+                        <span className="item-count">
+                          {language === 'fa' ? `(${toPersianDigits(day.total)} معامله)` : `(${day.total} trades)`}
+                        </span>
                       </div>
                       <div className="item-stats">
                         <span className={`item-winrate ${day.winRate >= 50 ? '' : 'losing'}`}>
-                          %{toPersianDigits(Math.round(day.winRate).toString())} برد
+                          {language === 'fa'
+                            ? `%${toPersianDigits(Math.round(day.winRate).toString())} برد`
+                            : `${Math.round(day.winRate)}% Win`}
                         </span>
-                        <span className={`item-pnl ${day.pnl >= 0 ? 'positive' : 'negative'}`}>
-                          {day.pnl >= 0 ? '+' : ''}${toPersianDigits(day.pnl.toFixed(0))}
+                        <span className={`item-pnl ${day.pnl >= 0 ? 'positive' : 'negative'}`} style={{ direction: 'ltr' }}>
+                          {formatCurrency(day.pnl, 0, true)}
                         </span>
                       </div>
                     </div>
@@ -1001,7 +1080,7 @@ export default function JournalPage() {
           {/* 1. Equity Curve Card */}
           <div className="journal-card journal-card--full-width">
             <div className="card-header">
-              <span className="card-title">نمودار رشد سرمایه (Cumulative Equity Curve)</span>
+              <span className="card-title">{language === 'fa' ? 'نمودار رشد سرمایه (Cumulative Equity Curve)' : 'Cumulative Equity Growth Curve'}</span>
               <span className="material-symbols-outlined card-icon">show_chart</span>
             </div>
             
@@ -1009,7 +1088,9 @@ export default function JournalPage() {
               {sortedClosedTrades.length > 0 ? (
                 <EquityChart closedTrades={sortedClosedTrades} />
               ) : (
-                <div style={{ color: '#bbcabe', fontSize: '13px' }}>اطلاعات کافی برای ترسیم وجود ندارد.</div>
+                <div style={{ color: '#bbcabe', fontSize: '13px' }}>
+                  {language === 'fa' ? 'اطلاعات کافی برای ترسیم وجود ندارد.' : 'Not enough data to draw chart.'}
+                </div>
               )}
             </div>
           </div>
@@ -1018,7 +1099,7 @@ export default function JournalPage() {
             {/* 2. Weekday P&L Bar Chart */}
             <div className="journal-card">
               <div className="card-header">
-                <span className="card-title">سود و زیان به تفکیک روزهای هفته</span>
+                <span className="card-title">{language === 'fa' ? 'سود و زیان به تفکیک روزهای هفته' : 'Profit & Loss by Weekday'}</span>
                 <span className="material-symbols-outlined card-icon">bar_chart</span>
               </div>
               <div className="chart-wrapper">
@@ -1034,7 +1115,7 @@ export default function JournalPage() {
             {/* 4. R-Multiple Distribution Histogram */}
             <div className="journal-card">
               <div className="card-header">
-                <span className="card-title">توزیع ریوارد کسب‌شده (R-Multiple Distribution)</span>
+                <span className="card-title">{language === 'fa' ? 'توزیع ریوارد کسب‌شده (R-Multiple Distribution)' : 'R-Multiple Distribution'}</span>
                 <span className="material-symbols-outlined card-icon">query_stats</span>
               </div>
               <div className="histogram-container">
@@ -1043,8 +1124,10 @@ export default function JournalPage() {
                     <div className="row-meta">
                       <span className="bin-label">{bin.label}</span>
                       <span className="bin-stats">
-                        {toPersianDigits(bin.count)} معامله
-                        <span className="percent">({toPersianDigits(Math.round(bin.percentage))}٪)</span>
+                        {formatNum(bin.count)} {t('trades.tradeUnit')}
+                        <span className="percent">
+                          {language === 'fa' ? `(${toPersianDigits(Math.round(bin.percentage))}٪)` : `(${Math.round(bin.percentage)}%)`}
+                        </span>
                       </span>
                     </div>
                     <div className="row-track">
@@ -1061,22 +1144,26 @@ export default function JournalPage() {
             {/* 5. Avg Winner vs Avg Loser Comparisons */}
             <div className="journal-card">
               <div className="card-header">
-                <span className="card-title">مقایسه معاملات برنده و بازنده (Risk Metrics)</span>
+                <span className="card-title">{language === 'fa' ? 'مقایسه معاملات برنده و بازنده (Risk Metrics)' : 'Risk Metrics (Winners vs Losers)'}</span>
                 <span className="material-symbols-outlined card-icon">balance</span>
               </div>
               <div className="comparisons-container">
                 
                 {/* Dollar Winner vs Loser */}
                 <div className="comparison-block">
-                  <div className="comparison-title">میانگین سود در برابر میانگین زیان (دلار)</div>
+                  <div className="comparison-title">{language === 'fa' ? 'میانگین سود در برابر میانگین زیان (دلار)' : 'Average Profit vs Average Loss (USD)'}</div>
                   <div className="comparison-values-row">
                     <div className="comp-item winner">
-                      <span className="lbl">میانگین برد</span>
-                      <span className="val">+${toPersianDigits(comparisons.avgWinnerUsd.toFixed(2))}</span>
+                      <span className="lbl">{language === 'fa' ? 'میانگین برد' : 'Avg Win'}</span>
+                      <span className="val" style={{ direction: 'ltr', display: 'inline-block' }}>
+                        {formatCurrency(comparisons.avgWinnerUsd, 2, true)}
+                      </span>
                     </div>
                     <div className="comp-item loser">
-                      <span className="lbl">میانگین باخت</span>
-                      <span className="val">-${toPersianDigits(comparisons.avgLoserUsd.toFixed(2))}</span>
+                      <span className="lbl">{language === 'fa' ? 'میانگین باخت' : 'Avg Loss'}</span>
+                      <span className="val" style={{ direction: 'ltr', display: 'inline-block' }}>
+                        {formatCurrency(-comparisons.avgLoserUsd, 2)}
+                      </span>
                     </div>
                   </div>
                   <div className="comparison-visual-track">
@@ -1097,15 +1184,19 @@ export default function JournalPage() {
 
                 {/* Pips Winner vs Loser */}
                 <div className="comparison-block">
-                  <div className="comparison-title">میانگین سود در برابر میانگین زیان (پیپ)</div>
+                  <div className="comparison-title">{language === 'fa' ? 'میانگین سود در برابر میانگین زیان (پیپ)' : 'Average Profit vs Average Loss (Pips)'}</div>
                   <div className="comparison-values-row">
                     <div className="comp-item winner">
-                      <span className="lbl">میانگین برد پیپ</span>
-                      <span className="val">+{toPersianDigits(comparisons.avgWinnerPips.toFixed(1))} pip</span>
+                      <span className="lbl">{language === 'fa' ? 'میانگین برد پیپ' : 'Avg Win Pips'}</span>
+                      <span className="val" style={{ direction: 'ltr', display: 'inline-block' }}>
+                        +{formatNum(comparisons.avgWinnerPips.toFixed(1))} pip
+                      </span>
                     </div>
                     <div className="comp-item loser">
-                      <span className="lbl">میانگین باخت پیپ</span>
-                      <span className="val">-{toPersianDigits(comparisons.avgLoserPips.toFixed(1))} pip</span>
+                      <span className="lbl">{language === 'fa' ? 'میانگین باخت پیپ' : 'Avg Loss Pips'}</span>
+                      <span className="val" style={{ direction: 'ltr', display: 'inline-block' }}>
+                        -{formatNum(comparisons.avgLoserPips.toFixed(1))} pip
+                      </span>
                     </div>
                   </div>
                   <div className="comparison-visual-track">
@@ -1126,9 +1217,9 @@ export default function JournalPage() {
 
                 {/* Risk reward ratio */}
                 <div className="ratio-card-footer">
-                  <span className="footer-label">نسبت ریسک به ریوارد واقعی (W/L Ratio)</span>
+                  <span className="footer-label">{language === 'fa' ? 'نسبت ریسک به ریوارد واقعی (W/L Ratio)' : 'Actual Risk-to-Reward Ratio (W/L Ratio)'}</span>
                   <span className="footer-value">
-                    {toPersianDigits(comparisons.winLossRatio.toFixed(2))}
+                    {formatNum(comparisons.winLossRatio.toFixed(2))}
                   </span>
                 </div>
 

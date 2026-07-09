@@ -553,15 +553,23 @@
           background-color: rgba($primary, 0.05);
           position: relative;
 
-          // Border indicator on the right side of the row (RTL start)
+          // Border indicator on the start side of the row (RTL right, LTR left)
           td:first-child::before {
             content: '';
             position: absolute;
-            right: 0;
             top: 0;
             bottom: 0;
             width: 4px;
             background-color: $primary;
+
+            [dir="rtl"] & {
+              right: 0;
+              left: auto;
+            }
+            [dir="ltr"] & {
+              left: 0;
+              right: auto;
+            }
           }
         }
 
@@ -569,17 +577,25 @@
           background-color: rgba($secondary, 0.04);
           animation: row-pulse 3s ease-in-out infinite;
 
-          // Pulsing right-border indicator (RTL start side)
+          // Pulsing border indicator on the start side (RTL right, LTR left)
           td:first-child::after {
             content: '';
             position: absolute;
-            right: 0;
             top: 0;
             bottom: 0;
             width: 3px;
             background-color: $secondary;
             box-shadow: 0 0 8px rgba($secondary, 0.5);
             animation: border-glow 2s ease-in-out infinite;
+
+            [dir="rtl"] & {
+              right: 0;
+              left: auto;
+            }
+            [dir="ltr"] & {
+              left: 0;
+              right: auto;
+            }
           }
         }
 
@@ -884,18 +900,30 @@
   width: 380px;
   flex-shrink: 0;
   background-color: $surface-container-high;
-  border-right: 1px solid $outline-variant;
   overflow: hidden;
-  box-shadow: -10px 0 30px rgba(0, 0, 0, 0.3);
   display: flex;
   flex-direction: column;
   height: 100vh;
   position: fixed;
   top: 0;
-  left: 0;
   bottom: 0;
   z-index: 1000;
-  animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+
+  [dir="rtl"] & {
+    left: 0;
+    right: auto;
+    border-right: 1px solid $outline-variant;
+    box-shadow: 10px 0 30px rgba(0, 0, 0, 0.3);
+    animation: slideInLeft 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  [dir="ltr"] & {
+    right: 0;
+    left: auto;
+    border-left: 1px solid $outline-variant;
+    box-shadow: -10px 0 30px rgba(0, 0, 0, 0.3);
+    animation: slideInRight 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
 
   .panel-header {
     display: flex;
@@ -1482,11 +1510,19 @@ input[type="checkbox"] {
   }
 }
 
-@keyframes slideIn {
+@keyframes slideInLeft {
   from {
     transform: translateX(-100%);
   }
+  to {
+    transform: translateX(0);
+  }
+}
 
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+  }
   to {
     transform: translateX(0);
   }

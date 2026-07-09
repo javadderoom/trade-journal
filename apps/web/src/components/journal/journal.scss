@@ -9,7 +9,6 @@
   background-color: $background;
   color: $on-surface;
   font-family: $font-primary;
-  direction: rtl;
 
   // Custom scrollbar
   ::-webkit-scrollbar {
@@ -848,7 +847,6 @@
   gap: 2px;
   align-items: center;
   min-width: 130px;
-  direction: rtl;
   
   // Slide-up animation on mount
   animation: tooltip-fade-in 0.15s cubic-bezier(0.23, 1, 0.32, 1) forwards;

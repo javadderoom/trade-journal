@@ -6,6 +6,7 @@ import { useAuthStore } from '../../lib/auth';
 import { api } from '../../lib/api';
 import { toPersianDigits } from '../../utils/farsi';
 import { notify } from '../../lib/notify';
+import { useTranslation } from '../../store/useAppStore';
 import './settings.scss';
 
 type Tab = 'profile' | 'accounts' | 'subscription' | 'security';
@@ -57,6 +58,9 @@ export default function SettingsPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { user, logout } = useAuthStore();
+  const { t, language, setLanguage } = useTranslation();
+
+  const formatNum = (num: number | string) => language === 'fa' ? toPersianDigits(num.toString()) : num.toString();
 
   const [activeTab, setActiveTab] = useState<Tab>((searchParams.get('tab') as Tab) || 'profile');
 
@@ -74,16 +78,16 @@ export default function SettingsPage() {
   const [prices, setPrices] = useState<any>(null);
   const [receiptFile, setReceiptFile] = useState<File | null>(null);
   const [cardDetails, setCardDetails] = useState({
-    cardNumber: '۶۰۳۷-۹۹۷۵-۹۴۴۴-۴۱۲۸',
+    cardNumber: '6037-9975-9444-4128',
     bankName: 'ملی ایران',
     ownerName: 'جواد شیخ اعظمی',
   });
 
   const activePrices = prices || DEFAULT_PRICES;
-  const standardMonthlyPrice = activePrices.STANDARD.monthly.toLocaleString('fa-IR');
-  const standardAnnualPrice = activePrices.STANDARD.annual.toLocaleString('fa-IR');
-  const proMonthlyPrice = activePrices.PRO.monthly.toLocaleString('fa-IR');
-  const proAnnualPrice = activePrices.PRO.annual.toLocaleString('fa-IR');
+  const standardMonthlyPrice = activePrices.STANDARD.monthly.toLocaleString(language === 'fa' ? 'fa-IR' : 'en-US');
+  const standardAnnualPrice = activePrices.STANDARD.annual.toLocaleString(language === 'fa' ? 'fa-IR' : 'en-US');
+  const proMonthlyPrice = activePrices.PRO.monthly.toLocaleString(language === 'fa' ? 'fa-IR' : 'en-US');
+  const proAnnualPrice = activePrices.PRO.annual.toLocaleString(language === 'fa' ? 'fa-IR' : 'en-US');
 
   const standardDiscountPercent = Math.round((1 - activePrices.STANDARD.annual / (activePrices.STANDARD.monthly * 12)) * 100);
   const proDiscountPercent = Math.round((1 - activePrices.PRO.annual / (activePrices.PRO.monthly * 12)) * 100);
@@ -239,10 +243,10 @@ export default function SettingsPage() {
         displayCurrency: profileForm.displayCurrency,
       });
       setProfileDirty(false);
-      notify.success('پروفایل با موفقیت ذخیره شد');
+      notify.success(t('settings.profileSaveSuccess'));
       fetchProfile();
     } catch (err: any) {
-      notify.error(err.response?.data?.error || 'خطا در ذخیره تغییرات');
+      notify.error(err.response?.data?.error || t('settings.profileSaveError'));
     }
   };
 
@@ -255,9 +259,9 @@ export default function SettingsPage() {
       formData.append('avatar', file);
       const res = await api.post('/api/settings/avatar', formData);
       if (profile) setProfile({ ...profile, avatar_url: res.data.avatar_url });
-      notify.success('عکس پروفایل تغییر کرد');
+      notify.success(t('settings.avatarUploadSuccess'));
     } catch (err: any) {
-      notify.error(err.response?.data?.error || 'خطا در بارگذاری تصویر');
+      notify.error(err.response?.data?.error || t('settings.avatarUploadError'));
     } finally {
       setAvatarUploading(false);
       e.target.value = '';
@@ -270,9 +274,9 @@ export default function SettingsPage() {
       setShowAddAccount(false);
       setNewAccount({ broker_name: '', account_number: '', currency: 'USD' });
       fetchAccounts();
-      notify.success('حساب جدید ایجاد شد');
+      notify.success(t('settings.accountCreateSuccess'));
     } catch (err: any) {
-      notify.error(err.response?.data?.error || 'خطا در ایجاد حساب');
+      notify.error(err.response?.data?.error || t('settings.accountCreateError'));
     }
   };
 
@@ -281,26 +285,28 @@ export default function SettingsPage() {
       await api.put(`/api/settings/accounts/${id}`, editAccount);
       setEditingId(null);
       fetchAccounts();
-      notify.success('حساب ویرایش شد');
+      notify.success(t('settings.accountUpdateSuccess'));
     } catch (err: any) {
-      notify.error(err.response?.data?.error || 'خطا در ویرایش');
+      notify.error(err.response?.data?.error || t('settings.accountUpdateError'));
     }
   };
 
   const handleDeleteAccount = async (id: string, tradeCount: number) => {
     const ok = await notify.confirm({
-      title: 'حذف حساب بروکر',
-      message: `با حذف این حساب، تمام ${toPersianDigits(tradeCount)} معامله مرتبط با آن نیز حذف می‌شوند. آیا مطمئن هستید؟`,
+      title: language === 'fa' ? 'حذف حساب بروکر' : 'Delete Broker Account',
+      message: language === 'fa'
+        ? `با حذف این حساب، تمام ${toPersianDigits(tradeCount)} معامله مرتبط با آن نیز حذف می‌شوند. آیا مطمئن هستید؟`
+        : `Deleting this account will also delete all ${tradeCount} trades associated with it. Are you sure?`,
       danger: true,
-      confirmLabel: 'حذف حساب',
+      confirmLabel: language === 'fa' ? 'حذف حساب' : 'Delete Account',
     });
     if (!ok) return;
     try {
       await api.delete(`/api/settings/accounts/${id}`);
       fetchAccounts();
-      notify.success('حساب حذف شد');
+      notify.success(t('settings.accountDeleteSuccess'));
     } catch (err: any) {
-      notify.error(err.response?.data?.error || 'خطا در حذف');
+      notify.error(err.response?.data?.error || t('settings.accountDeleteError'));
     }
   };
 
@@ -311,7 +317,7 @@ export default function SettingsPage() {
       const res = await api.get(`/api/accounts/${accountId}/tokens`);
       setTokens(prev => ({ ...prev, [accountId]: res.data }));
     } catch (err: any) {
-      notify.error(err.response?.data?.error || 'خطا در دریافت کلیدها');
+      notify.error(err.response?.data?.error || t('settings.apiKeyGetError'));
     } finally {
       setLoadingTokens(prev => ({ ...prev, [accountId]: false }));
     }
@@ -319,7 +325,7 @@ export default function SettingsPage() {
 
   const handleCreateToken = async (accountId: string) => {
     if (!newTokenName.trim()) {
-      notify.error('لطفاً نامی برای کلید انتخاب کنید');
+      notify.error(t('settings.apiKeyNameRequired'));
       return;
     }
     try {
@@ -327,26 +333,28 @@ export default function SettingsPage() {
       setShowTokenModal({ token: res.data.token, name: res.data.name });
       setNewTokenName('');
       fetchTokens(accountId);
-      notify.success('کلید اتصال جدید ایجاد شد');
+      notify.success(t('settings.apiKeyCreateSuccess'));
     } catch (err: any) {
-      notify.error(err.response?.data?.error || 'خطا در ایجاد کلید اتصال');
+      notify.error(err.response?.data?.error || t('settings.apiKeyCreateError'));
     }
   };
 
   const handleDeleteToken = async (accountId: string, tokenId: string) => {
     const ok = await notify.confirm({
-      title: 'حذف کلید اتصال',
-      message: 'آیا از حذف این کلید اتصال مطمئن هستید؟ اکسپرت‌های متصل به این کلید دیگر کار نخواهند کرد.',
+      title: language === 'fa' ? 'حذف کلید اتصال' : 'Delete Connection Key',
+      message: language === 'fa'
+        ? 'آیا از حذف این کلید اتصال مطمئن هستید؟ اکسپرت‌های متصل به این کلید دیگر کار نخواهند کرد.'
+        : 'Are you sure you want to delete this connection key? Connected Expert Advisors will stop working.',
       danger: true,
-      confirmLabel: 'حذف کلید',
+      confirmLabel: language === 'fa' ? 'حذف کلید' : 'Delete Key',
     });
     if (!ok) return;
     try {
       await api.delete(`/api/accounts/${accountId}/tokens/${tokenId}`);
       fetchTokens(accountId);
-      notify.success('کلید اتصال حذف شد');
+      notify.success(t('settings.apiKeyDeleteSuccess'));
     } catch (err: any) {
-      notify.error(err.response?.data?.error || 'خطا در حذف کلید اتصال');
+      notify.error(err.response?.data?.error || t('settings.apiKeyDeleteError'));
     }
   };
 
@@ -362,7 +370,7 @@ export default function SettingsPage() {
   const handleSubmitReceipt = async () => {
     if (!checkoutTarget) return;
     if (!receiptFile) {
-      notify.error('لطفاً تصویر فیش واریزی را انتخاب کنید');
+      notify.error(t('settings.receiptFileRequired'));
       return;
     }
     setCheckoutLoading(true);
@@ -381,7 +389,7 @@ export default function SettingsPage() {
         },
       });
 
-      notify.success(res.data.message || 'فیش با موفقیت ثبت شد');
+      notify.success(res.data.message || t('settings.receiptSubmitSuccess'));
       setCheckoutTarget(null);
       setReceiptFile(null);
       setDiscountCode('');
@@ -389,7 +397,7 @@ export default function SettingsPage() {
       fetchSubscription();
     } catch (err: any) {
       console.error('Submit receipt error:', err);
-      notify.error(err.response?.data?.error || 'خطا در ثبت فیش پرداخت');
+      notify.error(err.response?.data?.error || t('settings.receiptSubmitError'));
     } finally {
       setCheckoutLoading(false);
     }
@@ -409,11 +417,11 @@ export default function SettingsPage() {
       if (res.data.redirectUrl) {
         window.location.href = res.data.redirectUrl;
       } else {
-        notify.error('آدرس انتقال به درگاه پرداخت یافت نشد.');
+        notify.error(language === 'fa' ? 'آدرس انتقال به درگاه پرداخت یافت نشد.' : 'Payment gateway redirect URL not found.');
       }
     } catch (err: any) {
       console.error('Online checkout error:', err);
-      notify.error(err.response?.data?.error || 'خطا در اتصال به درگاه پرداخت');
+      notify.error(err.response?.data?.error || t('settings.checkoutGatewayError'));
     } finally {
       setCheckoutLoading(false);
     }
@@ -421,7 +429,7 @@ export default function SettingsPage() {
 
   const handlePasswordChange = async () => {
     if (passwordForm.newPassword !== passwordForm.confirmPassword) {
-      notify.error('رمز جدید و تکرار آن یکسان نیست');
+      notify.error(t('settings.passwordMismatch'));
       return;
     }
     try {
@@ -430,10 +438,10 @@ export default function SettingsPage() {
         newPassword: passwordForm.newPassword,
       });
       setPasswordForm({ currentPassword: '', newPassword: '', confirmPassword: '' });
-      notify.success('رمز عبور با موفقیت تغییر کرد');
+      notify.success(t('settings.passwordChangeSuccess'));
       fetchSessions();
     } catch (err: any) {
-      notify.error(err.response?.data?.error || 'خطا در تغییر رمز');
+      notify.error(err.response?.data?.error || t('settings.passwordChangeError'));
     }
   };
 
@@ -441,9 +449,9 @@ export default function SettingsPage() {
     try {
       await api.delete(`/api/settings/sessions/${id}`);
       fetchSessions();
-      notify.success('نشست بسته شد');
+      notify.success(t('settings.sessionRevokeSuccess'));
     } catch (err: any) {
-      notify.error(err.response?.data?.error || 'خطا');
+      notify.error(err.response?.data?.error || t('common.errorOccurred'));
     }
   };
 
@@ -451,9 +459,9 @@ export default function SettingsPage() {
     try {
       await api.delete('/api/settings/sessions');
       fetchSessions();
-      notify.success('همه نشست‌ها بسته شدند');
+      notify.success(t('settings.sessionRevokeAllSuccess'));
     } catch (err: any) {
-      notify.error(err.response?.data?.error || 'خطا');
+      notify.error(err.response?.data?.error || t('common.errorOccurred'));
     }
   };
 
@@ -462,7 +470,7 @@ export default function SettingsPage() {
       await api.delete('/api/settings/account', { data: { confirmEmail: deleteConfirmEmail } });
       await logout();
     } catch (err: any) {
-      notify.error(err.response?.data?.error || 'خطا در حذف حساب');
+      notify.error(err.response?.data?.error || t('settings.userDeleteError'));
     }
   };
 
@@ -476,9 +484,9 @@ export default function SettingsPage() {
     if (/[A-Z]/.test(p)) score++;
     if (/[0-9]/.test(p)) score++;
     if (/[^A-Za-z0-9]/.test(p)) score++;
-    if (score <= 1) return { label: 'ضعیف', class: 'weak' };
-    if (score <= 3) return { label: 'متوسط', class: 'medium' };
-    return { label: 'قوی', class: 'strong' };
+    if (score <= 1) return { label: t('settings.weak'), class: 'weak' };
+    if (score <= 3) return { label: t('settings.medium'), class: 'medium' };
+    return { label: t('settings.strong'), class: 'strong' };
   };
 
   const initials = (profile?.name || user?.name || '?').charAt(0);
@@ -487,16 +495,16 @@ export default function SettingsPage() {
     <div className="settings-page">
       {/* ─── Header ─── */}
       <header className="settings-header">
-        <h1>تنظیمات</h1>
+        <h1>{t('settings.title')}</h1>
       </header>
 
       {/* ─── Tab Bar ─── */}
       <div className="settings-tab-bar">
         {([
-          { key: 'profile', label: 'پروفایل', icon: 'person' },
-          { key: 'accounts', label: 'حساب‌های بروکر', icon: 'account_balance' },
-          { key: 'subscription', label: 'اشتراک', icon: 'card_membership' },
-          { key: 'security', label: 'امنیت', icon: 'shield' },
+          { key: 'profile', label: t('settings.profile'), icon: 'person' },
+          { key: 'accounts', label: t('settings.brokerAccounts'), icon: 'account_balance' },
+          { key: 'subscription', label: t('settings.subscription'), icon: 'card_membership' },
+          { key: 'security', label: t('settings.security'), icon: 'shield' },
         ] as const).map((tab) => (
           <button
             key={tab.key}
@@ -525,7 +533,7 @@ export default function SettingsPage() {
               </div>
               <label className="avatar-upload-btn">
                 <span className="material-symbols-outlined">photo_camera</span>
-                تغییر عکس
+                {t('settings.changeAvatar')}
                 <input type="file" accept="image/jpeg,image/png" onChange={handleAvatarUpload} hidden disabled={avatarUploading} />
               </label>
             </div>
@@ -533,17 +541,17 @@ export default function SettingsPage() {
             {/* Form */}
             <div className="settings-form-grid">
               <div className="form-field">
-                <label>نام کامل</label>
+                <label>{t('settings.fullName')}</label>
                 <input
                   type="text"
                   value={profileForm.name}
                   onChange={(e) => { setProfileForm({ ...profileForm, name: e.target.value }); setProfileDirty(true); }}
-                  placeholder="نام و نام خانوادگی"
+                  placeholder={t('auth.namePlaceholder')}
                 />
               </div>
 
               <div className="form-field">
-                <label>ایمیل</label>
+                <label>{t('settings.email')}</label>
                 <div className="readonly-field">
                   <span style={{ direction: 'ltr' }}>{profile.email}</span>
                   <span className="material-symbols-outlined verified-icon">verified</span>
@@ -551,18 +559,18 @@ export default function SettingsPage() {
               </div>
 
               <div className="form-field">
-                <label>شماره موبایل</label>
+                <label>{t('settings.phoneNumber')}</label>
                 <input
                   type="text"
                   value={profileForm.phone}
                   onChange={(e) => { setProfileForm({ ...profileForm, phone: e.target.value }); setProfileDirty(true); }}
-                  placeholder="09XXXXXXXXX"
-                  style={{ direction: 'ltr', textAlign: 'right' }}
+                  placeholder={t('auth.phonePlaceholder')}
+                  style={{ direction: 'ltr', textAlign: language === 'fa' ? 'right' : 'left' }}
                 />
               </div>
 
               <div className="form-field">
-                <label>ارز نمایش</label>
+                <label>{t('settings.displayCurrency')}</label>
                 <div className="toggle-group">
                   {(['USD', 'TOMAN', 'BOTH'] as const).map((curr) => (
                     <button
@@ -570,22 +578,33 @@ export default function SettingsPage() {
                       className={`toggle-btn ${profileForm.displayCurrency === curr ? 'active' : ''}`}
                       onClick={() => { setProfileForm({ ...profileForm, displayCurrency: curr }); setProfileDirty(true); }}
                     >
-                      {curr === 'USD' ? 'دلار' : curr === 'TOMAN' ? 'تومان' : 'هر دو'}
+                      {curr === 'USD' ? t('settings.currencyUsd') : curr === 'TOMAN' ? t('settings.currencyToman') : t('settings.currencyBoth')}
                     </button>
                   ))}
                 </div>
               </div>
 
               <div className="form-field">
-                <label>زبان</label>
-                <div className="readonly-field">
-                  <span>فارسی</span>
+                <label>{t('settings.language')}</label>
+                <div className="toggle-group">
+                  <button
+                    className={`toggle-btn ${language === 'fa' ? 'active' : ''}`}
+                    onClick={() => { setLanguage('fa'); }}
+                  >
+                    {t('settings.farsi')}
+                  </button>
+                  <button
+                    className={`toggle-btn ${language === 'en' ? 'active' : ''}`}
+                    onClick={() => { setLanguage('en'); }}
+                  >
+                    {t('settings.english')}
+                  </button>
                 </div>
               </div>
             </div>
 
             <button className="settings-save-btn" onClick={handleProfileSave} disabled={!profileDirty}>
-              ذخیره تغییرات
+              {t('settings.saveChanges')}
             </button>
           </section>
         )}
@@ -597,8 +616,8 @@ export default function SettingsPage() {
             {subscription && subscription.plan === 'FREE' && accounts.length >= 1 && (
               <div className="plan-limit-banner">
                 <span className="material-symbols-outlined">lock</span>
-                <span>برای افزودن حساب بیشتر، اشتراکت رو ارتقا بده</span>
-                <button onClick={() => switchTab('subscription')}>ارتقا به استاندارد</button>
+                <span>{language === 'fa' ? 'برای افزودن حساب بیشتر، اشتراکت رو ارتقا بده' : 'To add more accounts, please upgrade your subscription'}</span>
+                <button onClick={() => switchTab('subscription')}>{t('dashboard.upgradeSubscription')}</button>
               </div>
             )}
 
@@ -610,7 +629,7 @@ export default function SettingsPage() {
                   <div className="broker-edit-form">
                     <div className="settings-form-grid">
                       <div className="form-field">
-                        <label>نام بروکر</label>
+                        <label>{t('settings.brokerName')}</label>
                         <input
                           type="text"
                           value={editAccount.broker_name}
@@ -618,16 +637,16 @@ export default function SettingsPage() {
                         />
                       </div>
                       <div className="form-field">
-                        <label>شماره حساب</label>
+                        <label>{t('settings.accountNumber')}</label>
                         <input
                           type="text"
                           value={editAccount.account_number}
                           onChange={(e) => setEditAccount({ ...editAccount, account_number: e.target.value })}
-                          style={{ direction: 'ltr', textAlign: 'right' }}
+                          style={{ direction: 'ltr', textAlign: language === 'fa' ? 'right' : 'left' }}
                         />
                       </div>
                       <div className="form-field">
-                        <label>ارز حساب</label>
+                        <label>{t('settings.accountCurrency')}</label>
                         <div className="toggle-group">
                           {['USD', 'EUR', 'GBP'].map((c) => (
                             <button
@@ -640,8 +659,8 @@ export default function SettingsPage() {
                       </div>
                     </div>
                     <div className="broker-edit-actions">
-                      <button className="settings-save-btn" onClick={() => handleUpdateAccount(acc.id)}>ذخیره</button>
-                      <button className="settings-cancel-btn" onClick={() => setEditingId(null)}>انصراف</button>
+                      <button className="settings-save-btn" onClick={() => handleUpdateAccount(acc.id)}>{t('settings.save')}</button>
+                      <button className="settings-cancel-btn" onClick={() => setEditingId(null)}>{t('settings.cancel')}</button>
                     </div>
                   </div>
                 ) : (
@@ -650,14 +669,14 @@ export default function SettingsPage() {
                     <div className="broker-card-header">
                       <div className="broker-avatar">{(acc.broker_name || '?').charAt(0)}</div>
                       <div className="broker-info">
-                        <h4>{acc.broker_name || 'نامشخص'}</h4>
-                        <span>حساب شماره: {acc.account_number ? `#${acc.account_number}` : 'نامشخص'}</span>
-                        <span>ارز: {acc.currency}</span>
-                        <span>{toPersianDigits(acc.trade_count)} معامله</span>
+                        <h4>{acc.broker_name || (language === 'fa' ? 'نامشخص' : 'Unknown')}</h4>
+                        <span>{language === 'fa' ? 'حساب شماره' : 'Account No'}: {acc.account_number ? `#${acc.account_number}` : (language === 'fa' ? 'نامشخص' : 'Unknown')}</span>
+                        <span>{language === 'fa' ? 'ارز' : 'Currency'}: {acc.currency}</span>
+                        <span>{formatNum(acc.trade_count)} {t('trades.tradeUnit')}</span>
                       </div>
                     </div>
                     <div className="broker-card-actions">
-                      <button className="broker-action-btn" onClick={() => router.push('/trades')}>واردات جدید</button>
+                      <button className="broker-action-btn" onClick={() => router.push('/trades')}>{t('settings.newImport')}</button>
                       <button className="broker-action-btn" onClick={() => {
                         setEditingId(acc.id);
                         setEditAccount({
@@ -665,27 +684,27 @@ export default function SettingsPage() {
                           account_number: acc.account_number || '',
                           currency: acc.currency,
                         });
-                      }}>ویرایش</button>
+                      }}>{t('settings.edit')}</button>
                       <button 
                         className={`broker-action-btn ${expandedTokenAccountId === acc.id ? 'active' : ''}`} 
                         onClick={() => handleToggleTokens(acc.id)}
                       >
-                        کلیدهای اتصال (API)
+                        {t('settings.apiKeys')}
                       </button>
-                      <button className="broker-action-btn danger" onClick={() => handleDeleteAccount(acc.id, acc.trade_count)}>حذف</button>
+                      <button className="broker-action-btn danger" onClick={() => handleDeleteAccount(acc.id, acc.trade_count)}>{t('settings.delete')}</button>
                     </div>
 
                     {/* Expanded Tokens Sub-panel */}
                     {expandedTokenAccountId === acc.id && (
                       <div className="broker-tokens-panel">
                         <div className="tokens-list-header">
-                          <h5>کلیدهای اتصال متاتریدر ۵ (API Keys)</h5>
+                          <h5>{t('settings.apiKeysTitle')}</h5>
                         </div>
 
                         {loadingTokens[acc.id] ? (
-                          <div className="no-tokens">در حال بارگذاری...</div>
+                          <div className="no-tokens">{t('common.loading')}</div>
                         ) : !tokens[acc.id] || tokens[acc.id].length === 0 ? (
-                          <div className="no-tokens">هیچ کلید اتصالی برای این حساب ساخته نشده است.</div>
+                          <div className="no-tokens">{t('settings.noApiKeys')}</div>
                         ) : (
                           <div className="tokens-list">
                             {tokens[acc.id].map((tok: any) => (
@@ -693,14 +712,14 @@ export default function SettingsPage() {
                                 <button 
                                   className="delete-token-btn" 
                                   onClick={() => handleDeleteToken(acc.id, tok.id)}
-                                  title="حذف کلید"
+                                  title={t('settings.deleteKey')}
                                 >
                                   <span className="material-symbols-outlined">delete</span>
                                 </button>
                                 <div className="token-details">
                                   <span className="token-name">{tok.name}</span>
                                   <span className="token-meta">
-                                    پیش‌نمایش: <code>{tok.token_preview}</code>
+                                    {language === 'fa' ? 'پیش‌نمایش:' : 'Preview:'} <code>{tok.token_preview}</code>
                                   </span>
                                 </div>
                               </div>
@@ -711,11 +730,11 @@ export default function SettingsPage() {
                         <div className="create-token-form">
                           <input
                             type="text"
-                            placeholder="نام کلید (مثلاً لپ‌تاپ من)"
+                            placeholder={t('settings.keyNamePlaceholder')}
                             value={newTokenName}
                             onChange={(e) => setNewTokenName(e.target.value)}
                           />
-                          <button onClick={() => handleCreateToken(acc.id)}>ایجاد کلید</button>
+                          <button onClick={() => handleCreateToken(acc.id)}>{t('settings.createKey')}</button>
                         </div>
                       </div>
                     )}
@@ -729,30 +748,30 @@ export default function SettingsPage() {
               <div className="broker-card add-mode">
                 <div className="settings-form-grid">
                   <div className="form-field">
-                    <label>نام بروکر</label>
+                    <label>{t('settings.brokerName')}</label>
                     <input
                       type="text"
                       list="broker-presets"
                       value={newAccount.broker_name}
                       onChange={(e) => setNewAccount({ ...newAccount, broker_name: e.target.value })}
-                      placeholder="انتخاب یا تایپ نام بروکر"
+                      placeholder={language === 'fa' ? 'انتخاب یا تایپ نام بروکر' : 'Select or type broker name'}
                     />
                     <datalist id="broker-presets">
                       {BROKER_PRESETS.map((b) => <option key={b} value={b} />)}
                     </datalist>
                   </div>
                   <div className="form-field">
-                    <label>شماره حساب</label>
+                    <label>{t('settings.accountNumber')}</label>
                     <input
                       type="text"
                       value={newAccount.account_number}
                       onChange={(e) => setNewAccount({ ...newAccount, account_number: e.target.value })}
-                      placeholder="شماره حساب بروکر"
-                      style={{ direction: 'ltr', textAlign: 'right' }}
+                      placeholder={t('settings.accountNumber')}
+                      style={{ direction: 'ltr', textAlign: language === 'fa' ? 'right' : 'left' }}
                     />
                   </div>
                   <div className="form-field">
-                    <label>ارز حساب</label>
+                    <label>{t('settings.accountCurrency')}</label>
                     <div className="toggle-group">
                       {['USD', 'EUR', 'GBP'].map((c) => (
                         <button
@@ -765,14 +784,14 @@ export default function SettingsPage() {
                   </div>
                 </div>
                 <div className="broker-edit-actions">
-                  <button className="settings-save-btn" onClick={handleCreateAccount}>ذخیره حساب</button>
-                  <button className="settings-cancel-btn" onClick={() => setShowAddAccount(false)}>انصراف</button>
+                  <button className="settings-save-btn" onClick={handleCreateAccount}>{t('settings.save')}</button>
+                  <button className="settings-cancel-btn" onClick={() => setShowAddAccount(false)}>{t('settings.cancel')}</button>
                 </div>
               </div>
             ) : (
               <button className="add-account-card" onClick={() => setShowAddAccount(true)}>
                 <span className="material-symbols-outlined">add</span>
-                <span>افزودن حساب بروکر جدید</span>
+                <span>{t('settings.addBrokerAccount')}</span>
               </button>
             )}
 
@@ -798,9 +817,9 @@ export default function SettingsPage() {
                   <span className="material-symbols-outlined" style={{ fontSize: '2rem' }}>sync_alt</span>
                 </div>
                 <div style={{ flex: 1 }}>
-                  <h3 style={{ margin: '0 0 8px 0', fontSize: '1.1rem', fontWeight: 'bold', color: '#f8fafc' }}>همگام‌سازی خودکار با متاتریدر ۵</h3>
+                  <h3 style={{ margin: '0 0 8px 0', fontSize: '1.1rem', fontWeight: 'bold', color: '#f8fafc' }}>{t('settings.autoSyncMetaTrader')}</h3>
                   <p style={{ margin: '0 0 16px 0', color: '#94a3b8', fontSize: '0.85rem', lineHeight: '1.6' }}>
-                    با دانلود و نصب اکسپرت اختصاصی تریدکاو روی متاتریدر ۵، معاملات شما به صورت کاملاً خودکار و در لحظه به ژورنال منتقل می‌شوند. نیازی به خروجی گرفتن دستی نیست.
+                    {t('settings.autoSyncDesc')}
                   </p>
                   
                   <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
@@ -818,11 +837,11 @@ export default function SettingsPage() {
                       }}
                     >
                       <span className="material-symbols-outlined" style={{ fontSize: '1.2rem' }}>download</span>
-                      <span>دانلود اکسپرت متاتریدر ۵ (EX5)</span>
+                      <span>{t('settings.downloadEA')}</span>
                     </a>
                     
                     <a
-                      href="https://tradekav.ir/help/ea-setup"
+                      href={language === 'fa' ? 'https://tradekav.ir/help/ea-setup' : 'https://tradekav.ir/en/help/ea-setup'}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="settings-cancel-btn"
@@ -836,7 +855,7 @@ export default function SettingsPage() {
                       }}
                     >
                       <span className="material-symbols-outlined" style={{ fontSize: '1.2rem' }}>help</span>
-                      <span>راهنمای نصب و راه‌اندازی</span>
+                      <span>{t('settings.setupGuide')}</span>
                     </a>
                   </div>
                 </div>
@@ -851,12 +870,18 @@ export default function SettingsPage() {
             {/* Current plan */}
             <div className="subscription-current-card">
               <div className="plan-info">
-                <span className="plan-label">پلن فعلی:</span>
-                <span className="plan-badge">{subscription.plan === 'FREE' ? 'رایگان' : subscription.plan === 'STANDARD' ? 'استاندارد' : 'حرفه‌ای'}</span>
+                <span className="plan-label">{t('settings.currentPlan')}:</span>
+                <span className="plan-badge">
+                  {subscription.plan === 'FREE' 
+                    ? (language === 'fa' ? 'رایگان' : 'Free') 
+                    : subscription.plan === 'STANDARD' 
+                      ? (language === 'fa' ? 'استاندارد' : 'Standard') 
+                      : (language === 'fa' ? 'حرفه‌ای' : 'Pro')}
+                </span>
               </div>
               {subscription.subscription && (
                 <div className="plan-details">
-                  <span>تاریخ انقضای پلن: {new Date(subscription.subscription.end_date).toLocaleDateString('fa-IR')}</span>
+                  <span>{t('settings.planExpiry')}: {new Date(subscription.subscription.end_date).toLocaleDateString(language === 'fa' ? 'fa-IR' : 'en-US')}</span>
                 </div>
               )}
             </div>
@@ -865,9 +890,9 @@ export default function SettingsPage() {
               <div className="plan-limit-banner" style={{ marginTop: '16px', background: 'rgba(255, 179, 0, 0.08)', border: '1px solid rgba(255, 179, 0, 0.2)', color: '#ffb300', padding: '12px 16px', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <span className="material-symbols-outlined">pending_actions</span>
                 <span style={{ fontSize: '0.85rem' }}>
-                  فیش پرداخت شما برای ارتقا به پلن{' '}
-                  <strong>{subscription.pendingReceipt.plan === 'STANDARD' ? 'استاندارد' : 'حرفه‌ای'}</strong> (دوره{' '}
-                  {subscription.pendingReceipt.period === 'annual' ? 'سالانه' : 'ماهانه'}) ثبت شده و در حال بررسی توسط مدیریت است.
+                  {language === 'fa'
+                    ? `فیش پرداخت شما برای ارتقا به پلن ${subscription.pendingReceipt.plan === 'STANDARD' ? 'استاندارد' : 'حرفه‌ای'} (دوره ${subscription.pendingReceipt.period === 'annual' ? 'سالانه' : 'ماهانه'}) ثبت شده و در حال بررسی توسط مدیریت است.`
+                    : `Your payment receipt for upgrading to ${subscription.pendingReceipt.plan === 'STANDARD' ? 'Standard' : 'Pro'} plan (${subscription.pendingReceipt.period === 'annual' ? 'Annual' : 'Monthly'}) has been registered and is pending admin approval.`}
                 </span>
               </div>
             )}
@@ -876,13 +901,13 @@ export default function SettingsPage() {
               <div className="plan-limit-banner" style={{ marginTop: '16px', background: 'rgba(255, 83, 112, 0.08)', border: '1px solid rgba(255, 83, 112, 0.2)', color: '#ff5370', padding: '12px 16px', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <span className="material-symbols-outlined">cancel</span>
                 <span style={{ fontSize: '0.85rem', flex: 1 }}>
-                  آخرین فیش واریزی شما برای پلن{' '}
-                  <strong>{subscription.pendingReceipt.plan === 'STANDARD' ? 'استاندارد' : 'حرفه‌ای'}</strong>{' '}
-                  توسط مدیریت رد شد.
+                  {language === 'fa'
+                    ? `آخرین فیش واریزی شما برای پلن ${subscription.pendingReceipt.plan === 'STANDARD' ? 'استاندارد' : 'حرفه‌ای'} توسط مدیریت رد شد.`
+                    : `Your last receipt for the ${subscription.pendingReceipt.plan === 'STANDARD' ? 'Standard' : 'Pro'} plan was rejected by the admin.`}
                   {subscription.pendingReceipt.rejectionReason && (
                     <>
                       <br />
-                      <span style={{ color: '#a0aec0' }}>علت رد شدن: </span>
+                      <span style={{ color: '#a0aec0' }}>{language === 'fa' ? 'علت رد شدن: ' : 'Reason: '}</span>
                       <strong style={{ color: '#f8fafc' }}>{subscription.pendingReceipt.rejectionReason}</strong>
                     </>
                   )}
@@ -899,39 +924,42 @@ export default function SettingsPage() {
             {/* Pricing Packages Selection */}
             {subscription.plan !== 'PRO' && (
               <>
-                <h3 className="pricing-section-title">ارتقای اشتراک</h3>
+                <h3 className="pricing-section-title">{language === 'fa' ? 'ارتقای اشتراک' : 'Upgrade Subscription'}</h3>
                 <div className="pricing-plans-grid">
                   {/* Standard Plan Upgrade Card */}
                   {subscription.plan === 'FREE' && (
                     <div className="plan-upgrade-card featured">
                       <div className="plan-upgrade-header">
-                        <span className="plan-title">پلن استاندارد</span>
-                        <span className="plan-badge-tag">محبوب‌ترین</span>
+                        <span className="plan-title">{language === 'fa' ? 'پلن استاندارد' : 'Standard Plan'}</span>
+                        <span className="plan-badge-tag">{language === 'fa' ? 'محبوب‌ترین' : 'Popular'}</span>
                       </div>
-                      <p className="plan-upgrade-desc">دسترسی به ۳ حساب معاملاتی، واردات فایل‌های MT4/MT5 (تا ۱۵۰ معامله در هر فایل) و همگام‌سازی خودکار EA هر ۱ ساعت.</p>
+                      <p className="plan-upgrade-desc">
+                        {language === 'fa'
+                          ? 'دسترسی به ۳ حساب معاملاتی، واردات فایل‌های MT4/MT5 (تا ۱۵۰ معامله در هر فایل) و همگام‌سازی خودکار EA هر ۱ ساعت.'
+                          : 'Access to 3 trading accounts, MT4/MT5 file import (up to 150 trades per file) and automatic EA sync every 1 hour.'}
+                      </p>
                       <div className="plan-upgrade-periods">
                         <div className="period-checkout-row">
-                          <span className="period-name">۱ ماهه</span>
+                          <span className="period-name">{language === 'fa' ? '۱ ماهه' : '1 Month'}</span>
                           <button
                             className="period-price-btn"
                             disabled={checkoutLoading}
                             onClick={() => setCheckoutTarget({ plan: 'STANDARD', period: 'monthly' })}
                           >
-                            {standardMonthlyPrice} تومان
+                            {standardMonthlyPrice} {language === 'fa' ? 'تومان' : 'Toman'}
                           </button>
                         </div>
                         <div className="period-checkout-row">
                           <span className="period-name">
-                            سالانه
-
-                            <span className="period-discount">{toPersianDigits(standardDiscountPercent)}% تخفیف</span>
+                            {language === 'fa' ? 'سالانه' : 'Annual'}
+                            <span className="period-discount">{formatNum(standardDiscountPercent)}% {language === 'fa' ? 'تخفیف' : 'Off'}</span>
                           </span>
                           <button
                             className="period-price-btn"
                             disabled={checkoutLoading}
                             onClick={() => setCheckoutTarget({ plan: 'STANDARD', period: 'annual' })}
                           >
-                            {standardAnnualPrice} تومان
+                            {standardAnnualPrice} {language === 'fa' ? 'تومان' : 'Toman'}
                           </button>
                         </div>
                       </div>
@@ -941,31 +969,35 @@ export default function SettingsPage() {
                   {/* Pro Plan Upgrade Card */}
                   <div className="plan-upgrade-card">
                     <div className="plan-upgrade-header">
-                      <span className="plan-title">پلن حرفه‌ای</span>
+                      <span className="plan-title">{language === 'fa' ? 'پلن حرفه‌ای' : 'Pro Plan'}</span>
                     </div>
-                    <p className="plan-upgrade-desc">حساب‌های نامحدود، همگام‌سازی ۶۰ ثانیه‌ای EA، گزارش عملکرد نامحدود، پشتیبانی ویژه و خروجی کامل داده‌ها.</p>
+                    <p className="plan-upgrade-desc">
+                      {language === 'fa'
+                        ? 'حساب‌های نامحدود، همگام‌سازی ۶۰ ثانیه‌ای EA، گزارش عملکرد نامحدود، پشتیبانی ویژه و خروجی کامل داده‌ها.'
+                        : 'Unlimited accounts, 60-second EA sync, unlimited performance reports, priority support, and full data export.'}
+                    </p>
                     <div className="plan-upgrade-periods">
                       <div className="period-checkout-row">
-                        <span className="period-name">۱ ماهه</span>
+                        <span className="period-name">{language === 'fa' ? '۱ ماهه' : '1 Month'}</span>
                         <button
                           className="period-price-btn"
                           disabled={checkoutLoading}
                           onClick={() => setCheckoutTarget({ plan: 'PRO', period: 'monthly' })}
                         >
-                          {proMonthlyPrice} تومان
+                          {proMonthlyPrice} {language === 'fa' ? 'تومان' : 'Toman'}
                         </button>
                       </div>
                       <div className="period-checkout-row">
                         <span className="period-name">
-                          سالانه
-                          <span className="period-discount">{toPersianDigits(proDiscountPercent)}٪ تخفیف</span>
+                          {language === 'fa' ? 'سالانه' : 'Annual'}
+                          <span className="period-discount">{formatNum(proDiscountPercent)}٪ {language === 'fa' ? 'تخفیف' : 'Off'}</span>
                         </span>
                         <button
                           className="period-price-btn"
                           disabled={checkoutLoading}
                           onClick={() => setCheckoutTarget({ plan: 'PRO', period: 'annual' })}
                         >
-                          {proAnnualPrice} تومان
+                          {proAnnualPrice} {language === 'fa' ? 'تومان' : 'Toman'}
                         </button>
                       </div>
                     </div>
@@ -979,52 +1011,66 @@ export default function SettingsPage() {
               <table>
                 <thead>
                   <tr>
-                    <th>امکانات</th>
-                    <th className={subscription.plan === 'FREE' ? 'current-col' : ''}>رایگان</th>
-                    <th className={subscription.plan === 'STANDARD' ? 'current-col' : ''}>استاندارد</th>
-                    <th className={subscription.plan === 'PRO' ? 'current-col' : ''}>حرفه‌ای</th>
+                    <th>{language === 'fa' ? 'امکانات' : 'Features'}</th>
+                    <th className={subscription.plan === 'FREE' ? 'current-col' : ''}>{language === 'fa' ? 'رایگان' : 'Free'}</th>
+                    <th className={subscription.plan === 'STANDARD' ? 'current-col' : ''}>{language === 'fa' ? 'استاندارد' : 'Standard'}</th>
+                    <th className={subscription.plan === 'PRO' ? 'current-col' : ''}>{language === 'fa' ? 'حرفه‌ای' : 'Pro'}</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr>
-                    <td>سقف ثبت معامله دستی</td>
-                    <td>۳۰ در ماه</td><td>نامحدود</td><td>نامحدود</td>
+                    <td>{language === 'fa' ? 'سقف ثبت معامله دستی' : 'Manual Trade Limit'}</td>
+                    <td>{language === 'fa' ? '۳۰ در ماه' : '30 / month'}</td>
+                    <td>{language === 'fa' ? 'نامحدود' : 'Unlimited'}</td>
+                    <td>{language === 'fa' ? 'نامحدود' : 'Unlimited'}</td>
                   </tr>
                   <tr>
-                    <td>حساب بروکر مجاز</td>
-                    <td>۱ حساب</td><td>۳ حساب</td><td>نامحدود</td>
+                    <td>{language === 'fa' ? 'حساب بروکر مجاز' : 'Allowed Broker Accounts'}</td>
+                    <td>{language === 'fa' ? '۱ حساب' : '1 Account'}</td>
+                    <td>{language === 'fa' ? '۳ حساب' : '3 Accounts'}</td>
+                    <td>{language === 'fa' ? 'نامحدود' : 'Unlimited'}</td>
                   </tr>
                   <tr>
-                    <td>بازه زمانی محاسبات</td>
-                    <td>۱ ماه گذشته</td><td>۶ ماه گذشته</td><td>نامحدود (کل تاریخچه)</td>
+                    <td>{language === 'fa' ? 'بازه زمانی محاسبات' : 'Calculation Period'}</td>
+                    <td>{language === 'fa' ? '۱ ماه گذشته' : 'Last 1 month'}</td>
+                    <td>{language === 'fa' ? '۶ ماه گذشته' : 'Last 6 months'}</td>
+                    <td>{language === 'fa' ? 'نامحدود (کل تاریخچه)' : 'Unlimited (All history)'}</td>
                   </tr>
                   <tr>
-                    <td>همگام‌سازی خودکار EA</td>
-                    <td>✗</td><td>هر ۱ ساعت</td><td>هر ۶۰ ثانیه</td>
+                    <td>{language === 'fa' ? 'همگام‌سازی خودکار EA' : 'Automatic EA Sync'}</td>
+                    <td>✗</td>
+                    <td>{language === 'fa' ? 'هر ۱ ساعت' : 'Every 1 hour'}</td>
+                    <td>{language === 'fa' ? 'هر ۶۰ ثانیه' : 'Every 60 seconds'}</td>
                   </tr>
                   <tr>
-                    <td>واردات فایل MT4/MT5</td>
-                    <td>۱ فایل در ماه (تست)</td><td>✓ (تا ۱۵۰ ردیف)</td><td>✓ (نامحدود)</td>
+                    <td>{language === 'fa' ? 'واردات فایل MT4/MT5' : 'MT4/MT5 File Import'}</td>
+                    <td>{language === 'fa' ? '۱ فایل در ماه (تست)' : '1 file/month (trial)'}</td>
+                    <td>{language === 'fa' ? '✓ (تا ۱۵۰ ردیف)' : '✓ (up to 150 rows)'}</td>
+                    <td>{language === 'fa' ? '✓ (نامحدود)' : '✓ (unlimited)'}</td>
                   </tr>
                   <tr>
-                    <td>خروجی داده‌ها (Excel/CSV)</td>
-                    <td>✗</td><td>✗</td><td>✓</td>
+                    <td>{language === 'fa' ? 'خروجی داده‌ها (Excel/CSV)' : 'Data Export (Excel/CSV)'}</td>
+                    <td>✗</td>
+                    <td>✗</td>
+                    <td>✓</td>
                   </tr>
                   <tr>
-                    <td>پشتیبانی کاربران</td>
-                    <td>✗</td><td>عادی (ایمیل)</td><td>ویژه (Priority)</td>
+                    <td>{language === 'fa' ? 'پشتیبانی کاربران' : 'User Support'}</td>
+                    <td>✗</td>
+                    <td>{language === 'fa' ? 'عادی (ایمیل)' : 'Standard (Email)'}</td>
+                    <td>{language === 'fa' ? 'ویژه (Priority)' : 'Priority'}</td>
                   </tr>
                   <tr>
-                    <td>قیمت ماهانه</td>
-                    <td>رایگان</td>
-                    <td>{standardMonthlyPrice} ت</td>
-                    <td>{proMonthlyPrice} ت</td>
+                    <td>{language === 'fa' ? 'قیمت ماهانه' : 'Monthly Price'}</td>
+                    <td>{language === 'fa' ? 'رایگان' : 'Free'}</td>
+                    <td>{standardMonthlyPrice} {language === 'fa' ? 'ت' : 'T'}</td>
+                    <td>{proMonthlyPrice} {language === 'fa' ? 'ت' : 'T'}</td>
                   </tr>
                   <tr>
-                    <td>قیمت سالانه</td>
+                    <td>{language === 'fa' ? 'قیمت سالانه' : 'Annual Price'}</td>
                     <td>-</td>
-                    <td>{standardAnnualPrice} ت</td>
-                    <td>{proAnnualPrice} ت</td>
+                    <td>{standardAnnualPrice} {language === 'fa' ? 'ت' : 'T'}</td>
+                    <td>{proAnnualPrice} {language === 'fa' ? 'ت' : 'T'}</td>
                   </tr>
                 </tbody>
               </table>
@@ -1036,7 +1082,9 @@ export default function SettingsPage() {
                 <div className="checkout-modal-card">
                   <div className="checkout-modal-header">
                     <h4>
-                      خرید پلن {checkoutTarget.plan === 'STANDARD' ? 'استاندارد' : 'حرفه‌ای'} - {checkoutTarget.period === 'monthly' ? 'ماهانه' : 'سالانه'}
+                      {language === 'fa'
+                        ? `خرید پلن ${checkoutTarget.plan === 'STANDARD' ? 'استاندارد' : 'حرفه‌ای'} - ${checkoutTarget.period === 'monthly' ? 'ماهانه' : 'سالانه'}`
+                        : `Purchase ${checkoutTarget.plan === 'STANDARD' ? 'Standard' : 'Pro'} Plan - ${checkoutTarget.period === 'monthly' ? 'Monthly' : 'Annual'}`}
                     </h4>
                     <button className="close-modal-btn" onClick={() => {
                       setCheckoutTarget(null);
@@ -1051,23 +1099,27 @@ export default function SettingsPage() {
                   <div className="checkout-modal-body">
                     <div className="price-details-section">
                       <div className="price-row">
-                        <span>مبلغ پایه:</span>
+                        <span>{language === 'fa' ? 'مبلغ پایه:' : 'Base Price:'}</span>
                         <span className={discountDetails ? 'original-price-crossed' : 'final-price'}>
-                          {activePrices[checkoutTarget.plan as 'STANDARD' | 'PRO'][checkoutTarget.period as 'monthly' | 'annual'].toLocaleString('fa-IR')} تومان
+                          {activePrices[checkoutTarget.plan as 'STANDARD' | 'PRO'][checkoutTarget.period as 'monthly' | 'annual'].toLocaleString(language === 'fa' ? 'fa-IR' : 'en-US')} {language === 'fa' ? 'تومان' : 'Toman'}
                         </span>
                       </div>
                       {discountDetails && (
                         <div className="price-row discount-applied">
-                          <span>مبلغ با تخفیف ({toPersianDigits(discountDetails.discountPercent)}٪):</span>
+                          <span>
+                            {language === 'fa'
+                              ? `مبلغ با تخفیف (${formatNum(discountDetails.discountPercent)}٪):`
+                              : `Discounted Price (${discountDetails.discountPercent}%):`}
+                          </span>
                           <span className="final-price">
-                            {discountDetails.discountedPrice.toLocaleString('fa-IR')} تومان
+                            {discountDetails.discountedPrice.toLocaleString(language === 'fa' ? 'fa-IR' : 'en-US')} {language === 'fa' ? 'تومان' : 'Toman'}
                           </span>
                         </div>
                       )}
                     </div>
 
                     <div className="discount-input-section">
-                      <label>کد تخفیف (اختیاری)</label>
+                      <label>{language === 'fa' ? 'کد تخفیف (اختیاری)' : 'Discount Code (Optional)'}</label>
                       <div className="discount-input-wrap">
                         <input
                           type="text"
@@ -1077,7 +1129,7 @@ export default function SettingsPage() {
                             setDiscountError('');
                             setDiscountDetails(null);
                           }}
-                          placeholder="مثال: OFF50"
+                          placeholder={language === 'fa' ? 'مثال: OFF50' : 'Example: OFF50'}
                           style={{ direction: 'ltr', textAlign: 'center' }}
                         />
                         <button
@@ -1086,16 +1138,16 @@ export default function SettingsPage() {
                           disabled={validatingDiscount || !discountCode}
                           onClick={() => handleValidateDiscount(discountCode, checkoutTarget.plan, checkoutTarget.period)}
                         >
-                          {validatingDiscount ? 'بررسی...' : 'اعمال'}
+                          {validatingDiscount ? (language === 'fa' ? 'بررسی...' : 'Validating...') : (language === 'fa' ? 'اعمال' : 'Apply')}
                         </button>
                       </div>
                       {discountError && <span className="discount-error-msg">{discountError}</span>}
-                      {discountDetails && <span className="discount-success-msg">کد تخفیف با موفقیت اعمال شد.</span>}
+                      {discountDetails && <span className="discount-success-msg">{language === 'fa' ? 'کد تخفیف با موفقیت اعمال شد.' : 'Discount code applied successfully.'}</span>}
                     </div>
 
                     {/* Select Payment Method */}
                     <div className="payment-method-selector" style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '15px', marginTop: '15px' }}>
-                      <label style={{ fontSize: '0.85rem', color: '#a0aec0', fontWeight: '500' }}>روش پرداخت</label>
+                      <label style={{ fontSize: '0.85rem', color: '#a0aec0', fontWeight: '500' }}>{language === 'fa' ? 'روش پرداخت' : 'Payment Method'}</label>
                       <div style={{ display: 'flex', gap: '10px' }}>
                         <button
                           type="button"
@@ -1113,7 +1165,7 @@ export default function SettingsPage() {
                             transition: 'all 0.2s',
                           }}
                         >
-                          درگاه پی‌پینگ
+                          {language === 'fa' ? 'درگاه پی‌پینگ' : 'PayPing Gateway'}
                         </button>
                         <button
                           type="button"
@@ -1131,7 +1183,7 @@ export default function SettingsPage() {
                             transition: 'all 0.2s',
                           }}
                         >
-                          درگاه زرین‌پال
+                          {language === 'fa' ? 'درگاه زرین‌پال' : 'ZarinPal Gateway'}
                         </button>
                         <button
                           type="button"
@@ -1149,7 +1201,7 @@ export default function SettingsPage() {
                             transition: 'all 0.2s',
                           }}
                         >
-                          کارت به کارت
+                          {language === 'fa' ? 'کارت به کارت' : 'Card Transfer'}
                         </button>
                       </div>
                     </div>
@@ -1157,23 +1209,23 @@ export default function SettingsPage() {
                     {paymentMethod === 'manual' && (
                       <>
                         <div className="card-payment-instructions" style={{ marginTop: '10px', background: 'rgba(255, 255, 255, 0.02)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '8px', padding: '12px' }}>
-                          <h5 style={{ margin: '0 0 10px 0', fontSize: '0.88rem', color: '#ffb300' }}>مشخصات واریز کارت به کارت:</h5>
+                          <h5 style={{ margin: '0 0 10px 0', fontSize: '0.88rem', color: '#ffb300' }}>{language === 'fa' ? 'مشخصات واریز کارت به کارت:' : 'Card Transfer Details:'}</h5>
                           <div className="instruction-row" style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.82rem', marginBottom: '6px', color: '#a0aec0' }}>
-                            <span>شماره کارت:</span>
-                            <strong style={{ direction: 'ltr', color: '#ffffff' }}>{toPersianDigits(cardDetails.cardNumber)}</strong>
+                            <span>{language === 'fa' ? 'شماره کارت:' : 'Card Number:'}</span>
+                            <strong style={{ direction: 'ltr', color: '#ffffff' }}>{formatNum(cardDetails.cardNumber)}</strong>
                           </div>
                           <div className="instruction-row" style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.82rem', marginBottom: '6px', color: '#a0aec0' }}>
-                            <span>بانک:</span>
-                            <span style={{ color: '#ffffff' }}>{cardDetails.bankName}</span>
+                            <span>{language === 'fa' ? 'بانک:' : 'Bank:'}</span>
+                            <span style={{ color: '#ffffff' }}>{language === 'fa' ? cardDetails.bankName : 'Melli Iran'}</span>
                           </div>
                           <div className="instruction-row" style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.82rem', color: '#a0aec0' }}>
-                            <span>به نام:</span>
-                            <span style={{ color: '#ffffff' }}>{cardDetails.ownerName}</span>
+                            <span>{language === 'fa' ? 'به نام:' : 'Account Holder:'}</span>
+                            <span style={{ color: '#ffffff' }}>{language === 'fa' ? cardDetails.ownerName : 'Javad Sheikh Azami'}</span>
                           </div>
                         </div>
 
                         <div className="receipt-upload-section" style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '12px' }}>
-                          <label style={{ fontSize: '0.8rem', color: '#a0aec0', fontWeight: '500' }}>بارگذاری تصویر فیش پرداخت (الزامی)</label>
+                          <label style={{ fontSize: '0.8rem', color: '#a0aec0', fontWeight: '500' }}>{language === 'fa' ? 'بارگذاری تصویر فیش پرداخت (الزامی)' : 'Upload Payment Receipt (Required)'}</label>
                           <input
                             type="file"
                             id="receipt-file-input"
@@ -1200,7 +1252,7 @@ export default function SettingsPage() {
                             transition: 'border-color 0.2s'
                           }}>
                             <span className="material-symbols-outlined">upload_file</span>
-                            <span>{receiptFile ? receiptFile.name : 'انتخاب تصویر فیش (PNG, JPG)'}</span>
+                            <span>{receiptFile ? receiptFile.name : (language === 'fa' ? 'انتخاب تصویر فیش (PNG, JPG)' : 'Select receipt image (PNG, JPG)')}</span>
                           </label>
                         </div>
                       </>
@@ -1214,7 +1266,7 @@ export default function SettingsPage() {
                         disabled={checkoutLoading || !receiptFile}
                         onClick={handleSubmitReceipt}
                       >
-                        {checkoutLoading ? 'در حال ثبت اطلاعات...' : 'ثبت فیش پرداخت'}
+                        {checkoutLoading ? (language === 'fa' ? 'در حال ثبت اطلاعات...' : 'Submitting details...') : (language === 'fa' ? 'ثبت فیش پرداخت' : 'Submit Receipt')}
                       </button>
                     ) : (
                       <button
@@ -1226,7 +1278,7 @@ export default function SettingsPage() {
                           color: '#ffffff'
                         }}
                       >
-                        {checkoutLoading ? 'در حال انتقال به درگاه...' : `اتصال به درگاه ${paymentMethod === 'payping' ? 'پی‌پینگ' : 'زرین‌پال'}`}
+                        {checkoutLoading ? (language === 'fa' ? 'در حال انتقال به درگاه...' : 'Redirecting to gateway...') : (language === 'fa' ? `اتصال به درگاه ${paymentMethod === 'payping' ? 'پی‌پینگ' : 'زرین‌پال'}` : `Proceed to ${paymentMethod === 'payping' ? 'PayPing' : 'ZarinPal'}`)}
                       </button>
                     )}
                   </div>
@@ -1241,10 +1293,10 @@ export default function SettingsPage() {
           <section className="settings-section">
             {/* Change password */}
             <div className="security-card">
-              <h3>تغییر رمز عبور</h3>
+              <h3>{t('settings.changePassword')}</h3>
               <div className="password-fields">
                 <div className="form-field">
-                  <label>فعلی</label>
+                  <label>{t('settings.currentPassword')}</label>
                   <div className="password-input-wrap">
                     <input
                       type={showPasswords.current ? 'text' : 'password'}
@@ -1259,7 +1311,7 @@ export default function SettingsPage() {
                   </div>
                 </div>
                 <div className="form-field">
-                  <label>جدید</label>
+                  <label>{t('settings.newPassword')}</label>
                   <div className="password-input-wrap">
                     <input
                       type={showPasswords.new ? 'text' : 'password'}
@@ -1280,7 +1332,7 @@ export default function SettingsPage() {
                   )}
                 </div>
                 <div className="form-field">
-                  <label>تکرار</label>
+                  <label>{t('settings.confirmPassword')}</label>
                   <div className="password-input-wrap">
                     <input
                       type={showPasswords.confirm ? 'text' : 'password'}
@@ -1296,16 +1348,16 @@ export default function SettingsPage() {
                 </div>
               </div>
               <button className="settings-save-btn" onClick={handlePasswordChange} disabled={!passwordForm.currentPassword || !passwordForm.newPassword}>
-                تغییر رمز عبور
+                {t('settings.changePassword')}
               </button>
             </div>
 
             {/* Active sessions */}
             <div className="security-card">
               <div className="sessions-header">
-                <h3>نشست‌های فعال</h3>
+                <h3>{t('settings.activeSessions')}</h3>
                 {sessions.filter(s => !s.is_current).length > 0 && (
-                  <button className="revoke-all-btn" onClick={handleRevokeAllSessions}>خروج از تمام دستگاه‌ها</button>
+                  <button className="revoke-all-btn" onClick={handleRevokeAllSessions}>{t('settings.revokeAllSessions')}</button>
                 )}
               </div>
               <div className="sessions-list">
@@ -1315,14 +1367,14 @@ export default function SettingsPage() {
                       <span className="material-symbols-outlined session-icon">devices</span>
                       <div>
                         <span className="session-device">{s.user_agent}</span>
-                        <span className="session-time">آخرین فعالیت: {new Date(s.last_used_at).toLocaleDateString('fa-IR')}</span>
+                        <span className="session-time">{language === 'fa' ? 'آخرین فعالیت' : 'Last activity'}: {new Date(s.last_used_at).toLocaleDateString(language === 'fa' ? 'fa-IR' : 'en-US')}</span>
                       </div>
                     </div>
                     {s.is_current ? (
-                      <span className="current-session-badge">این دستگاه</span>
+                      <span className="current-session-badge">{t('settings.thisDevice')}</span>
                     ) : (
                       <button className="revoke-session-btn" onClick={() => handleRevokeSession(s.id)}>
-                        خروج از این دستگاه
+                        {t('settings.revokeThisSession')}
                       </button>
                     )}
                   </div>
@@ -1334,28 +1386,28 @@ export default function SettingsPage() {
             <div className="danger-zone">
               <div className="danger-header">
                 <span className="material-symbols-outlined">warning</span>
-                <h3>حذف حساب کاربری</h3>
+                <h3>{t('settings.deleteUserAccount')}</h3>
               </div>
-              <p>با حذف حساب، تمام معاملات، ژورنال‌ها و داده‌هایت به صورت دائمی حذف می‌شوند و قابل بازیابی نیستند.</p>
+              <p>{t('settings.deleteAccountDesc')}</p>
               {showDeleteAccount ? (
                 <div className="delete-confirm-form">
-                  <p>برای تایید، ایمیل خود را وارد کنید:</p>
+                  <p>{t('settings.deleteConfirmEmailText')}</p>
                   <input
                     type="text"
                     value={deleteConfirmEmail}
                     onChange={(e) => setDeleteConfirmEmail(e.target.value)}
-                    placeholder={profile?.email || 'ایمیل'}
-                    style={{ direction: 'ltr', textAlign: 'right' }}
+                    placeholder={profile?.email || t('settings.deleteConfirmEmailPlaceholder')}
+                    style={{ direction: 'ltr', textAlign: language === 'fa' ? 'right' : 'left' }}
                   />
                   <div className="delete-actions">
                     <button className="danger-confirm-btn" onClick={handleDeleteUserAccount} disabled={deleteConfirmEmail !== profile?.email}>
-                      بله، حسابم را حذف کن
+                      {t('settings.deleteAccountBtn')}
                     </button>
-                    <button className="settings-cancel-btn" onClick={() => { setShowDeleteAccount(false); setDeleteConfirmEmail(''); }}>انصراف</button>
+                    <button className="settings-cancel-btn" onClick={() => { setShowDeleteAccount(false); setDeleteConfirmEmail(''); }}>{t('settings.cancel')}</button>
                   </div>
                 </div>
               ) : (
-                <button className="danger-outline-btn" onClick={() => setShowDeleteAccount(true)}>حذف حساب کاربری</button>
+                <button className="danger-outline-btn" onClick={() => setShowDeleteAccount(true)}>{t('settings.deleteUserAccount')}</button>
               )}
             </div>
           </section>
@@ -1366,9 +1418,11 @@ export default function SettingsPage() {
       {showTokenModal && (
         <div className="token-modal-overlay">
           <div className="token-modal">
-            <h3>کلید اتصال جدید ایجاد شد</h3>
+            <h3>{language === 'fa' ? 'کلید اتصال جدید ایجاد شد' : 'New Connection Key Created'}</h3>
             <p>
-              لطفاً این کلید اتصال را کپی کرده و در محل امنی ذخیره کنید. به دلایل امنیتی، این کلید <strong>دیگر نمایش داده نخواهد شد</strong>!
+              {language === 'fa'
+                ? 'لطفاً این کلید اتصال را کپی کرده و در محل امنی ذخیره کنید. به دلایل امنیتی، این کلید دیگر نمایش داده نخواهد شد!'
+                : 'Please copy this connection key and store it in a secure location. For security reasons, this key will not be displayed again!'}
             </p>
             <div className="token-reveal-box">
               <code>{showTokenModal.token}</code>
@@ -1376,15 +1430,15 @@ export default function SettingsPage() {
                 className="copy-token-btn" 
                 onClick={() => {
                   navigator.clipboard.writeText(showTokenModal.token);
-                  notify.success('کلید اتصال کپی شد');
+                  notify.success(language === 'fa' ? 'کلید اتصال کپی شد' : 'Connection key copied to clipboard');
                 }}
-                title="کپی کلید"
+                title={language === 'fa' ? 'کپی کلید' : 'Copy Key'}
               >
                 <span className="material-symbols-outlined">content_copy</span>
               </button>
             </div>
             <div className="token-modal-actions">
-              <button onClick={() => setShowTokenModal(null)}>بستن و فهمیدم</button>
+              <button onClick={() => setShowTokenModal(null)}>{language === 'fa' ? 'بستن و فهمیدم' : 'Close and I understand'}</button>
             </div>
           </div>
         </div>

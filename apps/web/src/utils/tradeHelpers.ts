@@ -19,6 +19,18 @@ export const getEmotionEmoji = (emotion: string | null, emotionsList?: { value: 
 
 export const getEmotionLabel = (emotion: string | null, emotionsList?: { value: string; label: string; emoji?: string }[]): string => {
   if (!emotion) return '';
+  const lang = useAppStore.getState().language;
+  const isEn = lang === 'en';
+  const standardMap: Record<string, string> = {
+    CONFIDENT: isEn ? 'Confident' : 'با اطمینان',
+    NEUTRAL: isEn ? 'Neutral/Calm' : 'آرام/خنثی',
+    ANXIOUS: isEn ? 'Anxious' : 'مضطرب',
+    FOMO: 'FOMO',
+    REVENGE: isEn ? 'Revenge' : 'انتقام',
+  };
+  if (standardMap[emotion]) {
+    return standardMap[emotion];
+  }
   if (emotionsList) {
     const found = emotionsList.find(e => e.value === emotion);
     return found ? found.label : emotion;

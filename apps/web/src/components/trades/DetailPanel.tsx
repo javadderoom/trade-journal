@@ -74,31 +74,31 @@ export default function DetailPanel({
   const p = {
     details: isEn ? 'Details' : 'مشخصات',
     notesTab: isEn ? 'Notes & Documents' : 'یادداشت و مستندات',
-    netProfit: isEn ? 'Net Profit (P&L)' : '{p.netProfit}',
+    netProfit: isEn ? 'Net Profit (P&L)' : 'سود/زیان خالص',
     closed: isEn ? 'Closed' : 'بسته شده',
     open: isEn ? 'Open' : 'باز',
     pips: isEn ? 'Pips' : 'پیپ',
     riskReward: isEn ? 'Risk to Reward' : 'ریسک به ریوارد',
     chartTitle: isEn ? 'Trade Price Chart' : 'نمودار قیمت معامله',
     executionDetails: isEn ? 'Execution Details' : 'جزئیات اجرا',
-    account: isEn ? 'Trading Account:' : '{p.account}',
-    symbol: isEn ? 'Symbol:' : '{p.symbol}',
-    direction: isEn ? 'Direction:' : '{p.direction}',
-    volume: isEn ? 'Volume (Lot):' : '{p.volume}',
-    openTime: isEn ? 'Open Time:' : '{p.openTime}',
-    openSession: isEn ? 'Entry Session:' : '{p.openSession}',
-    analysisTimeframe: isEn ? 'Analysis Timeframe:' : '{p.analysisTimeframe}',
-    entryTimeframe: isEn ? 'Entry Timeframe:' : '{p.entryTimeframe}',
-    openPrice: isEn ? 'Open Price:' : '{p.openPrice}',
-    sl: isEn ? 'Stop Loss (SL):' : '{p.sl}',
-    tp: isEn ? 'Take Profit (TP):' : '{p.tp}',
-    closeTime: isEn ? 'Close Time:' : '{p.closeTime}',
-    closePrice: isEn ? 'Close Price:' : '{p.closePrice}',
-    profitUsd: isEn ? 'Profit/Loss (USD):' : '{p.profitUsd}',
-    commission: isEn ? 'Commission:' : '{p.commission}',
-    swap: isEn ? 'Swap:' : '{p.swap}',
-    closeTrade: isEn ? 'Close Trade' : '{p.closeTrade}',
-    reopenTrade: isEn ? 'Reopen Trade' : '{p.reopenTrade}',
+    account: isEn ? 'Trading Account:' : 'حساب معاملاتی:',
+    symbol: isEn ? 'Symbol:' : 'نماد:',
+    direction: isEn ? 'Direction:' : 'جهت:',
+    volume: isEn ? 'Volume (Lot):' : 'حجم (لات):',
+    openTime: isEn ? 'Open Time:' : 'زمان ورود:',
+    openSession: isEn ? 'Entry Session:' : 'سشن ورود:',
+    analysisTimeframe: isEn ? 'Analysis Timeframe:' : 'تایم‌فریم تحلیل:',
+    entryTimeframe: isEn ? 'Entry Timeframe:' : 'تایم‌فریم ورود:',
+    openPrice: isEn ? 'Open Price:' : 'قیمت ورود:',
+    sl: isEn ? 'Stop Loss (SL):' : 'حد ضرر (SL):',
+    tp: isEn ? 'Take Profit (TP):' : 'حد سود (TP):',
+    closeTime: isEn ? 'Close Time:' : 'زمان خروج:',
+    closePrice: isEn ? 'Close Price:' : 'قیمت خروج:',
+    profitUsd: isEn ? 'Profit/Loss (USD):' : 'سود/زیان (دلار):',
+    commission: isEn ? 'Commission:' : 'کمیسیون:',
+    swap: isEn ? 'Swap:' : 'سواپ:',
+    closeTrade: isEn ? 'Close Trade' : 'بستن معامله',
+    reopenTrade: isEn ? 'Reopen Trade' : 'باز کردن مجدد',
     timeframe: isEn ? 'Timeframe' : 'تایم‌فریم',
     tradeEmotion: isEn ? 'Trade Emotion' : 'احساس معاملاتی',
     manageProps: isEn ? 'Manage Properties' : 'مدیریت ویژگی‌ها',
@@ -224,6 +224,10 @@ export default function DetailPanel({
 
 
   const formatCurrency = (val: number) => {
+    if (isEn) {
+      const sign = val < 0 ? '-' : '';
+      return `${sign}$${Math.abs(val).toFixed(2)}`;
+    }
     return formatPersianCurrency(val);
   };
 
@@ -240,7 +244,7 @@ export default function DetailPanel({
           <div className="title-text">
             <h2>{activeTrade.symbol}</h2>
             <p dir="ltr">
-              {activeTrade.direction === 'BUY' ? p.buy : p.sell} {toPersianDigits(activeTrade.lotSize)} Lots
+              {activeTrade.direction === 'BUY' ? p.buy : p.sell} {isEn ? activeTrade.lotSize : toPersianDigits(activeTrade.lotSize)} {isEn ? 'Lots' : 'لات'}
             </p>
           </div>
         </div>
@@ -284,14 +288,16 @@ export default function DetailPanel({
                 {formatCurrency(activeTrade.profitUsd)}
               </div>
               <div className="pnl-toman">
-                {formatToman(activeTrade.profitUsd, usdToToman)}
+                {isEn 
+                  ? `${Math.round(activeTrade.profitUsd * usdToToman).toLocaleString('en-US')} Toman` 
+                  : formatToman(activeTrade.profitUsd, usdToToman)}
               </div>
               <div className="metrics-grid">
                 <div className="metric-item">
                   <span className="stat-label">{p.pips}</span>
                   <span className="stat-value">
                     {activeTrade.pips > 0 ? '+' : ''}
-                    {toPersianDigits(activeTrade.pips.toFixed(1))}
+                    {isEn ? activeTrade.pips.toFixed(1) : toPersianDigits(activeTrade.pips.toFixed(1))}
                   </span>
                 </div>
                 <div className="divider"></div>
@@ -299,7 +305,7 @@ export default function DetailPanel({
                   <span className="stat-label">{p.riskReward}</span>
                   <span className="stat-value">
                     {activeTrade.rMultiple > 0 ? '+' : ''}
-                    {toPersianDigits(activeTrade.rMultiple.toFixed(1))}R
+                    {isEn ? activeTrade.rMultiple.toFixed(1) : toPersianDigits(activeTrade.rMultiple.toFixed(1))}R
                   </span>
                 </div>
               </div>
@@ -634,7 +640,7 @@ export default function DetailPanel({
             {/* Strategy & Emotions / Tags */}
             <div className="form-group">
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                <label style={{ marginBottom: 0 }}>برچسب‌های معامله</label>
+                <label style={{ marginBottom: 0 }}>{isEn ? 'Trade Tags' : 'برچسب‌های معامله'}</label>
                 <button
                   type="button"
                   onClick={handleToggleConfigMode}
@@ -654,7 +660,7 @@ export default function DetailPanel({
                   <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>
                     {isConfiguringTags ? 'check' : 'settings'}
                   </span>
-                  {isConfiguringTags ? 'تأیید تنظیمات' : 'مدیریت ویژگی‌ها'}
+                  {isConfiguringTags ? p.confirmSettings : p.manageProps}
                 </button>
               </div>
 
@@ -684,10 +690,10 @@ export default function DetailPanel({
                             gap: '2px',
                             fontFamily: language === 'fa' ? 'Vazirmatn' : 'inherit',
                           }}
-                          title="نادیده گرفتن از آمار"
+                          title={isEn ? 'Ignore in stats' : 'نادیده گرفتن از آمار'}
                         >
                           <span className="material-symbols-outlined" style={{ fontSize: '12px' }}>block</span>
-                          نادیده
+                          {isEn ? 'Ignore' : 'نادیده'}
                         </button>
 
                         {/* Show first toggle */}
@@ -709,10 +715,10 @@ export default function DetailPanel({
                             gap: '2px',
                             fontFamily: language === 'fa' ? 'Vazirmatn' : 'inherit',
                           }}
-                          title="نمایش در ابتدای لیست"
+                          title={isEn ? 'Show first in list' : 'نمایش در ابتدای لیست'}
                         >
                           <span className="material-symbols-outlined" style={{ fontSize: '12px' }}>star</span>
-                          مهم
+                          {isEn ? 'Pin' : 'مهم'}
                         </button>
 
                         {/* Delete tag */}
@@ -953,7 +959,7 @@ export default function DetailPanel({
                           }}
                         >
                           <span>{displayEmoji}</span>
-                          <span>{label}</span>
+                          <span>{getEmotionLabel(value, allEmotions)}</span>
                         </span>
                       );
                     })}
