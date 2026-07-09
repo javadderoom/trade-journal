@@ -84,19 +84,17 @@ export default function SettingsPage() {
   });
 
   const activePrices = prices || DEFAULT_PRICES;
-  const standardMonthlyPrice = activePrices.STANDARD.monthly.toLocaleString(language === 'fa' ? 'fa-IR' : 'en-US');
-  const standardAnnualPrice = activePrices.STANDARD.annual.toLocaleString(language === 'fa' ? 'fa-IR' : 'en-US');
-  const proMonthlyPrice = activePrices.PRO.monthly.toLocaleString(language === 'fa' ? 'fa-IR' : 'en-US');
-  const proAnnualPrice = activePrices.PRO.annual.toLocaleString(language === 'fa' ? 'fa-IR' : 'en-US');
-
-  const standardDiscountPercent = Math.round((1 - activePrices.STANDARD.annual / (activePrices.STANDARD.monthly * 12)) * 100);
-  const proDiscountPercent = Math.round((1 - activePrices.PRO.annual / (activePrices.PRO.monthly * 12)) * 100);
+  const standardMonthlyPrice = activePrices.STANDARD.monthly.toLocaleString('fa-IR');
+  const standardAnnualPrice = activePrices.STANDARD.annual.toLocaleString('fa-IR');
+  const proMonthlyPrice = activePrices.PRO.monthly.toLocaleString('fa-IR');
+  const proAnnualPrice = activePrices.PRO.annual.toLocaleString('fa-IR');
 
   const [dismissedRejectionId, setDismissedRejectionId] = useState<string | null>(null);
 
+
   // Checkout modal & discount states
   const [checkoutTarget, setCheckoutTarget] = useState<{ plan: string; period: string } | null>(null);
-  const [paymentMethod, setPaymentMethod] = useState<'payping' | 'zarinpal' | 'manual'>('payping');
+  const [paymentMethod, setPaymentMethod] = useState<'payping' | 'zarinpal' | 'manual' | 'crypto'>('payping');
   const [discountCode, setDiscountCode] = useState('');
   const [discountDetails, setDiscountDetails] = useState<{
     valid: boolean;
@@ -106,6 +104,38 @@ export default function SettingsPage() {
   } | null>(null);
   const [discountError, setDiscountError] = useState('');
   const [validatingDiscount, setValidatingDiscount] = useState(false);
+  const [cryptoDetails, setCryptoDetails] = useState<{
+    usdtAddress: string;
+    trxAddress: string;
+    standard: { monthlyUsd: number; annualUsd: number };
+    pro: { monthlyUsd: number; annualUsd: number };
+  }>({
+    usdtAddress: '',
+    trxAddress: '',
+    standard: { monthlyUsd: 5.0, annualUsd: 45.0 },
+    pro: { monthlyUsd: 10.0, annualUsd: 90.0 }
+  });
+
+  // USD equivalents for English display (derived from cryptoDetails state)
+  const standardMonthlyUsd = cryptoDetails.standard.monthlyUsd;
+  const standardAnnualUsd = cryptoDetails.standard.annualUsd;
+  const proMonthlyUsd = cryptoDetails.pro.monthlyUsd;
+  const proAnnualUsd = cryptoDetails.pro.annualUsd;
+  const standardUsdDiscountPercent = standardAnnualUsd > 0
+    ? Math.round((1 - standardAnnualUsd / (standardMonthlyUsd * 12)) * 100)
+    : 0;
+  const proUsdDiscountPercent = proAnnualUsd > 0
+    ? Math.round((1 - proAnnualUsd / (proMonthlyUsd * 12)) * 100)
+    : 0;
+
+  const standardDiscountPercent = language === 'fa'
+    ? Math.round((1 - activePrices.STANDARD.annual / (activePrices.STANDARD.monthly * 12)) * 100)
+    : standardUsdDiscountPercent;
+  const proDiscountPercent = language === 'fa'
+    ? Math.round((1 - activePrices.PRO.annual / (activePrices.PRO.monthly * 12)) * 100)
+    : proUsdDiscountPercent;
+  const [cryptoCoin, setCryptoCoin] = useState<'USDT' | 'TRX'>('USDT');
+  const [cryptoTxHash, setCryptoTxHash] = useState('');
 
   const handleValidateDiscount = async (codeStr: string, plan: string, period: string) => {
     if (!codeStr) {
@@ -221,6 +251,17 @@ export default function SettingsPage() {
   }, []);
 
   useEffect(() => { fetchCardDetails(); }, [fetchCardDetails]);
+
+  const fetchCryptoDetails = useCallback(async () => {
+    try {
+      const res = await api.get('/api/settings/crypto-details');
+      setCryptoDetails(res.data);
+    } catch (err) {
+      console.error('Failed to fetch crypto details:', err);
+    }
+  }, []);
+
+  useEffect(() => { fetchCryptoDetails(); }, [fetchCryptoDetails]);
 
   // ─── Fetch sessions ──────────────────────────────────────────────────────
   const fetchSessions = useCallback(async () => {
@@ -422,6 +463,36 @@ export default function SettingsPage() {
     } catch (err: any) {
       console.error('Online checkout error:', err);
       notify.error(err.response?.data?.error || t('settings.checkoutGatewayError'));
+    } finally {
+      setCheckoutLoading(false);
+    }
+  };
+
+  const handleCryptoCheckout = async () => {
+    if (!checkoutTarget) return;
+    if (!cryptoTxHash.trim()) {
+      notify.error(language === 'fa' ? 'لطفا کد هش تراکنش (TXID) را وارد کنید' : 'Please enter the transaction hash (TXID)');
+      return;
+    }
+    setCheckoutLoading(true);
+    try {
+      const res = await api.post('/api/payments/crypto/submit', {
+        txHash: cryptoTxHash.trim(),
+        coin: cryptoCoin,
+        plan: checkoutTarget.plan,
+        period: checkoutTarget.period,
+        discountCode: discountCode || undefined,
+      });
+
+      notify.success(res.data.message || (language === 'fa' ? 'پرداخت رمزارز با موفقیت تایید شد' : 'Crypto payment approved successfully'));
+      setCheckoutTarget(null);
+      setCryptoTxHash('');
+      setDiscountCode('');
+      setDiscountDetails(null);
+      fetchSubscription();
+    } catch (err: any) {
+      console.error('Crypto checkout error:', err);
+      notify.error(err.response?.data?.error || (language === 'fa' ? 'خطا در تایید تراکنش رمزارز' : 'Error verifying crypto transaction'));
     } finally {
       setCheckoutLoading(false);
     }
@@ -946,7 +1017,7 @@ export default function SettingsPage() {
                             disabled={checkoutLoading}
                             onClick={() => setCheckoutTarget({ plan: 'STANDARD', period: 'monthly' })}
                           >
-                            {standardMonthlyPrice} {language === 'fa' ? 'تومان' : 'Toman'}
+                            {language === 'fa' ? `${standardMonthlyPrice} تومان` : `$${standardMonthlyUsd.toFixed(2)}`}
                           </button>
                         </div>
                         <div className="period-checkout-row">
@@ -959,7 +1030,7 @@ export default function SettingsPage() {
                             disabled={checkoutLoading}
                             onClick={() => setCheckoutTarget({ plan: 'STANDARD', period: 'annual' })}
                           >
-                            {standardAnnualPrice} {language === 'fa' ? 'تومان' : 'Toman'}
+                            {language === 'fa' ? `${standardAnnualPrice} تومان` : `$${standardAnnualUsd.toFixed(2)}`}
                           </button>
                         </div>
                       </div>
@@ -984,7 +1055,7 @@ export default function SettingsPage() {
                           disabled={checkoutLoading}
                           onClick={() => setCheckoutTarget({ plan: 'PRO', period: 'monthly' })}
                         >
-                          {proMonthlyPrice} {language === 'fa' ? 'تومان' : 'Toman'}
+                          {language === 'fa' ? `${proMonthlyPrice} تومان` : `$${proMonthlyUsd.toFixed(2)}`}
                         </button>
                       </div>
                       <div className="period-checkout-row">
@@ -997,7 +1068,7 @@ export default function SettingsPage() {
                           disabled={checkoutLoading}
                           onClick={() => setCheckoutTarget({ plan: 'PRO', period: 'annual' })}
                         >
-                          {proAnnualPrice} {language === 'fa' ? 'تومان' : 'Toman'}
+                          {language === 'fa' ? `${proAnnualPrice} تومان` : `$${proAnnualUsd.toFixed(2)}`}
                         </button>
                       </div>
                     </div>
@@ -1063,228 +1134,383 @@ export default function SettingsPage() {
                   <tr>
                     <td>{language === 'fa' ? 'قیمت ماهانه' : 'Monthly Price'}</td>
                     <td>{language === 'fa' ? 'رایگان' : 'Free'}</td>
-                    <td>{standardMonthlyPrice} {language === 'fa' ? 'ت' : 'T'}</td>
-                    <td>{proMonthlyPrice} {language === 'fa' ? 'ت' : 'T'}</td>
+                    <td>{language === 'fa' ? `${standardMonthlyPrice} ت` : `$${standardMonthlyUsd.toFixed(2)}`}</td>
+                    <td>{language === 'fa' ? `${proMonthlyPrice} ت` : `$${proMonthlyUsd.toFixed(2)}`}</td>
                   </tr>
                   <tr>
                     <td>{language === 'fa' ? 'قیمت سالانه' : 'Annual Price'}</td>
                     <td>-</td>
-                    <td>{standardAnnualPrice} {language === 'fa' ? 'ت' : 'T'}</td>
-                    <td>{proAnnualPrice} {language === 'fa' ? 'ت' : 'T'}</td>
+                    <td>{language === 'fa' ? `${standardAnnualPrice} ت` : `$${standardAnnualUsd.toFixed(2)}`}</td>
+                    <td>{language === 'fa' ? `${proAnnualPrice} ت` : `$${proAnnualUsd.toFixed(2)}`}</td>
                   </tr>
                 </tbody>
               </table>
             </div>
 
             {/* Checkout Discount Modal */}
-            {checkoutTarget && (
-              <div className="checkout-modal-overlay">
-                <div className="checkout-modal-card">
-                  <div className="checkout-modal-header">
-                    <h4>
-                      {language === 'fa'
-                        ? `خرید پلن ${checkoutTarget.plan === 'STANDARD' ? 'استاندارد' : 'حرفه‌ای'} - ${checkoutTarget.period === 'monthly' ? 'ماهانه' : 'سالانه'}`
-                        : `Purchase ${checkoutTarget.plan === 'STANDARD' ? 'Standard' : 'Pro'} Plan - ${checkoutTarget.period === 'monthly' ? 'Monthly' : 'Annual'}`}
-                    </h4>
-                    <button className="close-modal-btn" onClick={() => {
-                      setCheckoutTarget(null);
-                      setDiscountCode('');
-                      setDiscountDetails(null);
-                      setDiscountError('');
-                    }}>
-                      <span className="material-symbols-outlined">close</span>
-                    </button>
-                  </div>
+            {checkoutTarget && (() => {
+              const planKey = checkoutTarget.plan.toLowerCase() === 'standard' ? 'standard' : 'pro';
+              const periodKey = checkoutTarget.period === 'annual' ? 'annualUsd' : 'monthlyUsd';
+              let expectedAmount = cryptoDetails[planKey as 'standard' | 'pro'][periodKey as 'monthlyUsd' | 'annualUsd'] || 5.0;
+              if (discountDetails) {
+                expectedAmount = expectedAmount * (1 - discountDetails.discountPercent / 100);
+              }
 
-                  <div className="checkout-modal-body">
-                    <div className="price-details-section">
-                      <div className="price-row">
-                        <span>{language === 'fa' ? 'مبلغ پایه:' : 'Base Price:'}</span>
-                        <span className={discountDetails ? 'original-price-crossed' : 'final-price'}>
-                          {activePrices[checkoutTarget.plan as 'STANDARD' | 'PRO'][checkoutTarget.period as 'monthly' | 'annual'].toLocaleString(language === 'fa' ? 'fa-IR' : 'en-US')} {language === 'fa' ? 'تومان' : 'Toman'}
-                        </span>
-                      </div>
-                      {discountDetails && (
-                        <div className="price-row discount-applied">
-                          <span>
+              return (
+                <div className="checkout-modal-overlay">
+                  <div className="checkout-modal-card">
+                    <div className="checkout-modal-header">
+                      <h4>
+                        {language === 'fa'
+                          ? `خرید پلن ${checkoutTarget.plan === 'STANDARD' ? 'استاندارد' : 'حرفه‌ای'} - ${checkoutTarget.period === 'monthly' ? 'ماهانه' : 'سالانه'}`
+                          : `Purchase ${checkoutTarget.plan === 'STANDARD' ? 'Standard' : 'Pro'} Plan - ${checkoutTarget.period === 'monthly' ? 'Monthly' : 'Annual'}`}
+                      </h4>
+                      <button className="close-modal-btn" onClick={() => {
+                        setCheckoutTarget(null);
+                        setDiscountCode('');
+                        setDiscountDetails(null);
+                        setDiscountError('');
+                      }}>
+                        <span className="material-symbols-outlined">close</span>
+                      </button>
+                    </div>
+
+                    <div className="checkout-modal-body">
+                      <div className="price-details-section">
+                        <div className="price-row">
+                          <span>{language === 'fa' ? 'مبلغ پایه:' : 'Base Price:'}</span>
+                          <span className={discountDetails ? 'original-price-crossed' : 'final-price'}>
                             {language === 'fa'
-                              ? `مبلغ با تخفیف (${formatNum(discountDetails.discountPercent)}٪):`
-                              : `Discounted Price (${discountDetails.discountPercent}%):`}
-                          </span>
-                          <span className="final-price">
-                            {discountDetails.discountedPrice.toLocaleString(language === 'fa' ? 'fa-IR' : 'en-US')} {language === 'fa' ? 'تومان' : 'Toman'}
+                              ? `${activePrices[checkoutTarget.plan as 'STANDARD' | 'PRO'][checkoutTarget.period as 'monthly' | 'annual'].toLocaleString('fa-IR')} تومان`
+                              : `$${(checkoutTarget.plan === 'STANDARD'
+                                  ? (checkoutTarget.period === 'monthly' ? standardMonthlyUsd : standardAnnualUsd)
+                                  : (checkoutTarget.period === 'monthly' ? proMonthlyUsd : proAnnualUsd)
+                                ).toFixed(2)}`}
                           </span>
                         </div>
+                        {discountDetails && (
+                          <div className="price-row discount-applied">
+                            <span>
+                              {language === 'fa'
+                                ? `مبلغ با تخفیف (${formatNum(discountDetails.discountPercent)}٪):`
+                                : `Discounted Price (${discountDetails.discountPercent}%):`}
+                            </span>
+                            <span className="final-price">
+                              {language === 'fa'
+                                ? `${discountDetails.discountedPrice.toLocaleString('fa-IR')} تومان`
+                                : `$${(expectedAmount * (1 - discountDetails.discountPercent / 100)).toFixed(2)}`}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="discount-input-section">
+                        <label>{language === 'fa' ? 'کد تخفیف (اختیاری)' : 'Discount Code (Optional)'}</label>
+                        <div className="discount-input-wrap">
+                          <input
+                            type="text"
+                            value={discountCode}
+                            onChange={(e) => {
+                              setDiscountCode(e.target.value);
+                              setDiscountError('');
+                              setDiscountDetails(null);
+                            }}
+                            placeholder={language === 'fa' ? 'مثال: OFF50' : 'Example: OFF50'}
+                            style={{ direction: 'ltr', textAlign: 'center' }}
+                          />
+                          <button
+                            type="button"
+                            className="discount-apply-btn"
+                            disabled={validatingDiscount || !discountCode}
+                            onClick={() => handleValidateDiscount(discountCode, checkoutTarget.plan, checkoutTarget.period)}
+                          >
+                            {validatingDiscount ? (language === 'fa' ? 'بررسی...' : 'Validating...') : (language === 'fa' ? 'اعمال' : 'Apply')}
+                          </button>
+                        </div>
+                        {discountError && <span className="discount-error-msg">{discountError}</span>}
+                        {discountDetails && <span className="discount-success-msg">{language === 'fa' ? 'کد تخفیف با موفقیت اعمال شد.' : 'Discount code applied successfully.'}</span>}
+                      </div>
+
+                      {/* Select Payment Method */}
+                      <div className="payment-method-selector" style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '15px', marginTop: '15px' }}>
+                        <label style={{ fontSize: '0.85rem', color: '#a0aec0', fontWeight: '500' }}>{language === 'fa' ? 'روش پرداخت' : 'Payment Method'}</label>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '10px' }}>
+                          <button
+                            type="button"
+                            onClick={() => setPaymentMethod('payping')}
+                            style={{
+                              padding: '10px',
+                              background: paymentMethod === 'payping' ? 'rgba(97, 249, 177, 0.15)' : '#0f121d',
+                              border: paymentMethod === 'payping' ? '1px solid #61f9b1' : '1px solid rgba(255,255,255,0.1)',
+                              borderRadius: '8px',
+                              color: paymentMethod === 'payping' ? '#61f9b1' : '#a0aec0',
+                              fontWeight: 'bold',
+                              cursor: 'pointer',
+                              fontSize: '0.82rem',
+                              transition: 'all 0.2s',
+                            }}
+                          >
+                            {language === 'fa' ? 'درگاه پی‌پینگ' : 'PayPing Gateway'}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setPaymentMethod('zarinpal')}
+                            style={{
+                              padding: '10px',
+                              background: paymentMethod === 'zarinpal' ? 'rgba(255, 204, 0, 0.15)' : '#0f121d',
+                              border: paymentMethod === 'zarinpal' ? '1px solid #ffcc00' : '1px solid rgba(255,255,255,0.1)',
+                              borderRadius: '8px',
+                              color: paymentMethod === 'zarinpal' ? '#ffcc00' : '#a0aec0',
+                              fontWeight: 'bold',
+                              cursor: 'pointer',
+                              fontSize: '0.82rem',
+                              transition: 'all 0.2s',
+                            }}
+                          >
+                            {language === 'fa' ? 'درگاه زرین‌پال' : 'ZarinPal Gateway'}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setPaymentMethod('manual')}
+                            style={{
+                              padding: '10px',
+                              background: paymentMethod === 'manual' ? 'rgba(49, 130, 206, 0.15)' : '#0f121d',
+                              border: paymentMethod === 'manual' ? '1px solid #3182ce' : '1px solid rgba(255,255,255,0.1)',
+                              borderRadius: '8px',
+                              color: paymentMethod === 'manual' ? '#3182ce' : '#a0aec0',
+                              fontWeight: 'bold',
+                              cursor: 'pointer',
+                              fontSize: '0.82rem',
+                              transition: 'all 0.2s',
+                            }}
+                          >
+                            {language === 'fa' ? 'کارت به کارت' : 'Card Transfer'}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setPaymentMethod('crypto')}
+                            style={{
+                              padding: '10px',
+                              background: paymentMethod === 'crypto' ? 'rgba(155, 89, 182, 0.15)' : '#0f121d',
+                              border: paymentMethod === 'crypto' ? '1px solid #9b59b6' : '1px solid rgba(255,255,255,0.1)',
+                              borderRadius: '8px',
+                              color: paymentMethod === 'crypto' ? '#9b59b6' : '#a0aec0',
+                              fontWeight: 'bold',
+                              cursor: 'pointer',
+                              fontSize: '0.82rem',
+                              transition: 'all 0.2s',
+                            }}
+                          >
+                            {language === 'fa' ? 'پرداخت رمزارز' : 'Crypto Payment'}
+                          </button>
+                        </div>
+                      </div>
+
+                      {paymentMethod === 'manual' && (
+                        <>
+                          <div className="card-payment-instructions" style={{ marginTop: '10px', background: 'rgba(255, 255, 255, 0.02)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '8px', padding: '12px' }}>
+                            <h5 style={{ margin: '0 0 10px 0', fontSize: '0.88rem', color: '#ffb300' }}>{language === 'fa' ? 'مشخصات واریز کارت به کارت:' : 'Card Transfer Details:'}</h5>
+                            <div className="instruction-row" style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.82rem', marginBottom: '6px', color: '#a0aec0' }}>
+                              <span>{language === 'fa' ? 'شماره کارت:' : 'Card Number:'}</span>
+                              <strong style={{ direction: 'ltr', color: '#ffffff' }}>{formatNum(cardDetails.cardNumber)}</strong>
+                            </div>
+                            <div className="instruction-row" style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.82rem', marginBottom: '6px', color: '#a0aec0' }}>
+                              <span>{language === 'fa' ? 'بانک:' : 'Bank:'}</span>
+                              <span style={{ color: '#ffffff' }}>{language === 'fa' ? cardDetails.bankName : 'Melli Iran'}</span>
+                            </div>
+                            <div className="instruction-row" style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.82rem', color: '#a0aec0' }}>
+                              <span>{language === 'fa' ? 'به نام:' : 'Account Holder:'}</span>
+                              <span style={{ color: '#ffffff' }}>{language === 'fa' ? cardDetails.ownerName : 'Javad Sheikh Azami'}</span>
+                            </div>
+                          </div>
+
+                          <div className="receipt-upload-section" style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '12px' }}>
+                            <label style={{ fontSize: '0.8rem', color: '#a0aec0', fontWeight: '500' }}>{language === 'fa' ? 'بارگذاری تصویر فیش پرداخت (الزامی)' : 'Upload Payment Receipt (Required)'}</label>
+                            <input
+                              type="file"
+                              id="receipt-file-input"
+                              accept="image/png, image/jpeg, image/jpg"
+                              onChange={(e) => {
+                                if (e.target.files && e.target.files[0]) {
+                                  setReceiptFile(e.target.files[0]);
+                                }
+                              }}
+                              style={{ display: 'none' }}
+                            />
+                            <label htmlFor="receipt-file-input" style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              gap: '8px',
+                              padding: '12px',
+                              background: '#0f121d',
+                              border: '1px dashed rgba(255,255,255,0.2)',
+                              borderRadius: '8px',
+                              color: '#61f9b1',
+                              cursor: 'pointer',
+                              fontSize: '0.85rem',
+                              transition: 'border-color 0.2s'
+                            }}>
+                              <span className="material-symbols-outlined">upload_file</span>
+                              <span>{receiptFile ? receiptFile.name : (language === 'fa' ? 'انتخاب تصویر فیش (PNG, JPG)' : 'Select receipt image (PNG, JPG)')}</span>
+                            </label>
+                          </div>
+                        </>
+                      )}
+
+                      {paymentMethod === 'crypto' && (
+                        <>
+                          {/* Coin Selector */}
+                          <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
+                            <button
+                              type="button"
+                              onClick={() => setCryptoCoin('USDT')}
+                              style={{
+                                flex: 1,
+                                padding: '8px',
+                                background: cryptoCoin === 'USDT' ? 'rgba(38, 166, 154, 0.15)' : '#0f121d',
+                                border: cryptoCoin === 'USDT' ? '1px solid #26a69a' : '1px solid rgba(255,255,255,0.1)',
+                                borderRadius: '6px',
+                                color: cryptoCoin === 'USDT' ? '#26a69a' : '#a0aec0',
+                                cursor: 'pointer',
+                                fontSize: '0.8rem',
+                                fontWeight: 'bold',
+                              }}
+                            >
+                              USDT (TRC-20)
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setCryptoCoin('TRX')}
+                              style={{
+                                flex: 1,
+                                padding: '8px',
+                                background: cryptoCoin === 'TRX' ? 'rgba(239, 83, 80, 0.15)' : '#0f121d',
+                                border: cryptoCoin === 'TRX' ? '1px solid #ef5350' : '1px solid rgba(255,255,255,0.1)',
+                                borderRadius: '6px',
+                                color: cryptoCoin === 'TRX' ? '#ef5350' : '#a0aec0',
+                                cursor: 'pointer',
+                                fontSize: '0.8rem',
+                                fontWeight: 'bold',
+                              }}
+                            >
+                              TRON (TRX)
+                            </button>
+                          </div>
+
+                          {/* Instructions */}
+                          <div className="crypto-payment-instructions" style={{ marginTop: '10px', background: 'rgba(255, 255, 255, 0.02)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '8px', padding: '12px' }}>
+                            <h5 style={{ margin: '0 0 10px 0', fontSize: '0.88rem', color: '#9b59b6' }}>
+                              {language === 'fa' ? 'دستورالعمل پرداخت رمزارز:' : 'Crypto Payment Instructions:'}
+                            </h5>
+                            
+                            <div style={{ fontSize: '0.82rem', marginBottom: '8px', color: '#e2e8f0', display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                              <div>
+                                {language === 'fa' ? 'مبلغ قابل پرداخت:' : 'Amount to Pay:'}{' '}
+                                <strong style={{ color: '#61f9b1' }}>
+                                  {cryptoCoin === 'USDT' 
+                                    ? `${expectedAmount.toFixed(2)} USDT` 
+                                    : `${language === 'fa' ? 'معادل ریالی/دلاری با نرخ زنده در تراکنش' : 'Live dynamic conversion equivalent of'} $${expectedAmount.toFixed(2)} USD`}
+                                </strong>
+                              </div>
+                              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginTop: '5px' }}>
+                                <span>{language === 'fa' ? 'آدرس واریز:' : 'Deposit Address:'}</span>
+                                <div style={{ display: 'flex', gap: '8px', alignItems: 'center', background: '#0b0d19', padding: '8px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.08)' }}>
+                                  <span style={{ fontFamily: 'monospace', fontSize: '0.78rem', wordBreak: 'break-all', color: '#fff', flex: 1, direction: 'ltr' }}>
+                                    {cryptoCoin === 'USDT' ? cryptoDetails.usdtAddress : cryptoDetails.trxAddress}
+                                  </span>
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      navigator.clipboard.writeText(cryptoCoin === 'USDT' ? cryptoDetails.usdtAddress : cryptoDetails.trxAddress);
+                                      notify.success(language === 'fa' ? 'آدرس کپی شد' : 'Address copied');
+                                    }}
+                                    style={{
+                                      background: 'none',
+                                      border: 'none',
+                                      color: '#61f9b1',
+                                      cursor: 'pointer',
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      padding: '2px'
+                                    }}
+                                  >
+                                    <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>content_copy</span>
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* TxHash Input */}
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '12px' }}>
+                            <label style={{ fontSize: '0.8rem', color: '#a0aec0', fontWeight: '500' }}>
+                              {language === 'fa' ? 'کد هش تراکنش / TXID (الزامی)' : 'Transaction Hash / TXID (Required)'}
+                            </label>
+                            <input
+                              type="text"
+                              value={cryptoTxHash}
+                              onChange={(e) => setCryptoTxHash(e.target.value)}
+                              placeholder="e.g. f83d726b..."
+                              style={{
+                                width: '100%',
+                                padding: '10px',
+                                background: '#0f121d',
+                                border: '1px solid rgba(255,255,255,0.1)',
+                                borderRadius: '8px',
+                                color: '#fff',
+                                fontFamily: 'monospace',
+                                fontSize: '0.8rem',
+                                direction: 'ltr',
+                                textAlign: 'center'
+                              }}
+                            />
+                          </div>
+                        </>
                       )}
                     </div>
 
-                    <div className="discount-input-section">
-                      <label>{language === 'fa' ? 'کد تخفیف (اختیاری)' : 'Discount Code (Optional)'}</label>
-                      <div className="discount-input-wrap">
-                        <input
-                          type="text"
-                          value={discountCode}
-                          onChange={(e) => {
-                            setDiscountCode(e.target.value);
-                            setDiscountError('');
-                            setDiscountDetails(null);
-                          }}
-                          placeholder={language === 'fa' ? 'مثال: OFF50' : 'Example: OFF50'}
-                          style={{ direction: 'ltr', textAlign: 'center' }}
-                        />
+                    <div className="checkout-modal-footer">
+                      {paymentMethod === 'manual' && (
                         <button
-                          type="button"
-                          className="discount-apply-btn"
-                          disabled={validatingDiscount || !discountCode}
-                          onClick={() => handleValidateDiscount(discountCode, checkoutTarget.plan, checkoutTarget.period)}
+                          className="start-checkout-btn"
+                          disabled={checkoutLoading || !receiptFile}
+                          onClick={handleSubmitReceipt}
                         >
-                          {validatingDiscount ? (language === 'fa' ? 'بررسی...' : 'Validating...') : (language === 'fa' ? 'اعمال' : 'Apply')}
+                          {checkoutLoading ? (language === 'fa' ? 'در حال ثبت اطلاعات...' : 'Submitting details...') : (language === 'fa' ? 'ثبت فیش پرداخت' : 'Submit Receipt')}
                         </button>
-                      </div>
-                      {discountError && <span className="discount-error-msg">{discountError}</span>}
-                      {discountDetails && <span className="discount-success-msg">{language === 'fa' ? 'کد تخفیف با موفقیت اعمال شد.' : 'Discount code applied successfully.'}</span>}
+                      )}
+                      {paymentMethod === 'crypto' && (
+                        <button
+                          className="start-checkout-btn"
+                          disabled={checkoutLoading || !cryptoTxHash.trim()}
+                          onClick={handleCryptoCheckout}
+                          style={{
+                            background: '#9b59b6',
+                            color: '#ffffff'
+                          }}
+                        >
+                          {checkoutLoading ? (language === 'fa' ? 'در حال تایید تراکنش...' : 'Verifying transaction...') : (language === 'fa' ? 'بررسی و فعال‌سازی اشتراک' : 'Verify & Activate Plan')}
+                        </button>
+                      )}
+                      {(paymentMethod === 'payping' || paymentMethod === 'zarinpal') && (
+                        <button
+                          className="start-checkout-btn"
+                          disabled={checkoutLoading}
+                          onClick={handleOnlineCheckout}
+                          style={{
+                            background: paymentMethod === 'payping' ? '#2c7a7b' : '#b7791f',
+                            color: '#ffffff'
+                          }}
+                        >
+                          {checkoutLoading ? (language === 'fa' ? 'در حال انتقال به درگاه...' : 'Redirecting to gateway...') : (language === 'fa' ? `اتصال به درگاه ${paymentMethod === 'payping' ? 'پی‌پینگ' : 'زرین‌پال'}` : `Proceed to ${paymentMethod === 'payping' ? 'PayPing' : 'ZarinPal'}`)}
+                        </button>
+                      )}
                     </div>
-
-                    {/* Select Payment Method */}
-                    <div className="payment-method-selector" style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '15px', marginTop: '15px' }}>
-                      <label style={{ fontSize: '0.85rem', color: '#a0aec0', fontWeight: '500' }}>{language === 'fa' ? 'روش پرداخت' : 'Payment Method'}</label>
-                      <div style={{ display: 'flex', gap: '10px' }}>
-                        <button
-                          type="button"
-                          onClick={() => setPaymentMethod('payping')}
-                          style={{
-                            flex: 1,
-                            padding: '10px',
-                            background: paymentMethod === 'payping' ? 'rgba(97, 249, 177, 0.15)' : '#0f121d',
-                            border: paymentMethod === 'payping' ? '1px solid #61f9b1' : '1px solid rgba(255,255,255,0.1)',
-                            borderRadius: '8px',
-                            color: paymentMethod === 'payping' ? '#61f9b1' : '#a0aec0',
-                            fontWeight: 'bold',
-                            cursor: 'pointer',
-                            fontSize: '0.82rem',
-                            transition: 'all 0.2s',
-                          }}
-                        >
-                          {language === 'fa' ? 'درگاه پی‌پینگ' : 'PayPing Gateway'}
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setPaymentMethod('zarinpal')}
-                          style={{
-                            flex: 1,
-                            padding: '10px',
-                            background: paymentMethod === 'zarinpal' ? 'rgba(255, 204, 0, 0.15)' : '#0f121d',
-                            border: paymentMethod === 'zarinpal' ? '1px solid #ffcc00' : '1px solid rgba(255,255,255,0.1)',
-                            borderRadius: '8px',
-                            color: paymentMethod === 'zarinpal' ? '#ffcc00' : '#a0aec0',
-                            fontWeight: 'bold',
-                            cursor: 'pointer',
-                            fontSize: '0.82rem',
-                            transition: 'all 0.2s',
-                          }}
-                        >
-                          {language === 'fa' ? 'درگاه زرین‌پال' : 'ZarinPal Gateway'}
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setPaymentMethod('manual')}
-                          style={{
-                            flex: 1,
-                            padding: '10px',
-                            background: paymentMethod === 'manual' ? 'rgba(49, 130, 206, 0.15)' : '#0f121d',
-                            border: paymentMethod === 'manual' ? '1px solid #3182ce' : '1px solid rgba(255,255,255,0.1)',
-                            borderRadius: '8px',
-                            color: paymentMethod === 'manual' ? '#3182ce' : '#a0aec0',
-                            fontWeight: 'bold',
-                            cursor: 'pointer',
-                            fontSize: '0.82rem',
-                            transition: 'all 0.2s',
-                          }}
-                        >
-                          {language === 'fa' ? 'کارت به کارت' : 'Card Transfer'}
-                        </button>
-                      </div>
-                    </div>
-
-                    {paymentMethod === 'manual' && (
-                      <>
-                        <div className="card-payment-instructions" style={{ marginTop: '10px', background: 'rgba(255, 255, 255, 0.02)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '8px', padding: '12px' }}>
-                          <h5 style={{ margin: '0 0 10px 0', fontSize: '0.88rem', color: '#ffb300' }}>{language === 'fa' ? 'مشخصات واریز کارت به کارت:' : 'Card Transfer Details:'}</h5>
-                          <div className="instruction-row" style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.82rem', marginBottom: '6px', color: '#a0aec0' }}>
-                            <span>{language === 'fa' ? 'شماره کارت:' : 'Card Number:'}</span>
-                            <strong style={{ direction: 'ltr', color: '#ffffff' }}>{formatNum(cardDetails.cardNumber)}</strong>
-                          </div>
-                          <div className="instruction-row" style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.82rem', marginBottom: '6px', color: '#a0aec0' }}>
-                            <span>{language === 'fa' ? 'بانک:' : 'Bank:'}</span>
-                            <span style={{ color: '#ffffff' }}>{language === 'fa' ? cardDetails.bankName : 'Melli Iran'}</span>
-                          </div>
-                          <div className="instruction-row" style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.82rem', color: '#a0aec0' }}>
-                            <span>{language === 'fa' ? 'به نام:' : 'Account Holder:'}</span>
-                            <span style={{ color: '#ffffff' }}>{language === 'fa' ? cardDetails.ownerName : 'Javad Sheikh Azami'}</span>
-                          </div>
-                        </div>
-
-                        <div className="receipt-upload-section" style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '12px' }}>
-                          <label style={{ fontSize: '0.8rem', color: '#a0aec0', fontWeight: '500' }}>{language === 'fa' ? 'بارگذاری تصویر فیش پرداخت (الزامی)' : 'Upload Payment Receipt (Required)'}</label>
-                          <input
-                            type="file"
-                            id="receipt-file-input"
-                            accept="image/png, image/jpeg, image/jpg"
-                            onChange={(e) => {
-                              if (e.target.files && e.target.files[0]) {
-                                setReceiptFile(e.target.files[0]);
-                              }
-                            }}
-                            style={{ display: 'none' }}
-                          />
-                          <label htmlFor="receipt-file-input" style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            gap: '8px',
-                            padding: '12px',
-                            background: '#0f121d',
-                            border: '1px dashed rgba(255,255,255,0.2)',
-                            borderRadius: '8px',
-                            color: '#61f9b1',
-                            cursor: 'pointer',
-                            fontSize: '0.85rem',
-                            transition: 'border-color 0.2s'
-                          }}>
-                            <span className="material-symbols-outlined">upload_file</span>
-                            <span>{receiptFile ? receiptFile.name : (language === 'fa' ? 'انتخاب تصویر فیش (PNG, JPG)' : 'Select receipt image (PNG, JPG)')}</span>
-                          </label>
-                        </div>
-                      </>
-                    )}
-                  </div>
-
-                  <div className="checkout-modal-footer">
-                    {paymentMethod === 'manual' ? (
-                      <button
-                        className="start-checkout-btn"
-                        disabled={checkoutLoading || !receiptFile}
-                        onClick={handleSubmitReceipt}
-                      >
-                        {checkoutLoading ? (language === 'fa' ? 'در حال ثبت اطلاعات...' : 'Submitting details...') : (language === 'fa' ? 'ثبت فیش پرداخت' : 'Submit Receipt')}
-                      </button>
-                    ) : (
-                      <button
-                        className="start-checkout-btn"
-                        disabled={checkoutLoading}
-                        onClick={handleOnlineCheckout}
-                        style={{
-                          background: paymentMethod === 'payping' ? '#2c7a7b' : '#b7791f',
-                          color: '#ffffff'
-                        }}
-                      >
-                        {checkoutLoading ? (language === 'fa' ? 'در حال انتقال به درگاه...' : 'Redirecting to gateway...') : (language === 'fa' ? `اتصال به درگاه ${paymentMethod === 'payping' ? 'پی‌پینگ' : 'زرین‌پال'}` : `Proceed to ${paymentMethod === 'payping' ? 'PayPing' : 'ZarinPal'}`)}
-                      </button>
-                    )}
                   </div>
                 </div>
-              </div>
-            )}
+              );
+            })()}
           </section>
         )}
 

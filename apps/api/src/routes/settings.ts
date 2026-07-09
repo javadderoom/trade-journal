@@ -638,4 +638,37 @@ router.get('/exchange-rate', async (req, res) => {
   }
 });
 
+/**
+ * GET /api/settings/crypto-details
+ * Retrieve manual crypto deposit wallet addresses & plans pricing
+ */
+router.get('/crypto-details', async (req, res) => {
+  try {
+    const setting = await prisma.systemSetting.findUnique({
+      where: { key: 'CRYPTO_DETAILS' },
+    });
+
+    if (setting && setting.value) {
+      return res.status(200).json(setting.value);
+    }
+
+    // Default fallback
+    return res.status(200).json({
+      usdtAddress: 'TYTRX20USDTADDRESSxxxxxxxxxxxxxx',
+      trxAddress: 'TYTRXNATIVEADDRESSxxxxxxxxxxxxx',
+      standard: {
+        monthlyUsd: 5.0,
+        annualUsd: 45.0
+      },
+      pro: {
+        monthlyUsd: 10.0,
+        annualUsd: 90.0
+      }
+    });
+  } catch (err: any) {
+    console.error('Fetch crypto details error:', err);
+    return res.status(500).json({ error: 'خطا در دریافت اطلاعات پرداخت رمزارز' });
+  }
+});
+
 export default router;

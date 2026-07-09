@@ -8,7 +8,7 @@ import { toPersianDigits } from '../../utils/farsi';
 import { notify } from '../../lib/notify';
 import './admin.scss';
 
-type AdminTab = 'stats' | 'users' | 'receipts' | 'coupons' | 'pricing' | 'contact';
+type AdminTab = 'stats' | 'users' | 'receipts' | 'coupons' | 'pricing' | 'contact' | 'crypto';
 
 interface AdminStats {
   totalUsers: number;
@@ -101,6 +101,14 @@ export default function AdminPage() {
     ownerName: '',
   });
   const [exchangeRate, setExchangeRate] = useState<number | string>('');
+  const [cryptoConfig, setCryptoConfig] = useState({
+    usdtAddress: '',
+    trxAddress: '',
+    standard: { monthlyUsd: 5.0, annualUsd: 45.0 },
+    pro: { monthlyUsd: 10.0, annualUsd: 90.0 }
+  });
+
+  const [updatingCrypto, setUpdatingCrypto] = useState(false);
 
   // Modal states
   const [selectedReceipt, setSelectedReceipt] = useState<AdminReceipt | null>(null);
@@ -202,6 +210,17 @@ export default function AdminPage() {
     }
   }, []);
 
+  const fetchCryptoSetting = useCallback(async () => {
+    try {
+      const res = await api.get('/api/settings/crypto-details');
+      if (res.data) {
+        setCryptoConfig(res.data);
+      }
+    } catch (err) {
+      console.error('Failed to fetch crypto config:', err);
+    }
+  }, []);
+
   // Fetch initial data based on active tab
   useEffect(() => {
     if (!user || user.role !== 'ADMIN') return;
@@ -217,7 +236,10 @@ export default function AdminPage() {
       fetchContactSetting();
       fetchCardSetting();
     }
-  }, [activeTab, user, fetchStats, fetchUsers, fetchReceipts, fetchCoupons, fetchPricesSetting, fetchExchangeRateSetting, fetchContactSetting, fetchCardSetting]);
+    if (activeTab === 'crypto') {
+      fetchCryptoSetting();
+    }
+  }, [activeTab, user, fetchStats, fetchUsers, fetchReceipts, fetchCoupons, fetchPricesSetting, fetchExchangeRateSetting, fetchContactSetting, fetchCardSetting, fetchCryptoSetting]);
 
   // Actions
   const handleVerifyReceipt = async (id: string, status: 'APPROVED' | 'REJECTED', inlineReason?: string) => {
@@ -331,6 +353,19 @@ export default function AdminPage() {
     }
   };
 
+  const handleUpdateCryptoDetails = async () => {
+    setUpdatingCrypto(true);
+    try {
+      await api.put('/api/admin/settings/crypto-details', cryptoConfig);
+      notify.success('تنظیمات پرداخت رمزارز با موفقیت بروزرسانی شد');
+    } catch (err: any) {
+      console.error('Failed to update crypto config:', err);
+      notify.error(err.response?.data?.error || 'خطا در ذخیره‌سازی تنظیمات پرداخت رمزارز');
+    } finally {
+      setUpdatingCrypto(false);
+    }
+  };
+
   const handleManualPlanOverride = async () => {
     if (!selectedUserForPlan) return;
     const ok = await notify.confirm({
@@ -411,6 +446,13 @@ export default function AdminPage() {
         >
           <span className="material-symbols-outlined">contact_support</span>
           <span>اطلاعات تماس</span>
+        </button>
+        <button
+          className={`admin-tab-btn ${activeTab === 'crypto' ? 'active' : ''}`}
+          onClick={() => setActiveTab('crypto')}
+        >
+          <span className="material-symbols-outlined">currency_bitcoin</span>
+          <span>کیف پول رمزارز</span>
         </button>
       </div>
 
@@ -873,6 +915,115 @@ export default function AdminPage() {
               <button className="admin-btn" onClick={handleUpdateCardDetails}>ذخیره تغییرات کارت بانکی</button>
             </div>
           </div>
+        </div>
+      )}
+
+      {activeTab === 'crypto' && (
+        <div className="admin-panel-card">
+          <div className="card-header-actions">
+            <h3>تنظیمات کیف پول رمزارز</h3>
+          </div>
+          <p style={{ color: '#a0aec0', fontSize: '0.85rem', marginBottom: '20px' }}>
+            مشخصات آدرس‌های واریز تتر (USDT-TRC20) و ترون (TRX) و همچنین مبالغ دلاری مربوط به هر پلن اشتراکی را در این بخش مدیریت کنید.
+          </p>
+
+          <form onSubmit={(e) => { e.preventDefault(); handleUpdateCryptoDetails(); }} style={{ display: 'flex', flexDirection: 'column', gap: '20px', maxWidth: '600px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+              <label style={{ fontSize: '0.88rem', color: '#e2e2eb', fontWeight: 'bold' }}>آدرس واریز تتر USDT (TRC-20)</label>
+              <input
+                type="text"
+                placeholder="مثال: TYxxxxxx..."
+                style={{ background: '#0b0d19', border: '1px solid rgba(255,255,255,0.1)', padding: '12px', color: '#fff', borderRadius: '6px', fontSize: '0.9rem', direction: 'ltr' }}
+                value={cryptoConfig.usdtAddress}
+                onChange={(e) => setCryptoConfig({ ...cryptoConfig, usdtAddress: e.target.value })}
+              />
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+              <label style={{ fontSize: '0.88rem', color: '#e2e2eb', fontWeight: 'bold' }}>آدرس واریز ترون TRX</label>
+              <input
+                type="text"
+                placeholder="مثال: TYxxxxxx..."
+                style={{ background: '#0b0d19', border: '1px solid rgba(255,255,255,0.1)', padding: '12px', color: '#fff', borderRadius: '6px', fontSize: '0.9rem', direction: 'ltr' }}
+                value={cryptoConfig.trxAddress}
+                onChange={(e) => setCryptoConfig({ ...cryptoConfig, trxAddress: e.target.value })}
+              />
+            </div>
+
+            <div style={{ marginTop: '10px', paddingTop: '20px', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
+              <h4 style={{ fontSize: '1rem', color: '#61f9b1', marginBottom: '12px' }}>مبالغ دلاری پلن استاندارد (STANDARD)</h4>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                  <label style={{ fontSize: '0.85rem', color: '#a0aec0' }}>هزینه ماهانه (USDT / USD)</label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    style={{ background: '#0b0d19', border: '1px solid rgba(255,255,255,0.1)', padding: '12px', color: '#fff', borderRadius: '6px', fontSize: '0.9rem', direction: 'ltr' }}
+                    value={cryptoConfig.standard.monthlyUsd}
+                    onChange={(e) => setCryptoConfig({
+                      ...cryptoConfig,
+                      standard: { ...cryptoConfig.standard, monthlyUsd: parseFloat(e.target.value) || 0 }
+                    })}
+                  />
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                  <label style={{ fontSize: '0.85rem', color: '#a0aec0' }}>هزینه سالانه (USDT / USD)</label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    style={{ background: '#0b0d19', border: '1px solid rgba(255,255,255,0.1)', padding: '12px', color: '#fff', borderRadius: '6px', fontSize: '0.9rem', direction: 'ltr' }}
+                    value={cryptoConfig.standard.annualUsd}
+                    onChange={(e) => setCryptoConfig({
+                      ...cryptoConfig,
+                      standard: { ...cryptoConfig.standard, annualUsd: parseFloat(e.target.value) || 0 }
+                    })}
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div style={{ marginTop: '10px', paddingTop: '10px' }}>
+              <h4 style={{ fontSize: '1rem', color: '#61f9b1', marginBottom: '12px' }}>مبالغ دلاری پلن حرفه‌ای (PRO)</h4>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                  <label style={{ fontSize: '0.85rem', color: '#a0aec0' }}>هزینه ماهانه (USDT / USD)</label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    style={{ background: '#0b0d19', border: '1px solid rgba(255,255,255,0.1)', padding: '12px', color: '#fff', borderRadius: '6px', fontSize: '0.9rem', direction: 'ltr' }}
+                    value={cryptoConfig.pro.monthlyUsd}
+                    onChange={(e) => setCryptoConfig({
+                      ...cryptoConfig,
+                      pro: { ...cryptoConfig.pro, monthlyUsd: parseFloat(e.target.value) || 0 }
+                    })}
+                  />
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                  <label style={{ fontSize: '0.85rem', color: '#a0aec0' }}>هزینه سالانه (USDT / USD)</label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    style={{ background: '#0b0d19', border: '1px solid rgba(255,255,255,0.1)', padding: '12px', color: '#fff', borderRadius: '6px', fontSize: '0.9rem', direction: 'ltr' }}
+                    value={cryptoConfig.pro.annualUsd}
+                    onChange={(e) => setCryptoConfig({
+                      ...cryptoConfig,
+                      pro: { ...cryptoConfig.pro, annualUsd: parseFloat(e.target.value) || 0 }
+                    })}
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div style={{ marginTop: '15px' }}>
+              <button type="submit" className="admin-btn" disabled={updatingCrypto}>
+                {updatingCrypto ? 'در حال ذخیره‌سازی...' : 'ذخیره تنظیمات کیف پول رمزارز'}
+              </button>
+            </div>
+          </form>
         </div>
       )}
 

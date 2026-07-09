@@ -12,7 +12,7 @@ interface JournalEditorProps {
 
 export default function JournalEditor({ value, onChange, onSave, saveStatus }: JournalEditorProps) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const [showPreview, setShowPreview] = useState(false);
+  const [showPreview, setShowPreview] = useState(true);
   const { language } = useTranslation();
   const isEn = language === 'en';
 

@@ -440,4 +440,30 @@ router.put('/settings/exchange-rate', async (req: AuthRequest, res: Response) =>
   }
 });
 
+/**
+ * PUT /api/admin/settings/crypto-details
+ * Update crypto wallet addresses & plans pricing
+ */
+router.put('/settings/crypto-details', authenticate, async (req: AuthRequest, res: Response) => {
+  try {
+    const { usdtAddress, trxAddress, standard, pro } = req.body;
+
+    await prisma.systemSetting.upsert({
+      where: { key: 'CRYPTO_DETAILS' },
+      create: {
+        key: 'CRYPTO_DETAILS',
+        value: { usdtAddress, trxAddress, standard, pro },
+      },
+      update: {
+        value: { usdtAddress, trxAddress, standard, pro },
+      },
+    });
+
+    return res.status(200).json({ message: 'تنظیمات پرداخت رمزارز با موفقیت بروزرسانی شد' });
+  } catch (err: any) {
+    console.error('Admin update crypto details error:', err);
+    return res.status(500).json({ error: 'خطا در ذخیره‌سازی تنظیمات پرداخت رمزارز' });
+  }
+});
+
 export default router;

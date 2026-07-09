@@ -33,6 +33,7 @@ model User {
   userDiscounts    UserDiscount[]
   manualReceipts   ManualReceipt[]
   mistakeIncidents MistakeIncident[]
+  cryptoTransactions CryptoTransaction[]
 }
 
 model Account {
@@ -300,4 +301,26 @@ model Otp {
   used       Boolean  @default(false)
 
   @@index([phone])
+}
+
+model CryptoTransaction {
+  id           String            @id @default(uuid())
+  user_id      String
+  user         User              @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  tx_hash      String            @unique
+  coin         String
+  amount       Float
+  plan         Plan
+  period       String
+  status       CryptoTxStatus    @default(PENDING)
+  created_at   DateTime          @default(now())
+  updated_at   DateTime          @updatedAt
+
+  @@index([user_id])
+}
+
+enum CryptoTxStatus {
+  PENDING
+  COMPLETED
+  FAILED
 }

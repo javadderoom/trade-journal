@@ -3,6 +3,7 @@ import { prisma } from '../services/tradeSync';
 import { authenticate, AuthRequest } from '../middleware/auth';
 import { requestPayment, verifyPayment } from '../services/zarinpal';
 import { requestPaypingPayment, verifyPaypingPayment } from '../services/payping';
+import { verifyTronTransaction } from '../services/tron';
 import { Plan, SubscriptionStatus } from '@prisma/client';
 import multer from 'multer';
 import crypto from 'crypto';
@@ -413,6 +414,198 @@ router.post(
     }
   }
 );
+
+/**
+ * POST /api/payments/crypto/submit
+ * Submit and verify a crypto (USDT/TRX) blockchain transaction for package subscription
+ */
+router.post('/crypto/submit', authenticate, async (req: AuthRequest, res: Response) => {
+  try {
+    const userId = req.user!.userId;
+    const { txHash, coin, plan, period, discountCode } = req.body;
+
+    if (!txHash) {
+      return res.status(400).json({ error: 'کد تراکنش (TXID) ارسال نشده است' });
+    }
+
+    if (!coin || !['USDT', 'TRX'].includes(coin)) {
+      return res.status(400).json({ error: 'نوع ارز انتخابی معتبر نیست' });
+    }
+
+    if (!plan || !['STANDARD', 'PRO'].includes(plan)) {
+      return res.status(400).json({ error: 'پلن انتخابی معتبر نیست' });
+    }
+
+    if (!period || !['monthly', 'annual'].includes(period)) {
+      return res.status(400).json({ error: 'دوره زمانی معتبر نیست' });
+    }
+
+    const cleanHash = txHash.trim();
+
+    // 1. Double spend protection (must be unique txHash)
+    const existingTx = await prisma.cryptoTransaction.findUnique({
+      where: { tx_hash: cleanHash },
+    });
+
+    if (existingTx) {
+      return res.status(400).json({ error: 'این تراکنش قبلاً در سیستم ثبت شده است' });
+    }
+
+    // 2. Load settings for wallet addresses & base pricing (USD)
+    const setting = await prisma.systemSetting.findUnique({
+      where: { key: 'CRYPTO_DETAILS' },
+    });
+
+    const cryptoConfig = setting?.value as any || {
+      usdtAddress: 'TYTRX20USDTADDRESSxxxxxxxxxxxxxx',
+      trxAddress: 'TYTRXNATIVEADDRESSxxxxxxxxxxxxx',
+      standard: { monthlyUsd: 5.0, annualUsd: 45.0 },
+      pro: { monthlyUsd: 10.0, annualUsd: 90.0 }
+    };
+
+    // Calculate base plan price in USD
+    const planKey = plan.toLowerCase() === 'standard' ? 'standard' : 'pro';
+    const periodKey = period === 'annual' ? 'annualUsd' : 'monthlyUsd';
+    let expectedAmount = cryptoConfig[planKey][periodKey];
+
+    // 3. Compute discount if any
+    if (discountCode) {
+      const codeClean = String(discountCode).trim().toUpperCase();
+      const coupon = await prisma.discountCode.findUnique({
+        where: { code: codeClean },
+        include: { userDiscounts: { where: { user_id: userId } } },
+      });
+
+      if (coupon) {
+        const hasUsed = coupon.userDiscounts.length > 0;
+        const isExpired = new Date(coupon.expireDate).getTime() < Date.now();
+        const isLimitReached = coupon.usedCount >= coupon.maxUses;
+
+        let validCoupon = false;
+        if (hasUsed && coupon.isAccountBound) {
+          validCoupon = true;
+        } else if (!hasUsed && !isExpired && !isLimitReached) {
+          validCoupon = true;
+        }
+
+        if (validCoupon) {
+          expectedAmount = expectedAmount * (1 - coupon.discountPercent / 100);
+        }
+      }
+    }
+
+    // 4. Create pending transaction in db
+    const cryptoTx = await prisma.cryptoTransaction.create({
+      data: {
+        user_id: userId,
+        tx_hash: cleanHash,
+        coin,
+        amount: expectedAmount,
+        plan: plan as Plan,
+        period,
+        status: 'PENDING',
+      },
+    });
+
+    // 5. Query and verify the transaction in TRON blockchain
+    const verification = await verifyTronTransaction(cleanHash, coin, expectedAmount, {
+      usdtAddress: cryptoConfig.usdtAddress,
+      trxAddress: cryptoConfig.trxAddress,
+    });
+
+    if (!verification.isValid) {
+      await prisma.cryptoTransaction.update({
+        where: { id: cryptoTx.id },
+        data: { status: 'FAILED' },
+      });
+      return res.status(400).json({ error: verification.error || 'تراکنش در شبکه تایید نشد' });
+    }
+
+    // 6. Upgrades user plan and status in Prisma Transaction
+    const startDate = new Date();
+    const endDate = new Date();
+    if (period === 'monthly') {
+      endDate.setDate(startDate.getDate() + 30);
+    } else if (period === 'annual') {
+      endDate.setDate(startDate.getDate() + 365);
+    }
+
+    const result = await prisma.$transaction(async (tx) => {
+      // 6.1 Update crypto transaction state
+      await tx.cryptoTransaction.update({
+        where: { id: cryptoTx.id },
+        data: { status: 'COMPLETED', amount: verification.amount || expectedAmount },
+      });
+
+      // 6.2 Expire old subscriptions
+      await tx.subscription.updateMany({
+        where: { user_id: userId, status: 'ACTIVE' },
+        data: { status: 'EXPIRED' },
+      });
+
+      // 6.3 Create subscription
+      const subscription = await tx.subscription.create({
+        data: {
+          user_id: userId,
+          plan: plan as Plan,
+          status: 'ACTIVE',
+          start_date: startDate,
+          end_date: endDate,
+        },
+      });
+
+      // 6.4 Upgrade user
+      await tx.user.update({
+        where: { id: userId },
+        data: { plan: plan as Plan },
+      });
+
+      // 6.5 Increment discount count if used
+      if (discountCode) {
+        const codeClean = String(discountCode).trim().toUpperCase();
+        const codeRecord = await tx.discountCode.findUnique({
+          where: { code: codeClean },
+        });
+
+        if (codeRecord) {
+          await tx.discountCode.update({
+            where: { id: codeRecord.id },
+            data: { usedCount: { increment: 1 } },
+          });
+
+          await tx.userDiscount.upsert({
+            where: {
+              user_id_discount_id: {
+                user_id: userId,
+                discount_id: codeRecord.id,
+              },
+            },
+            create: {
+              user_id: userId,
+              discount_id: codeRecord.id,
+            },
+            update: {},
+          });
+        }
+      }
+
+      return subscription;
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: 'پرداخت رمزارز با موفقیت تایید شد و اشتراک شما فعال گردید.',
+      subscription: {
+        plan: result.plan,
+        end_date: result.end_date,
+      },
+    });
+
+  } catch (err: any) {
+    console.error('Crypto checkout submit error:', err);
+    return res.status(500).json({ error: 'خطا در ثبت و بررسی پرداخت رمزارز' });
+  }
+});
 
 /**
  * GET /api/payments/status
