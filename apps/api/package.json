@@ -6,7 +6,7 @@
     "dev": "ts-node src/server.ts",
     "build": "tsc",
     "start": "node dist/server.js",
-    "prisma:migrate": "prisma migrate dev --config=src/prisma/prisma.config.ts"
+    "prisma:migrate": "prisma migrate dev --config=prisma.config.js"
   },
   "prisma": {
     "schema": "src/prisma/schema.prisma"

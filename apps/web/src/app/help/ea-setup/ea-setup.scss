@@ -90,6 +90,7 @@
     color: #6366f1;
     text-decoration: none;
     background: linear-gradient(135deg, #6366f1, #a855f7);
+    background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
   }
@@ -182,6 +183,7 @@
         margin-bottom: 6px;
         color: #ffffff;
       }
+
       p {
         font-size: 0.85rem;
         color: #64748b;
@@ -361,7 +363,8 @@
   margin-bottom: 16px;
   font-size: 0.85rem;
 
-  th, td {
+  th,
+  td {
     padding: 12px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
   }

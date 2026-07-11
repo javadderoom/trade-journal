@@ -1,12 +1,7 @@
 {
   "apps/api/package.json": {
-    "mtime": 1783793994.036858,
-    "ast_hash": "b9edf3c3a0d0323fedc19395a669b3f6",
-    "semantic_hash": ""
-  },
-  "apps/api/src/prisma/prisma.config.ts": {
-    "mtime": 1781718425.3328793,
-    "ast_hash": "940f487e0c481a72d17c60c826d8f34b",
+    "mtime": 1783803296.698164,
+    "ast_hash": "c07d2a54acf3c8630d14ba84738489f5",
     "semantic_hash": ""
   },
   "apps/api/src/routes/tradeSync.ts": {
@@ -1182,6 +1177,11 @@
   "apps/api/src/prisma/migrations/20260711190303_add_checkout_sessions/migration.sql": {
     "mtime": 1783796583.5627532,
     "ast_hash": "759fe4e580181731362945a54c09b6ac",
+    "semantic_hash": ""
+  },
+  "apps/api/prisma.config.js": {
+    "mtime": 1783803289.4031136,
+    "ast_hash": "ed7f37b905fce835f3144c25975b84d8",
     "semantic_hash": ""
   }
 }

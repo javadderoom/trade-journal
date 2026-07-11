@@ -18,4 +18,4 @@ COPY --from=builder /app/package.json /app/package-lock.json ./
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/apps/api ./apps/api
 EXPOSE 3000
-CMD ["sh", "-c", "npx prisma migrate deploy --schema=apps/api/src/prisma/schema.prisma --config=apps/api/src/prisma/prisma.config.ts && node apps/api/dist/server.js"]
+CMD ["sh", "-c", "for i in 1 2 3 4 5 6 7 8 9 10; do npx prisma migrate deploy --schema=apps/api/src/prisma/schema.prisma --config=apps/api/prisma.config.js && break || (echo 'Migration failed, retrying in 3s...' && sleep 3); done && node apps/api/dist/server.js"]
