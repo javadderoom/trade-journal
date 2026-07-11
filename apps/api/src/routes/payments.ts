@@ -214,6 +214,19 @@ router.post('/checkout', authenticate, async (req: AuthRequest, res: Response) =
       { email: user.email, phone: user.phone || undefined }
     );
 
+    // Save checkout session for server-side verification integrity
+    await prisma.checkoutSession.create({
+      data: {
+        gateway: 'zarinpal',
+        authority,
+        user_id: userId,
+        plan: plan as Plan,
+        period,
+        amount: price,
+        discountCode: discountCode || null,
+      },
+    });
+
     return res.status(200).json({ authority, redirectUrl });
   } catch (err: any) {
     console.error('Checkout error:', err);
@@ -228,9 +241,9 @@ router.post('/checkout', authenticate, async (req: AuthRequest, res: Response) =
 router.post('/verify', authenticate, async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user!.userId;
-    const { authority, status, amount, plan, period, discountCode } = req.body;
+    const { authority, status } = req.body;
 
-    if (!authority || !status || !amount || !plan || !period) {
+    if (!authority || !status) {
       return res.status(400).json({ error: 'اطلاعات تایید پرداخت نامعتبر است' });
     }
 
@@ -238,23 +251,47 @@ router.post('/verify', authenticate, async (req: AuthRequest, res: Response) => 
       return res.status(400).json({ error: 'پرداخت توسط کاربر لغو شده یا ناموفق بوده است' });
     }
 
-    const verification = await verifyPayment(Number(amount), authority);
+    // 1. Fetch matching checkout session from database
+    const session = await prisma.checkoutSession.findUnique({
+      where: { authority },
+    });
+
+    if (!session) {
+      return res.status(404).json({ error: 'جلسه پرداخت یافت نشد یا منقضی شده است' });
+    }
+
+    if (session.user_id !== userId) {
+      return res.status(403).json({ error: 'عدم تطابق کاربر جلسه پرداخت' });
+    }
+
+    // 2. Verify payment using the stored amount
+    const verification = await verifyPayment(Number(session.amount), authority);
 
     if (!verification.success) {
       return res.status(400).json({ error: verification.message });
     }
 
+    // Use values from database session record
+    const finalPlan = session.plan;
+    const finalPeriod = session.period;
+    const finalDiscountCode = session.discountCode;
+
     // Determine end date based on billing period
     const startDate = new Date();
     const endDate = new Date();
-    if (period === 'monthly') {
+    if (finalPeriod === 'monthly') {
       endDate.setDate(startDate.getDate() + 30);
-    } else if (period === 'annual') {
+    } else if (finalPeriod === 'annual') {
       endDate.setDate(startDate.getDate() + 365);
     }
 
     // Start a Prisma transaction to update both user plan, create subscription, and record discount
     const result = await prisma.$transaction(async (tx) => {
+      // Delete the checkout session so it cannot be reused
+      await tx.checkoutSession.delete({
+        where: { id: session.id },
+      });
+
       // 1. Expire any existing active subscriptions for this user
       await tx.subscription.updateMany({
         where: { user_id: userId, status: 'ACTIVE' },
@@ -265,7 +302,7 @@ router.post('/verify', authenticate, async (req: AuthRequest, res: Response) => 
       const subscription = await tx.subscription.create({
         data: {
           user_id: userId,
-          plan: plan as Plan,
+          plan: finalPlan,
           status: 'ACTIVE',
           start_date: startDate,
           end_date: endDate,
@@ -275,12 +312,12 @@ router.post('/verify', authenticate, async (req: AuthRequest, res: Response) => 
       // 3. Update the user plan
       await tx.user.update({
         where: { id: userId },
-        data: { plan: plan as Plan },
+        data: { plan: finalPlan },
       });
 
       // 4. Record discount code usage if applicable
-      if (discountCode) {
-        const codeClean = String(discountCode).trim().toUpperCase();
+      if (finalDiscountCode) {
+        const codeClean = String(finalDiscountCode).trim().toUpperCase();
         const codeRecord = await tx.discountCode.findUnique({
           where: { code: codeClean },
         });
@@ -882,6 +919,19 @@ router.post('/payping/checkout', authenticate, async (req: AuthRequest, res: Res
       { email: user.email, phone: user.phone || undefined }
     );
 
+    // Save checkout session for server-side verification integrity
+    await prisma.checkoutSession.create({
+      data: {
+        gateway: 'payping',
+        authority: code, // PayPing uses 'code' as authority/session ID
+        user_id: userId,
+        plan: plan as Plan,
+        period,
+        amount: price,
+        discountCode: discountCode || null,
+      },
+    });
+
     return res.status(200).json({ code, redirectUrl });
   } catch (err: any) {
     console.error('PayPing checkout error:', err);
@@ -896,28 +946,52 @@ router.post('/payping/checkout', authenticate, async (req: AuthRequest, res: Res
 router.post('/payping/verify', authenticate, async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user!.userId;
-    const { refid, code, amount, plan, period, discountCode } = req.body;
-    console.log('[PayPing Verify Route] Received Body:', { refid, code, amount, plan, period, discountCode });
+    const { refid, code } = req.body;
+    console.log('[PayPing Verify Route] Received Body:', { refid, code });
 
-    if (!refid || !amount || !plan || !period) {
+    if (!refid || !code) {
       return res.status(400).json({ error: 'اطلاعات تایید پرداخت نامعتبر است' });
     }
 
-    const verification = await verifyPaypingPayment(Number(amount), code || '', Number(refid));
+    // 1. Fetch matching checkout session from database
+    const session = await prisma.checkoutSession.findUnique({
+      where: { authority: code },
+    });
+
+    if (!session) {
+      return res.status(404).json({ error: 'جلسه پرداخت یافت نشد یا منقضی شده است' });
+    }
+
+    if (session.user_id !== userId) {
+      return res.status(403).json({ error: 'عدم تطابق کاربر جلسه پرداخت' });
+    }
+
+    // 2. Verify payment using the stored amount
+    const verification = await verifyPaypingPayment(Number(session.amount), code, Number(refid));
 
     if (!verification.success) {
       return res.status(400).json({ error: verification.message });
     }
 
+    // Use values from database session record
+    const finalPlan = session.plan;
+    const finalPeriod = session.period;
+    const finalDiscountCode = session.discountCode;
+
     const startDate = new Date();
     const endDate = new Date();
-    if (period === 'monthly') {
+    if (finalPeriod === 'monthly') {
       endDate.setDate(startDate.getDate() + 30);
-    } else if (period === 'annual') {
+    } else if (finalPeriod === 'annual') {
       endDate.setDate(startDate.getDate() + 365);
     }
 
     const result = await prisma.$transaction(async (tx) => {
+      // Delete the checkout session so it cannot be reused
+      await tx.checkoutSession.delete({
+        where: { id: session.id },
+      });
+
       await tx.subscription.updateMany({
         where: { user_id: userId, status: 'ACTIVE' },
         data: { status: 'EXPIRED' },
@@ -926,7 +1000,7 @@ router.post('/payping/verify', authenticate, async (req: AuthRequest, res: Respo
       const subscription = await tx.subscription.create({
         data: {
           user_id: userId,
-          plan: plan as Plan,
+          plan: finalPlan,
           status: 'ACTIVE',
           start_date: startDate,
           end_date: endDate,
@@ -935,11 +1009,11 @@ router.post('/payping/verify', authenticate, async (req: AuthRequest, res: Respo
 
       await tx.user.update({
         where: { id: userId },
-        data: { plan: plan as Plan },
+        data: { plan: finalPlan },
       });
 
-      if (discountCode) {
-        const codeClean = String(discountCode).trim().toUpperCase();
+      if (finalDiscountCode) {
+        const codeClean = String(finalDiscountCode).trim().toUpperCase();
         const codeRecord = await tx.discountCode.findUnique({
           where: { code: codeClean },
         });

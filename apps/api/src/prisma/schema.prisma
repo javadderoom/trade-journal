@@ -34,6 +34,7 @@ model User {
   manualReceipts   ManualReceipt[]
   mistakeIncidents MistakeIncident[]
   cryptoTransactions CryptoTransaction[]
+  checkoutSessions CheckoutSession[]
 }
 
 model Account {
@@ -343,3 +344,20 @@ enum CryptoTxStatus {
   COMPLETED
   FAILED
 }
+
+model CheckoutSession {
+  id            String   @id @default(uuid())
+  gateway       String   // "zarinpal" or "payping"
+  authority     String   @unique // ZarinPal authority string OR PayPing session code
+  user_id       String
+  user          User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  plan          Plan
+  period        String
+  amount        Float
+  discountCode  String?
+  created_at    DateTime @default(now())
+
+  @@index([user_id])
+  @@index([authority])
+}
+

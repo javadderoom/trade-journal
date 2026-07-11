@@ -950,8 +950,8 @@
     "semantic_hash": ""
   },
   "apps/api/src/routes/payments.ts": {
-    "mtime": 1783632301.2984502,
-    "ast_hash": "6c35105022206b9b095d093b82c51414",
+    "mtime": 1783796638.536494,
+    "ast_hash": "389dc1b2572e348118cd1fc51bf342ff",
     "semantic_hash": ""
   },
   "apps/api/src/services/sms.ts": {
@@ -1177,6 +1177,11 @@
   "apps/web/src/components/modals/ConnectExchangeModal.tsx": {
     "mtime": 1783794119.7692845,
     "ast_hash": "37041626db502d7e9a8a33d0a33cf77f",
+    "semantic_hash": ""
+  },
+  "apps/api/src/prisma/migrations/20260711190303_add_checkout_sessions/migration.sql": {
+    "mtime": 1783796583.5627532,
+    "ast_hash": "759fe4e580181731362945a54c09b6ac",
     "semantic_hash": ""
   }
 }
