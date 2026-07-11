@@ -910,9 +910,29 @@ export default function SettingsPage() {
                       <span className="material-symbols-outlined" style={{ fontSize: '1.2rem' }}>download</span>
                       <span>{t('settings.downloadEA')}</span>
                     </a>
+
+                    <a
+                      href="/downloads/TradeKav_EA.ex4"
+                      download="TradeKav_EA.ex4"
+                      className="settings-save-btn"
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        textDecoration: 'none',
+                        fontSize: '0.85rem',
+                        padding: '10px 16px',
+                        backgroundColor: '#1e293b',
+                        border: '1px solid #334155',
+                        color: '#cbd5e1'
+                      }}
+                    >
+                      <span className="material-symbols-outlined" style={{ fontSize: '1.2rem' }}>download</span>
+                      <span>{t('settings.downloadEAMT4')}</span>
+                    </a>
                     
                     <a
-                      href={language === 'fa' ? 'https://tradekav.ir/help/ea-setup' : 'https://tradekav.ir/en/help/ea-setup'}
+                      href="/help/ea-setup"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="settings-cancel-btn"

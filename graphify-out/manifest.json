@@ -325,8 +325,8 @@
     "semantic_hash": ""
   },
   "apps/web/src/app/settings/page.tsx": {
-    "mtime": 1783634366.4981852,
-    "ast_hash": "944a1bb68bc9d36ebb5b8f7d4a025b73",
+    "mtime": 1783792144.980977,
+    "ast_hash": "7ffc75f1620375414e7cf64e5894c474",
     "semantic_hash": ""
   },
   "apps/web/src/components/layout/AppLayout.tsx": {
@@ -975,8 +975,8 @@
     "semantic_hash": ""
   },
   "apps/web/src/app/help/ea-setup/page.tsx": {
-    "mtime": 1783531198.9903336,
-    "ast_hash": "8fb9430143943fc91f4c995a0ffbb141",
+    "mtime": 1783792174.9213738,
+    "ast_hash": "aafe73182309f2a56c1371d79387a414",
     "semantic_hash": ""
   },
   "apps/web/src/app/namad/page.tsx": {
@@ -1115,13 +1115,13 @@
     "semantic_hash": ""
   },
   "apps/web/src/locales/en.json": {
-    "mtime": 1783548023.180427,
-    "ast_hash": "cd4c2307a8d33129d685f2c9eb855e92",
+    "mtime": 1783792130.7137623,
+    "ast_hash": "bc11785922aac3c23af97863992e0761",
     "semantic_hash": ""
   },
   "apps/web/src/locales/fa.json": {
-    "mtime": 1783548011.8488479,
-    "ast_hash": "9899f7fba97c1eb3b5dba808dc76a4a9",
+    "mtime": 1783792108.7345128,
+    "ast_hash": "d7b9ab9c73748f472e3eec7655ff9f9b",
     "semantic_hash": ""
   },
   ".agents/AGENTS.md": {

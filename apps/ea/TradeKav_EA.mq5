@@ -139,11 +139,15 @@ void SyncOpenPositions()
             pips = (openPrice - curPrice) / pipSize;
       }
 
-      // Calculate live R-multiple
+      // Calculate live R-multiple (price-based)
       double entryRisk = MathAbs(openPrice - sl);
       double rMultiple = 0;
       if(entryRisk > 0)
-         rMultiple = (profit + commission + swap) / entryRisk;
+      {
+         double exitPrice = curPrice;
+         double reward = (direction == "BUY") ? (exitPrice - openPrice) : (openPrice - exitPrice);
+         rMultiple = reward / entryRisk;
+      }
 
       // Build JSON — closeTime and closePrice are null (open trade marker)
       if(count > 0) jsonPayload += ",";
@@ -292,11 +296,14 @@ void SyncTrades()
             pips = (openPrice - dealPrice) / pipSize;
       }
       
-      // Calculate R-multiple using total commission
+      // Calculate R-multiple (price-based)
       double entryRisk = MathAbs(openPrice - sl);
       double rMultiple = 0;
       if(entryRisk > 0)
-         rMultiple = (profit + totalCommission + swap) / entryRisk;
+      {
+         double reward = (direction == "BUY") ? (dealPrice - openPrice) : (openPrice - dealPrice);
+         rMultiple = reward / entryRisk;
+      }
 
       // Use the position ID as the ticket for closed trades so it matches
       // the open position ticket that was previously synced

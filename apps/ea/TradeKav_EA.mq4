@@ -150,11 +150,15 @@ void SyncOpenPositions()
             pips = (openPrice - curPrice) / pipSize;
       }
 
-      // R-multiple
+      // R-multiple (price-based)
       double entryRisk = MathAbs(openPrice - sl);
       double rMultiple = 0;
       if (entryRisk > 0)
-         rMultiple = (profit + commission + swap) / (entryRisk / 0.0001); // approximate
+      {
+         double exitPrice = curPrice;
+         double reward = (direction == "BUY") ? (exitPrice - openPrice) : (openPrice - exitPrice);
+         rMultiple = reward / entryRisk;
+      }
 
       if (count > 0) jsonPayload += ",";
 
@@ -199,12 +203,6 @@ void SyncClosedTrades()
    else
       fromDate = g_lastSyncTime > 0 ? g_lastSyncTime - 86400 : TimeCurrent() - 86400;
 
-   if (!HistorySelect(fromDate, TimeCurrent()))
-   {
-      Print("Failed to select trade history");
-      return;
-   }
-
    int total = OrdersHistoryTotal();
    if (total == 0) return;
 
@@ -222,6 +220,10 @@ void SyncClosedTrades()
       // Skip already synced
       if (ticket <= g_lastTicket) continue;
 
+      // Filter by close time
+      datetime closeTime = OrderCloseTime();
+      if (closeTime < fromDate) continue;
+
       int type = (int)OrderType();
       if (type != OP_BUY && type != OP_SELL) continue;
 
@@ -236,7 +238,6 @@ void SyncClosedTrades()
       double commission = OrderCommission();
       double swap      = OrderSwap();
       datetime openTime = OrderOpenTime();
-      datetime closeTime = OrderCloseTime();
 
       datetime utcOpenTime = openTime - timezoneOffset;
       datetime utcCloseTime = closeTime - timezoneOffset;
@@ -257,11 +258,14 @@ void SyncClosedTrades()
             pips = (openPrice - closePrice) / pipSize;
       }
 
-      // R-multiple
+      // R-multiple (price-based)
       double entryRisk = MathAbs(openPrice - sl);
       double rMultiple = 0;
       if (entryRisk > 0)
-         rMultiple = (profit + commission + swap) / (entryRisk / 0.0001);
+      {
+         double reward = (direction == "BUY") ? (closePrice - openPrice) : (openPrice - closePrice);
+         rMultiple = reward / entryRisk;
+      }
 
       if (newTrades > 0) jsonPayload += ",";
 

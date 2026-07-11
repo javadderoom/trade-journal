@@ -3,10 +3,50 @@
   background-color: #0b0f19;
   color: #e2e8f0;
   font-family: 'Vazirmatn', sans-serif;
-  direction: rtl;
   position: relative;
   overflow: hidden;
   padding: 0 24px;
+
+  &[dir="rtl"] {
+    direction: rtl;
+    text-align: right;
+
+    .ea-download-card {
+      text-align: right;
+    }
+
+    .ea-steps-section h2 {
+      border-right: 4px solid #6366f1;
+      padding-right: 12px;
+    }
+
+    .ea-table {
+      text-align: right;
+    }
+  }
+
+  &[dir="ltr"] {
+    direction: ltr;
+    text-align: left;
+    font-family: system-ui, -apple-system, sans-serif;
+
+    .ea-back-btn .material-symbols-outlined {
+      transform: scaleX(-1);
+    }
+
+    .ea-download-card {
+      text-align: left;
+    }
+
+    .ea-steps-section h2 {
+      border-left: 4px solid #6366f1;
+      padding-left: 12px;
+    }
+
+    .ea-table {
+      text-align: left;
+    }
+  }
 }
 
 // Glowing background effects
@@ -127,7 +167,6 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    text-align: right;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
 
     @media (max-width: 600px) {
@@ -181,8 +220,6 @@
     font-size: 1.5rem;
     font-weight: 800;
     margin-bottom: 32px;
-    border-right: 4px solid #6366f1;
-    padding-right: 12px;
     color: #ffffff;
   }
 
@@ -322,7 +359,6 @@
   border-collapse: collapse;
   margin-top: 16px;
   margin-bottom: 16px;
-  text-align: right;
   font-size: 0.85rem;
 
   th, td {
