@@ -13,6 +13,8 @@ import settingsRouter from './routes/settings';
 import paymentsRouter from './routes/payments';
 import adminRouter from './routes/admin';
 import tradeExportRouter from './routes/tradeExport';
+import cryptoSyncRouter from './routes/cryptoSync';
+import { syncExchangeTrades } from './services/ccxtSync';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -50,6 +52,7 @@ app.use('/api/dashboard', dashboardRouter);
 app.use('/api/settings', settingsRouter);
 app.use('/api/payments', paymentsRouter);
 app.use('/api/admin', adminRouter);
+app.use('/api/crypto', cryptoSyncRouter);
 
 // Health check
 app.get('/api/health', (_req, res) => {
@@ -65,6 +68,29 @@ cron.schedule('0 3 * * *', async () => {
     console.log(`[Cron] Cleared ${deleted.count} expired refresh tokens.`);
   } catch (err) {
     console.error('[Cron] Failed to clean up expired refresh tokens:', err);
+  }
+});
+
+// Cron job: Sync exchange connections every 30 minutes
+cron.schedule('*/30 * * * *', async () => {
+  try {
+    console.log('[Cron] Starting exchange connections sync...');
+    const activeConnections = await prisma.exchangeConnection.findMany({
+      where: { is_active: true },
+      include: { account: true }
+    });
+
+    for (const conn of activeConnections) {
+      try {
+        console.log(`[Cron] Syncing trades for account ${conn.account_id} (${conn.exchange_id})...`);
+        const syncRes = await syncExchangeTrades(conn.account.user_id, conn.account_id);
+        console.log(`[Cron] Sync finished for account ${conn.account_id}: created ${syncRes.created}, skipped ${syncRes.skipped}`);
+      } catch (syncErr: any) {
+        console.error(`[Cron] Failed to sync exchange connection for account ${conn.account_id}:`, syncErr);
+      }
+    }
+  } catch (err) {
+    console.error('[Cron] Exchange sync scheduler failed:', err);
   }
 });
 

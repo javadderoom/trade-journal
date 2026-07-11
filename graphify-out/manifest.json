@@ -1,7 +1,7 @@
 {
   "apps/api/package.json": {
-    "mtime": 1783531198.9555604,
-    "ast_hash": "528913ba8da2b726d0d9a5b361c8152e",
+    "mtime": 1783793994.036858,
+    "ast_hash": "b9edf3c3a0d0323fedc19395a669b3f6",
     "semantic_hash": ""
   },
   "apps/api/src/prisma/prisma.config.ts": {
@@ -15,8 +15,8 @@
     "semantic_hash": ""
   },
   "apps/api/src/server.ts": {
-    "mtime": 1783531198.9555604,
-    "ast_hash": "14e2a7d100f55c19721579cdffbe6d19",
+    "mtime": 1783794093.4450967,
+    "ast_hash": "d048d1d8ea13db123eb64e89c919ff4d",
     "semantic_hash": ""
   },
   "apps/api/src/services/mt4Parser.ts": {
@@ -325,8 +325,8 @@
     "semantic_hash": ""
   },
   "apps/web/src/app/settings/page.tsx": {
-    "mtime": 1783792144.980977,
-    "ast_hash": "7ffc75f1620375414e7cf64e5894c474",
+    "mtime": 1783794276.9725246,
+    "ast_hash": "87579db731e8d82f54595bf13162fef3",
     "semantic_hash": ""
   },
   "apps/web/src/components/layout/AppLayout.tsx": {
@@ -920,8 +920,8 @@
     "semantic_hash": ""
   },
   "apps/api/src/middleware/checkPlanLimits.ts": {
-    "mtime": 1783531198.9555604,
-    "ast_hash": "b93b1423162abbb77fa3da48ae139b48",
+    "mtime": 1783794061.3053863,
+    "ast_hash": "fd925a4ecdfae2aa90dfc8f573e99e85",
     "semantic_hash": ""
   },
   "apps/api/src/prisma/migrations/20260628093231_add_discount_codes_and_sync_limit/migration.sql": {
@@ -1147,6 +1147,36 @@
   "apps/api/src/services/tron.ts": {
     "mtime": 1783788744.3275626,
     "ast_hash": "3b12b394019572ff938dbf98ffc5c9bf",
+    "semantic_hash": ""
+  },
+  "apps/api/src/lib/encryption.ts": {
+    "mtime": 1783793613.083112,
+    "ast_hash": "a817e7db5a4d464cf9140c98e6d01631",
+    "semantic_hash": ""
+  },
+  "apps/api/src/prisma/migrations/20260711181312_add_exchange_connection/migration.sql": {
+    "mtime": 1783793592.4035704,
+    "ast_hash": "7d4b8166539d117c431a4569cba01a74",
+    "semantic_hash": ""
+  },
+  "apps/api/src/prisma/migrations/20260711181823_add_crypto_api_source/migration.sql": {
+    "mtime": 1783793903.837039,
+    "ast_hash": "4665aad0494d6e2e4ba91c2a120d42d5",
+    "semantic_hash": ""
+  },
+  "apps/api/src/routes/cryptoSync.ts": {
+    "mtime": 1783794340.4108937,
+    "ast_hash": "435eb0711721905757494aab687c7ba6",
+    "semantic_hash": ""
+  },
+  "apps/api/src/services/ccxtSync.ts": {
+    "mtime": 1783794359.6999152,
+    "ast_hash": "72f430c946deda3b536e261f57505c66",
+    "semantic_hash": ""
+  },
+  "apps/web/src/components/modals/ConnectExchangeModal.tsx": {
+    "mtime": 1783794119.7692845,
+    "ast_hash": "37041626db502d7e9a8a33d0a33cf77f",
     "semantic_hash": ""
   }
 }

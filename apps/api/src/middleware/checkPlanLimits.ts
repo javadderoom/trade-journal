@@ -224,3 +224,39 @@ export const checkSyncPermission = async (
     return res.status(500).json({ error: 'خطای داخلی سرور در بررسی دسترسی همگام‌سازی' });
   }
 };
+
+/**
+ * Middleware to restrict Crypto Exchange (CCXT) sync access.
+ */
+export const checkCryptoPermission = async (
+  req: AuthRequest,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const userId = req.user?.userId;
+    if (!userId) {
+      return res.status(401).json({ error: 'کاربر احراز هویت نشده است' });
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { plan: true },
+    });
+
+    if (!user) {
+      return res.status(404).json({ error: 'کاربر یافت نشد' });
+    }
+
+    if (user.plan === 'FREE') {
+      return res.status(403).json({
+        error: 'قابلیت اتصال به صرافی‌های کریپتو در پلن رایگان در دسترس نیست. لطفا پلن خود را ارتقا دهید.',
+      });
+    }
+
+    next();
+  } catch (err: any) {
+    console.error('checkCryptoPermission middleware error:', err);
+    return res.status(500).json({ error: 'خطای داخلی سرور در بررسی دسترسی اتصال به صرافی' });
+  }
+};

@@ -7,6 +7,7 @@ import { api } from '../../lib/api';
 import { toPersianDigits } from '../../utils/farsi';
 import { notify } from '../../lib/notify';
 import { useTranslation } from '../../store/useAppStore';
+import ConnectExchangeModal from '../../components/modals/ConnectExchangeModal';
 import './settings.scss';
 
 type Tab = 'profile' | 'accounts' | 'subscription' | 'security';
@@ -180,6 +181,8 @@ export default function SettingsPage() {
   const [newTokenName, setNewTokenName] = useState('');
   const [showTokenModal, setShowTokenModal] = useState<{ token: string; name: string } | null>(null);
   const [expandedTokenAccountId, setExpandedTokenAccountId] = useState<string | null>(null);
+  const [isConnectExchangeOpen, setIsConnectExchangeOpen] = useState(false);
+  const [syncingAccountId, setSyncingAccountId] = useState<string | null>(null);
 
   // ─── Security state ──────────────────────────────────────────────────────
   const [passwordForm, setPasswordForm] = useState({ currentPassword: '', newPassword: '', confirmPassword: '' });
@@ -274,6 +277,42 @@ export default function SettingsPage() {
   }, []);
 
   useEffect(() => { fetchSessions(); }, [fetchSessions]);
+
+  const handleSyncExchange = async (accountId: string) => {
+    setSyncingAccountId(accountId);
+    try {
+      const res = await api.post(`/api/crypto/sync/${accountId}`);
+      notify.success(
+        language === 'fa'
+          ? `همگام‌سازی موفقیت‌آمیز بود! ${toPersianDigits(res.data.created)} معامله اضافه شد.`
+          : `Sync completed! ${res.data.created} trades imported.`
+      );
+      fetchAccounts(); // refresh counts
+    } catch (err: any) {
+      notify.error(err.response?.data?.error || (language === 'fa' ? 'خطا در همگام‌سازی صرافی' : 'Failed to sync exchange'));
+    } finally {
+      setSyncingAccountId(null);
+    }
+  };
+
+  const handleDisconnectExchange = async (accountId: string) => {
+    const ok = await notify.confirm({
+      title: language === 'fa' ? 'قطع اتصال صرافی' : 'Disconnect Exchange API',
+      message: language === 'fa'
+        ? 'آیا از قطع اتصال کلیدهای API صرافی مطمئن هستید؟ معاملات ثبت‌شده شما حفظ می‌شوند اما دیگر همگام‌سازی خودکار انجام نخواهد شد.'
+        : 'Are you sure you want to disconnect this exchange API? Existing trades will be kept, but automatic sync will stop.',
+      danger: true,
+      confirmLabel: language === 'fa' ? 'قطع اتصال' : 'Disconnect',
+    });
+    if (!ok) return;
+    try {
+      await api.delete(`/api/crypto/disconnect/${accountId}`);
+      fetchAccounts();
+      notify.success(language === 'fa' ? 'اتصال صرافی با موفقیت قطع شد.' : 'Exchange disconnected successfully.');
+    } catch (err: any) {
+      notify.error(err.response?.data?.error || (language === 'fa' ? 'خطا در قطع اتصال صرافی' : 'Failed to disconnect exchange'));
+    }
+  };
 
   // ─── Handlers ──────────────────────────────────────────────────────────────
   const handleProfileSave = async () => {
@@ -747,22 +786,53 @@ export default function SettingsPage() {
                       </div>
                     </div>
                     <div className="broker-card-actions">
-                      <button className="broker-action-btn" onClick={() => router.push('/trades')}>{t('settings.newImport')}</button>
-                      <button className="broker-action-btn" onClick={() => {
-                        setEditingId(acc.id);
-                        setEditAccount({
-                          broker_name: acc.broker_name || '',
-                          account_number: acc.account_number || '',
-                          currency: acc.currency,
-                        });
-                      }}>{t('settings.edit')}</button>
-                      <button 
-                        className={`broker-action-btn ${expandedTokenAccountId === acc.id ? 'active' : ''}`} 
-                        onClick={() => handleToggleTokens(acc.id)}
-                      >
-                        {t('settings.apiKeys')}
-                      </button>
-                      <button className="broker-action-btn danger" onClick={() => handleDeleteAccount(acc.id, acc.trade_count)}>{t('settings.delete')}</button>
+                      {acc.account_number?.includes('API Connection') ? (
+                        <>
+                          <button 
+                            className="broker-action-btn" 
+                            onClick={() => handleSyncExchange(acc.id)}
+                            disabled={syncingAccountId === acc.id}
+                          >
+                            {syncingAccountId === acc.id 
+                              ? (language === 'fa' ? 'در حال همگام‌سازی...' : 'Syncing...') 
+                              : (language === 'fa' ? 'همگام‌سازی صرافی' : 'Sync Exchange')}
+                          </button>
+                          {acc.account_number === 'API Connection' ? (
+                            <button 
+                              className="broker-action-btn danger" 
+                              onClick={() => handleDisconnectExchange(acc.id)}
+                            >
+                              {language === 'fa' ? 'قطع اتصال API' : 'Disconnect API'}
+                            </button>
+                          ) : (
+                            <button 
+                              className="broker-action-btn danger" 
+                              onClick={() => handleDeleteAccount(acc.id, acc.trade_count)}
+                            >
+                              {t('settings.delete')}
+                            </button>
+                          )}
+                        </>
+                      ) : (
+                        <>
+                          <button className="broker-action-btn" onClick={() => router.push('/trades')}>{t('settings.newImport')}</button>
+                          <button className="broker-action-btn" onClick={() => {
+                            setEditingId(acc.id);
+                            setEditAccount({
+                              broker_name: acc.broker_name || '',
+                              account_number: acc.account_number || '',
+                              currency: acc.currency,
+                            });
+                          }}>{t('settings.edit')}</button>
+                          <button 
+                            className={`broker-action-btn ${expandedTokenAccountId === acc.id ? 'active' : ''}`} 
+                            onClick={() => handleToggleTokens(acc.id)}
+                          >
+                            {t('settings.apiKeys')}
+                          </button>
+                          <button className="broker-action-btn danger" onClick={() => handleDeleteAccount(acc.id, acc.trade_count)}>{t('settings.delete')}</button>
+                        </>
+                      )}
                     </div>
 
                     {/* Expanded Tokens Sub-panel */}
@@ -860,10 +930,43 @@ export default function SettingsPage() {
                 </div>
               </div>
             ) : (
-              <button className="add-account-card" onClick={() => setShowAddAccount(true)}>
-                <span className="material-symbols-outlined">add</span>
-                <span>{t('settings.addBrokerAccount')}</span>
-              </button>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px', width: '100%' }}>
+                <button 
+                  className="add-account-card" 
+                  onClick={() => setShowAddAccount(true)}
+                  style={{ display: 'flex', flexDirection: 'column', height: '100px', justifyContent: 'center', gap: '8px' }}
+                >
+                  <span className="material-symbols-outlined">add</span>
+                  <span>{t('settings.addBrokerAccount')}</span>
+                </button>
+                <button 
+                  className="add-account-card" 
+                  onClick={() => {
+                    if (profile?.plan === 'FREE') {
+                      notify.error(
+                        language === 'fa' 
+                          ? 'قابلیت اتصال به صرافی در پلن رایگان در دسترس نیست. لطفاً اشتراک خود را ارتقا دهید.' 
+                          : 'Connecting crypto exchanges is not available in the Free plan. Please upgrade your subscription.'
+                      );
+                    } else {
+                      setIsConnectExchangeOpen(true);
+                    }
+                  }}
+                  style={{ 
+                    display: 'flex', 
+                    flexDirection: 'column', 
+                    height: '100px', 
+                    justifyContent: 'center', 
+                    gap: '8px',
+                    borderColor: 'rgba(59, 130, 246, 0.2)',
+                    background: 'rgba(59, 130, 246, 0.02)',
+                    color: '#60a5fa'
+                  }}
+                >
+                  <span className="material-symbols-outlined">currency_exchange</span>
+                  <span>{language === 'fa' ? 'اتصال صرافی کریپتو' : 'Connect Crypto Exchange'}</span>
+                </button>
+              </div>
             )}
 
             {/* MetaTrader EA Syncing Section */}
@@ -1689,6 +1792,13 @@ export default function SettingsPage() {
           </div>
         </div>
       )}
+
+      {/* Connect Exchange Modal */}
+      <ConnectExchangeModal
+        isOpen={isConnectExchangeOpen}
+        onClose={() => setIsConnectExchangeOpen(false)}
+        onSuccess={() => fetchAccounts()}
+      />
     </div>
   );
 }

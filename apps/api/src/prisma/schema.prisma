@@ -37,17 +37,18 @@ model User {
 }
 
 model Account {
-  id             String         @id @default(uuid())
-  user_id        String
-  user           User           @relation(fields: [user_id], references: [id])
-  broker_name    String?
-  account_number String?
-  currency       String         @default("USD")
-  created_at     DateTime       @default(now())
-  trades         Trade[]
-  importJobs     ImportJob[]
-  account_tokens AccountToken[]
-  last_sync_at   DateTime?
+  id                 String              @id @default(uuid())
+  user_id            String
+  user               User                @relation(fields: [user_id], references: [id])
+  broker_name        String?
+  account_number     String?
+  currency           String              @default("USD")
+  created_at         DateTime            @default(now())
+  trades             Trade[]
+  importJobs         ImportJob[]
+  account_tokens     AccountToken[]
+  last_sync_at       DateTime?
+  exchangeConnection ExchangeConnection?
 }
 
 model RefreshToken {
@@ -271,6 +272,7 @@ enum ImportSource {
   MT4_HTM
   MT5_CSV
   MT5_EA
+  CRYPTO_API
 }
 
 enum ImportStatus {
@@ -318,6 +320,23 @@ model CryptoTransaction {
 
   @@index([user_id])
 }
+
+model ExchangeConnection {
+  id            String    @id @default(uuid())
+  account_id    String    @unique
+  account       Account   @relation(fields: [account_id], references: [id], onDelete: Cascade)
+  exchange_id   String    // e.g. "binance", "nobitex"
+  api_key       String    // encrypted
+  api_secret    String    // encrypted
+  passphrase    String?   // encrypted (optional)
+  last_trade_id String?   // last synced trade ID
+  is_active     Boolean   @default(true)
+  created_at    DateTime  @default(now())
+  updated_at    DateTime  @updatedAt
+
+  @@index([account_id])
+}
+
 
 enum CryptoTxStatus {
   PENDING
