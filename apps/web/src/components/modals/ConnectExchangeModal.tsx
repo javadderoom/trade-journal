@@ -44,7 +44,7 @@ export default function ConnectExchangeModal({ isOpen, onClose, onSuccess }: Con
   // Fetch full exchange list from backend on mount
   useEffect(() => {
     if (isOpen) {
-      api.get('/crypto/exchanges')
+      api.get('/api/crypto/exchanges')
         .then(res => {
           if (res.data && Array.isArray(res.data.exchanges)) {
             // Sort exchanges, putting popular ones first
@@ -114,7 +114,7 @@ export default function ConnectExchangeModal({ isOpen, onClose, onSuccess }: Con
     setErrorMsg('');
 
     try {
-      await api.post('/crypto/connect', {
+      await api.post('/api/crypto/connect', {
         exchangeId: selectedExchange,
         apiKey,
         apiSecret,
@@ -152,29 +152,30 @@ export default function ConnectExchangeModal({ isOpen, onClose, onSuccess }: Con
   };
 
   return (
-    <div className="modal-overlay">
-      <div className="modal-container" style={{ maxWidth: '480px' }}>
+    <div className="lightbox-overlay" style={{ display: 'flex' }} onClick={onClose}>
+      <div className="manual-trade-modal connect-exchange-modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '480px' }}>
         <div className="modal-header">
-          <h2>{p.title}</h2>
+          <h3>{p.title}</h3>
           <button type="button" className="close-btn" onClick={onClose} disabled={isSubmitting}>
             <span className="material-symbols-outlined">close</span>
           </button>
         </div>
 
-        <form onSubmit={handleSubmit}>
-          <div className="modal-body" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            <p style={{ fontSize: '0.85rem', color: '#94a3b8', lineHeight: '1.6', margin: '0 0 8px 0' }}>
-              {p.desc}
-            </p>
+        <form onSubmit={handleSubmit} className="modal-form">
+          <p style={{ fontSize: '0.85rem', color: '#94a3b8', lineHeight: '1.6', margin: '0 0 8px 0' }}>
+            {p.desc}
+          </p>
 
-            {errorMsg && (
-              <div className="form-error-alert" style={{ margin: '0 0 8px 0' }}>
-                {errorMsg}
-              </div>
-            )}
+          {errorMsg && (
+            <div className="form-error-alert" style={{ margin: '0 0 8px 0' }}>
+              {errorMsg}
+            </div>
+          )}
 
-            {/* Searchable Exchange Dropdown */}
-            <div className="form-group" style={{ position: 'relative' }} ref={dropdownRef}>
+          <div className="form-columns">
+            <div className="form-column">
+              {/* Searchable Exchange Dropdown */}
+              <div className="form-group" style={{ position: 'relative' }} ref={dropdownRef}>
               <label className="form-label">{p.exchangeLabel}</label>
               
               <div style={{ position: 'relative' }}>
@@ -318,8 +319,9 @@ export default function ConnectExchangeModal({ isOpen, onClose, onSuccess }: Con
               </span>
             </div>
           </div>
+        </div>
 
-          <div className="modal-footer">
+        <div className="modal-footer">
             <button
               type="button"
               className="btn btn-secondary"

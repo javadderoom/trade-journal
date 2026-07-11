@@ -109,10 +109,10 @@ export default function ExportModal({
   };
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="export-modal-container" onClick={(e) => e.stopPropagation()}>
+    <div className="lightbox-overlay" style={{ display: 'flex' }} onClick={onClose}>
+      <div className="manual-trade-modal export-modal-container" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
-          <h2>{p.title}</h2>
+          <h3>{p.title}</h3>
           <button className="close-btn" onClick={onClose}>
             <span className="material-symbols-outlined">close</span>
           </button>
