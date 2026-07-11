@@ -71,18 +71,44 @@ cron.schedule('0 3 * * *', async () => {
   }
 });
 
-// Cron job: Sync exchange connections every 30 minutes
-cron.schedule('*/30 * * * *', async () => {
+// Cron job: Sync exchange connections based on subscription plan rates
+// Pro: every 5 minutes, Standard: every 1 hour
+cron.schedule('*/5 * * * *', async () => {
   try {
     console.log('[Cron] Starting exchange connections sync...');
     const activeConnections = await prisma.exchangeConnection.findMany({
       where: { is_active: true },
-      include: { account: true }
+      include: {
+        account: {
+          include: {
+            user: true
+          }
+        }
+      }
     });
 
     for (const conn of activeConnections) {
       try {
-        console.log(`[Cron] Syncing trades for account ${conn.account_id} (${conn.exchange_id})...`);
+        const plan = conn.account.user.plan;
+
+        if (plan === 'FREE') {
+          // Skip FREE users in background sync
+          continue;
+        }
+
+        const lastSync = conn.account.last_sync_at;
+        const now = new Date();
+
+        if (plan === 'STANDARD') {
+          const oneHourAgo = new Date(now.getTime() - 55 * 60 * 1000); // 55 mins threshold for hourly standard sync
+          if (lastSync && lastSync > oneHourAgo) {
+            // Not enough time has elapsed for Standard plan users
+            continue;
+          }
+        }
+
+        // PRO users sync every 5 minutes (every cron run)
+        console.log(`[Cron] Syncing trades for account ${conn.account_id} (${conn.exchange_id}) - Plan: ${plan}...`);
         const syncRes = await syncExchangeTrades(conn.account.user_id, conn.account_id);
         console.log(`[Cron] Sync finished for account ${conn.account_id}: created ${syncRes.created}, skipped ${syncRes.skipped}`);
       } catch (syncErr: any) {

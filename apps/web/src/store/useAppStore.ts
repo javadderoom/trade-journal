@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useCallback } from 'react';
 import { create } from 'zustand';
 
 export interface TradingAccount {
@@ -89,7 +89,7 @@ export function useTranslation() {
     }
   }, []);
 
-  const t = (key: string): string => {
+  const t = useCallback((key: string): string => {
     const dict = language === 'fa' ? faTranslations : enTranslations;
     const parts = key.split('.');
     let current: any = dict;
@@ -101,7 +101,7 @@ export function useTranslation() {
       }
     }
     return typeof current === 'string' ? current : key;
-  };
+  }, [language]);
 
   return { t, language, setLanguage, dir: language === 'fa' ? 'rtl' : 'ltr' };
 }
