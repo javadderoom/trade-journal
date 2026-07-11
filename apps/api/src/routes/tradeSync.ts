@@ -193,9 +193,9 @@ router.post('/', authenticate, checkTradeLimit, async (req: AuthRequest, res: Re
     if (sym.includes('JPY')) {
       digits = 3;
     } else if (sym.includes('BTC') || sym.includes('ETH')) {
-      digits = 2;
+      digits = 0;
     } else if (sym.includes('XAU') || sym.includes('GOLD')) {
-      digits = 2;
+      digits = 1;
     }
 
     let pipSize = Math.pow(10, -digits);
@@ -316,8 +316,8 @@ router.put('/:id', authenticate, async (req: AuthRequest, res: Response) => {
       let digits = 5;
       const sym = (symbol || existing.symbol).toUpperCase();
       if (sym.includes('JPY')) digits = 3;
-      else if (sym.includes('BTC') || sym.includes('ETH')) digits = 2;
-      else if (sym.includes('XAU') || sym.includes('GOLD')) digits = 2;
+      else if (sym.includes('BTC') || sym.includes('ETH')) digits = 0;
+      else if (sym.includes('XAU') || sym.includes('GOLD')) digits = 1;
 
       let pipSize = Math.pow(10, -digits);
       if (digits === 3 || digits === 5) pipSize *= 10;
@@ -1253,9 +1253,9 @@ router.post('/import-mt4', authenticate, checkImportPermission, uploadMemory.sin
             if (sym.includes('JPY')) {
               digits = 3;
             } else if (sym.includes('BTC') || sym.includes('ETH')) {
-              digits = 2;
+              digits = 0;
             } else if (sym.includes('XAU') || sym.includes('GOLD')) {
-              digits = 2;
+              digits = 1;
             }
 
             let pipSize = Math.pow(10, -digits);

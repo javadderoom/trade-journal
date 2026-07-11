@@ -71,10 +71,15 @@ export async function verifyTronTransaction(
       // TRX has 6 decimal places
       const actualTrx = transferInfo.amount / 1000000;
 
-      // Fetch TRX price dynamically from CoinGecko
+      // Fetch TRX price dynamically from CoinGecko with a timeout
       let trxPriceUsd = 0.12; // Fallback price
       try {
-        const priceRes = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=tron&vs_currencies=usd');
+        const priceController = new AbortController();
+        const priceTimeoutId = setTimeout(() => priceController.abort(), 5000);
+        const priceRes = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=tron&vs_currencies=usd', {
+          signal: priceController.signal,
+        });
+        clearTimeout(priceTimeoutId);
         if (priceRes.ok) {
           const priceData = await priceRes.json() as any;
           if (priceData?.tron?.usd) {

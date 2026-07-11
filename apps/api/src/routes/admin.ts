@@ -444,7 +444,7 @@ router.put('/settings/exchange-rate', async (req: AuthRequest, res: Response) =>
  * PUT /api/admin/settings/crypto-details
  * Update crypto wallet addresses & plans pricing
  */
-router.put('/settings/crypto-details', authenticate, async (req: AuthRequest, res: Response) => {
+router.put('/settings/crypto-details', async (req: AuthRequest, res: Response) => {
   try {
     const { usdtAddress, trxAddress, standard, pro } = req.body;
 
