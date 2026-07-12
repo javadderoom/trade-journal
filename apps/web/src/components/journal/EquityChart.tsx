@@ -3,13 +3,7 @@
 import React, { useEffect, useRef } from 'react';
 import { createChart, ColorType, UTCTimestamp } from 'lightweight-charts';
 import { toPersianDigits } from '../../utils/farsi';
-
-interface Trade {
-  closeTime: string | null;
-  profitUsd: number;
-  commission?: number | null;
-  swap?: number | null;
-}
+import { Trade } from '../../types/trade';
 
 interface EquityChartProps {
   closedTrades: Trade[];

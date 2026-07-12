@@ -2,51 +2,14 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
-import { toPersianDigits } from '../../utils/farsi';
+import { toPersianDigits, getJalaliParts } from '../../utils/farsi';
 import { useTranslation, useAppStore } from '../../store/useAppStore';
-
-interface Trade {
-  closeTime: string | null;
-  profitUsd: number;
-  commission?: number | null;
-  swap?: number | null;
-}
+import { Trade } from '../../types/trade';
+import { JALALI_MONTH_NAMES, GREGORIAN_MONTH_NAMES } from '../../constants/dates';
 
 interface TradingCalendarProps {
   closedTrades: Trade[];
 }
-
-const JALALI_MONTH_NAMES = [
-  'فروردین', 'اردیبهشت', 'خرداد', 'تیر', 'مرداد', 'شهریور',
-  'مهر', 'آبان', 'آذر', 'دی', 'بهمن', 'اسفند'
-];
-
-const GREGORIAN_MONTH_NAMES = [
-  'January', 'February', 'March', 'April', 'May', 'June',
-  'July', 'August', 'September', 'October', 'November', 'December'
-];
-
-// Utility to convert Gregorian date to Jalali
-const getJalaliDate = (date: Date) => {
-  try {
-    const formatted = new Intl.DateTimeFormat('en-US-u-ca-persian-nu-latn', {
-      year: 'numeric',
-      month: 'numeric',
-      day: 'numeric',
-      timeZone: 'Asia/Tehran'
-    }).format(date);
-    const clean = formatted.replace(' AP', '');
-    const [mStr, dStr, yStr] = clean.split('/');
-    return {
-      year: parseInt(yStr, 10),
-      month: parseInt(mStr, 10),
-      day: parseInt(dStr, 10)
-    };
-  } catch {
-    const today = new Date();
-    return { year: today.getFullYear(), month: today.getMonth() + 1, day: today.getDate() };
-  }
-};
 
 export default function TradingCalendar({ closedTrades }: TradingCalendarProps) {
   const router = useRouter();
@@ -64,7 +27,7 @@ export default function TradingCalendar({ closedTrades }: TradingCalendarProps) 
       setCalendarYear(today.getFullYear());
       setCalendarMonth(today.getMonth() + 1);
     } else {
-      const todayJ = getJalaliDate(new Date());
+      const todayJ = getJalaliParts(new Date());
       setCalendarYear(todayJ.year);
       setCalendarMonth(todayJ.month);
     }
@@ -131,7 +94,7 @@ export default function TradingCalendar({ closedTrades }: TradingCalendarProps) 
       const gregMonth = (calendarMonth + 1) % 12;
       
       let current = new Date(gregYear, gregMonth, 15);
-      let jDate = getJalaliDate(current);
+      let jDate = getJalaliParts(current);
       
       let limit = 0;
       while ((jDate.year !== calendarYear || jDate.month !== calendarMonth) && limit < 100) {
@@ -144,20 +107,20 @@ export default function TradingCalendar({ closedTrades }: TradingCalendarProps) 
         } else if (diffMonths !== 0) {
           current.setDate(current.getDate() + diffMonths * 30);
         }
-        jDate = getJalaliDate(current);
+        jDate = getJalaliParts(current);
       }
       
       limit = 0;
       while (jDate.day > 1 && limit < 40) {
         limit++;
         current.setDate(current.getDate() - 1);
-        jDate = getJalaliDate(current);
+        jDate = getJalaliParts(current);
       }
       limit = 0;
       while (jDate.month !== calendarMonth && limit < 40) {
         limit++;
         current.setDate(current.getDate() + 1);
-        jDate = getJalaliDate(current);
+        jDate = getJalaliParts(current);
       }
 
       targetMonth = jDate.month;
@@ -179,7 +142,7 @@ export default function TradingCalendar({ closedTrades }: TradingCalendarProps) 
           dateStr
         });
         current.setDate(current.getDate() + 1);
-        jDate = getJalaliDate(current);
+        jDate = getJalaliParts(current);
       }
     }
 

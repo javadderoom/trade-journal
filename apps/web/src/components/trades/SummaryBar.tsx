@@ -1,8 +1,9 @@
 'use client';
 
 import React from 'react';
-import { toPersianDigits, formatPersianCurrency, formatToman } from '../../utils/farsi';
+import { toPersianDigits, formatToman } from '../../utils/farsi';
 import { useTranslation } from '../../store/useAppStore';
+import { formatCurrency } from '../../utils/tradeHelpers';
 
 interface SummaryBarProps {
   count: number;
@@ -13,10 +14,6 @@ interface SummaryBarProps {
 
 export default function SummaryBar({ count, winRate, totalProfit, usdToToman }: SummaryBarProps) {
   const { t, language } = useTranslation();
-
-  const formatCurrency = (val: number) => {
-    return formatPersianCurrency(val);
-  };
 
   return (
     <div className="summary-bar">

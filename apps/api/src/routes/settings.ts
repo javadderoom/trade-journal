@@ -45,6 +45,146 @@ const PLAN_ACCOUNT_LIMITS: Record<Plan, number | null> = {
 };
 
 // ═══════════════════════════════════════════════════════════════════════════════
+// CONSOLIDATED ENDPOINT — single round-trip for settings page
+// ═══════════════════════════════════════════════════════════════════════════════
+
+const DEFAULT_PRICES = {
+  FREE: { monthly: 0, annual: 0 },
+  STANDARD: { monthly: 249000, annual: 2390000 },
+  PRO: { monthly: 499000, annual: 4790000 },
+};
+
+const DEFAULT_CARD_DETAILS = {
+  cardNumber: '۶۰۳۷-۹۹۷۵-۹۴۴۴-۴۱۲۸',
+  bankName: 'ملی ایران',
+  ownerName: 'جواد شیخ اعظمی',
+};
+
+const DEFAULT_CRYPTO_DETAILS = {
+  usdtAddress: '',
+  trxAddress: '',
+  standard: { monthlyUsd: 5.0, annualUsd: 45.0 },
+  pro: { monthlyUsd: 10.0, annualUsd: 90.0 },
+};
+
+/**
+ * GET /api/settings/all
+ * Returns profile, accounts, subscription, prices, card-details, crypto-details, and sessions
+ * in a single round-trip using parallel queries.
+ */
+router.get('/all', authenticate, async (req: AuthRequest, res: Response) => {
+  try {
+    const userId = req.user!.userId;
+    const currentToken = req.cookies?.refreshToken;
+
+    const [
+      user,
+      rawAccounts,
+      subscription,
+      pendingReceipt,
+      pricesSetting,
+      cardSetting,
+      cryptoSetting,
+      refreshTokens,
+    ] = await Promise.all([
+      prisma.user.findUnique({
+        where: { id: userId },
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          phone: true,
+          plan: true,
+          display_currency: true,
+          avatar_url: true,
+          created_at: true,
+        },
+      }),
+      prisma.account.findMany({
+        where: { user_id: userId },
+        orderBy: { created_at: 'desc' },
+        include: {
+          _count: { select: { trades: true } },
+          trades: {
+            orderBy: { created_at: 'desc' },
+            take: 1,
+            select: { created_at: true },
+          },
+        },
+      }),
+      prisma.subscription.findFirst({
+        where: { user_id: userId, status: 'ACTIVE' },
+        orderBy: { created_at: 'desc' },
+      }),
+      prisma.manualReceipt.findFirst({
+        where: { user_id: userId, status: { in: ['PENDING', 'REJECTED'] } },
+        orderBy: { created_at: 'desc' },
+      }),
+      prisma.systemSetting.findUnique({ where: { key: 'PRICING_PLANS' } }),
+      prisma.systemSetting.findUnique({ where: { key: 'CARD_DETAILS' } }),
+      prisma.systemSetting.findUnique({ where: { key: 'CRYPTO_DETAILS' } }),
+      prisma.refreshToken.findMany({
+        where: { user_id: userId, expires_at: { gt: new Date() } },
+        orderBy: { last_used_at: 'desc' },
+      }),
+    ]);
+
+    if (!user) return res.status(404).json({ error: 'کاربر یافت نشد' });
+
+    const accounts = rawAccounts.map((acc) => ({
+      id: acc.id,
+      broker_name: acc.broker_name,
+      account_number: acc.account_number,
+      currency: acc.currency,
+      created_at: acc.created_at,
+      trade_count: acc._count.trades,
+      last_import: acc.trades[0]?.created_at || null,
+    }));
+
+    const sessions = refreshTokens.map((t) => ({
+      id: t.id,
+      user_agent: t.user_agent || 'نامشخص',
+      created_at: t.created_at,
+      last_used_at: t.last_used_at,
+      is_current: t.token === (currentToken as string),
+    }));
+
+    return res.json({
+      user,
+      accounts,
+      subscription: {
+        plan: user.plan,
+        subscription: subscription
+          ? {
+              start_date: subscription.start_date,
+              end_date: subscription.end_date,
+              status: subscription.status,
+            }
+          : null,
+        pendingReceipt: pendingReceipt
+          ? {
+              id: pendingReceipt.id,
+              plan: pendingReceipt.plan,
+              period: pendingReceipt.period,
+              amount: pendingReceipt.amount,
+              status: pendingReceipt.status,
+              rejectionReason: pendingReceipt.rejectionReason,
+              created_at: pendingReceipt.created_at,
+            }
+          : null,
+      },
+      prices: pricesSetting?.value || DEFAULT_PRICES,
+      cardDetails: cardSetting?.value || DEFAULT_CARD_DETAILS,
+      cryptoDetails: cryptoSetting?.value || DEFAULT_CRYPTO_DETAILS,
+      sessions,
+    });
+  } catch (err: any) {
+    console.error('Settings all fetch error:', err);
+    return res.status(500).json({ error: 'خطای داخلی سرور' });
+  }
+});
+
+// ═══════════════════════════════════════════════════════════════════════════════
 // PROFILE ENDPOINTS
 // ═══════════════════════════════════════════════════════════════════════════════
 

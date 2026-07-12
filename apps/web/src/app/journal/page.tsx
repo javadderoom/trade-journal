@@ -5,72 +5,11 @@ import { api } from '../../lib/api';
 import { useTranslation } from '../../store/useAppStore';
 import { useTradeStore } from '../../store/useTradeStore';
 import JournalEditor from '../../components/journal/JournalEditor';
-import { toPersianDigits, formatToman } from '../../utils/farsi';
+import { toPersianDigits, formatToman, getJalaliParts, jalaliToGregorian, getJalaliMonthLength } from '../../utils/farsi';
+import { JALALI_MONTH_NAMES, GREGORIAN_MONTH_NAMES, WEEKDAY_NAMES_FA_SHORT, GREGORIAN_WEEKDAY_NAMES_SHORT } from '../../constants/dates';
 import './journal.scss';
 
 // --- JALALI CALENDAR HELPERS (Using native Intl API) ---
-
-const MONTH_NAMES = [
-  'فروردین', 'اردیبهشت', 'خرداد', 'تیر', 'مرداد', 'شهریور',
-  'مهر', 'آبان', 'آذر', 'دی', 'بهمن', 'اسفند'
-];
-
-const WEEKDAY_NAMES_SHORT = ['ش', 'ی', 'د', 'س', 'چ', 'پ', 'ج'];
-
-const GREGORIAN_MONTH_NAMES = [
-  'January', 'February', 'March', 'April', 'May', 'June',
-  'July', 'August', 'September', 'October', 'November', 'December'
-];
-
-const GREGORIAN_WEEKDAY_NAMES_SHORT = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
-
-function getJalaliParts(date: Date) {
-  const formatter = new Intl.DateTimeFormat('en-US-u-ca-persian', {
-    year: 'numeric',
-    month: 'numeric',
-    day: 'numeric',
-  });
-  const parts = formatter.formatToParts(date);
-  const findPart = (type: string) => parts.find(p => p.type === type)?.value || '';
-  return {
-    year: parseInt(findPart('year'), 10),
-    month: parseInt(findPart('month'), 10),
-    day: parseInt(findPart('day'), 10),
-  };
-}
-
-function jalaliToGregorian(jy: number, jm: number, jd: number): Date {
-  const gYear = jy + 621;
-  let dayOffset = 0;
-  if (jm <= 6) {
-    dayOffset = (jm - 1) * 31 + jd;
-  } else {
-    dayOffset = 186 + (jm - 7) * 30 + jd;
-  }
-
-  const date = new Date(gYear, 2, 18); // March 18th
-  date.setDate(date.getDate() + dayOffset - 1);
-
-  // Search local window to find exact match
-  for (let i = 0; i < 10; i++) {
-    const parts = getJalaliParts(date);
-    if (parts.year === jy && parts.month === jm && parts.day === jd) {
-      return new Date(date);
-    }
-    date.setDate(date.getDate() + 1);
-  }
-
-  return new Date(gYear, 2, 21); // Fallback
-}
-
-function getMonthLength(jy: number, jm: number): number {
-  if (jm <= 6) return 31;
-  if (jm <= 11) return 30;
-  // Check Esfand leap year length
-  const testDate = jalaliToGregorian(jy, 12, 30);
-  const parts = getJalaliParts(testDate);
-  return parts.day === 30 ? 30 : 29;
-}
 
 export default function JournalPage() {
   const { t, language } = useTranslation();
@@ -231,7 +170,7 @@ export default function JournalPage() {
 
   // Render Jalali Date Picker Calendar Days
   const renderCalendarDays = () => {
-    const daysInMonth = getMonthLength(calendarYear, calendarMonth);
+    const daysInMonth = getJalaliMonthLength(calendarYear, calendarMonth);
     const firstDayDate = jalaliToGregorian(calendarYear, calendarMonth, 1);
     
     // First day of the month weekday index: 0 = Sun, 1 = Mon, ..., 6 = Sat
@@ -341,7 +280,7 @@ export default function JournalPage() {
     } catch {
       return isEn 
         ? selectedDate.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
-        : `${jalaliSelected.day} ${MONTH_NAMES[jalaliSelected.month - 1]} ${jalaliSelected.year}`;
+        : `${jalaliSelected.day} ${JALALI_MONTH_NAMES[jalaliSelected.month - 1]} ${jalaliSelected.year}`;
     }
   };
 
@@ -374,7 +313,7 @@ export default function JournalPage() {
                   <span className="month-year-label">
                     {isEn 
                       ? `${GREGORIAN_MONTH_NAMES[calendarMonth - 1]} ${calendarYear}` 
-                      : `${MONTH_NAMES[calendarMonth - 1]} ${toPersianDigits(calendarYear.toString())}`}
+                      : `${JALALI_MONTH_NAMES[calendarMonth - 1]} ${toPersianDigits(calendarYear.toString())}`}
                   </span>
                   <button className="nav-month-btn" onClick={() => changeCalendarMonth(isEn ? 1 : -1)}>
                     <span className="material-symbols-outlined">{isEn ? 'chevron_right' : 'chevron_left'}</span>
@@ -382,7 +321,7 @@ export default function JournalPage() {
                 </div>
 
                 <div className="weekdays-grid">
-                  {(isEn ? GREGORIAN_WEEKDAY_NAMES_SHORT : WEEKDAY_NAMES_SHORT).map((w, idx) => (
+                  {(isEn ? GREGORIAN_WEEKDAY_NAMES_SHORT : WEEKDAY_NAMES_FA_SHORT).map((w, idx) => (
                     <span key={idx} className="weekday-lbl">{w}</span>
                   ))}
                 </div>

@@ -3,9 +3,10 @@
 import React, { useState } from 'react';
 import { Trade, TagObject } from './TradesTable';
 import TradeChart from './TradeChart';
-import { toPersianDigits, formatPersianCurrency, formatToman } from '../../utils/farsi';
+import { toPersianDigits, formatToman } from '../../utils/farsi';
 import { useTranslation } from '../../store/useAppStore';
 import {
+  formatCurrency,
   getEmotionEmoji,
   getEmotionLabel,
   formatDate,
@@ -222,14 +223,6 @@ export default function DetailPanel({
     }
   };
 
-
-  const formatCurrency = (val: number) => {
-    if (isEn) {
-      const sign = val < 0 ? '-' : '';
-      return `${sign}$${Math.abs(val).toFixed(2)}`;
-    }
-    return formatPersianCurrency(val);
-  };
 
   return (
     <aside className="detail-panel">

@@ -4,7 +4,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuthStore } from '../../lib/auth';
 import { api } from '../../lib/api';
-import { toPersianDigits } from '../../utils/farsi';
+import { toPersianDigits, formatNum } from '../../utils/farsi';
 import { notify } from '../../lib/notify';
 import { useTranslation } from '../../store/useAppStore';
 import ConnectExchangeModal from '../../components/modals/ConnectExchangeModal';
@@ -60,8 +60,6 @@ export default function SettingsPage() {
   const searchParams = useSearchParams();
   const { user, logout } = useAuthStore();
   const { t, language, setLanguage } = useTranslation();
-
-  const formatNum = (num: number | string) => language === 'fa' ? toPersianDigits(num.toString()) : num.toString();
 
   const [activeTab, setActiveTab] = useState<Tab>((searchParams.get('tab') as Tab) || 'profile');
 
@@ -191,7 +189,37 @@ export default function SettingsPage() {
   const [showDeleteAccount, setShowDeleteAccount] = useState(false);
   const [deleteConfirmEmail, setDeleteConfirmEmail] = useState('');
 
-  // ─── Fetch profile ────────────────────────────────────────────────────────
+  // ─── Consolidated fetch (single round-trip on mount) ─────────────────────
+  const [loading, setLoading] = useState(true);
+
+  const fetchAll = useCallback(async () => {
+    try {
+      const res = await api.get('/api/settings/all');
+      const d = res.data;
+
+      setProfile(d.user);
+      setProfileForm({
+        name: d.user.name || '',
+        phone: d.user.phone || '',
+        displayCurrency: d.user.display_currency || 'USD',
+      });
+
+      setAccounts(d.accounts);
+      setSubscription(d.subscription);
+      setPrices(d.prices);
+      setCardDetails(d.cardDetails);
+      setCryptoDetails(d.cryptoDetails);
+      setSessions(d.sessions);
+    } catch (err) {
+      console.error('Failed to fetch settings:', err);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => { fetchAll(); }, [fetchAll]);
+
+  // ─── Individual refetch helpers (used after mutations) ──────────────────────
   const fetchProfile = useCallback(async () => {
     try {
       const res = await api.get('/api/settings/profile');
@@ -206,9 +234,6 @@ export default function SettingsPage() {
     }
   }, []);
 
-  useEffect(() => { fetchProfile(); }, [fetchProfile]);
-
-  // ─── Fetch accounts ──────────────────────────────────────────────────────
   const fetchAccounts = useCallback(async () => {
     try {
       const res = await api.get('/api/settings/accounts');
@@ -218,9 +243,6 @@ export default function SettingsPage() {
     }
   }, []);
 
-  useEffect(() => { fetchAccounts(); }, [fetchAccounts]);
-
-  // ─── Fetch subscription ───────────────────────────────────────────────────
   const fetchSubscription = useCallback(async () => {
     try {
       const res = await api.get('/api/settings/subscription');
@@ -230,43 +252,6 @@ export default function SettingsPage() {
     }
   }, []);
 
-  useEffect(() => { fetchSubscription(); }, [fetchSubscription]);
-
-  // ─── Fetch prices ─────────────────────────────────────────────────────────
-  const fetchPrices = useCallback(async () => {
-    try {
-      const res = await api.get('/api/payments/prices');
-      setPrices(res.data);
-    } catch (err) {
-      console.error('Failed to fetch prices:', err);
-    }
-  }, []);
-
-  useEffect(() => { fetchPrices(); }, [fetchPrices]);
-
-  const fetchCardDetails = useCallback(async () => {
-    try {
-      const res = await api.get('/api/settings/card-details');
-      setCardDetails(res.data);
-    } catch (err) {
-      console.error('Failed to fetch card details:', err);
-    }
-  }, []);
-
-  useEffect(() => { fetchCardDetails(); }, [fetchCardDetails]);
-
-  const fetchCryptoDetails = useCallback(async () => {
-    try {
-      const res = await api.get('/api/settings/crypto-details');
-      setCryptoDetails(res.data);
-    } catch (err) {
-      console.error('Failed to fetch crypto details:', err);
-    }
-  }, []);
-
-  useEffect(() => { fetchCryptoDetails(); }, [fetchCryptoDetails]);
-
-  // ─── Fetch sessions ──────────────────────────────────────────────────────
   const fetchSessions = useCallback(async () => {
     try {
       const res = await api.get('/api/settings/sessions');
@@ -275,8 +260,6 @@ export default function SettingsPage() {
       console.error('Failed to fetch sessions:', err);
     }
   }, []);
-
-  useEffect(() => { fetchSessions(); }, [fetchSessions]);
 
   const handleSyncExchange = async (accountId: string) => {
     setSyncingAccountId(accountId);
@@ -600,6 +583,14 @@ export default function SettingsPage() {
   };
 
   const initials = (profile?.name || user?.name || '?').charAt(0);
+
+  if (loading) {
+    return (
+      <div className="settings-page" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '60vh' }}>
+        <span className="material-symbols-outlined" style={{ fontSize: '2rem', color: '#94a3b8', animation: 'spin 1s linear infinite' }}>progress_activity</span>
+      </div>
+    );
+  }
 
   return (
     <div className="settings-page">

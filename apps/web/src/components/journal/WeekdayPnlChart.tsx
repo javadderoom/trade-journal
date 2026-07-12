@@ -2,13 +2,7 @@
 
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { toPersianDigits } from '../../utils/farsi';
-
-interface Trade {
-  openTime: string;
-  profitUsd: number;
-  commission?: number | null;
-  swap?: number | null;
-}
+import { Trade } from '../../types/trade';
 
 interface WeekdayPnlChartProps {
   closedTrades: Trade[];

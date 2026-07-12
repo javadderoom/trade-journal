@@ -1,5 +1,18 @@
-import { toPersianDigits } from './farsi';
+import { toPersianDigits, formatPersianCurrency } from './farsi';
 import { useAppStore } from '../store/useAppStore';
+import { getEmotionEmoji as _getEmotionEmoji, getEmotionLabel as _getEmotionLabel } from '../constants/emotions';
+
+export const formatCurrency = (val: number, decimals = 2, showPlus = false): string => {
+  const lang = useAppStore.getState().language;
+  const isEn = lang === 'en';
+
+  if (isEn) {
+    const absVal = Math.abs(val).toFixed(decimals);
+    const sign = val < 0 ? '-' : showPlus ? '+' : '';
+    return `${sign}$${absVal}`;
+  }
+  return formatPersianCurrency(val);
+};
 
 export const getEmotionEmoji = (emotion: string | null, emotionsList?: { value: string; label: string; emoji?: string }[]): string => {
   if (!emotion) return '💭';
@@ -7,26 +20,19 @@ export const getEmotionEmoji = (emotion: string | null, emotionsList?: { value: 
     const found = emotionsList.find(e => e.value === emotion);
     if (found && found.emoji) return found.emoji;
   }
-  switch (emotion) {
-    case 'CONFIDENT': return '😌';
-    case 'NEUTRAL': return '😐';
-    case 'ANXIOUS': return '😰';
-    case 'FOMO': return '🎯';
-    case 'REVENGE': return '😡';
-    default: return '💭';
-  }
+  return _getEmotionEmoji(emotion);
 };
 
 export const getEmotionLabel = (emotion: string | null, emotionsList?: { value: string; label: string; emoji?: string }[]): string => {
   if (!emotion) return '';
   const lang = useAppStore.getState().language;
-  const isEn = lang === 'en';
   const standardMap: Record<string, string> = {
-    CONFIDENT: isEn ? 'Confident' : 'با اطمینان',
-    NEUTRAL: isEn ? 'Neutral/Calm' : 'آرام/خنثی',
-    ANXIOUS: isEn ? 'Anxious' : 'مضطرب',
-    FOMO: 'FOMO',
-    REVENGE: isEn ? 'Revenge' : 'انتقام',
+    CONFIDENT: lang === 'en' ? 'Confident' : 'با اطمینان',
+    NEUTRAL: lang === 'en' ? 'Neutral' : 'خنثی',
+    ANXIOUS: lang === 'en' ? 'Anxious' : 'مضطرب',
+    FOMO: lang === 'en' ? 'FOMO' : 'فومو (عجول)',
+    REVENGE: lang === 'en' ? 'Revenge' : 'انتقامی',
+    UNKNOWN: lang === 'en' ? 'Unknown' : 'نامشخص',
   };
   if (standardMap[emotion]) {
     return standardMap[emotion];

@@ -8,6 +8,9 @@ import { useAppStore, useTranslation } from '../../store/useAppStore';
 import { toPersianDigits, formatPersianCurrency, formatToman } from '../../utils/farsi';
 import Select from '../../components/ui/Select';
 import Link from 'next/link';
+import { useSubscriptionStatus } from '../../hooks/useSubscriptionStatus';
+import SubscriptionBanners from '../../components/SubscriptionBanners';
+import { useExchangeRate } from '../../hooks/useExchangeRate';
 import './dashboard.scss';
 
 // ─── Types matching the /api/dashboard/summary response ────────────────────────
@@ -56,21 +59,7 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [edgeRefreshSpin, setEdgeRefreshSpin] = useState(false);
-  const [subStatus, setSubStatus] = useState<any>(null);
-  const [dismissedRejectionId, setDismissedRejectionId] = useState<string | null>(null);
-
-  const fetchSubStatus = async () => {
-    try {
-      const res = await api.get('/api/payments/status');
-      setSubStatus(res.data);
-    } catch (err) {
-      console.error('Failed to fetch subscription status:', err);
-    }
-  };
-
-  useEffect(() => {
-    fetchSubStatus();
-  }, []);
+  const { subStatus, dismissedRejectionId, setDismissedRejectionId } = useSubscriptionStatus();
 
   // Fetch accounts list if not already loaded
   useEffect(() => {
@@ -106,15 +95,10 @@ export default function DashboardPage() {
     fetchDashboard();
   }, [fetchDashboard]);
 
-  // Fetch live USD→Toman rate
+  const liveRate = useExchangeRate();
   useEffect(() => {
-    fetch('/api/exchange-rate')
-      .then((r) => r.json())
-      .then((d) => {
-        if (d?.usdToToman && d.usdToToman > 0) setUsdToToman(d.usdToToman);
-      })
-      .catch(() => { });
-  }, [setUsdToToman]);
+    if (liveRate > 0) setUsdToToman(liveRate);
+  }, [liveRate, setUsdToToman]);
 
   // Date string based on selected language
   const todayDateStr = useMemo(() => {
@@ -176,86 +160,11 @@ export default function DashboardPage() {
 
   return (
     <main className="dashboard-page">
-      {subStatus?.pendingReceipt && subStatus.pendingReceipt.status === 'PENDING' && (
-        <div style={{
-          backgroundColor: 'rgba(255, 179, 0, 0.08)',
-          border: '1px solid rgba(255, 179, 0, 0.2)',
-          color: '#ffb300',
-          padding: '12px 20px',
-          borderRadius: '8px',
-          marginBottom: '20px',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '10px',
-          fontSize: '0.9rem',
-          fontFamily: language === 'fa' ? 'Vazirmatn' : 'inherit'
-        }}>
-          <span className="material-symbols-outlined">pending_actions</span>
-          <span>
-            {t('dashboard.pendingReceiptBanner')
-              .replace('{plan}', subStatus.pendingReceipt.plan === 'STANDARD' ? t('dashboard.planStandard') : t('dashboard.planPro'))
-              .replace('{period}', subStatus.pendingReceipt.period === 'annual' ? t('dashboard.periodAnnual') : t('dashboard.periodMonthly'))}
-          </span>
-        </div>
-      )}
-
-      {subStatus?.pendingReceipt && subStatus.pendingReceipt.status === 'REJECTED' && dismissedRejectionId !== subStatus.pendingReceipt.id && (
-        <div style={{
-          backgroundColor: 'rgba(255, 83, 112, 0.08)',
-          border: '1px solid rgba(255, 83, 112, 0.2)',
-          color: '#ff5370',
-          padding: '12px 20px',
-          borderRadius: '8px',
-          marginBottom: '20px',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '10px',
-          fontSize: '0.9rem',
-          fontFamily: language === 'fa' ? 'Vazirmatn' : 'inherit'
-        }}>
-          <span className="material-symbols-outlined">cancel</span>
-          <span style={{ flex: 1 }}>
-            {t('dashboard.rejectedReceiptBanner')
-              .replace('{plan}', subStatus.pendingReceipt.plan === 'STANDARD' ? t('dashboard.planStandard') : t('dashboard.planPro'))
-              .replace('{reason}', subStatus.pendingReceipt.rejectionReason || '')}
-          </span>
-          <button
-            onClick={() => setDismissedRejectionId(subStatus.pendingReceipt.id)}
-            style={{ background: 'none', border: 'none', color: '#ff5370', cursor: 'pointer', padding: 0 }}
-          >
-            <span className="material-symbols-outlined">close</span>
-          </button>
-        </div>
-      )}
-
-      {subStatus?.plan === 'FREE' && subStatus?.usage?.monthlyTrades >= 24 && (
-        <div style={{
-          backgroundColor: '#ffb300',
-          color: '#111319',
-          padding: '12px 20px',
-          textAlign: 'center',
-          fontWeight: 'bold',
-          fontFamily: language === 'fa' ? 'Vazirmatn' : 'inherit',
-          fontSize: '0.9rem',
-          borderRadius: '8px',
-          marginBottom: '20px',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          gap: '10px'
-        }}>
-          <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>warning</span>
-          <span>
-            {subStatus.usage.monthlyTrades >= 30
-              ? t('dashboard.limitWarning')
-              : t('dashboard.limitWarningNear').replace('{count}', toPersianDigits(subStatus.usage.monthlyTrades))
-            }
-          </span>
-          <Link href="/settings?tab=subscription" style={{ color: '#111319', textDecoration: 'underline', marginRight: '15px' }}>
-            {t('dashboard.upgradeSubscription')}
-          </Link>
-        </div>
-      )}
+      <SubscriptionBanners
+        subStatus={subStatus}
+        dismissedRejectionId={dismissedRejectionId}
+        onDismissRejection={setDismissedRejectionId}
+      />
 
       {/* ─── Top Bar ─── */}
       <div className="dash-topbar">

@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useAuthStore } from '../../../lib/auth';
 import { useTranslation } from '../../../store/useAppStore';
 import { notify } from '../../../lib/notify';
+import { formatTimer } from '../../../utils/otp';
 import '../auth.scss';
 
 export default function LoginPage() {
@@ -153,12 +154,6 @@ export default function LoginPage() {
     } finally {
       setLoading(false);
     }
-  };
-
-  const formatTimer = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
   return (

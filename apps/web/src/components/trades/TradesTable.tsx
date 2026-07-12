@@ -5,6 +5,8 @@ import { toPersianDigits } from '../../utils/farsi';
 import { useTranslation, useAppStore } from '../../store/useAppStore';
 import { api } from '../../lib/api';
 import { notify } from '../../lib/notify';
+import { useTradesTags, TagObject } from '../../hooks/useTradesTags';
+import { useTradesEmotions } from '../../hooks/useTradesEmotions';
 import SummaryBar from './SummaryBar';
 import FilterBar from './FilterBar';
 import DesktopTable from './DesktopTable';
@@ -13,33 +15,11 @@ import DetailPanel from './DetailPanel';
 import { getMainPair } from '../../utils/tradeHelpers';
 import { useAuthStore } from '../../lib/auth';
 import ExportModal from '../modals/ExportModal';
+import { Trade } from '../../types/trade';
+import { getDefaultEmotions } from '../../constants/emotions';
 
-export interface Trade {
-  id: string;
-  accountId?: string;
-  ticket?: number | null;
-  symbol: string;
-  direction: 'BUY' | 'SELL';
-  openTime: string;
-  closeTime: string | null;
-  openPrice: number;
-  closePrice: number | null;
-  lotSize: number;
-  stopLoss: number | null;
-  takeProfit: number | null;
-  profitUsd: number;
-  commission: number;
-  swap: number;
-  pips: number;
-  rMultiple: number;
-  tags: string[];
-  emotion: string | null;
-  notes: string | null;
-  screenshots?: string[];
-  chartData?: any;
-  analysisTimeframe?: string | null;
-  entryTimeframe?: string | null;
-}
+export type { Trade };
+export type { TagObject } from '../../hooks/useTradesTags';
 
 interface TradesTableProps {
   initialTrades: Trade[];
@@ -57,27 +37,12 @@ interface TradesTableProps {
   onAccountIdChange?: (val: string) => void;
 }
 
-export interface TagObject {
-  id?: string;
-  name: string;
-  is_ignored: boolean;
-  show_first: boolean;
-}
-
 const getDefaultSystemTags = (isEn: boolean): TagObject[] => [
   { name: isEn ? 'Missed' : 'فرصت از دست رفته', is_ignored: true, show_first: false },
   { name: 'Missed', is_ignored: true, show_first: false },
   { name: 'ignore', is_ignored: true, show_first: false },
   { name: 'Ignore', is_ignored: true, show_first: false },
   { name: isEn ? 'Ignore' : 'نادیده گرفتن', is_ignored: true, show_first: false },
-];
-
-const getDefaultEmotions = (isEn: boolean) => [
-  { value: 'CONFIDENT', label: isEn ? 'Confident' : 'با اطمینان', emoji: '😌' },
-  { value: 'NEUTRAL', label: isEn ? 'Neutral/Calm' : 'آرام/خنثی', emoji: '😐' },
-  { value: 'ANXIOUS', label: isEn ? 'Anxious' : 'مضطرب', emoji: '😰' },
-  { value: 'FOMO', label: 'FOMO', emoji: '🎯' },
-  { value: 'REVENGE', label: isEn ? 'Revenge' : 'انتقام', emoji: '😡' },
 ];
 
 const getJalaliDisplayDate = (gregorianDateStr: string) => {
@@ -201,7 +166,7 @@ export default function TradesTable({
   const [selectedTimeframe, setSelectedTimeframe] = useState('ALL');
   const [selectedStatus, setSelectedStatus] = useState<'ALL' | 'OPEN' | 'CLOSED' | 'MISSED'>('ALL');
   const [isAdvancedFiltersOpen, setIsAdvancedFiltersOpen] = useState(false);
-  const [allEmotions, setAllEmotions] = useState<{ value: string; label: string; emoji?: string }[]>(() => getDefaultEmotions(isEn));
+  const [allEmotions, setAllEmotions] = useState<{ value: string; label: string; emoji?: string }[]>(() => getDefaultEmotions(language));
   const [selectedTimezone, setSelectedTimezone] = useState('Asia/Tehran');
 
   // USD → Toman exchange rate
@@ -229,33 +194,24 @@ export default function TradesTable({
   }, [trades]);
 
   const [allTags, setAllTags] = useState<TagObject[]>([]);
+  const { tags: fetchedTags } = useTradesTags();
 
-  // Fetch custom persistent tags from database on mount
   useEffect(() => {
-    const fetchCustomTags = async () => {
-      try {
-        const res = await api.get(`/api/trades/tags?t=${Date.now()}`);
-        const customTags = res.data;
-        if (Array.isArray(customTags)) {
-          setAllTags(prev => {
-            const map = new Map<string, TagObject>();
-            prev.forEach(t => map.set(t.name, t));
-            customTags.forEach((t: TagObject) => {
-              map.set(t.name, {
-                name: t.name,
-                is_ignored: Boolean(t.is_ignored),
-                show_first: Boolean(t.show_first),
-              });
-            });
-            return Array.from(map.values());
+    if (Array.isArray(fetchedTags)) {
+      setAllTags(prev => {
+        const map = new Map<string, TagObject>();
+        prev.forEach(t => map.set(t.name, t));
+        fetchedTags.forEach((t: TagObject) => {
+          map.set(t.name, {
+            name: t.name,
+            is_ignored: Boolean(t.is_ignored),
+            show_first: Boolean(t.show_first),
           });
-        }
-      } catch (err) {
-        console.error('Failed to fetch custom tags:', err);
-      }
-    };
-    fetchCustomTags();
-  }, []);
+        });
+        return Array.from(map.values());
+      });
+    }
+  }, [fetchedTags]);
 
   const handleAddCustomTag = async (newTag: string) => {
     try {
@@ -294,22 +250,12 @@ export default function TradesTable({
   };
 
   // Fetch custom persistent emotions from database on mount
+  const { emotions: fetchedEmotions } = useTradesEmotions();
   useEffect(() => {
-    const fetchCustomEmotions = async () => {
-      try {
-        const res = await api.get(`/api/trades/emotions?t=${Date.now()}`);
-        const customEmotions = res.data;
-        if (Array.isArray(customEmotions)) {
-          if (customEmotions.length > 0) {
-            setAllEmotions(customEmotions);
-          }
-        }
-      } catch (err) {
-        console.error('Failed to fetch custom emotions:', err);
-      }
-    };
-    fetchCustomEmotions();
-  }, []);
+    if (Array.isArray(fetchedEmotions) && fetchedEmotions.length > 0) {
+      setAllEmotions(fetchedEmotions);
+    }
+  }, [fetchedEmotions]);
 
   const handleSaveEmotionConfigurations = async (emotionsList: { value: string; label: string; emoji: string }[], deletedValues: string[]) => {
     try {

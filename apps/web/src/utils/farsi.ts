@@ -36,6 +36,18 @@ export function formatPersianNumber(val: number, decimals: number = 2): string {
 }
 
 /**
+ * Formats a number or string for display, converting to Persian digits if locale is fa
+ */
+export function formatNum(num: number | string): string {
+  try {
+    if (useAppStore.getState().language === 'en') {
+      return num.toString();
+    }
+  } catch (e) {}
+  return toPersianDigits(num.toString());
+}
+
+/**
  * Formats net profit/loss into a currency string using Persian digits (e.g. +$۳۷۵.۰۰ or -$۲۰۰.۰۰)
  */
 export function formatPersianCurrency(val: number): string {
@@ -84,4 +96,69 @@ export function formatToman(usd: number, usdToToman: number): string {
   }
 
   return `${display}${prefix}${suffix} ت`;
+}
+
+// ─── Jalali (Persian) Calendar Helpers ────────────────────────────────────────
+
+/**
+ * Converts a Gregorian Date to Jalali calendar parts { year, month, day }
+ */
+export function getJalaliParts(date: Date): { year: number; month: number; day: number } {
+  try {
+    const formatted = new Intl.DateTimeFormat('en-US-u-ca-persian-nu-latn', {
+      year: 'numeric',
+      month: 'numeric',
+      day: 'numeric',
+      timeZone: 'Asia/Tehran'
+    }).format(date);
+    const clean = formatted.replace(' AP', '');
+    const [mStr, dStr, yStr] = clean.split('/');
+    return {
+      year: parseInt(yStr, 10),
+      month: parseInt(mStr, 10),
+      day: parseInt(dStr, 10)
+    };
+  } catch {
+    const today = new Date();
+    return { year: today.getFullYear(), month: today.getMonth() + 1, day: today.getDate() };
+  }
+}
+
+/**
+ * Converts Jalali date parts to a Gregorian Date
+ */
+export function jalaliToGregorian(jy: number, jm: number, jd: number): Date {
+  const gYear = jy + 621;
+  let dayOffset = 0;
+  if (jm <= 6) {
+    dayOffset = (jm - 1) * 31 + jd;
+  } else {
+    dayOffset = 186 + (jm - 7) * 30 + jd;
+  }
+
+  const date = new Date(gYear, 2, 18); // March 18th
+  date.setDate(date.getDate() + dayOffset - 1);
+
+  // Search local window to find exact match
+  for (let i = 0; i < 10; i++) {
+    const parts = getJalaliParts(date);
+    if (parts.year === jy && parts.month === jm && parts.day === jd) {
+      return new Date(date);
+    }
+    date.setDate(date.getDate() + 1);
+  }
+
+  return new Date(gYear, 2, 21); // Fallback
+}
+
+/**
+ * Returns the number of days in a given Jalali month
+ */
+export function getJalaliMonthLength(jy: number, jm: number): number {
+  if (jm <= 6) return 31;
+  if (jm <= 11) return 30;
+  // Check Esfand leap year length
+  const testDate = jalaliToGregorian(jy, 12, 30);
+  const parts = getJalaliParts(testDate);
+  return parts.day === 30 ? 30 : 29;
 }

@@ -137,6 +137,9 @@ model JournalEntry {
   body       String
   mood       Mood?
   created_at DateTime @default(now())
+
+  @@index([user_id])
+  @@index([user_id, date])
 }
 
 model ImportJob {
@@ -151,6 +154,9 @@ model ImportJob {
   rows_imported  Int          @default(0)
   errors         String[]
   created_at     DateTime     @default(now())
+
+  @@index([user_id])
+  @@index([account_id])
 }
 
 model Subscription {
@@ -162,6 +168,8 @@ model Subscription {
   start_date DateTime
   end_date   DateTime?
   created_at DateTime           @default(now())
+
+  @@index([user_id])
 }
 
 model Tag {

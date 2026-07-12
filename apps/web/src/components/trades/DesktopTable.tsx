@@ -2,9 +2,10 @@
 
 import React from 'react';
 import { Trade, TagObject } from './TradesTable';
-import { toPersianDigits, formatPersianCurrency, formatToman } from '../../utils/farsi';
+import { toPersianDigits, formatToman } from '../../utils/farsi';
 import { useTranslation } from '../../store/useAppStore';
 import {
+  formatCurrency,
   getEmotionEmoji,
   getEmotionLabel,
   formatDate,
@@ -41,10 +42,6 @@ export default function DesktopTable({
   allTags,
 }: DesktopTableProps) {
   const { t, language } = useTranslation();
-
-  const formatCurrency = (val: number) => {
-    return formatPersianCurrency(val);
-  };
 
   return (
     <div className="table-section-container">

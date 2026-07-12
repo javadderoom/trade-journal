@@ -2,9 +2,10 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { Trade, TagObject } from './TradesTable';
-import { toPersianDigits, formatPersianCurrency, formatToman } from '../../utils/farsi';
+import { toPersianDigits, formatToman } from '../../utils/farsi';
 import { useTranslation } from '../../store/useAppStore';
 import {
+  formatCurrency,
   getEmotionEmoji,
   getEmotionLabel,
   formatDate,
@@ -45,10 +46,6 @@ export default function MobileCardsList({
   allTags,
 }: MobileCardsListProps) {
   const { t, language } = useTranslation();
-
-  const formatCurrency = (val: number) => {
-    return formatPersianCurrency(val);
-  };
 
   const [isMobile, setIsMobile] = useState(false);
 

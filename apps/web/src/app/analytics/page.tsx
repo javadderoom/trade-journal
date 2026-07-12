@@ -3,59 +3,20 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useAppStore, useTranslation } from '../../store/useAppStore';
 import { useTradeStore } from '../../store/useTradeStore';
-import { api } from '../../lib/api';
 import Select from '../../components/ui/Select';
-import { toPersianDigits, formatPersianCurrency, formatToman } from '../../utils/farsi';
-import { getTradingSession, getMainPair, getEmotionEmoji } from '../../utils/tradeHelpers';
+import { toPersianDigits, formatToman, formatNum } from '../../utils/farsi';
+import { formatCurrency, getTradingSession, getMainPair, getEmotionEmoji, getEmotionLabel } from '../../utils/tradeHelpers';
+import { WEEKDAY_NAMES_FA, WEEKDAY_NAMES_EN } from '../../constants/dates';
+import { useTradesTags } from '../../hooks/useTradesTags';
+import { useTradesEmotions } from '../../hooks/useTradesEmotions';
 import '../../components/journal/journal.scss';
 import EquityChart from '../../components/journal/EquityChart';
 import WeekdayPnlChart from '../../components/journal/WeekdayPnlChart';
 import TradingCalendar from '../../components/journal/TradingCalendar';
 
-// Emotions helper mapping
-const EMOTION_MAP: { [key: string]: { label: string; emoji: string } } = {
-  CONFIDENT: { label: 'با اطمینان', emoji: '😌' },
-  NEUTRAL: { label: 'خنثی', emoji: '😐' },
-  ANXIOUS: { label: 'مضطرب', emoji: '😰' },
-  FOMO: { label: 'فومو (عجول)', emoji: '🎯' },
-  REVENGE: { label: 'انتقامی', emoji: '😡' },
-  UNKNOWN: { label: 'نامشخص', emoji: '💭' },
-};
-
-// Weekday index mapping to Persian names
-const WEEKDAY_NAMES = ['یکشنبه', 'دوشنبه', 'سه‌شنبه', 'چهارشنبه', 'پنج‌شنبه', 'جمعه', 'شنبه'];
-
-
 export default function JournalPage() {
   const [activeTab, setActiveTab] = useState<'overview' | 'patterns' | 'charts'>('overview');
   const { t, language } = useTranslation();
-
-  const formatNum = (num: number | string) => language === 'fa' ? toPersianDigits(num.toString()) : num.toString();
-
-  const formatCurrency = (val: number, decimals = 2, showPlus = false) => {
-    if (val === 0) return `$${formatNum('0' + (decimals > 0 ? '.' + '0'.repeat(decimals) : ''))}`;
-    const isNeg = val < 0;
-    const absVal = Math.abs(val).toFixed(decimals);
-    const formatted = formatNum(absVal);
-    const sign = isNeg ? '-' : (showPlus ? '+' : '');
-    return `${sign}$${formatted}`;
-  };
-
-  const getEmotionLabel = (key: string) => {
-    if (language === 'en') {
-      const enMap: { [key: string]: string } = {
-        CONFIDENT: 'Confident',
-        NEUTRAL: 'Neutral',
-        ANXIOUS: 'Anxious',
-        FOMO: 'FOMO',
-        REVENGE: 'Revenge',
-        UNKNOWN: 'Unknown'
-      };
-      return enMap[key] || key;
-    } else {
-      return EMOTION_MAP[key]?.label || key;
-    }
-  };
 
   const getSessionLabel = (label: string) => {
     if (language === 'en') {
@@ -71,8 +32,8 @@ export default function JournalPage() {
   };
 
   const weekdayNames = language === 'fa'
-    ? WEEKDAY_NAMES
-    : ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    ? WEEKDAY_NAMES_FA
+    : WEEKDAY_NAMES_EN;
 
   const {
     accounts,
@@ -95,41 +56,23 @@ export default function JournalPage() {
     fetchTrades(false, selectedAccountId);
   }, [selectedAccountId]);
 
+  const { tags: fetchedTags } = useTradesTags();
   useEffect(() => {
-    const fetchCustomTags = async () => {
-      try {
-        const res = await api.get(`/api/trades/tags?t=${Date.now()}`);
-        const tags = res.data;
-        if (Array.isArray(tags)) {
-          const ignored = new Set<string>();
-          tags.forEach((tag: any) => {
-            if (tag.is_ignored) {
-              ignored.add(tag.name);
-            }
-          });
-          setIgnoredTags(ignored);
-        }
-      } catch (err) {
-        console.error('Failed to fetch tags options in journal:', err);
-      }
-    };
-    fetchCustomTags();
-  }, []);
+    if (Array.isArray(fetchedTags)) {
+      const ignored = new Set<string>();
+      fetchedTags.forEach((tag: any) => {
+        if (tag.is_ignored) ignored.add(tag.name);
+      });
+      setIgnoredTags(ignored);
+    }
+  }, [fetchedTags]);
 
+  const { emotions: fetchedEmotions } = useTradesEmotions();
   useEffect(() => {
-    const fetchCustomEmotions = async () => {
-      try {
-        const res = await api.get(`/api/trades/emotions?t=${Date.now()}`);
-        const data = res.data;
-        if (Array.isArray(data)) {
-          setCustomEmotions(data);
-        }
-      } catch (err) {
-        console.error('Failed to fetch emotions in journal:', err);
-      }
-    };
-    fetchCustomEmotions();
-  }, []);
+    if (Array.isArray(fetchedEmotions)) {
+      setCustomEmotions(fetchedEmotions);
+    }
+  }, [fetchedEmotions]);
 
   // Compute Statistics (Tier 1 & Tier 2)
   const stats = useMemo(() => {
@@ -395,7 +338,7 @@ export default function JournalPage() {
       return {
         name: key,
         label: foundCustom?.label || getEmotionLabel(key) || key,
-        emoji: foundCustom?.emoji || EMOTION_MAP[key]?.emoji || '💭',
+        emoji: foundCustom?.emoji || getEmotionEmoji(key),
         ...emotionsGroup[key],
         winRate: (emotionsGroup[key].wins / emotionsGroup[key].total) * 100,
         avgPnl: emotionsGroup[key].pnl / emotionsGroup[key].total,

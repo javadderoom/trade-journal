@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuthStore } from '../../lib/auth';
 import { toPersianDigits } from '../../utils/farsi';
+import { usePrices } from '../../hooks/usePrices';
+import { useCryptoDetails } from '../../hooks/useCryptoDetails';
 import '../landing.scss';
 
 type CellType = 'check' | 'cross' | 'partial' | string;
@@ -217,21 +219,8 @@ export default function LandingPage({ params }: PageProps) {
   const [navScrolled, setNavScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [openFaq, setOpenFaq] = useState<number | null>(0);
-  const [prices, setPrices] = useState<any>(null);
-  const [cryptoDetails, setCryptoDetails] = useState<any>(null);
-
-  useEffect(() => {
-    const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
-    fetch(`${apiBase}/api/payments/prices`)
-      .then(r => r.json())
-      .then(data => setPrices(data))
-      .catch(e => console.error('Failed to fetch pricing:', e));
-
-    fetch(`${apiBase}/api/settings/crypto-details`)
-      .then(r => r.json())
-      .then(data => setCryptoDetails(data))
-      .catch(e => console.warn('Failed to fetch crypto details:', e));
-  }, []);
+  const prices = usePrices();
+  const cryptoDetails = useCryptoDetails();
 
   const plans = useMemo(() => {
     const formatPrice = (p: number) => {
