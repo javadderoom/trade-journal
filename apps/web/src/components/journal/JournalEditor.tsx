@@ -2,6 +2,7 @@
 
 import React, { useRef, useEffect, useState } from 'react';
 import { useTranslation } from '../../store/useAppStore';
+import { getSharedTranslations } from '../../locales/components';
 
 interface JournalEditorProps {
   value: string;
@@ -17,6 +18,7 @@ export default function JournalEditor({ value, onChange, onSave, saveStatus }: J
   const isEn = language === 'en';
 
   const p = {
+    ...getSharedTranslations(isEn),
     emptyPreview: isEn ? 'Nothing written yet...' : 'چیزی نوشته نشده است...',
     bold: isEn ? 'Bold' : 'ضخیم (Bold)',
     boldPlaceholder: isEn ? 'bold text' : 'متن ضخیم',

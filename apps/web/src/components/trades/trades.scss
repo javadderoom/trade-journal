@@ -118,16 +118,6 @@
     }
   }
 
-  &.btn-danger {
-    background-color: $error-container;
-    color: $on-error-container;
-    font-weight: 700;
-    box-shadow: 0 4px 20px rgba($error, 0.15);
-
-    &:hover {
-      filter: brightness(1.2);
-    }
-  }
 }
 
 // 2. Filter Bar Overhaul
@@ -731,18 +721,6 @@
               opacity: 0.65;
               margin-top: 2px;
               direction: rtl;
-            }
-
-            &.profit-positive {
-              color: $primary;
-            }
-
-            &.profit-negative {
-              color: $error;
-            }
-
-            &.profit-zero {
-              color: $on-surface-variant;
             }
 
             &.profit-open {
@@ -1811,11 +1789,6 @@ input[type="checkbox"] {
   }
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
 .trade-chart-section {
   margin-top: 20px;
   display: flex;
@@ -2492,19 +2465,6 @@ input[type="checkbox"] {
   }
 }
 
-.animate-fade-in {
-  animation: fadeIn 0.2s ease-out forwards;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
  // ==========================================
  // RESPONSIVE STYLES & MOBILE LAYOUT
  // ==========================================
@@ -2783,18 +2743,6 @@ input[type="checkbox"] {
 
           .profit-toman {
             font-size: 11px;
-            color: $on-surface-variant;
-          }
-
-          &.profit-positive {
-            color: $primary;
-            .profit-usd { color: $primary; }
-          }
-          &.profit-negative {
-            color: $error;
-            .profit-usd { color: $error; }
-          }
-          &.profit-zero {
             color: $on-surface-variant;
           }
           &.profit-open {

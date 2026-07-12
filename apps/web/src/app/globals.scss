@@ -1,5 +1,9 @@
 /* Global styles for Next.js App Router (SCSS) */
 @use './variables' as *;
+@use './animations';
+@use './buttons';
+@use './modals';
+@use './utilities';
 @use '../components/trades/trades';
 @use '../components/ui/select';
 @use '../components/layout/sidenav';

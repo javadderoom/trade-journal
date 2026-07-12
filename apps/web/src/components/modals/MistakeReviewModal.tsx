@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { api } from '../../lib/api';
 import { notify } from '../../lib/notify';
 import { useTranslation } from '../../store/useAppStore';
+import { getSharedTranslations } from '../../locales/components';
 import './mistake-review-modal.scss';
 
 export interface SuggestedMistake {
@@ -121,6 +122,7 @@ export default function MistakeReviewModal({
   };
 
   const p = {
+    ...getSharedTranslations(isEn),
     title: isEn ? '🔍 Auto Mistake Detection' : '🔍 تشخیص خودکار اشتباه',
     desc: isEn ? 'Simple rules checked on your actual trade details' : 'هوش مصنوعی نشد، قوانین ساده روی داده‌های خودت',
     potentialMistakes: isEn ? 'Potential mistakes identified:' : 'اشتباهات احتمالی شناسایی شده:',

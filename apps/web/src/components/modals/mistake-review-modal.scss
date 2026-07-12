@@ -32,11 +32,6 @@
   animation: slideUp 0.2s ease;
   direction: rtl;
 
-  @keyframes slideUp {
-    from { transform: translateY(16px); opacity: 0; }
-    to   { transform: translateY(0);    opacity: 1; }
-  }
-
   .modal-header {
     display: flex;
     align-items: flex-start;

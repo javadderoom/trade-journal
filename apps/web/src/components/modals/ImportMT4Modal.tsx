@@ -3,6 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { api } from '../../lib/api';
 import { useTranslation } from '../../store/useAppStore';
+import { getSharedTranslations } from '../../locales/components';
 
 interface ImportMT4ModalProps {
   isOpen: boolean;
@@ -183,6 +184,7 @@ export default function ImportMT4Modal({ isOpen, onClose, onSuccess, accounts }:
   };
 
   const p = {
+    ...getSharedTranslations(isEn),
     title: isEn ? 'Import MetaTrader Trades' : 'واردات معاملات از متاتریدر (MT4 / MT5)',
     step1: isEn ? 'Select File' : 'انتخاب فایل',
     step2: isEn ? 'Select Account' : 'انتخاب حساب',
@@ -192,7 +194,6 @@ export default function ImportMT4Modal({ isOpen, onClose, onSuccess, accounts }:
     accountDesc: isEn ? 'Select the trading account associated with this file to import trades to.' : 'حساب معاملاتی مربوط به این فایل را انتخاب کنید تا معاملات در همان حساب ثبت شوند.',
     noAccountError: isEn ? 'No trading accounts found.' : 'هیچ حساب معاملاتی برای انتخاب پیدا نشد.',
     back: isEn ? 'Back' : 'بازگشت',
-    cancel: isEn ? 'Cancel' : 'انصراف',
     next: isEn ? 'Next Step' : 'مرحله بعد',
     import: isEn ? 'Start Import' : 'شروع واردات معاملات',
     processing: isEn ? 'Processing...' : 'در حال پردازش...',

@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { api } from '../../lib/api';
 import { useTranslation } from '../../store/useAppStore';
+import { getSharedTranslations } from '../../locales/components';
 import { useTradeStore } from '../../store/useTradeStore';
 import JournalEditor from '../../components/journal/JournalEditor';
 import { toPersianDigits, formatToman, getJalaliParts, jalaliToGregorian, getJalaliMonthLength } from '../../utils/farsi';
@@ -16,6 +17,7 @@ export default function JournalPage() {
   const isEn = language === 'en';
 
   const p = {
+    ...getSharedTranslations(isEn),
     prevDay: isEn ? 'Previous Day' : 'روز قبل',
     nextDay: isEn ? 'Next Day' : 'روز بعد',
     today: isEn ? 'Today' : 'امروز',

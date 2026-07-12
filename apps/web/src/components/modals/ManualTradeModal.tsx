@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { api } from '../../lib/api';
 import { SuggestedMistake } from './MistakeReviewModal';
 import { useTranslation } from '../../store/useAppStore';
+import { getSharedTranslations } from '../../locales/components';
 
 interface ManualTradeModalProps {
   isOpen: boolean;
@@ -128,6 +129,7 @@ export default function ManualTradeModal({ isOpen, onClose, onSuccess }: ManualT
   };
 
   const p = {
+    ...getSharedTranslations(isEn),
     title: isEn ? 'Record Manual Trade' : 'ثبت معامله دستی جدید',
     status: isEn ? 'Status' : 'وضعیت معامله',
     open: isEn ? 'Open' : 'باز (Open)',
@@ -148,7 +150,6 @@ export default function ManualTradeModal({ isOpen, onClose, onSuccess }: ManualT
     netProfit: isEn ? 'Net Profit/Loss (USD)' : 'سود/زیان خالص (دلار USD)',
     commission: isEn ? 'Commission (USD)' : 'کمیسیون (دلار)',
     swap: isEn ? 'Swap (USD)' : 'سواپ (دلار)',
-    cancel: isEn ? 'Cancel' : 'انصراف',
     save: isEn ? 'Save Trade' : 'ثبت معامله دستی',
     saving: isEn ? 'Saving...' : 'در حال ثبت...',
   };

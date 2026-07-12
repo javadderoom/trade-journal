@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { toPersianDigits } from '../../utils/farsi';
 import { useTranslation, useAppStore } from '../../store/useAppStore';
+import { getSharedTranslations } from '../../locales/components';
 import { api } from '../../lib/api';
 import { notify } from '../../lib/notify';
 import { useTradesTags, TagObject } from '../../hooks/useTradesTags';
@@ -98,6 +99,7 @@ export default function TradesTable({
   const isEn = language === 'en';
 
   const p = {
+    ...getSharedTranslations(isEn),
     trades: isEn ? 'Trades' : 'معاملات',
     exportLabel: isEn ? 'Export Excel/CSV' : 'خروجی اکسل/CSV',
     importLabel: isEn ? 'Import MT4/5' : 'واردات MT4/MT5',
@@ -107,7 +109,6 @@ export default function TradesTable({
       ? 'Exporting data is only available for Pro users. Please upgrade your account to access this and other advanced features.'
       : 'خروجی داده فقط برای کاربران حرفه‌ای در دسترس است. برای دسترسی به این قابلیت و امکانات پیشرفته دیگر، لطفاً حساب خود را به حرفه‌ای ارتقا دهید.',
     upgradeAccount: isEn ? 'Upgrade Account' : 'ارتقای حساب',
-    close: isEn ? 'Close' : 'بستن',
     dateLabel: isEn ? 'Date:' : 'تاریخ:',
     daysSelected: isEn ? 'days selected' : 'روز انتخاب شده',
   };

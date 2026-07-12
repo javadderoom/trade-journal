@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { api } from '../../lib/api';
 import { notify } from '../../lib/notify';
 import { useTranslation } from '../../store/useAppStore';
+import { getSharedTranslations } from '../../locales/components';
 import './export-modal.scss';
 
 interface ExportModalProps {
@@ -92,6 +93,7 @@ export default function ExportModal({
   };
 
   const p = {
+    ...getSharedTranslations(isEn),
     title: isEn ? 'Export Data' : 'خروجی داده‌ها (Export)',
     formatTitle: isEn ? 'Output File Format:' : 'فرمت فایل خروجی:',
     csvName: isEn ? 'CSV File' : 'فایل CSV',
@@ -105,7 +107,6 @@ export default function ExportModal({
     scopeAll: isEn ? `All account trades (${totalCount} trades)` : `همه معاملات حساب (${totalCount} معامله)`,
     preparing: isEn ? 'Preparing file...' : 'در حال آماده‌سازی فایل...',
     downloadLabel: isEn ? 'Download Export' : 'دریافت خروجی داده',
-    cancel: isEn ? 'Cancel' : 'انصراف',
   };
 
   return (

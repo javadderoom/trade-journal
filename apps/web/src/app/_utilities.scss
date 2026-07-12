@@ -1,0 +1,19 @@
+@use './variables' as *;
+
+.profit-positive {
+  color: $primary !important;
+  .profit-usd {
+    color: $primary !important;
+  }
+}
+
+.profit-negative {
+  color: $error !important;
+  .profit-usd {
+    color: $error !important;
+  }
+}
+
+.profit-zero {
+  color: $on-surface-variant !important;
+}

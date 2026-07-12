@@ -5,6 +5,7 @@ import { api } from '../../lib/api';
 import { notify } from '../../lib/notify';
 import { SuggestedMistake } from './MistakeReviewModal';
 import { useTranslation } from '../../store/useAppStore';
+import { getSharedTranslations } from '../../locales/components';
 import './mistake-review-modal.scss';
 
 export interface ImportMistakeEntry {
@@ -100,6 +101,7 @@ export default function ImportMistakeSummaryModal({
   };
 
   const p = {
+    ...getSharedTranslations(isEn),
     title: isEn ? 'Losing Trade Patterns Detected' : 'الگوهای اشتباه در واردات',
     desc: isEn 
       ? `In this import, ${totalAffected} losing trades were identified with the following mistake patterns:`

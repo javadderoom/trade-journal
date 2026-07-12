@@ -5,6 +5,7 @@ import { Trade, TagObject } from './TradesTable';
 import TradeChart from './TradeChart';
 import { toPersianDigits, formatToman } from '../../utils/farsi';
 import { useTranslation } from '../../store/useAppStore';
+import { getSharedTranslations } from '../../locales/components';
 import {
   formatCurrency,
   getEmotionEmoji,
@@ -73,6 +74,7 @@ export default function DetailPanel({
   };
 
   const p = {
+    ...getSharedTranslations(isEn),
     details: isEn ? 'Details' : 'مشخصات',
     notesTab: isEn ? 'Notes & Documents' : 'یادداشت و مستندات',
     netProfit: isEn ? 'Net Profit (P&L)' : 'سود/زیان خالص',

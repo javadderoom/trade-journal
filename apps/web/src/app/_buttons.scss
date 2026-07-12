@@ -1,0 +1,49 @@
+@use './variables' as *;
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+  background: transparent;
+
+  &.btn-secondary {
+    border: 1px solid $outline-variant;
+    color: $on-surface-variant;
+    background-color: transparent;
+
+    &:hover {
+      color: $on-surface;
+      background-color: rgba($surface-variant, 0.5);
+    }
+  }
+
+  &.btn-primary {
+    background-color: $primary-container;
+    color: $on-primary-container;
+    font-weight: 700;
+    box-shadow: 0 4px 20px rgba($primary, 0.15);
+
+    &:hover {
+      filter: brightness(1.1);
+    }
+  }
+
+  &.btn-danger {
+    background-color: $error-container;
+    color: $on-error-container;
+    font-weight: 700;
+    box-shadow: 0 4px 20px rgba($error, 0.15);
+
+    &:hover {
+      filter: brightness(1.2);
+    }
+  }
+}

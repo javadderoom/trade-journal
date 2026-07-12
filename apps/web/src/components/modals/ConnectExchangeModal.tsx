@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { api } from '../../lib/api';
 import { useTranslation } from '../../store/useAppStore';
 import { notify } from '../../lib/notify';
+import { getSharedTranslations } from '../../locales/components';
 
 interface ConnectExchangeModalProps {
   isOpen: boolean;
@@ -134,6 +135,7 @@ export default function ConnectExchangeModal({ isOpen, onClose, onSuccess }: Con
   };
 
   const p = {
+    ...getSharedTranslations(isEn),
     title: isEn ? 'Connect Crypto Exchange API' : 'اتصال API صرافی کریپتو',
     desc: isEn 
       ? 'Connect your crypto exchange via Read-Only API keys to automatically synchronize your trade history.' 
@@ -146,7 +148,6 @@ export default function ConnectExchangeModal({ isOpen, onClose, onSuccess }: Con
     apiSecretLabel: isEn ? 'API Secret' : 'رمز API (API Secret)',
     passphraseLabel: isEn ? 'Passphrase (Optional)' : 'عبارت عبور - Passphrase (اختیاری)',
     passphraseHelp: isEn ? 'Required for some exchanges (e.g. KuCoin, OKX, BingX)' : 'برای برخی صرافی‌ها الزامی است (مانند کوکوین، اوکی‌اکس، بینگ‌اکس)',
-    cancel: isEn ? 'Cancel' : 'انصراف',
     connect: isEn ? 'Connect & Sync' : 'اتصال و همگام‌سازی',
     connecting: isEn ? 'Connecting...' : 'در حال اتصال...',
   };
