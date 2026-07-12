@@ -320,8 +320,8 @@
     "semantic_hash": ""
   },
   "apps/web/src/app/settings/page.tsx": {
-    "mtime": 1783794276.9725246,
-    "ast_hash": "87579db731e8d82f54595bf13162fef3",
+    "mtime": 1783874796.7436206,
+    "ast_hash": "762fa6c5502b53fc3919e99bc868916b",
     "semantic_hash": ""
   },
   "apps/web/src/components/layout/AppLayout.tsx": {
@@ -1085,8 +1085,8 @@
     "semantic_hash": ""
   },
   "apps/web/src/app/[locale]/page.tsx": {
-    "mtime": 1783543031.586266,
-    "ast_hash": "24a0de1fc84a381106264ab11c249324",
+    "mtime": 1783874197.8799846,
+    "ast_hash": "7f8352dfad54cee4d5cfc2c63bfc0339",
     "semantic_hash": ""
   },
   "apps/web/src/app/api/payments/payping/callback/route.ts": {
@@ -1095,8 +1095,8 @@
     "semantic_hash": ""
   },
   "apps/web/src/components/modals/ExportModal.tsx": {
-    "mtime": 1783809903.6387,
-    "ast_hash": "28bbdb861c17c752294c59e7691bc9db",
+    "mtime": 1783863142.3807492,
+    "ast_hash": "acf5649a483a669cca2a4d2c6420452c",
     "semantic_hash": ""
   },
   "apps/web/src/components/modals/ImportMistakeSummaryModal.tsx": {

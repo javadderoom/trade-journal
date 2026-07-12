@@ -118,104 +118,112 @@ export default function ExportModal({
           </button>
         </div>
 
-        <div className="modal-body">
-          {/* Format selection */}
-          <div className="section-title">{p.formatTitle}</div>
-          <div className="format-options-grid">
-            <label className={`format-option-card ${format === 'csv' ? 'active' : ''}`}>
-              <input
-                type="radio"
-                name="format"
-                value="csv"
-                checked={format === 'csv'}
-                onChange={() => setFormat('csv')}
-              />
-              <span className="material-symbols-outlined format-icon">csv</span>
-              <span className="format-name">{p.csvName}</span>
-              <span className="format-desc">{p.csvDesc}</span>
-            </label>
-
-            <label className={`format-option-card ${format === 'xlsx' ? 'active' : ''}`}>
-              <input
-                type="radio"
-                name="format"
-                value="xlsx"
-                checked={format === 'xlsx'}
-                onChange={() => setFormat('xlsx')}
-              />
-              <span className="material-symbols-outlined format-icon">table_chart</span>
-              <span className="format-name">{p.xlsxName}</span>
-              <span className="format-desc">{p.xlsxDesc}</span>
-            </label>
-
-            <label className={`format-option-card ${format === 'pdf' ? 'active' : ''}`}>
-              <input
-                type="radio"
-                name="format"
-                value="pdf"
-                checked={format === 'pdf'}
-                onChange={() => setFormat('pdf')}
-              />
-              <span className="material-symbols-outlined format-icon">picture_as_pdf</span>
-              <span className="format-name">{p.pdfName}</span>
-              <span className="format-desc">{p.pdfDesc}</span>
-            </label>
-          </div>
-
-          {/* Scope selection */}
-          <div className="scope-selection-section">
-            <div className="section-title">{p.scopeTitle}</div>
-            <div className="scope-options">
-              <label className="scope-radio-option">
+        <div className="modal-form">
+          <div className="modal-body">
+            {/* Format selection */}
+            <div className="section-title">{p.formatTitle}</div>
+            <div className="format-options-grid">
+              <label className={`format-option-card ${format === 'csv' ? 'active' : ''}`}>
                 <input
                   type="radio"
-                  name="scope"
-                  value="filtered"
-                  checked={scope === 'filtered'}
-                  onChange={() => setScope('filtered')}
+                  name="format"
+                  value="csv"
+                  checked={format === 'csv'}
+                  onChange={() => setFormat('csv')}
                 />
-                <span className="radio-label-text">
-                  {p.scopeFiltered}
-                </span>
+                <span className="material-symbols-outlined format-icon">csv</span>
+                <span className="format-name">{p.csvName}</span>
+                <span className="format-desc">{p.csvDesc}</span>
               </label>
 
-              <label className="scope-radio-option">
+              <label className={`format-option-card ${format === 'xlsx' ? 'active' : ''}`}>
                 <input
                   type="radio"
-                  name="scope"
-                  value="all"
-                  checked={scope === 'all'}
-                  onChange={() => setScope('all')}
+                  name="format"
+                  value="xlsx"
+                  checked={format === 'xlsx'}
+                  onChange={() => setFormat('xlsx')}
                 />
-                <span className="radio-label-text">
-                  {p.scopeAll}
-                </span>
+                <span className="material-symbols-outlined format-icon">table_chart</span>
+                <span className="format-name">{p.xlsxName}</span>
+                <span className="format-desc">{p.xlsxDesc}</span>
+              </label>
+
+              <label className={`format-option-card ${format === 'pdf' ? 'active' : ''}`}>
+                <input
+                  type="radio"
+                  name="format"
+                  value="pdf"
+                  checked={format === 'pdf'}
+                  onChange={() => setFormat('pdf')}
+                />
+                <span className="material-symbols-outlined format-icon">picture_as_pdf</span>
+                <span className="format-name">{p.pdfName}</span>
+                <span className="format-desc">{p.pdfDesc}</span>
               </label>
             </div>
-          </div>
-        </div>
 
-        <div className="modal-footer">
-          <button
-            className="btn btn-primary btn-download"
-            onClick={handleDownload}
-            disabled={isDownloading}
-          >
-            {isDownloading ? (
-              <>
-                <span className="spinner"></span>
-                {p.preparing}
-              </>
-            ) : (
-              <>
-                <span className="material-symbols-outlined">download</span>
-                {p.downloadLabel}
-              </>
-            )}
-          </button>
-          <button className="btn btn-secondary" onClick={onClose} disabled={isDownloading}>
-            {p.cancel}
-          </button>
+            {/* Scope selection */}
+            <div className="scope-selection-section">
+              <div className="section-title">{p.scopeTitle}</div>
+              <div className="scope-options">
+                <label className="scope-radio-option">
+                  <input
+                    type="radio"
+                    name="scope"
+                    value="filtered"
+                    checked={scope === 'filtered'}
+                    onChange={() => setScope('filtered')}
+                  />
+                  <span className="radio-label-text">
+                    {p.scopeFiltered}
+                  </span>
+                </label>
+
+                <label className="scope-radio-option">
+                  <input
+                    type="radio"
+                    name="scope"
+                    value="all"
+                    checked={scope === 'all'}
+                    onChange={() => setScope('all')}
+                  />
+                  <span className="radio-label-text">
+                    {p.scopeAll}
+                  </span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <div className="modal-footer">
+            <button 
+              type="button"
+              className="btn btn-secondary" 
+              onClick={onClose} 
+              disabled={isDownloading}
+            >
+              {p.cancel}
+            </button>
+            <button
+              type="button"
+              className="btn btn-primary btn-download"
+              onClick={handleDownload}
+              disabled={isDownloading}
+            >
+              {isDownloading ? (
+                <>
+                  <span className="spinner"></span>
+                  {p.preparing}
+                </>
+              ) : (
+                <>
+                  <span className="material-symbols-outlined">download</span>
+                  {p.downloadLabel}
+                </>
+              )}
+            </button>
+          </div>
         </div>
       </div>
     </div>

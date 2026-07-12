@@ -5670,7 +5670,7 @@
       "source_location": "L925",
       "_origin": "ast",
       "id": "rules_checks_oklchtorgb",
-      "community": 29,
+      "community": 2,
       "norm_label": "oklchtorgb()"
     },
     {
@@ -5680,7 +5680,7 @@
       "source_location": "L951",
       "_origin": "ast",
       "id": "rules_checks_parseanycolor",
-      "community": 29,
+      "community": 2,
       "norm_label": "parseanycolor()"
     },
     {
@@ -5820,7 +5820,7 @@
       "source_location": "L1252",
       "_origin": "ast",
       "id": "rules_checks_resolvelengthpx",
-      "community": 29,
+      "community": 2,
       "norm_label": "resolvelengthpx()"
     },
     {
@@ -5830,7 +5830,7 @@
       "source_location": "L1264",
       "_origin": "ast",
       "id": "rules_checks_csscoloristransparent",
-      "community": 29,
+      "community": 2,
       "norm_label": "csscoloristransparent()"
     },
     {
@@ -5840,7 +5840,7 @@
       "source_location": "L1273",
       "_origin": "ast",
       "id": "rules_checks_colorsnearlymatch",
-      "community": 29,
+      "community": 2,
       "norm_label": "colorsnearlymatch()"
     },
     {
@@ -5850,7 +5850,7 @@
       "source_location": "L1286",
       "_origin": "ast",
       "id": "rules_checks_getcomputedstylefor",
-      "community": 29,
+      "community": 2,
       "norm_label": "getcomputedstylefor()"
     },
     {
@@ -5860,7 +5860,7 @@
       "source_location": "L1296",
       "_origin": "ast",
       "id": "rules_checks_hasvisiblebackgroundboundary",
-      "community": 29,
+      "community": 2,
       "norm_label": "hasvisiblebackgroundboundary()"
     },
     {
@@ -5880,7 +5880,7 @@
       "source_location": "L1315",
       "_origin": "ast",
       "id": "rules_checks_hasmeaningfuldirecttext",
-      "community": 29,
+      "community": 2,
       "norm_label": "hasmeaningfuldirecttext()"
     },
     {
@@ -5890,7 +5890,7 @@
       "source_location": "L1323",
       "_origin": "ast",
       "id": "rules_checks_textdescendantsflushsides",
-      "community": 29,
+      "community": 2,
       "norm_label": "textdescendantsflushsides()"
     },
     {
@@ -5900,7 +5900,7 @@
       "source_location": "L1349",
       "_origin": "ast",
       "id": "rules_checks_checkquality",
-      "community": 29,
+      "community": 2,
       "norm_label": "checkquality()"
     },
     {
@@ -5910,7 +5910,7 @@
       "source_location": "L1660",
       "_origin": "ast",
       "id": "rules_checks_checkelementqualitydom",
-      "community": 29,
+      "community": 2,
       "norm_label": "checkelementqualitydom()"
     },
     {
@@ -5920,7 +5920,7 @@
       "source_location": "L1678",
       "_origin": "ast",
       "id": "rules_checks_checkpagequalityfromdoc",
-      "community": 2,
+      "community": 4,
       "norm_label": "checkpagequalityfromdoc()"
     },
     {
@@ -5930,7 +5930,7 @@
       "source_location": "L1699",
       "_origin": "ast",
       "id": "rules_checks_checkpagequalitydom",
-      "community": 2,
+      "community": 4,
       "norm_label": "checkpagequalitydom()"
     },
     {
@@ -5940,7 +5940,7 @@
       "source_location": "L1709",
       "_origin": "ast",
       "id": "rules_checks_checkelementquality",
-      "community": 29,
+      "community": 2,
       "norm_label": "checkelementquality()"
     },
     {
@@ -6180,7 +6180,7 @@
       "source_location": "L2301",
       "_origin": "ast",
       "id": "rules_checks_csscoloralpha",
-      "community": 29,
+      "community": 2,
       "norm_label": "csscoloralpha()"
     },
     {
@@ -12050,7 +12050,7 @@
       "source_location": "L4329",
       "_origin": "ast",
       "id": "scripts_live_browser_usesshadowchromeroot",
-      "community": 117,
+      "community": 29,
       "norm_label": "usesshadowchromeroot()"
     },
     {
@@ -12060,7 +12060,7 @@
       "source_location": "L4334",
       "_origin": "ast",
       "id": "scripts_live_browser_setimportantstyle",
-      "community": 117,
+      "community": 29,
       "norm_label": "setimportantstyle()"
     },
     {
@@ -12070,7 +12070,7 @@
       "source_location": "L4338",
       "_origin": "ast",
       "id": "scripts_live_browser_initeditbadgehitproxies",
-      "community": 117,
+      "community": 29,
       "norm_label": "initeditbadgehitproxies()"
     },
     {
@@ -12080,7 +12080,7 @@
       "source_location": "L4360",
       "_origin": "ast",
       "id": "scripts_live_browser_styleeditbadgeproxy",
-      "community": 117,
+      "community": 29,
       "norm_label": "styleeditbadgeproxy()"
     },
     {
@@ -12100,7 +12100,7 @@
       "source_location": "L4408",
       "_origin": "ast",
       "id": "scripts_live_browser_bindeditbadgeproxy",
-      "community": 117,
+      "community": 29,
       "norm_label": "bindeditbadgeproxy()"
     },
     {
@@ -12110,7 +12110,7 @@
       "source_location": "L4439",
       "_origin": "ast",
       "id": "scripts_live_browser_editbadgeproxytargets",
-      "community": 117,
+      "community": 29,
       "norm_label": "editbadgeproxytargets()"
     },
     {
@@ -12120,7 +12120,7 @@
       "source_location": "L4450",
       "_origin": "ast",
       "id": "scripts_live_browser_synceditbadgehitproxies",
-      "community": 117,
+      "community": 29,
       "norm_label": "synceditbadgehitproxies()"
     },
     {
@@ -12140,7 +12140,7 @@
       "source_location": "L4512",
       "_origin": "ast",
       "id": "scripts_live_browser_positioneditbadge",
-      "community": 117,
+      "community": 29,
       "norm_label": "positioneditbadge()"
     },
     {
@@ -22327,7 +22327,7 @@
       "label": "pointTitle()",
       "file_type": "code",
       "source_file": "apps/web/src/app/[locale]/page.tsx",
-      "source_location": "L614",
+      "source_location": "L618",
       "_origin": "ast",
       "id": "locale_page_pointtitle",
       "community": 71,
@@ -22337,7 +22337,7 @@
       "label": "renderCompareCell()",
       "file_type": "code",
       "source_file": "apps/web/src/app/[locale]/page.tsx",
-      "source_location": "L618",
+      "source_location": "L622",
       "_origin": "ast",
       "id": "locale_page_rendercomparecell",
       "community": 71,
@@ -22347,7 +22347,7 @@
       "label": "renderPreview()",
       "file_type": "code",
       "source_file": "apps/web/src/app/[locale]/page.tsx",
-      "source_location": "L650",
+      "source_location": "L654",
       "_origin": "ast",
       "id": "locale_page_renderpreview",
       "community": 71,
@@ -22357,7 +22357,7 @@
       "label": "CountUp()",
       "file_type": "code",
       "source_file": "apps/web/src/app/[locale]/page.tsx",
-      "source_location": "L667",
+      "source_location": "L671",
       "_origin": "ast",
       "id": "locale_page_countup",
       "community": 71,
@@ -22367,7 +22367,7 @@
       "label": "DashboardMockup()",
       "file_type": "code",
       "source_file": "apps/web/src/app/[locale]/page.tsx",
-      "source_location": "L705",
+      "source_location": "L709",
       "_origin": "ast",
       "id": "locale_page_dashboardmockup",
       "community": 71,
@@ -22377,7 +22377,7 @@
       "label": "EquityMini()",
       "file_type": "code",
       "source_file": "apps/web/src/app/[locale]/page.tsx",
-      "source_location": "L749",
+      "source_location": "L753",
       "_origin": "ast",
       "id": "locale_page_equitymini",
       "community": 71,
@@ -22387,7 +22387,7 @@
       "label": "CalendarMini()",
       "file_type": "code",
       "source_file": "apps/web/src/app/[locale]/page.tsx",
-      "source_location": "L777",
+      "source_location": "L781",
       "_origin": "ast",
       "id": "locale_page_calendarmini",
       "community": 71,
@@ -22397,7 +22397,7 @@
       "label": "EmotionMini()",
       "file_type": "code",
       "source_file": "apps/web/src/app/[locale]/page.tsx",
-      "source_location": "L796",
+      "source_location": "L800",
       "_origin": "ast",
       "id": "locale_page_emotionmini",
       "community": 71,
@@ -22407,7 +22407,7 @@
       "label": "EdgeMini()",
       "file_type": "code",
       "source_file": "apps/web/src/app/[locale]/page.tsx",
-      "source_location": "L821",
+      "source_location": "L825",
       "_origin": "ast",
       "id": "locale_page_edgemini",
       "community": 71,
@@ -22417,7 +22417,7 @@
       "label": "ImportMini()",
       "file_type": "code",
       "source_file": "apps/web/src/app/[locale]/page.tsx",
-      "source_location": "L839",
+      "source_location": "L843",
       "_origin": "ast",
       "id": "locale_page_importmini",
       "community": 71,
@@ -103833,5 +103833,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "3c1ab69b70b81dcccd74fc75ef9059f9ad904d7a"
+  "built_at_commit": "9abf7ec472e7ef2fe3bc3ec57e1dcd678daa0635"
 }

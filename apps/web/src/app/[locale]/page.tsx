@@ -73,7 +73,7 @@ const DATA = {
     ],
     faqs: [
       { q: 'آیا برای شروع باید هزینه کنم؟', a: 'خیر. ثبت‌نام و استفاده از پلن رایگان کاملاً بدون هزینه‌ است و در کمتر از ۳۰ ثانیه آماده‌ست.' },
-      { q: 'با کدام بروکرها و پلتفرم‌ها کار می‌کنه؟', a: 'هر بروکری که از MetaTrader 4 یا 5 پشتیبانی کنه. فایل HTML اکسپرت رو وارد کن یا از اکسپرت EA برای همگام‌سازی زنده استفاده کن.' },
+      { q: 'با کدام بروکرها و پلتفرم‌ها کار می‌کنه؟', a: 'هر بروکری که از MetaTrader 4 یا 5 پشتیبانی کنه. همچنین صرافی‌های ارز دیجیتال از طریق API پشتیبانی میشن. فایل HTML اکسپرت رو وارد کن یا از اکسپرت EA برای همگام‌سازی زنده استفاده کن.' },
       { q: 'تفاوت تریدکاو با اکسل و نوشن در چیست؟', a: 'تریدکاو نیاز به فرمول‌نویسی دستی یا وارد کردن دیتای عددی معاملات نداره. تمام محاسبات pips، سود تجمعی، مدیریت ریسک، R:R و هیتمپ به صورت کاملاً اتوماتیک انجام می‌شه و الگوهای سودده شما شناسایی می‌شن.' },
       { q: 'داده‌های من امن هستند؟', a: 'همه داده‌ها روی سرور امن ذخیره می‌شن و فقط با توکن اختصاصی خودت قابل دسترسیه.' },
     ],
@@ -153,7 +153,7 @@ const DATA = {
     ],
     faqs: [
       { q: 'Do I have to pay to start?', a: 'No! Registration and using the Free plan are completely free, taking less than 30 seconds.' },
-      { q: 'Which brokers and platforms are supported?', a: 'Any broker that supports MetaTrader 4 or 5. Simply import the HTML report or use our EA for live sync.' },
+      { q: 'Which brokers and platforms are supported?', a: 'Any broker that supports MetaTrader 4 or 5. Crypto exchanges are also supported via API. Simply import the HTML report or use our EA for live sync.' },
       { q: 'How is TradeKav different from Excel or Notion?', a: 'No manual formulas or data entry required. TradeKav automatically processes pips, risk management, R:R multipliers, equity curves, and performance heatmaps.' },
       { q: 'Are my data secure?', a: 'All data are stored securely on our encrypted servers and accessible only via your unique authorization token.' },
     ],
@@ -201,12 +201,7 @@ export default function LandingPage({ params }: PageProps) {
   const { user, isInitialized } = useAuthStore();
   const router = useRouter();
 
-  // Redirect authenticated users to dashboard
-  useEffect(() => {
-    if (isInitialized && user) {
-      router.replace('/dashboard');
-    }
-  }, [user, isInitialized, router]);
+
 
   // Dynamically update page title and meta description based on locale
   useEffect(() => {
@@ -223,6 +218,7 @@ export default function LandingPage({ params }: PageProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [openFaq, setOpenFaq] = useState<number | null>(0);
   const [prices, setPrices] = useState<any>(null);
+  const [cryptoDetails, setCryptoDetails] = useState<any>(null);
 
   useEffect(() => {
     const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
@@ -230,16 +226,24 @@ export default function LandingPage({ params }: PageProps) {
       .then(r => r.json())
       .then(data => setPrices(data))
       .catch(e => console.error('Failed to fetch pricing:', e));
+
+    fetch(`${apiBase}/api/settings/crypto-details`)
+      .then(r => r.json())
+      .then(data => setCryptoDetails(data))
+      .catch(e => console.warn('Failed to fetch crypto details:', e));
   }, []);
 
   const plans = useMemo(() => {
     const formatPrice = (p: number) => {
-      if (isEn) return `$${(p / 50000).toFixed(0)}`; // Mock tomans to USD conversion for EN
       return p.toLocaleString('fa-IR');
     };
 
-    const standardMonthly = prices ? formatPrice(prices.STANDARD.monthly) : (isEn ? '$5' : '۲۴۹٬۰۰۰');
-    const proMonthly = prices ? formatPrice(prices.PRO.monthly) : (isEn ? '$10' : '۴۹۹٬۰۰۰');
+    const standardMonthly = isEn
+      ? `$${(cryptoDetails?.standard?.monthlyUsd ?? 4.90).toFixed(2)}`
+      : (prices ? formatPrice(prices.STANDARD.monthly) : '۲۴۹٬۰۰۰');
+    const proMonthly = isEn
+      ? `$${(cryptoDetails?.pro?.monthlyUsd ?? 9.90).toFixed(2)}`
+      : (prices ? formatPrice(prices.PRO.monthly) : '۴۹۹٬۰۰۰');
 
     return [
       {
@@ -271,6 +275,20 @@ export default function LandingPage({ params }: PageProps) {
       },
     ];
   }, [prices, isEn, copy]);
+
+  const comparison = useMemo(() => {
+    const rows = [...copy.comparison];
+    const lastIdx = rows.length - 1;
+    const lastRow = rows[lastIdx] as CompareRow;
+    if (isEn) {
+      const usd = `$${(cryptoDetails?.standard?.monthlyUsd ?? 4.90).toFixed(2)}`;
+      rows[lastIdx] = { ...lastRow, tradekav: usd };
+    } else {
+      const formatted = prices ? prices.STANDARD.monthly.toLocaleString('fa-IR') : '۲۴۹٬۰۰۰';
+      rows[lastIdx] = { ...lastRow, tradekav: `${formatted} ت` };
+    }
+    return rows;
+  }, [prices, cryptoDetails, isEn, copy]);
 
   useEffect(() => {
     const onScroll = () => setNavScrolled(window.scrollY > 24);
@@ -307,8 +325,8 @@ export default function LandingPage({ params }: PageProps) {
     setMobileMenuOpen(false);
   };
 
-  if (!isInitialized || user) {
-    return null; // Let useEffect handle redirect
+  if (!isInitialized) {
+    return null;
   }
 
   return (
@@ -372,6 +390,7 @@ export default function LandingPage({ params }: PageProps) {
             <div className="hero-trust">
               <span><span className="material-symbols-outlined">check_circle</span> MT4 / MT5</span>
               <span><span className="material-symbols-outlined">check_circle</span> {isEn ? 'Manual Entry' : 'ورود دستی'}</span>
+              <span><span className="material-symbols-outlined">check_circle</span> {isEn ? 'Crypto Exchange Auto-Sync' : 'همگام‌سازی خودکار صرافی‌ها'}</span>
             </div>
           </div>
           <div className="hero-mockup" aria-hidden="true">
@@ -463,7 +482,7 @@ export default function LandingPage({ params }: PageProps) {
               </tr>
             </thead>
             <tbody>
-              {copy.comparison.map((item, idx) => {
+              {comparison.map((item, idx) => {
                 if (item.type === 'section') {
                   return (
                     <tr key={idx} className="section-label">

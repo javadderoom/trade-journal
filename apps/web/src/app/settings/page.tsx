@@ -1237,6 +1237,12 @@ export default function SettingsPage() {
                     <td>{language === 'fa' ? 'هر ۶۰ ثانیه' : 'Every 60 seconds'}</td>
                   </tr>
                   <tr>
+                    <td>{language === 'fa' ? 'همگام‌سازی خودکار صرافی' : 'Automatic Exchange Sync'}</td>
+                    <td>✗</td>
+                    <td>{language === 'fa' ? 'هر ۱ ساعت' : 'Every 1 hour'}</td>
+                    <td>{language === 'fa' ? 'هر ۵ دقیقه' : 'Every 5 minutes'}</td>
+                  </tr>
+                  <tr>
                     <td>{language === 'fa' ? 'واردات فایل MT4/MT5' : 'MT4/MT5 File Import'}</td>
                     <td>{language === 'fa' ? '۱ فایل در ماه (تست)' : '1 file/month (trial)'}</td>
                     <td>{language === 'fa' ? '✓ (تا ۱۵۰ ردیف)' : '✓ (up to 150 rows)'}</td>
