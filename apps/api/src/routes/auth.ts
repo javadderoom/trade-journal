@@ -1,6 +1,7 @@
 import { Router, Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import { z } from 'zod';
 import { prisma } from '../services/tradeSync';
 import {
   generateAccessToken,
@@ -295,7 +296,7 @@ router.post('/otp/send', async (req: Request, res: Response) => {
 });
 
 // ─── POST /api/auth/otp/verify ────────────────────────────────────────────────
-router.post('/otp/verify', async (req: Request, res: Response) => {
+router.post('/otp/verify', rateLimit(2 * 60 * 1000, 5), async (req: Request, res: Response) => {
   try {
     const { phone, code } = req.body;
     if (!phone || !code || typeof phone !== 'string' || typeof code !== 'string') {
@@ -380,12 +381,24 @@ router.post('/otp/verify', async (req: Request, res: Response) => {
 });
 
 // ─── POST /api/auth/otp/register ──────────────────────────────────────────────
+const otpRegisterSchema = z.object({
+  registerToken: z.string().min(1, 'توکن ثبت‌نام الزامی است'),
+  name: z.string().min(2, 'نام باید حداقل ۲ کاراکتر باشد'),
+  email: z.string().email('ایمیل معتبر نیست'),
+  password: z
+    .string()
+    .min(8, 'رمز عبور باید حداقل ۸ کاراکتر باشد')
+    .regex(/[A-Z]/, 'رمز عبور باید حداقل یک حرف بزرگ داشته باشد')
+    .regex(/[0-9]/, 'رمز عبور باید حداقل یک عدد داشته باشد'),
+});
+
 router.post('/otp/register', async (req: Request, res: Response) => {
   try {
-    const { registerToken, name, email, password } = req.body;
-    if (!registerToken || !name || !email || !password) {
-      return res.status(400).json({ error: 'تمامی فیلدها الزامی هستند' });
+    const parsed = otpRegisterSchema.safeParse(req.body);
+    if (!parsed.success) {
+      return res.status(400).json({ error: parsed.error.issues[0].message });
     }
+    const { registerToken, name, email, password } = parsed.data;
 
     let payload: any;
     try {

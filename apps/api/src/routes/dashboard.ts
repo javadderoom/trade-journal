@@ -408,10 +408,11 @@ router.get('/summary', authenticate, async (req: AuthRequest, res: Response) => 
     const todayStr = getTehranDateStr(now);
     const monthStr = getTehranMonthStr(now);
 
-    // ─── Fetch all user trades (we'll filter in JS for the various groupings) ────
+    // ─── Fetch user trades — limited to last 5000 for performance ────
     const allTrades = await prisma.trade.findMany({
       where: accountWhere,
       orderBy: { open_time: 'desc' },
+      take: 5000,
       select: {
         id: true,
         account_id: true,
@@ -638,7 +639,7 @@ router.get('/summary', authenticate, async (req: AuthRequest, res: Response) => 
     });
   } catch (err: any) {
     console.error('Dashboard summary error:', err);
-    return res.status(500).json({ error: err.message || 'خطای داخلی سرور' });
+    return res.status(500).json({ error: 'خطای داخلی سرور' });
   }
 });
 

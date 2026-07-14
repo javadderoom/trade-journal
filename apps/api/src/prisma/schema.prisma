@@ -112,6 +112,8 @@ model Trade {
   @@unique([account_id, ticket])
   @@index([user_id])
   @@index([account_id])
+  @@index([open_time])
+  @@index([user_id, open_time])
   mistakeIncidents MistakeIncident[]
 }
 

@@ -3,6 +3,10 @@ import { useAuthStore } from './auth';
 
 const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
 
+if (!process.env.NEXT_PUBLIC_API_BASE_URL && !process.env.NEXT_PUBLIC_API_URL) {
+  console.warn('[TradeKav] NEXT_PUBLIC_API_BASE_URL is not set. Falling back to http://localhost:3000');
+}
+
 export const api = axios.create({
   baseURL: API_URL,
   withCredentials: true,

@@ -13,6 +13,7 @@ export const FREE_MONTHLY_TRADE_LIMIT = 30;
 
 /**
  * Middleware to enforce account limits based on the user's plan.
+ * Uses req.user.plan from JWT — no extra DB query needed.
  */
 export const checkAccountLimit = async (
   req: AuthRequest,
@@ -21,24 +22,16 @@ export const checkAccountLimit = async (
 ) => {
   try {
     const userId = req.user?.userId;
-    if (!userId) {
+    const plan = req.user?.plan as Plan | undefined;
+    if (!userId || !plan) {
       return res.status(401).json({ error: 'کاربر احراز هویت نشده است' });
-    }
-
-    const user = await prisma.user.findUnique({
-      where: { id: userId },
-      select: { plan: true },
-    });
-
-    if (!user) {
-      return res.status(404).json({ error: 'کاربر یافت نشد' });
     }
 
     const currentCount = await prisma.account.count({
       where: { user_id: userId },
     });
 
-    const limit = PLAN_ACCOUNT_LIMITS[user.plan];
+    const limit = PLAN_ACCOUNT_LIMITS[plan];
     if (limit !== null && currentCount >= limit) {
       return res.status(403).json({
         error: `سقف حساب‌های مجاز برای پلن شما (${limit} حساب) تکمیل شده است. لطفاً پلن خود را ارتقا دهید.`,
@@ -55,7 +48,8 @@ export const checkAccountLimit = async (
 };
 
 /**
- * Middleware to enforce trade limits (50 trades/month for FREE users).
+ * Middleware to enforce trade limits (30 trades/month for FREE users).
+ * Uses req.user.plan from JWT — no extra DB query needed.
  */
 export const checkTradeLimit = async (
   req: AuthRequest,
@@ -64,21 +58,13 @@ export const checkTradeLimit = async (
 ) => {
   try {
     const userId = req.user?.userId;
-    if (!userId) {
+    const plan = req.user?.plan as Plan | undefined;
+    if (!userId || !plan) {
       return res.status(401).json({ error: 'کاربر احراز هویت نشده است' });
     }
 
-    const user = await prisma.user.findUnique({
-      where: { id: userId },
-      select: { plan: true },
-    });
-
-    if (!user) {
-      return res.status(404).json({ error: 'کاربر یافت نشد' });
-    }
-
     // Only FREE plan is restricted
-    if (user.plan === 'FREE') {
+    if (plan === 'FREE') {
       const now = new Date();
       const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
       const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
@@ -111,6 +97,7 @@ export const checkTradeLimit = async (
 
 /**
  * Middleware to restrict MT4/MT5 file imports.
+ * Uses req.user.plan from JWT — no extra DB query needed.
  */
 export const checkImportPermission = async (
   req: AuthRequest,
@@ -119,20 +106,12 @@ export const checkImportPermission = async (
 ) => {
   try {
     const userId = req.user?.userId;
-    if (!userId) {
+    const plan = req.user?.plan as Plan | undefined;
+    if (!userId || !plan) {
       return res.status(401).json({ error: 'کاربر احراز هویت نشده است' });
     }
 
-    const user = await prisma.user.findUnique({
-      where: { id: userId },
-      select: { plan: true },
-    });
-
-    if (!user) {
-      return res.status(404).json({ error: 'کاربر یافت نشد' });
-    }
-
-    if (user.plan === 'FREE') {
+    if (plan === 'FREE') {
       const now = new Date();
       const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
       const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
@@ -163,6 +142,7 @@ export const checkImportPermission = async (
 
 /**
  * Middleware to restrict MT5 Expert Advisor sync access.
+ * Uses req.user.plan from JWT — no extra DB query needed.
  */
 export const checkSyncPermission = async (
   req: AuthRequest,
@@ -171,20 +151,12 @@ export const checkSyncPermission = async (
 ) => {
   try {
     const userId = req.user?.userId;
-    if (!userId) {
+    const plan = req.user?.plan as Plan | undefined;
+    if (!userId || !plan) {
       return res.status(401).json({ error: 'کاربر احراز هویت نشده است' });
     }
 
-    const user = await prisma.user.findUnique({
-      where: { id: userId },
-      select: { plan: true },
-    });
-
-    if (!user) {
-      return res.status(404).json({ error: 'کاربر یافت نشد' });
-    }
-
-    if (user.plan === 'FREE') {
+    if (plan === 'FREE') {
       return res.status(403).json({
         error: 'قابلیت همگام‌سازی خودکار با دستیار معاملاتی MT5 (EA) در پلن رایگان در دسترس نیست. لطفا پلن خود را ارتقا دهید.',
       });
@@ -202,14 +174,14 @@ export const checkSyncPermission = async (
         const now = Date.now();
         const diffSeconds = (now - lastSync) / 1000;
 
-        if (user.plan === 'STANDARD' && diffSeconds < 3600) {
+        if (plan === 'STANDARD' && diffSeconds < 3600) {
           const remainMins = Math.ceil((3600 - diffSeconds) / 60);
           return res.status(429).json({
             error: `همگام‌سازی خودکار در پلن استاندارد به هر ۱ ساعت یک‌بار محدود است. لطفاً ${remainMins} دقیقه دیگر تلاش کنید یا برای همگام‌سازی سریع‌تر (۶۰ ثانیه)، پلن خود را به حرفه‌ای ارتقا دهید.`,
           });
         }
 
-        if (user.plan === 'PRO' && diffSeconds < 60) {
+        if (plan === 'PRO' && diffSeconds < 60) {
           const remainSecs = Math.ceil(60 - diffSeconds);
           return res.status(429).json({
             error: `همگام‌سازی خودکار به هر ۶۰ ثانیه یک‌بار محدود است. لطفاً ${remainSecs} ثانیه دیگر تلاش کنید.`,
@@ -227,6 +199,7 @@ export const checkSyncPermission = async (
 
 /**
  * Middleware to restrict Crypto Exchange (CCXT) sync access.
+ * Uses req.user.plan from JWT — no extra DB query needed.
  */
 export const checkCryptoPermission = async (
   req: AuthRequest,
@@ -234,21 +207,12 @@ export const checkCryptoPermission = async (
   next: NextFunction
 ) => {
   try {
-    const userId = req.user?.userId;
-    if (!userId) {
+    const plan = req.user?.plan as Plan | undefined;
+    if (!plan) {
       return res.status(401).json({ error: 'کاربر احراز هویت نشده است' });
     }
 
-    const user = await prisma.user.findUnique({
-      where: { id: userId },
-      select: { plan: true },
-    });
-
-    if (!user) {
-      return res.status(404).json({ error: 'کاربر یافت نشد' });
-    }
-
-    if (user.plan === 'FREE') {
+    if (plan === 'FREE') {
       return res.status(403).json({
         error: 'قابلیت اتصال به صرافی‌های کریپتو در پلن رایگان در دسترس نیست. لطفا پلن خود را ارتقا دهید.',
       });

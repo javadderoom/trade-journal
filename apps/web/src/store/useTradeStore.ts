@@ -256,29 +256,29 @@ export const useTradeStore = create<TradeState>((set, get) => ({
             entryTimeframe: item.entryTimeframe ?? null,
           };
         });
-        set({ trades: mapped });
+        set({ trades: mapped, error: null });
       } else {
-        set({ trades: MOCK_TRADES });
+        set({ trades: [], error: null });
       }
     } catch (e: any) {
-      console.warn('API error, falling back to mock data:', e.message);
-      set({ trades: MOCK_TRADES });
+      console.error('Failed to fetch trades:', e.message);
+      set({ error: e.message || 'Failed to load trades' });
     } finally {
       set({ loading: false });
     }
   },
 
   updateTrade: async (updatedTrade: Trade): Promise<boolean> => {
-    // Optimistic state update in local state
+    const tradeId = updatedTrade.id;
+    if (tradeId.startsWith('mock-')) return true;
+
+    // Optimistic state update
     const currentTrades = get().trades;
     set({
       trades: currentTrades.map((t) => (t.id === updatedTrade.id ? updatedTrade : t))
     });
 
     try {
-      const tradeId = updatedTrade.id;
-      if (tradeId.startsWith('mock-')) return true; // mock local only
-
       const res = await api.put(`/api/trades/${tradeId}`, {
         notes: updatedTrade.notes,
         emotion: updatedTrade.emotion,
@@ -304,45 +304,65 @@ export const useTradeStore = create<TradeState>((set, get) => ({
         mutate('/api/payments/status');
         return true;
       }
+      // Revert on failure
+      set({ trades: currentTrades });
       return false;
     } catch (err) {
       console.error('Failed to update trade on backend:', err);
-      return true; // Return true so frontend local change persists
+      // Revert optimistic update
+      set({ trades: currentTrades });
+      return false;
     }
   },
 
   deleteTrade: async (tradeId: string): Promise<boolean> => {
-    try {
-      if (tradeId.startsWith('mock-')) return true; // local mock only
+    if (tradeId.startsWith('mock-')) return true;
 
+    // Optimistic removal
+    const currentTrades = get().trades;
+    set({ trades: currentTrades.filter((t) => t.id !== tradeId) });
+
+    try {
       const res = await api.delete(`/api/trades/${tradeId}`);
 
       if (res.status >= 200 && res.status < 300) {
         mutate('/api/payments/status');
         return true;
       }
+      // Revert on failure
+      set({ trades: currentTrades });
       return false;
     } catch (err) {
       console.error('Failed to delete trade on backend:', err);
-      return true;
+      // Revert optimistic removal
+      set({ trades: currentTrades });
+      return false;
     }
   },
 
   deleteMultipleTrades: async (tradeIds: string[]): Promise<boolean> => {
-    try {
-      const realIds = tradeIds.filter(id => !id.startsWith('mock-'));
-      if (realIds.length === 0) return true; // local mock only
+    const realIds = tradeIds.filter(id => !id.startsWith('mock-'));
+    if (realIds.length === 0) return true;
 
+    // Optimistic removal
+    const currentTrades = get().trades;
+    set({ trades: currentTrades.filter((t) => !tradeIds.includes(t.id)) });
+
+    try {
       const res = await api.post(`/api/trades/bulk-delete`, { ids: realIds });
 
       if (res.status >= 200 && res.status < 300) {
         mutate('/api/payments/status');
         return true;
       }
+      // Revert on failure
+      set({ trades: currentTrades });
       return false;
     } catch (err) {
       console.error('Failed to delete multiple trades on backend:', err);
-      return true;
+      // Revert optimistic removal
+      set({ trades: currentTrades });
+      return false;
     }
   }
 }));

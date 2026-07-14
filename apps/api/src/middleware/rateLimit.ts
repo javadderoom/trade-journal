@@ -14,13 +14,14 @@ export function rateLimit(windowMs: number, max: number) {
     const key = `rl:${ip}:${req.baseUrl}${req.path}`;
     const now = Date.now();
     const windowStart = now - windowMs;
+    const nonce = `${now}:${Math.random().toString(36).slice(2, 8)}`;
 
     try {
       const pipeline = redis.pipeline();
       // Remove expired entries outside the window
       pipeline.zremrangebyscore(key, 0, windowStart);
       // Add current request timestamp
-      pipeline.zadd(key, String(now), `${now}:${Math.random().toString(36).slice(2, 8)}`);
+      pipeline.zadd(key, String(now), nonce);
       // Count requests in the window
       pipeline.zcard(key);
       // Set TTL on the key so it auto-cleans
@@ -36,8 +37,8 @@ export function rateLimit(windowMs: number, max: number) {
           ? Math.ceil((parseInt(oldest[1]) + windowMs - now) / 1000)
           : Math.ceil(windowMs / 1000);
 
-        // Remove the entry we just added (over-limit)
-        await redis.zrem(key, `${now}:${Math.random().toString(36).slice(2, 8)}`);
+        // Remove the exact entry we just added
+        await redis.zrem(key, nonce);
 
         res.setHeader('Retry-After', String(retryAfter));
         res.status(429).json({

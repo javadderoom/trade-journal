@@ -54,20 +54,17 @@ export const requireAdmin = (
  * Token can be passed in:
  *   1. Authorization header: Bearer <token>
  *   2. Custom header: x-api-token
- *   3. Query parameter: token
  */
 export const authenticateAccountToken = async (
   req: AuthRequest,
   res: Response,
   next: NextFunction
 ) => {
-  let token = req.query.token as string;
-  
-  if (!token) {
-    const customHeader = req.headers['x-api-token'] as string;
-    if (customHeader) {
-      token = customHeader;
-    }
+  let token: string | undefined;
+
+  const customHeader = req.headers['x-api-token'] as string;
+  if (customHeader) {
+    token = customHeader;
   }
 
   if (!token) {
@@ -98,12 +95,17 @@ export const authenticateAccountToken = async (
       user_id: accountToken.account.user_id,
     };
     
-    // Attach to req.user for general access checks
+    // Look up the actual user's plan and email
+    const user = await prisma.user.findUnique({
+      where: { id: accountToken.account.user_id },
+      select: { email: true, plan: true, role: true },
+    });
+
     req.user = {
       userId: accountToken.account.user_id,
-      email: '',
-      plan: 'FREE',
-      role: 'USER',
+      email: user?.email || '',
+      plan: user?.plan || 'FREE',
+      role: user?.role || 'USER',
     };
 
     next();

@@ -73,15 +73,31 @@ app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
-// Cron job: Daily clean up expired refresh tokens at 03:00 AM
+// Cron job: Daily clean up expired tokens, OTPs, and sessions at 03:00 AM
 cron.schedule('0 3 * * *', async () => {
   try {
-    const deleted = await prisma.refreshToken.deleteMany({
-      where: { expires_at: { lt: new Date() } },
+    const now = new Date();
+
+    const deletedTokens = await prisma.refreshToken.deleteMany({
+      where: { expires_at: { lt: now } },
     });
-    console.log(`[Cron] Cleared ${deleted.count} expired refresh tokens.`);
+
+    const deletedOtps = await prisma.otp.deleteMany({
+      where: {
+        OR: [
+          { expires_at: { lt: now } },
+          { created_at: { lt: new Date(now.getTime() - 24 * 60 * 60 * 1000) } },
+        ],
+      },
+    });
+
+    const deletedSessions = await prisma.checkoutSession.deleteMany({
+      where: { created_at: { lt: new Date(now.getTime() - 24 * 60 * 60 * 1000) } },
+    });
+
+    console.log(`[Cron] Cleanup: ${deletedTokens.count} tokens, ${deletedOtps.count} OTPs, ${deletedSessions.count} sessions.`);
   } catch (err) {
-    console.error('[Cron] Failed to clean up expired refresh tokens:', err);
+    console.error('[Cron] Cleanup job failed:', err);
   }
 });
 
@@ -132,6 +148,15 @@ cron.schedule('*/5 * * * *', async () => {
   } catch (err) {
     console.error('[Cron] Exchange sync scheduler failed:', err);
   }
+});
+
+// Global error handlers — prevent silent crashes
+process.on('unhandledRejection', (reason) => {
+  console.error('[FATAL] Unhandled rejection:', reason);
+});
+process.on('uncaughtException', (err) => {
+  console.error('[FATAL] Uncaught exception:', err);
+  process.exit(1);
 });
 
 // Start server

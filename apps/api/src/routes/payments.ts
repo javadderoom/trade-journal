@@ -10,6 +10,26 @@ import crypto from 'crypto';
 import path from 'path';
 import fs from 'fs';
 
+/** Escape HTML special characters to prevent XSS */
+function escapeHtml(str: string | number): string {
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+/** Escape a value for safe embedding in a JavaScript string literal */
+function escapeJsString(str: string): string {
+  return String(str)
+    .replace(/\\/g, '\\\\')
+    .replace(/"/g, '\\"')
+    .replace(/'/g, "\\'")
+    .replace(/</g, '\\x3c')
+    .replace(/>/g, '\\x3e');
+}
+
 const receiptDir = path.join(__dirname, '../../uploads/receipts');
 if (!fs.existsSync(receiptDir)) {
   fs.mkdirSync(receiptDir, { recursive: true });
@@ -230,7 +250,7 @@ router.post('/checkout', authenticate, async (req: AuthRequest, res: Response) =
     return res.status(200).json({ authority, redirectUrl });
   } catch (err: any) {
     console.error('Checkout error:', err);
-    return res.status(500).json({ error: err.message || 'خطا در برقراری ارتباط با درگاه پرداخت' });
+    return res.status(500).json({ error: 'خطا در برقراری ارتباط با درگاه پرداخت' });
   }
 });
 
@@ -360,7 +380,7 @@ router.post('/verify', authenticate, async (req: AuthRequest, res: Response) => 
     });
   } catch (err: any) {
     console.error('Verify error:', err);
-    return res.status(500).json({ error: err.message || 'خطا در تایید تراکنش پرداخت' });
+    return res.status(500).json({ error: 'خطا در تایید تراکنش پرداخت' });
   }
 });
 
@@ -818,11 +838,11 @@ router.get('/mock-gateway', async (req, res) => {
         
         <div class="info-row">
           <span class="label">شناسه مرجع (Authority):</span>
-          <span class="value" style="font-family: monospace;">${Authority}</span>
+          <span class="value" style="font-family: monospace;">${escapeHtml(String(Authority))}</span>
         </div>
         <div class="info-row">
           <span class="label">مبلغ پرداخت:</span>
-          <span class="value" style="color: #2b6cb0;">${Number(Amount).toLocaleString('fa-IR')} تومان</span>
+          <span class="value" style="color: #2b6cb0;">${escapeHtml(Number(Amount).toLocaleString('fa-IR'))} تومان</span>
         </div>
         
         <div class="btn-group">
@@ -833,9 +853,9 @@ router.get('/mock-gateway', async (req, res) => {
 
       <script>
         function redirect(status) {
-          const callback = decodeURIComponent("${CallbackUrl}");
+          const callback = decodeURIComponent("${escapeJsString(String(CallbackUrl))}");
           const hasQuery = callback.includes('?');
-          const finalUrl = callback + (hasQuery ? '&' : '?') + 'Authority=${Authority}&Status=' + status;
+          const finalUrl = callback + (hasQuery ? '&' : '?') + 'Authority=${escapeJsString(String(Authority))}&Status=' + status;
           window.location.href = finalUrl;
         }
       </script>
@@ -938,7 +958,7 @@ router.post('/payping/checkout', authenticate, async (req: AuthRequest, res: Res
     return res.status(200).json({ code, redirectUrl });
   } catch (err: any) {
     console.error('PayPing checkout error:', err);
-    return res.status(500).json({ error: err.message || 'خطا در برقراری ارتباط با درگاه پرداخت پی‌پینگ' });
+    return res.status(500).json({ error: 'خطا در برقراری ارتباط با درگاه پرداخت پی‌پینگ' });
   }
 });
 
@@ -1057,7 +1077,7 @@ router.post('/payping/verify', authenticate, async (req: AuthRequest, res: Respo
     });
   } catch (err: any) {
     console.error('PayPing verify error:', err);
-    return res.status(500).json({ error: err.message || 'خطا در تایید تراکنش پرداخت پی‌پینگ' });
+    return res.status(500).json({ error: 'خطا در تایید تراکنش پرداخت پی‌پینگ' });
   }
 });
 
@@ -1211,11 +1231,11 @@ router.get('/payping/mock-gateway', async (req, res) => {
         
         <div class="info-row">
           <span class="label">کد پرداخت (Code):</span>
-          <span class="value" style="font-family: monospace;">${Code}</span>
+          <span class="value" style="font-family: monospace;">${escapeHtml(String(Code))}</span>
         </div>
         <div class="info-row">
           <span class="label">مبلغ پرداخت:</span>
-          <span class="value" style="color: #2b6cb0;">${Number(Amount).toLocaleString('fa-IR')} تومان</span>
+          <span class="value" style="color: #2b6cb0;">${escapeHtml(Number(Amount).toLocaleString('fa-IR'))} تومان</span>
         </div>
         
         <div class="btn-group">
@@ -1226,10 +1246,10 @@ router.get('/payping/mock-gateway', async (req, res) => {
 
       <script>
         function redirect(action) {
-          const callback = decodeURIComponent("${CallbackUrl}");
+          const callback = decodeURIComponent("${escapeJsString(String(CallbackUrl))}");
           const hasQuery = callback.includes('?');
           const refid = action === 'success' ? 'PP-REF-' + Math.floor(10000000 + Math.random() * 90000000) : '';
-          const finalUrl = callback + (hasQuery ? '&' : '?') + 'refid=' + refid + '&code=${Code}' + '&clientrefid=test-ref-id';
+          const finalUrl = callback + (hasQuery ? '&' : '?') + 'refid=' + refid + '&code=${escapeJsString(String(Code))}' + '&clientrefid=test-ref-id';
           window.location.href = finalUrl;
         }
       </script>

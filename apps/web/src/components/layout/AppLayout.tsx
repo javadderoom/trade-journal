@@ -28,6 +28,17 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     // 1. Wrap global fetch to automatically attach access token and handle refresh on 401
     const originalFetch = window.fetch;
+    let isRefreshing = false;
+    let refreshQueue: Array<{ resolve: (token: string) => void; reject: (err: any) => void }> = [];
+
+    const processQueue = (error: any, token: string | null) => {
+      refreshQueue.forEach(({ resolve, reject }) => {
+        if (error) reject(error);
+        else resolve(token!);
+      });
+      refreshQueue = [];
+    };
+
     window.fetch = async (input, init) => {
       const url = typeof input === 'string' ? input : input instanceof URL ? input.toString() : input.url;
       
@@ -69,14 +80,36 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           let response = await originalFetch(input, newInit);
           
           if (response.status === 401 && !isAuthRoute) {
-            const newAccessToken = await useAuthStore.getState().refresh();
-            if (newAccessToken) {
-              const headers = new Headers(newInit.headers || {});
-              headers.set('Authorization', `Bearer ${newAccessToken}`);
-              newInit.headers = headers;
-              response = await originalFetch(input, newInit);
-            } else {
+            if (isRefreshing) {
+              // Queue this request to retry after the ongoing refresh
+              return new Promise<string>((resolve, reject) => {
+                refreshQueue.push({ resolve, reject });
+              }).then((newToken) => {
+                const headers = new Headers(newInit.headers || {});
+                headers.set('Authorization', `Bearer ${newToken}`);
+                newInit.headers = headers;
+                return originalFetch(input, newInit);
+              });
+            }
+
+            isRefreshing = true;
+            try {
+              const newAccessToken = await useAuthStore.getState().refresh();
+              if (newAccessToken) {
+                processQueue(null, newAccessToken);
+                const headers = new Headers(newInit.headers || {});
+                headers.set('Authorization', `Bearer ${newAccessToken}`);
+                newInit.headers = headers;
+                response = await originalFetch(input, newInit);
+              } else {
+                processQueue(new Error('Refresh failed'), null);
+                useAuthStore.getState().logout();
+              }
+            } catch (refreshErr) {
+              processQueue(refreshErr, null);
               useAuthStore.getState().logout();
+            } finally {
+              isRefreshing = false;
             }
           }
           return response;

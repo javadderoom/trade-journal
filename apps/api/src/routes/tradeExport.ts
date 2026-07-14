@@ -7,6 +7,16 @@ import { Direction, Plan } from '@prisma/client';
 
 const router = Router();
 
+/** Sanitize a cell value to prevent CSV/formula injection */
+function sanitizeCsvCell(value: string): string {
+  if (!value) return value;
+  const firstChar = value[0];
+  if (firstChar === '=' || firstChar === '+' || firstChar === '-' || firstChar === '@' || firstChar === '\t' || firstChar === '\r') {
+    return "'" + value;
+  }
+  return value;
+}
+
 // Persian Headers mapping
 const HEADERS = {
   ticket: 'تیکت',
@@ -171,7 +181,7 @@ router.get('/export', authenticate, async (req: AuthRequest, res: Response) => {
       for (const t of trades) {
         const rowData = [
           t.ticket || '',
-          t.symbol,
+          sanitizeCsvCell(t.symbol),
           formatDirection(t.direction),
           t.lot_size,
           formatTehranDateTime(t.open_time),
@@ -185,8 +195,8 @@ router.get('/export', authenticate, async (req: AuthRequest, res: Response) => {
           t.pips,
           t.r_multiple,
           t.profit_usd,
-          t.emotion || '',
-          `"${(t.tags || []).join(' | ')}"`,
+          sanitizeCsvCell(t.emotion || ''),
+          `"${(t.tags || []).map(sanitizeCsvCell).join(' | ')}"`,
           `"${(t.notes || '').replace(/"/g, '""').replace(/\n/g, ' ')}"`,
         ].join(',');
         res.write(rowData + '\n');

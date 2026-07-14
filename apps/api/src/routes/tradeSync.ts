@@ -41,7 +41,7 @@ router.get('/accounts', authenticate, async (req: AuthRequest, res: Response) =>
     res.status(200).json(accounts);
   } catch (err: any) {
     console.error('Accounts list error:', err);
-    res.status(500).json({ error: err.message || 'Internal server error' });
+    res.status(500).json({ error: 'خطای داخلی سرور' });
   }
 });
 
@@ -79,7 +79,7 @@ router.get('/', authenticate, async (req: AuthRequest, res: Response) => {
     });
   } catch (err: any) {
     console.error('Trade list error:', err);
-    res.status(500).json({ error: err.message || 'Internal server error' });
+    res.status(500).json({ error: 'خطای داخلی سرور' });
   }
 });
 
@@ -122,7 +122,7 @@ router.post('/sync', authenticateAccountToken, checkSyncPermission, async (req: 
     });
   } catch (err: any) {
     console.error('Trade sync error:', err);
-    res.status(500).json({ error: err.message || 'Internal server error' });
+    res.status(500).json({ error: 'خطای داخلی سرور' });
   }
 });
 
@@ -296,7 +296,7 @@ router.post('/', authenticate, checkTradeLimit, async (req: AuthRequest, res: Re
     res.status(201).json({ ...newTrade, suggestedMistakes });
   } catch (err: any) {
     console.error('Create manual trade error:', err);
-    res.status(500).json({ error: err.message || 'Internal server error' });
+    res.status(500).json({ error: 'خطای داخلی سرور' });
   }
 });
 
@@ -494,7 +494,7 @@ router.put('/:id', authenticate, async (req: AuthRequest, res: Response) => {
     res.status(200).json(updated);
   } catch (err: any) {
     console.error('Update trade error:', err);
-    res.status(500).json({ error: err.message || 'Internal server error' });
+    res.status(500).json({ error: 'خطای داخلی سرور' });
   }
 });
 
@@ -524,7 +524,7 @@ router.post('/bulk-delete', authenticate, async (req: AuthRequest, res: Response
     res.status(200).json({ success: true, count: result.count });
   } catch (err: any) {
     console.error('Bulk delete error:', err);
-    res.status(500).json({ error: err.message || 'Internal server error' });
+    res.status(500).json({ error: 'خطای داخلی سرور' });
   }
 });
 
@@ -569,7 +569,7 @@ router.get('/tags', authenticate, async (req: AuthRequest, res: Response) => {
     res.status(200).json(tags);
   } catch (err: any) {
     console.error('Fetch tags error:', err);
-    res.status(500).json({ error: err.message || 'Internal server error' });
+    res.status(500).json({ error: 'خطای داخلی سرور' });
   }
 });
 
@@ -611,7 +611,7 @@ router.post('/tags', authenticate, async (req: AuthRequest, res: Response) => {
     res.status(201).json(tag);
   } catch (err: any) {
     console.error('Create tag error:', err);
-    res.status(500).json({ error: err.message || 'Internal server error' });
+    res.status(500).json({ error: 'خطای داخلی سرور' });
   }
 });
 
@@ -640,23 +640,27 @@ router.post('/tags/bulk', authenticate, async (req: AuthRequest, res: Response) 
       }
     }
 
-    // 2. Handle updates/upserts
-    if (Array.isArray(tags)) {
+    // 2. Handle updates/upserts — batch with createMany + updateMany
+    if (Array.isArray(tags) && tags.length > 0) {
+      // Batch create new tags (skip duplicates)
+      await prisma.tag.createMany({
+        data: tags.map(t => ({
+          user_id: userId,
+          name: t.name,
+          is_ignored: Boolean(t.is_ignored),
+          show_first: Boolean(t.show_first),
+        })),
+        skipDuplicates: true,
+      });
+
+      // Batch update existing tags
       for (const t of tags) {
-        await prisma.tag.upsert({
+        await prisma.tag.updateMany({
           where: {
-            user_id_name: {
-              user_id: userId,
-              name: t.name,
-            },
-          },
-          create: {
             user_id: userId,
             name: t.name,
-            is_ignored: Boolean(t.is_ignored),
-            show_first: Boolean(t.show_first),
           },
-          update: {
+          data: {
             is_ignored: Boolean(t.is_ignored),
             show_first: Boolean(t.show_first),
           },
@@ -667,7 +671,7 @@ router.post('/tags/bulk', authenticate, async (req: AuthRequest, res: Response) 
     res.status(200).json({ success: true });
   } catch (err: any) {
     console.error('Bulk tag update error:', err);
-    res.status(500).json({ error: err.message || 'Internal server error' });
+    res.status(500).json({ error: 'خطای داخلی سرور' });
   }
 });
 
@@ -703,7 +707,7 @@ router.put('/tags/:name', authenticate, async (req: AuthRequest, res: Response) 
     res.status(200).json(updated);
   } catch (err: any) {
     console.error('Update tag error:', err);
-    res.status(500).json({ error: err.message || 'Internal server error' });
+    res.status(500).json({ error: 'خطای داخلی سرور' });
   }
 });
 
@@ -730,7 +734,7 @@ router.delete('/tags/:name', authenticate, async (req: AuthRequest, res: Respons
     res.status(200).json({ success: true });
   } catch (err: any) {
     console.error('Delete tag error:', err);
-    res.status(500).json({ error: err.message || 'Internal server error' });
+    res.status(500).json({ error: 'خطای داخلی سرور' });
   }
 });
 
@@ -776,7 +780,7 @@ router.get('/emotions', authenticate, async (req: AuthRequest, res: Response) =>
     res.status(200).json(emotions);
   } catch (err: any) {
     console.error('Fetch emotions error:', err);
-    res.status(500).json({ error: err.message || 'Internal server error' });
+    res.status(500).json({ error: 'خطای داخلی سرور' });
   }
 });
 
@@ -838,7 +842,7 @@ router.post('/emotions/bulk', authenticate, async (req: AuthRequest, res: Respon
     res.status(200).json({ success: true });
   } catch (err: any) {
     console.error('Bulk emotion update error:', err);
-    res.status(500).json({ error: err.message || 'Internal server error' });
+    res.status(500).json({ error: 'خطای داخلی سرور' });
   }
 });
 
@@ -896,7 +900,7 @@ router.post('/mistakes/confirm', authenticate, async (req: AuthRequest, res: Res
     res.status(200).json({ success: true });
   } catch (err: any) {
     console.error('Mistake confirm error:', err);
-    res.status(500).json({ error: err.message || 'Internal server error' });
+    res.status(500).json({ error: 'خطای داخلی سرور' });
   }
 });
 
@@ -933,7 +937,7 @@ router.get('/mistakes/stats', authenticate, async (req: AuthRequest, res: Respon
     res.status(200).json(stats);
   } catch (err: any) {
     console.error('Mistake stats error:', err);
-    res.status(500).json({ error: err.message || 'Internal server error' });
+    res.status(500).json({ error: 'خطای داخلی سرور' });
   }
 });
 
@@ -963,7 +967,7 @@ router.delete('/:id', authenticate, async (req: AuthRequest, res: Response) => {
     res.status(200).json({ success: true });
   } catch (err: any) {
     console.error('Delete trade error:', err);
-    res.status(500).json({ error: err.message || 'Internal server error' });
+    res.status(500).json({ error: 'خطای داخلی سرور' });
   }
 });
 
@@ -1039,7 +1043,7 @@ router.post('/:id/screenshots', authenticate, upload.single('screenshot'), async
     res.status(200).json({ screenshots: updatedScreenshots });
   } catch (err: any) {
     console.error('Screenshot upload error:', err);
-    res.status(500).json({ error: err.message || 'Internal server error' });
+    res.status(500).json({ error: 'خطای داخلی سرور' });
   }
 });
 
@@ -1092,7 +1096,7 @@ router.delete('/:id/screenshots', authenticate, async (req: AuthRequest, res: Re
     res.status(200).json({ screenshots: updatedScreenshots });
   } catch (err: any) {
     console.error('Screenshot deletion error:', err);
-    res.status(500).json({ error: err.message || 'Internal server error' });
+    res.status(500).json({ error: 'خطای داخلی سرور' });
   }
 });
 
@@ -1542,7 +1546,7 @@ router.post('/import-mt4', authenticate, checkImportPermission, uploadMemory.sin
     });
   } catch (err: any) {
     console.error('MT4/MT5 import error:', err);
-    res.status(500).json({ error: err.message || 'Internal server error' });
+    res.status(500).json({ error: 'خطای داخلی سرور' });
   }
 });
 
