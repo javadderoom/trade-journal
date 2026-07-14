@@ -415,6 +415,8 @@ function RegisterForm() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   disabled={loading}
+                  minLength={8}
+                  autoComplete="new-password"
                 />
                 <button
                   type="button"

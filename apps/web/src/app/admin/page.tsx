@@ -697,7 +697,7 @@ export default function AdminPage() {
                 {couponsList.map((c) => (
                   <tr key={c.id}>
                     <td style={{ direction: 'ltr', fontWeight: 'bold' }}>{c.code}</td>
-                    <td>{toPersianDigits(c.discountPercent)}٪</td>
+                    <td>{toPersianDigits(c.discountPercent)}%</td>
                     <td>{toPersianDigits(c.usedCount)} بار</td>
                     <td>{toPersianDigits(c.maxUses)} بار</td>
                     <td>{new Date(c.expireDate).toLocaleDateString('fa-IR')}</td>

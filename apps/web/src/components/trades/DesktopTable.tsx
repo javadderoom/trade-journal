@@ -48,6 +48,11 @@ export default function DesktopTable({
   onSort,
 }: DesktopTableProps) {
   const { t, language } = useTranslation();
+  const isRtl = language === 'fa';
+  const sortIcon = (key: string) => {
+    if (sortKey !== key) return isRtl ? 'arrow_upward' : 'arrow_downward';
+    return sortDir === 'asc' ? (isRtl ? 'arrow_downward' : 'arrow_upward') : (isRtl ? 'arrow_upward' : 'arrow_downward');
+  };
 
   return (
     <div className="table-section-container">
@@ -66,24 +71,24 @@ export default function DesktopTable({
                 />
               </th>
               <th className="sortable-th" onClick={() => onSort('date')}>
-                {t('trades.date')} <span className="material-symbols-outlined sort-icon">{sortKey === 'date' ? (sortDir === 'asc' ? 'arrow_upward' : 'arrow_downward') : 'arrow_downward'}</span>
+                {t('trades.date')} <span className="material-symbols-outlined sort-icon">{sortIcon('date')}</span>
               </th>
               <th>{t('trades.day')}</th>
               <th className="sortable-th" onClick={() => onSort('symbol')}>
-                {t('trades.symbol')} <span className="material-symbols-outlined sort-icon">{sortKey === 'symbol' ? (sortDir === 'asc' ? 'arrow_upward' : 'arrow_downward') : 'arrow_downward'}</span>
+                {t('trades.symbol')} <span className="material-symbols-outlined sort-icon">{sortIcon('symbol')}</span>
               </th>
               <th>{t('trades.account')}</th>
               <th className="sortable-th" onClick={() => onSort('direction')}>
-                {t('trades.direction')} <span className="material-symbols-outlined sort-icon">{sortKey === 'direction' ? (sortDir === 'asc' ? 'arrow_upward' : 'arrow_downward') : 'arrow_downward'}</span>
+                {t('trades.direction')} <span className="material-symbols-outlined sort-icon">{sortIcon('direction')}</span>
               </th>
               <th className="sortable-th" onClick={() => onSort('volume')}>
-                {t('trades.volume')} <span className="material-symbols-outlined sort-icon">{sortKey === 'volume' ? (sortDir === 'asc' ? 'arrow_upward' : 'arrow_downward') : 'arrow_downward'}</span>
+                {t('trades.volume')} <span className="material-symbols-outlined sort-icon">{sortIcon('volume')}</span>
               </th>
               <th className="sortable-th" onClick={() => onSort('rr')}>
-                {t('trades.rr')} <span className="material-symbols-outlined sort-icon">{sortKey === 'rr' ? (sortDir === 'asc' ? 'arrow_upward' : 'arrow_downward') : 'arrow_downward'}</span>
+                {t('trades.rr')} <span className="material-symbols-outlined sort-icon">{sortIcon('rr')}</span>
               </th>
               <th className="sortable-th" style={{ textAlign: 'left' }} onClick={() => onSort('pnl')}>
-                {t('trades.pnl')} <span className="material-symbols-outlined sort-icon">{sortKey === 'pnl' ? (sortDir === 'asc' ? 'arrow_upward' : 'arrow_downward') : 'arrow_downward'}</span>
+                {t('trades.pnl')} <span className="material-symbols-outlined sort-icon">{sortIcon('pnl')}</span>
               </th>
               <th style={{ textAlign: 'center' }}>{t('trades.status')}</th>
             </tr>

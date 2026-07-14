@@ -8,6 +8,7 @@ import crypto from 'node:crypto';
 import { parse as parseHtml } from 'node-html-parser';
 import { authenticate, authenticateAccountToken, AuthRequest } from '../middleware/auth';
 import { checkTradeLimit, checkImportPermission, checkSyncPermission } from '../middleware/checkPlanLimits';
+import { createTradeSchema, updateTradeSchema } from '../validators/trade';
 
 const router = Router();
 
@@ -132,23 +133,18 @@ router.post('/sync', authenticateAccountToken, checkSyncPermission, async (req: 
  */
 router.post('/', authenticate, checkTradeLimit, async (req: AuthRequest, res: Response) => {
   try {
+    const parsed = createTradeSchema.safeParse(req.body);
+    if (!parsed.success) {
+      const msg = parsed.error.issues[0]?.message || 'Invalid trade data';
+      res.status(400).json({ error: msg });
+      return;
+    }
     const {
-      symbol,
-      direction,
-      lotSize,
-      openPrice,
-      openTime,
-      stopLoss,
-      takeProfit,
-      closePrice,
-      closeTime,
-      profitUsd,
-      commission,
-      swap,
-      accountId,
-      analysisTimeframe,
-      entryTimeframe,
-    } = req.body;
+      symbol, direction, lotSize, openPrice, openTime,
+      stopLoss, takeProfit, closePrice, closeTime,
+      profitUsd, commission, swap, accountId,
+      analysisTimeframe, entryTimeframe,
+    } = parsed.data;
 
     const userId = req.user!.userId;
     if (!accountId) {
@@ -164,26 +160,14 @@ router.post('/', authenticate, checkTradeLimit, async (req: AuthRequest, res: Re
       return;
     }
 
-    // 1. Validation
-    if (!symbol || !direction || !lotSize || !openPrice || !openTime) {
-      res.status(400).json({ error: 'Missing required trade fields' });
-      return;
-    }
-
-    // Ensure direction is BUY or SELL
-    if (direction !== 'BUY' && direction !== 'SELL') {
-      res.status(400).json({ error: 'Direction must be BUY or SELL' });
-      return;
-    }
-
-    const openPriceNum = parseFloat(openPrice);
-    const lotSizeNum = parseFloat(lotSize);
-    const stopLossNum = stopLoss ? parseFloat(stopLoss) : null;
-    const takeProfitNum = takeProfit ? parseFloat(takeProfit) : null;
-    const closePriceNum = closePrice ? parseFloat(closePrice) : null;
-    const profitUsdNum = profitUsd ? parseFloat(profitUsd) : 0;
-    const commissionNum = commission ? parseFloat(commission) : 0;
-    const swapNum = swap ? parseFloat(swap) : 0;
+    const openPriceNum = openPrice;
+    const lotSizeNum = lotSize;
+    const stopLossNum = stopLoss ?? null;
+    const takeProfitNum = takeProfit ?? null;
+    const closePriceNum = closePrice ?? null;
+    const profitUsdNum = profitUsd ?? 0;
+    const commissionNum = commission ?? 0;
+    const swapNum = swap ?? 0;
 
     // 2. Calculate Pips
     // Standard currency pairs (5 digits): EURUSD, GBPUSD -> 1 pip = 0.0001
@@ -308,12 +292,19 @@ router.put('/:id', authenticate, async (req: AuthRequest, res: Response) => {
   try {
     const id = req.params.id as string;
     const userId = req.user!.userId;
+
+    const parsed = updateTradeSchema.safeParse(req.body);
+    if (!parsed.success) {
+      const msg = parsed.error.issues[0]?.message || 'Invalid trade data';
+      res.status(400).json({ error: msg });
+      return;
+    }
     const {
       notes, emotion, stopLoss, takeProfit, tags, accountId,
       closeTime, closePrice, profitUsd, commission, swap,
       symbol, direction, lotSize, openPrice, openTime,
       analysisTimeframe, entryTimeframe,
-    } = req.body;
+    } = parsed.data;
 
     const existing = await prisma.trade.findFirst({
       where: { id, user_id: userId },
@@ -336,19 +327,19 @@ router.put('/:id', authenticate, async (req: AuthRequest, res: Response) => {
 
     // Resolve the effective values (existing or incoming) for calculations
     const effDirection = direction !== undefined ? direction : existing.direction;
-    const effOpenPrice = openPrice !== undefined ? parseFloat(openPrice) : existing.open_price;
+    const effOpenPrice = openPrice !== undefined ? openPrice : existing.open_price;
     const effClosePrice = closePrice !== undefined
-      ? (closePrice === null ? null : parseFloat(closePrice))
+      ? closePrice
       : existing.close_price;
     const effCloseTime = closeTime !== undefined
       ? (closeTime === null ? null : new Date(closeTime))
       : existing.close_time;
     const effStopLoss = stopLoss !== undefined
-      ? (stopLoss === null ? null : parseFloat(stopLoss))
+      ? stopLoss
       : existing.stop_loss;
-    const effProfitUsd = profitUsd !== undefined ? parseFloat(profitUsd) : existing.profit_usd;
-    const effCommission = commission !== undefined ? parseFloat(commission) : existing.commission;
-    const effSwap = swap !== undefined ? parseFloat(swap) : existing.swap;
+    const effProfitUsd = profitUsd !== undefined ? profitUsd : existing.profit_usd;
+    const effCommission = commission !== undefined ? commission : existing.commission;
+    const effSwap = swap !== undefined ? swap : existing.swap;
 
     // Calculate pips when closePrice or openPrice changes
     let pipsUpdate: number | undefined = undefined;
@@ -388,7 +379,7 @@ router.put('/:id', authenticate, async (req: AuthRequest, res: Response) => {
     const isPnlChange = openPrice !== undefined || closePrice !== undefined || lotSize !== undefined || direction !== undefined || commission !== undefined || swap !== undefined;
     if (isPnlChange && effClosePrice !== null && effOpenPrice > 0) {
       const isBuy = effDirection === 'BUY';
-      const effLot = lotSize !== undefined ? parseFloat(lotSize) : existing.lot_size;
+      const effLot = lotSize !== undefined ? lotSize : existing.lot_size;
       const priceDiff = isBuy ? (effClosePrice - effOpenPrice) : (effOpenPrice - effClosePrice);
       profitUsdUpdate = priceDiff * effLot * 10000 + effCommission + effSwap;
     }
@@ -400,22 +391,22 @@ router.put('/:id', authenticate, async (req: AuthRequest, res: Response) => {
           account_id: accountId !== undefined ? accountId : undefined,
           notes: notes !== undefined ? notes : undefined,
           emotion: emotion !== undefined ? emotion : undefined,
-          stop_loss: stopLoss !== undefined ? (stopLoss === null ? null : parseFloat(stopLoss)) : undefined,
-          take_profit: takeProfit !== undefined ? (takeProfit === null ? null : parseFloat(takeProfit)) : undefined,
+          stop_loss: stopLoss !== undefined ? stopLoss : undefined,
+          take_profit: takeProfit !== undefined ? takeProfit : undefined,
           tags: tags !== undefined ? tags : undefined,
           r_multiple: rMultipleUpdate !== undefined ? rMultipleUpdate : undefined,
           analysis_timeframe: analysisTimeframe !== undefined ? analysisTimeframe : undefined,
           entry_timeframe: entryTimeframe !== undefined ? entryTimeframe : undefined,
           symbol: symbol !== undefined ? symbol : undefined,
           direction: direction !== undefined ? direction : undefined,
-          lot_size: lotSize !== undefined ? parseFloat(lotSize) : undefined,
-          open_price: openPrice !== undefined ? parseFloat(openPrice) : undefined,
+          lot_size: lotSize !== undefined ? lotSize : undefined,
+          open_price: openPrice !== undefined ? openPrice : undefined,
           open_time: openTime !== undefined ? new Date(openTime) : undefined,
           close_time: closeTime !== undefined ? (closeTime === null ? null : new Date(closeTime)) : undefined,
-          close_price: closePrice !== undefined ? (closePrice === null ? null : parseFloat(closePrice)) : undefined,
-          profit_usd: profitUsdUpdate !== undefined ? profitUsdUpdate : (profitUsd !== undefined ? parseFloat(profitUsd) : undefined),
-          commission: commission !== undefined ? parseFloat(commission) : undefined,
-          swap: swap !== undefined ? parseFloat(swap) : undefined,
+          close_price: closePrice !== undefined ? closePrice : undefined,
+          profit_usd: profitUsdUpdate !== undefined ? profitUsdUpdate : (profitUsd !== undefined ? profitUsd : undefined),
+          commission: commission !== undefined ? commission : undefined,
+          swap: swap !== undefined ? swap : undefined,
           pips: pipsUpdate !== undefined ? pipsUpdate : undefined,
         },
       });
@@ -430,10 +421,10 @@ router.put('/:id', authenticate, async (req: AuthRequest, res: Response) => {
           where: { trade_id: id, type: 'EXIT' },
         });
 
-        const closePriceVal = parseFloat(closePrice);
+        const closePriceVal = closePrice!;
         const closeTimeVal = new Date(closeTime);
-        const lotSizeVal = lotSize !== undefined ? parseFloat(lotSize) : existing.lot_size;
-        const openPriceVal = openPrice !== undefined ? parseFloat(openPrice) : existing.open_price;
+        const lotSizeVal = lotSize !== undefined ? lotSize : existing.lot_size;
+        const openPriceVal = openPrice !== undefined ? openPrice : existing.open_price;
         const dir = direction || existing.direction;
 
         // Calculate pips for this exit
@@ -451,7 +442,7 @@ router.put('/:id', authenticate, async (req: AuthRequest, res: Response) => {
 
         // Calculate R-multiple for this exit
         let exitR = 0;
-        const sl = stopLoss !== undefined ? (stopLoss === null ? null : parseFloat(stopLoss)) : existing.stop_loss;
+        const sl = stopLoss !== undefined ? stopLoss : existing.stop_loss;
         if (sl && sl > 0 && openPriceVal > 0) {
           const isBuy = dir === 'BUY';
           const risk = isBuy ? (openPriceVal - sl) : (sl - openPriceVal);
@@ -461,7 +452,7 @@ router.put('/:id', authenticate, async (req: AuthRequest, res: Response) => {
           }
         }
 
-        const exitProfitUsd = profitUsdUpdate !== undefined ? profitUsdUpdate : (profitUsd !== undefined ? parseFloat(profitUsd) : 0);
+        const exitProfitUsd = profitUsdUpdate !== undefined ? profitUsdUpdate : (profitUsd !== undefined ? profitUsd : 0);
 
         await tx.execution.create({
           data: {
@@ -470,8 +461,8 @@ router.put('/:id', authenticate, async (req: AuthRequest, res: Response) => {
             lot_size: lotSizeVal,
             price: closePriceVal,
             profit_usd: exitProfitUsd,
-            commission: commission !== undefined ? parseFloat(commission) : 0,
-            swap: swap !== undefined ? parseFloat(swap) : 0,
+            commission: commission !== undefined ? commission : 0,
+            swap: swap !== undefined ? swap : 0,
             pips: exitPips,
             r_multiple: exitR,
             close_time: closeTimeVal,

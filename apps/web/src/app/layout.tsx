@@ -75,7 +75,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   };
 
   return (
-    <html suppressHydrationWarning>
+    <html suppressHydrationWarning lang="fa" dir="rtl">
       <head>
         {/* Vazirmatn — self-hosted, no CDN (Google Fonts is blocked in Iran) */}
         <link rel="stylesheet" href="/fonts/vazirmatn.css" />
@@ -94,7 +94,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>
-      <body suppressHydrationWarning>
+      <body>
         <AppLayout>{children}</AppLayout>
       </body>
     </html>

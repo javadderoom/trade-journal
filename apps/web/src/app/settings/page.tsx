@@ -1665,6 +1665,8 @@ export default function SettingsPage() {
                       onChange={(e) => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
                       placeholder="••••••••"
                       style={{ direction: 'ltr' }}
+                      minLength={8}
+                      autoComplete="new-password"
                     />
                     <button type="button" onClick={() => setShowPasswords({ ...showPasswords, new: !showPasswords.new })}>
                       <span className="material-symbols-outlined">{showPasswords.new ? 'visibility_off' : 'visibility'}</span>

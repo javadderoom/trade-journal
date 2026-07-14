@@ -28,7 +28,7 @@ export default function SummaryBar({ count, winRate, totalProfit, usdToToman }: 
         <div className="dot dot-primary"></div>
         <span className="label">{t('trades.winRate')}:</span>
         <span className="value" style={{ color: '#61f9b1' }}>
-          {toPersianDigits(winRate)}٪
+          {language === 'fa' ? `${toPersianDigits(winRate)}٪` : `${winRate}%`}
         </span>
       </div>
       <div className="summary-card glow-profit-card">

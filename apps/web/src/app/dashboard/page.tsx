@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState, useMemo, useCallback } from 'react';
+import React, { useEffect, useState, useMemo, useCallback, memo } from 'react';
 import { useRouter } from 'next/navigation';
 import { api } from '../../lib/api';
 import { useAuthStore } from '../../lib/auth';
@@ -75,15 +75,17 @@ export default function DashboardPage() {
     }
   }, []);
 
-  const fetchDashboard = useCallback(async () => {
+  const fetchDashboard = useCallback(async (signal?: AbortSignal) => {
     try {
       setLoading(true);
       setError(null);
       const res = await api.get(
-        `/api/dashboard/summary?accountId=${selectedAccountId}&locale=${language}&t=${Date.now()}`
+        `/api/dashboard/summary?accountId=${selectedAccountId}&locale=${language}&t=${Date.now()}`,
+        { signal }
       );
       setData(res.data);
     } catch (err: any) {
+      if (err?.name === 'CanceledError' || err?.code === 'ERR_CANCELED') return;
       console.error('Dashboard fetch error:', err);
       setError(err.message || t('dashboard.errorOccurred'));
     } finally {
@@ -92,7 +94,9 @@ export default function DashboardPage() {
   }, [selectedAccountId, language, t]);
 
   useEffect(() => {
-    fetchDashboard();
+    const controller = new AbortController();
+    fetchDashboard(controller.signal);
+    return () => controller.abort();
   }, [fetchDashboard]);
 
   const liveRate = useExchangeRate();
@@ -146,7 +150,7 @@ export default function DashboardPage() {
       <main className="dashboard-page">
         <div className="dash-loading">
           <span style={{ color: '#ff5370' }}>{error || t('dashboard.errorOccurred')}</span>
-          <button className="dash-empty-cta-btn" onClick={fetchDashboard}>
+          <button className="dash-empty-cta-btn" onClick={() => fetchDashboard()}>
             {t('dashboard.retry')}
           </button>
         </div>
@@ -291,7 +295,7 @@ export default function DashboardPage() {
         <div className="dash-kpi-grid">
           <KPICard
             label={t('dashboard.winRateLabel')}
-            value={`${toPersianDigits(month.kpis.winRate)}٪`}
+            value={language === 'fa' ? `${toPersianDigits(month.kpis.winRate)}٪` : `${month.kpis.winRate}%`}
             colorClass={month.kpis.winRate >= 50 ? 'gold' : 'red'}
             tooltip={t('dashboard.winRateTooltip')}
             points={month.equityCurve}
@@ -444,7 +448,7 @@ export default function DashboardPage() {
 }
 
 // ─── Inline SVG Equity Curve (no external chart dependency) ─────────────────────
-function EquityCurveSVG({ points }: { points: { date: string; cumPnl: number }[] }) {
+const EquityCurveSVG = memo(function EquityCurveSVG({ points }: { points: { date: string; cumPnl: number }[] }) {
   const width = 800;
   const height = 240;
   const padding = { top: 20, right: 20, bottom: 30, left: 50 };
@@ -568,7 +572,7 @@ function EquityCurveSVG({ points }: { points: { date: string; cumPnl: number }[]
       )}
     </svg>
   );
-}
+});
 
 // ─── KPI Card with mini sparkline ───────────────────────────────────────────────
 function KPICard({

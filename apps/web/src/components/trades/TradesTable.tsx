@@ -855,9 +855,9 @@ export default function TradesTable({
         {/* 6. Pagination */}
         <div className="pagination-container">
           <div>
-            نمایش {toPersianDigits((currentPage - 1) * itemsPerPage + 1)} تا{' '}
-            {toPersianDigits(Math.min(currentPage * itemsPerPage, filteredTrades.length))} از {toPersianDigits(filteredTrades.length)}{' '}
-            معامله
+            {isEn
+              ? `Showing ${(currentPage - 1) * itemsPerPage + 1} to ${Math.min(currentPage * itemsPerPage, filteredTrades.length)} of ${filteredTrades.length} trades`
+              : `نمایش ${toPersianDigits((currentPage - 1) * itemsPerPage + 1)} تا ${toPersianDigits(Math.min(currentPage * itemsPerPage, filteredTrades.length))} از ${toPersianDigits(filteredTrades.length)} معامله`}
           </div>
           <div className="pagination-actions">
             <button
@@ -866,17 +866,19 @@ export default function TradesTable({
               disabled={currentPage === 1}
             >
               <span className="material-symbols-outlined btn-icon">arrow_forward</span>
-              قبلی
+              {isEn ? 'Previous' : 'قبلی'}
             </button>
             <span className="page-indicator">
-              صفحه {toPersianDigits(currentPage)} از {toPersianDigits(totalPages)}
+              {isEn
+                ? `Page ${currentPage} of ${totalPages}`
+                : `صفحه ${toPersianDigits(currentPage)} از ${toPersianDigits(totalPages)}`}
             </span>
             <button
               className="nav-btn"
               onClick={() => handlePageChange(currentPage + 1)}
               disabled={currentPage === totalPages}
             >
-              بعدی
+              {isEn ? 'Next' : 'بعدی'}
               <span className="material-symbols-outlined btn-icon">arrow_back</span>
             </button>
           </div>
@@ -931,7 +933,13 @@ export default function TradesTable({
       )}
 
       {/* 9. Floating Action Button (FAB) Speed Dial */}
-      <div className={`fab-container ${isFabOpen ? 'active' : ''}`} onMouseLeave={() => setIsFabOpen(false)}>
+      <div
+        className={`fab-container ${isFabOpen ? 'active' : ''}`}
+        onMouseLeave={() => setIsFabOpen(false)}
+        onKeyDown={(e) => {
+          if (e.key === 'Escape') setIsFabOpen(false);
+        }}
+      >
         <div className="fab-options">
           <button
             className="fab-sub-btn"
@@ -940,6 +948,7 @@ export default function TradesTable({
               setIsFabOpen(false);
             }}
             title="ثبت معامله دستی"
+            tabIndex={isFabOpen ? 0 : -1}
           >
             <span className="fab-label">ثبت معامله دستی</span>
             <div className="fab-icon-wrapper">
@@ -953,6 +962,7 @@ export default function TradesTable({
               setIsFabOpen(false);
             }}
             title="واردات MT4/MT5"
+            tabIndex={isFabOpen ? 0 : -1}
           >
             <span className="fab-label">واردات MT4/MT5</span>
             <div className="fab-icon-wrapper">
@@ -966,6 +976,7 @@ export default function TradesTable({
               setIsFabOpen(false);
             }}
             title="خروجی داده"
+            tabIndex={isFabOpen ? 0 : -1}
           >
             <span className="fab-label">خروجی داده</span>
             <div className="fab-icon-wrapper">
@@ -977,6 +988,8 @@ export default function TradesTable({
           className="fab-main-btn"
           onClick={() => setIsFabOpen(!isFabOpen)}
           title="افزودن معامله"
+          aria-expanded={isFabOpen}
+          aria-haspopup="true"
         >
           <span className="material-symbols-outlined fab-icon">add</span>
         </button>
