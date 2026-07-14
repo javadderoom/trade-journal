@@ -5,6 +5,7 @@ import { api } from '../../lib/api';
 import { SuggestedMistake } from './MistakeReviewModal';
 import { useTranslation } from '../../store/useAppStore';
 import { getSharedTranslations } from '../../locales/components';
+import { normalizeNumericInput } from '../../utils/farsi';
 
 interface ManualTradeModalProps {
   isOpen: boolean;
@@ -56,11 +57,11 @@ export default function ManualTradeModal({ isOpen, onClose, onSuccess }: ManualT
       setErrorMsg(isEn ? 'Symbol is required.' : 'وارد کردن نماد معامله الزامی است.');
       return;
     }
-    if (!openPrice || parseFloat(openPrice) <= 0) {
+    if (!openPrice || parseFloat(normalizeNumericInput(openPrice)) <= 0) {
       setErrorMsg(isEn ? 'Open price must be greater than zero.' : 'قیمت ورود باید یک عدد بزرگتر از صفر باشد.');
       return;
     }
-    if (!lotSize || parseFloat(lotSize) <= 0) {
+    if (!lotSize || parseFloat(normalizeNumericInput(lotSize)) <= 0) {
       setErrorMsg(isEn ? 'Volume (lot size) must be greater than zero.' : 'حجم معامله (لات) باید بزرگتر از صفر باشد.');
       return;
     }
@@ -70,7 +71,7 @@ export default function ManualTradeModal({ isOpen, onClose, onSuccess }: ManualT
     }
     
     if (isClosed) {
-      if (!closePrice || parseFloat(closePrice) <= 0) {
+      if (!closePrice || parseFloat(normalizeNumericInput(closePrice)) <= 0) {
         setErrorMsg(isEn ? 'Close price is required and must be greater than zero.' : 'قیمت خروج الزامی و باید بزرگتر از صفر باشد.');
         return;
       }
@@ -90,24 +91,49 @@ export default function ManualTradeModal({ isOpen, onClose, onSuccess }: ManualT
       const payload = {
         symbol: symbol.toUpperCase().trim(),
         direction,
-        lotSize: parseFloat(lotSize),
-        openPrice: parseFloat(openPrice),
+        lotSize: parseFloat(normalizeNumericInput(lotSize)),
+        openPrice: parseFloat(normalizeNumericInput(openPrice)),
         openTime: new Date(openTime).toISOString(),
-        stopLoss: stopLoss ? parseFloat(stopLoss) : null,
-        takeProfit: takeProfit ? parseFloat(takeProfit) : null,
-        closePrice: isClosed ? parseFloat(closePrice) : null,
+        stopLoss: stopLoss ? parseFloat(normalizeNumericInput(stopLoss)) : null,
+        takeProfit: takeProfit ? parseFloat(normalizeNumericInput(takeProfit)) : null,
+        closePrice: isClosed ? parseFloat(normalizeNumericInput(closePrice)) : null,
         closeTime: isClosed ? new Date(closeTime).toISOString() : null,
-        profitUsd: isClosed ? parseFloat(profitUsd) : 0,
-        commission: commission ? parseFloat(commission) : 0,
-        swap: swap ? parseFloat(swap) : 0,
+        profitUsd: isClosed ? parseFloat(normalizeNumericInput(profitUsd)) : 0,
+        commission: commission ? parseFloat(normalizeNumericInput(commission)) : 0,
+        swap: swap ? parseFloat(normalizeNumericInput(swap)) : 0,
       };
 
-      const res = await api.post('/api/trades', payload);
-
-      const newTrade = res.data;
-      onSuccess(newTrade, res.data.suggestedMistakes);
+      // Optimistic: build a temporary trade and show it immediately
+      const tempId = `temp-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+      const optimisticTrade = {
+        id: tempId,
+        ticket: null,
+        symbol: payload.symbol,
+        direction: payload.direction,
+        openTime: payload.openTime,
+        closeTime: payload.closeTime,
+        openPrice: payload.openPrice,
+        closePrice: payload.closePrice,
+        lotSize: payload.lotSize,
+        stopLoss: payload.stopLoss,
+        takeProfit: payload.takeProfit,
+        profitUsd: payload.profitUsd,
+        commission: payload.commission,
+        swap: payload.swap,
+        pips: 0,
+        rMultiple: 0,
+        tags: [],
+        emotion: null,
+        notes: null,
+      };
+      onSuccess(optimisticTrade);
       resetForm();
       onClose();
+
+      // Server request in background — replace temp with real data
+      const res = await api.post('/api/trades', payload);
+      const newTrade = res.data;
+      onSuccess(newTrade, res.data.suggestedMistakes);
     } catch (err: any) {
       setErrorMsg(err.response?.data?.error || err.message || (isEn ? 'Error connecting to server' : 'خطا در اتصال به سرور'));
     } finally {
@@ -165,7 +191,11 @@ export default function ManualTradeModal({ isOpen, onClose, onSuccess }: ManualT
         </div>
 
         <form onSubmit={handleSubmit} className="modal-form">
-          {errorMsg && <div className="form-error-alert">{errorMsg}</div>}
+          {errorMsg && (
+            <div className="form-error-alert" role="alert" aria-live="assertive">
+              {errorMsg}
+            </div>
+          )}
 
           {/* Top Status & Direction Toggles */}
           <div className="form-toggles">

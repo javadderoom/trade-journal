@@ -67,7 +67,7 @@ export async function syncTradesFromEA(
       // Prepare CREATE operation
       operations.push(async () => {
         try {
-          await prisma.trade.create({
+          const newTrade = await prisma.trade.create({
             data: {
               account_id: accountId,
               user_id: userId,
@@ -90,6 +90,42 @@ export async function syncTradesFromEA(
               chart_data: trade.chartData ? trade.chartData : undefined,
             },
           });
+
+          // Create ENTRY execution
+          await prisma.execution.create({
+            data: {
+              trade_id: newTrade.id,
+              type: 'ENTRY',
+              lot_size: trade.lotSize,
+              price: trade.openPrice,
+              profit_usd: 0,
+              commission: trade.commission,
+              swap: 0,
+              pips: 0,
+              r_multiple: 0,
+              executed_at: new Date(trade.openTime),
+            },
+          });
+
+          // If already closed on first sync, create EXIT execution too
+          if (trade.closeTime && trade.closePrice !== null && trade.closePrice !== undefined) {
+            await prisma.execution.create({
+              data: {
+                trade_id: newTrade.id,
+                type: 'EXIT',
+                lot_size: trade.lotSize,
+                price: trade.closePrice,
+                profit_usd: trade.profitUsd,
+                commission: 0,
+                swap: trade.swap,
+                pips: trade.pips ?? 0,
+                r_multiple: trade.rMultiple,
+                close_time: new Date(trade.closeTime),
+                executed_at: new Date(trade.closeTime),
+              },
+            });
+          }
+
           result.created++;
         } catch (err: any) {
           result.errors.push(`Ticket ${trade.ticket} [Create]: ${err.message}`);
@@ -109,6 +145,8 @@ export async function syncTradesFromEA(
             ? { take_profit: trade.takeProfit }
             : {};
 
+          const isClosing = !!trade.closeTime;
+
           await prisma.trade.update({
             where: { id: existing.id },
             data: {
@@ -120,14 +158,35 @@ export async function syncTradesFromEA(
               pips: trade.pips ?? 0,
               r_multiple: trade.rMultiple,
               chart_data: trade.chartData ? trade.chartData : undefined,
-              ...(trade.closeTime
+              ...(isClosing
                 ? {
-                    close_time: new Date(trade.closeTime),
+                    close_time: new Date(trade.closeTime!),
                     close_price: trade.closePrice ?? null,
                   }
                 : {}),
             },
           });
+
+          // If closing, create EXIT execution
+          if (isClosing && trade.closePrice !== null && trade.closePrice !== undefined) {
+            await prisma.execution.create({
+              data: {
+                trade_id: existing.id,
+                type: 'EXIT',
+                lot_size: existing.lot_size,
+                price: trade.closePrice,
+                profit_usd: trade.profitUsd,
+                commission: trade.commission,
+                swap: trade.swap,
+                pips: trade.pips ?? 0,
+                r_multiple: trade.rMultiple,
+                close_time: new Date(trade.closeTime!),
+                executed_at: new Date(trade.closeTime!),
+              },
+            });
+            await syncTradeAggregates(existing.id);
+          }
+
           result.updated++;
         } catch (err: any) {
           result.errors.push(`Ticket ${trade.ticket} [Update]: ${err.message}`);
@@ -157,6 +216,50 @@ export async function syncTradesFromEA(
   }
 
   return result;
+}
+
+
+/**
+ * Syncs Trade-level aggregate fields from its Executions.
+ * Call after creating/updating/deleting Executions.
+ *
+ * Aggregates:
+ * - profit_usd: sum of EXIT.profit_usd
+ * - commission: sum of all Execution.commission
+ * - swap: sum of all Execution.swap
+ * - close_price: last EXIT.price (null if no exits)
+ * - close_time: last EXIT.close_time (null if no exits)
+ * - pips: last EXIT.pips
+ * - r_multiple: last EXIT.r_multiple
+ */
+export async function syncTradeAggregates(tradeId: string, prismaClient?: typeof prisma) {
+  const db = prismaClient || prisma;
+  const executions = await db.execution.findMany({
+    where: { trade_id: tradeId },
+    orderBy: { executed_at: 'asc' },
+  });
+
+  if (executions.length === 0) return;
+
+  const exits = executions.filter(e => e.type === 'EXIT');
+  const lastExit = exits.length > 0 ? exits[exits.length - 1] : null;
+
+  const totalProfitUsd = exits.reduce((sum, e) => sum + e.profit_usd, 0);
+  const totalCommission = executions.reduce((sum, e) => sum + e.commission, 0);
+  const totalSwap = executions.reduce((sum, e) => sum + e.swap, 0);
+
+  await db.trade.update({
+    where: { id: tradeId },
+    data: {
+      profit_usd: totalProfitUsd,
+      commission: totalCommission,
+      swap: totalSwap,
+      close_price: lastExit?.price ?? null,
+      close_time: lastExit?.close_time ?? null,
+      pips: lastExit?.pips ?? 0,
+      r_multiple: lastExit?.r_multiple ?? 0,
+    },
+  });
 }
 
 
@@ -192,12 +295,26 @@ export async function getTradesForAccount(params: {
   accountId?: string;
   limit?: number;
   offset?: number;
+  sortKey?: string;
+  sortDir?: 'asc' | 'desc';
 }): Promise<TradeListRow[]> {
   const { userId, accountId } = params;
   const limit = Math.min(Math.max(params.limit ?? 100, 1), 500);
   const offset = Math.max(params.offset ?? 0, 0);
 
   const filterAccount = accountId && accountId !== 'all';
+
+  // Map client sort keys to Prisma column names
+  const sortColumnMap: Record<string, string> = {
+    date: 'open_time',
+    symbol: 'symbol',
+    direction: 'direction',
+    volume: 'lot_size',
+    pnl: 'profit_usd',
+    rr: 'r_multiple',
+  };
+  const sortCol = sortColumnMap[params.sortKey || ''] || 'open_time';
+  const sortDir = params.sortDir === 'asc' ? 'asc' : 'desc';
 
   // Retrieve user plan to apply historical limit
   const user = await prisma.user.findUnique({
@@ -221,7 +338,7 @@ export async function getTradesForAccount(params: {
       ...(filterAccount ? { account_id: accountId } : {}),
       ...(dateLimit ? { open_time: { gte: dateLimit } } : {}),
     },
-    orderBy: { open_time: 'desc' },
+    orderBy: { [sortCol]: sortDir },
     skip: offset,
     take: limit,
     select: {

@@ -168,7 +168,7 @@ export default function ConnectExchangeModal({ isOpen, onClose, onSuccess }: Con
           </p>
 
           {errorMsg && (
-            <div className="form-error-alert" style={{ margin: '0 0 8px 0' }}>
+            <div className="form-error-alert" style={{ margin: '0 0 8px 0' }} role="alert" aria-live="assertive">
               {errorMsg}
             </div>
           )}

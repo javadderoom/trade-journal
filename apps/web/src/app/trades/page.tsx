@@ -120,15 +120,45 @@ export default function TradesPage() {
   };
 
   const handleManualTradeSuccess = async (newTrade: any, suggestedMistakes?: SuggestedMistake[]) => {
-    // 1. Re-fetch trades from database
+    // If this is an optimistic (temp) trade, add it directly to the store
+    if (newTrade?.id?.startsWith('temp-')) {
+      const { trades: currentTrades } = useTradeStore.getState();
+      const mappedTrade: Trade = {
+        id: newTrade.id,
+        ticket: newTrade.ticket,
+        symbol: newTrade.symbol,
+        direction: newTrade.direction,
+        openTime: newTrade.openTime,
+        closeTime: newTrade.closeTime,
+        openPrice: newTrade.openPrice,
+        closePrice: newTrade.closePrice,
+        lotSize: newTrade.lotSize,
+        stopLoss: newTrade.stopLoss,
+        takeProfit: newTrade.takeProfit,
+        profitUsd: newTrade.profitUsd,
+        commission: newTrade.commission,
+        swap: newTrade.swap,
+        pips: newTrade.pips,
+        rMultiple: newTrade.rMultiple,
+        tags: newTrade.tags,
+        emotion: newTrade.emotion,
+        notes: newTrade.notes,
+      };
+      useTradeStore.setState({ trades: [mappedTrade, ...currentTrades] });
+      setAutoOpenTradeId(newTrade.id);
+      setTimeout(() => { setAutoOpenTradeId(null); }, 500);
+      return;
+    }
+
+    // Real server response — re-fetch to get accurate data
     await fetchTrades(true);
     fetchSubStatus();
-    // 2. Set newly created trade to open in sidebar automatically
+    // Set newly created trade to open in sidebar automatically
     if (newTrade && newTrade.id) {
       setAutoOpenTradeId(newTrade.id);
       setTimeout(() => { setAutoOpenTradeId(null); }, 500);
     }
-    // 3. Open mistake review modal if any mistakes were detected
+    // Open mistake review modal if any mistakes were detected
     if (suggestedMistakes && suggestedMistakes.length > 0 && newTrade?.id) {
       setMistakeReview({
         tradeId: newTrade.id,

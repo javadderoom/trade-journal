@@ -179,7 +179,7 @@ interface TradeState {
   loading: boolean;
   error: string | null;
   setTrades: (trades: Trade[]) => void;
-  fetchTrades: (isManualRefresh?: boolean, accountId?: string) => Promise<void>;
+  fetchTrades: (isManualRefresh?: boolean, accountId?: string, sortKey?: string, sortDir?: 'asc' | 'desc') => Promise<void>;
   updateTrade: (updatedTrade: Trade) => Promise<boolean>;
   deleteTrade: (tradeId: string) => Promise<boolean>;
   deleteMultipleTrades: (tradeIds: string[]) => Promise<boolean>;
@@ -192,14 +192,15 @@ export const useTradeStore = create<TradeState>((set, get) => ({
 
   setTrades: (trades) => set({ trades }),
 
-  fetchTrades: async (isManualRefresh = false, accountId = 'all') => {
+  fetchTrades: async (isManualRefresh = false, accountId = 'all', sortKey?: string, sortDir?: 'asc' | 'desc') => {
     try {
       if (!isManualRefresh) {
         set({ loading: true });
       }
       set({ error: null });
 
-      const res = await api.get(`/api/trades?limit=200&offset=0&accountId=${accountId}&t=${Date.now()}`);
+      const sortParams = sortKey ? `&sortKey=${sortKey}&sortDir=${sortDir || 'desc'}` : '';
+      const res = await api.get(`/api/trades?limit=200&offset=0&accountId=${accountId}${sortParams}&t=${Date.now()}`);
       
       const apiItems = Array.isArray(res.data?.items) ? res.data.items : [];
 

@@ -9,8 +9,14 @@ import {
 import { authenticate, AuthRequest } from '../middleware/auth';
 import { registerSchema, loginSchema } from '../validators/auth';
 import { sendOtpSms } from '../services/sms';
+import { rateLimit } from '../middleware/rateLimit';
 
 const router = Router();
+
+// Rate limit: 10 login attempts per 15 minutes per IP
+const loginLimiter = rateLimit(15 * 60 * 1000, 10);
+// Rate limit: 5 registration attempts per hour per IP
+const registerLimiter = rateLimit(60 * 60 * 1000, 5);
 
 const REFRESH_TOKEN_EXPIRES_DAYS = 30;
 
@@ -36,7 +42,7 @@ const clearRefreshCookie = (res: Response) => {
 };
 
 // ─── POST /api/auth/register ─────────────────────────────────────────────────
-router.post('/register', async (req: Request, res: Response) => {
+router.post('/register', registerLimiter, async (req: Request, res: Response) => {
   try {
     const result = registerSchema.safeParse(req.body);
     if (!result.success) {
@@ -106,7 +112,7 @@ router.post('/register', async (req: Request, res: Response) => {
 });
 
 // ─── POST /api/auth/login ─────────────────────────────────────────────────────
-router.post('/login', async (req: Request, res: Response) => {
+router.post('/login', loginLimiter, async (req: Request, res: Response) => {
   try {
     const result = loginSchema.safeParse(req.body);
     if (!result.success) {

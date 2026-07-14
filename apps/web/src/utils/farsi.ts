@@ -18,6 +18,42 @@ export function toPersianDigits(val: string | number | null | undefined): string
 }
 
 /**
+ * Converts Persian/Arabic digits and thousand separators to ASCII for parsing.
+ * Handles: ۰-۹ (Persian), ٠-٩ (Arabic), and comma/period separators.
+ */
+export function toAsciiDigits(input: string): string {
+  const persianToLatin: Record<string, string> = {
+    '۰': '0', '۱': '1', '۲': '2', '۳': '3', '۴': '4',
+    '۵': '5', '۶': '6', '۷': '7', '۸': '8', '۹': '9',
+  };
+  const arabicToLatin: Record<string, string> = {
+    '٠': '0', '١': '1', '٢': '2', '٣': '3', '٤': '4',
+    '٥': '5', '٦': '6', '٧': '7', '٨': '8', '٩': '9',
+  };
+
+  let result = input;
+  for (const [persian, latin] of Object.entries(persianToLatin)) {
+    result = result.replaceAll(persian, latin);
+  }
+  for (const [arabic, latin] of Object.entries(arabicToLatin)) {
+    result = result.replaceAll(arabic, latin);
+  }
+  // Remove thousand separators (commas) but preserve decimal point
+  result = result.replace(/,/g, '');
+  return result;
+}
+
+/**
+ * Normalizes a numeric input string: converts Farsi/Arabic digits, strips commas,
+ * and returns a clean string safe for parseFloat/Number().
+ * Returns the original string if empty.
+ */
+export function normalizeNumericInput(value: string): string {
+  if (!value) return value;
+  return toAsciiDigits(value.trim());
+}
+
+/**
  * Formats a number with thousand separators and converts it to Persian digits
  */
 export function formatPersianNumber(val: number, decimals: number = 2): string {

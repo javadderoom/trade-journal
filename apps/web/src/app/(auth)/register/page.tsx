@@ -214,7 +214,7 @@ function RegisterForm() {
         </div>
 
         {error && (
-          <div className="error-alert" style={{ alignItems: 'flex-start' }}>
+          <div className="error-alert" style={{ alignItems: 'flex-start' }} role="alert" aria-live="assertive">
             <span className="material-symbols-outlined" style={{ marginTop: '2px' }}>error</span>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', textAlign: language === 'fa' ? 'right' : 'left', width: '100%' }}>
               {error.split('\n').map((errLine, idx) => (

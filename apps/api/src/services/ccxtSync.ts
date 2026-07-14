@@ -1,5 +1,5 @@
 import ccxt from 'ccxt';
-import { prisma } from './tradeSync';
+import { prisma, syncTradeAggregates } from './tradeSync';
 import { decrypt } from '../lib/encryption';
 
 function stringToHash(str: string): number {
@@ -171,7 +171,7 @@ export async function syncExchangeTrades(
         commission = trade.fee.cost;
       }
 
-      await prisma.trade.create({
+      const newTrade = await prisma.trade.create({
         data: {
           account_id: accountId,
           user_id: userId,
@@ -189,6 +189,39 @@ export async function syncExchangeTrades(
           r_multiple: 0,
           ticket: ticket,
           import_source: 'CRYPTO_API' as any,
+        },
+      });
+
+      // Create ENTRY execution (fill)
+      await prisma.execution.create({
+        data: {
+          trade_id: newTrade.id,
+          type: 'ENTRY',
+          lot_size: trade.amount,
+          price: trade.price,
+          profit_usd: 0,
+          commission: commission,
+          swap: 0,
+          pips: 0,
+          r_multiple: 0,
+          executed_at: new Date(trade.timestamp),
+        },
+      });
+
+      // Create EXIT execution (crypto trades from fetchMyTrades are closed fills)
+      await prisma.execution.create({
+        data: {
+          trade_id: newTrade.id,
+          type: 'EXIT',
+          lot_size: trade.amount,
+          price: trade.price,
+          profit_usd: profitUsd,
+          commission: 0,
+          swap: 0,
+          pips: 0,
+          r_multiple: 0,
+          close_time: new Date(trade.timestamp),
+          executed_at: new Date(trade.timestamp),
         },
       });
 

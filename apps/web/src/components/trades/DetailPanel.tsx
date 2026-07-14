@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { Trade, TagObject } from './TradesTable';
 import TradeChart from './TradeChart';
-import { toPersianDigits, formatToman } from '../../utils/farsi';
+import { toPersianDigits, formatToman, normalizeNumericInput } from '../../utils/farsi';
 import { useTranslation } from '../../store/useAppStore';
 import { getSharedTranslations } from '../../locales/components';
 import {
@@ -374,7 +374,7 @@ export default function DetailPanel({
                      step="any"
                      className="grid-input"
                      value={activeTrade.lotSize}
-                     onChange={e => updateActiveTradeField('lotSize', parseFloat(e.target.value) || 0)}
+                      onChange={e => updateActiveTradeField('lotSize', parseFloat(normalizeNumericInput(e.target.value)) || 0)}
                      style={inputStyle}
                    />
                  </span>
@@ -451,7 +451,7 @@ export default function DetailPanel({
                      step="any"
                      className="grid-input"
                      value={activeTrade.openPrice}
-                     onChange={e => updateActiveTradeField('openPrice', parseFloat(e.target.value) || 0)}
+                      onChange={e => updateActiveTradeField('openPrice', parseFloat(normalizeNumericInput(e.target.value)) || 0)}
                      style={{ ...inputStyle, fontFamily: "'Courier New', monospace" }}
                    />
                  </span>
@@ -464,25 +464,25 @@ export default function DetailPanel({
                      className="grid-input sl-input"
                      placeholder="--"
                      value={activeTrade.stopLoss !== null ? activeTrade.stopLoss : ''}
-                     onChange={e => {
-                       const val = e.target.value === '' ? null : parseFloat(e.target.value);
-                       updateActiveTradeField('stopLoss', val);
-                     }}
-                   />
-                 </span>
+                      onChange={e => {
+                        const val = e.target.value === '' ? null : parseFloat(normalizeNumericInput(e.target.value));
+                        updateActiveTradeField('stopLoss', val);
+                      }}
+                    />
+                  </span>
 
-                 <span className="grid-label">{p.tp}</span>
-                 <span className="grid-value">
-                   <input
-                     type="number"
-                     step="any"
-                     className="grid-input tp-input"
-                     placeholder="--"
-                     value={activeTrade.takeProfit !== null ? activeTrade.takeProfit : ''}
-                     onChange={e => {
-                       const val = e.target.value === '' ? null : parseFloat(e.target.value);
-                       updateActiveTradeField('takeProfit', val);
-                     }}
+                  <span className="grid-label">{p.tp}</span>
+                  <span className="grid-value">
+                    <input
+                      type="number"
+                      step="any"
+                      className="grid-input tp-input"
+                      placeholder="--"
+                      value={activeTrade.takeProfit !== null ? activeTrade.takeProfit : ''}
+                      onChange={e => {
+                        const val = e.target.value === '' ? null : parseFloat(normalizeNumericInput(e.target.value));
+                        updateActiveTradeField('takeProfit', val);
+                      }}
                    />
                  </span>
 
@@ -505,10 +505,10 @@ export default function DetailPanel({
                      className="grid-input"
                      value={activeTrade.closePrice !== null ? activeTrade.closePrice : ''}
                      placeholder="--"
-                     onChange={e => {
-                       const val = e.target.value === '' ? null : parseFloat(e.target.value);
-                       updateActiveTradeField('closePrice', val);
-                     }}
+                      onChange={e => {
+                        const val = e.target.value === '' ? null : parseFloat(normalizeNumericInput(e.target.value));
+                        updateActiveTradeField('closePrice', val);
+                      }}
                      style={{ ...inputStyle, fontFamily: "'Courier New', monospace" }}
                    />
                  </span>
@@ -520,7 +520,7 @@ export default function DetailPanel({
                      step="any"
                      className="grid-input"
                      value={activeTrade.profitUsd}
-                     onChange={e => updateActiveTradeField('profitUsd', parseFloat(e.target.value) || 0)}
+                      onChange={e => updateActiveTradeField('profitUsd', parseFloat(normalizeNumericInput(e.target.value)) || 0)}
                      style={inputStyle}
                    />
                  </span>
@@ -532,7 +532,7 @@ export default function DetailPanel({
                      step="any"
                      className="grid-input"
                      value={activeTrade.commission}
-                     onChange={e => updateActiveTradeField('commission', parseFloat(e.target.value) || 0)}
+                      onChange={e => updateActiveTradeField('commission', parseFloat(normalizeNumericInput(e.target.value)) || 0)}
                      style={inputStyle}
                    />
                  </span>
@@ -544,7 +544,7 @@ export default function DetailPanel({
                      step="any"
                      className="grid-input"
                      value={activeTrade.swap}
-                     onChange={e => updateActiveTradeField('swap', parseFloat(e.target.value) || 0)}
+                      onChange={e => updateActiveTradeField('swap', parseFloat(normalizeNumericInput(e.target.value)) || 0)}
                      style={inputStyle}
                    />
                  </span>

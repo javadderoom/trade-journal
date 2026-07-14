@@ -1,5 +1,5 @@
 import { Router, Response } from 'express';
-import { getTradesForAccount, syncTradesFromEA, prisma } from '../services/tradeSync';
+import { getTradesForAccount, syncTradesFromEA, syncTradeAggregates, prisma } from '../services/tradeSync';
 import { detectMistakes } from '../services/mistakeDetector';
 import multer from 'multer';
 import path from 'node:path';
@@ -63,11 +63,13 @@ router.get('/', authenticate, async (req: AuthRequest, res: Response) => {
 
     const limitRaw = body.limit as string | undefined;
     const offsetRaw = body.offset as string | undefined;
+    const sortKey = body.sortKey as string | undefined;
+    const sortDir = (body.sortDir as string | undefined) === 'asc' ? 'asc' : 'desc';
 
     const limit = limitRaw ? Number.parseInt(limitRaw, 10) : undefined;
     const offset = offsetRaw ? Number.parseInt(offsetRaw, 10) : undefined;
 
-    const items = await getTradesForAccount({ userId, accountId, limit, offset });
+    const items = await getTradesForAccount({ userId, accountId, limit, offset, sortKey, sortDir });
 
     res.status(200).json({
       items,
@@ -223,30 +225,69 @@ router.post('/', authenticate, checkTradeLimit, async (req: AuthRequest, res: Re
       }
     }
 
-    // 4. Save to Database
-    const newTrade = await prisma.trade.create({
-      data: {
-        account_id: accountId,
-        user_id: userId,
-        symbol: sym,
-        direction: direction as any,
-        open_time: new Date(openTime),
-        close_time: closeTime ? new Date(closeTime) : null,
-        open_price: openPriceNum,
-        close_price: closePriceNum,
-        lot_size: lotSizeNum,
-        stop_loss: stopLossNum,
-        take_profit: takeProfitNum,
-        profit_usd: profitUsdNum,
-        commission: commissionNum,
-        swap: swapNum,
-        pips: pips,
-        r_multiple: rMultiple,
-        import_source: 'MANUAL',
-        ticket: null,
-        analysis_timeframe: analysisTimeframe || null,
-        entry_timeframe: entryTimeframe || null,
-      },
+    // 4. Save to Database (Trade + initial ENTRY Execution in a transaction)
+    const newTrade = await prisma.$transaction(async (tx) => {
+      const trade = await tx.trade.create({
+        data: {
+          account_id: accountId,
+          user_id: userId,
+          symbol: sym,
+          direction: direction as any,
+          open_time: new Date(openTime),
+          close_time: closeTime ? new Date(closeTime) : null,
+          open_price: openPriceNum,
+          close_price: closePriceNum,
+          lot_size: lotSizeNum,
+          stop_loss: stopLossNum,
+          take_profit: takeProfitNum,
+          profit_usd: profitUsdNum,
+          commission: commissionNum,
+          swap: swapNum,
+          pips: pips,
+          r_multiple: rMultiple,
+          import_source: 'MANUAL',
+          ticket: null,
+          analysis_timeframe: analysisTimeframe || null,
+          entry_timeframe: entryTimeframe || null,
+        },
+      });
+
+      // Create ENTRY execution
+      await tx.execution.create({
+        data: {
+          trade_id: trade.id,
+          type: 'ENTRY',
+          lot_size: lotSizeNum,
+          price: openPriceNum,
+          profit_usd: 0,
+          commission: commissionNum,
+          swap: swapNum,
+          pips: 0,
+          r_multiple: 0,
+          executed_at: new Date(openTime),
+        },
+      });
+
+      // If closed on creation, also create EXIT execution
+      if (closePriceNum !== null && closeTime) {
+        await tx.execution.create({
+          data: {
+            trade_id: trade.id,
+            type: 'EXIT',
+            lot_size: lotSizeNum,
+            price: closePriceNum,
+            profit_usd: profitUsdNum,
+            commission: 0,
+            swap: 0,
+            pips: pips,
+            r_multiple: rMultiple,
+            close_time: new Date(closeTime),
+            executed_at: new Date(closeTime),
+          },
+        });
+      }
+
+      return trade;
     });
 
     // 5. Run mistake detection on closed losing trades
@@ -342,33 +383,113 @@ router.put('/:id', authenticate, async (req: AuthRequest, res: Response) => {
       }
     }
 
-    const updated = await prisma.trade.update({
-      where: { id },
-      data: {
-        account_id: accountId !== undefined ? accountId : undefined,
-        notes: notes !== undefined ? notes : undefined,
-        emotion: emotion !== undefined ? emotion : undefined,
-        stop_loss: stopLoss !== undefined ? (stopLoss === null ? null : parseFloat(stopLoss)) : undefined,
-        take_profit: takeProfit !== undefined ? (takeProfit === null ? null : parseFloat(takeProfit)) : undefined,
-        tags: tags !== undefined ? tags : undefined,
-        r_multiple: rMultipleUpdate !== undefined ? rMultipleUpdate : undefined,
-        analysis_timeframe: analysisTimeframe !== undefined ? analysisTimeframe : undefined,
-        entry_timeframe: entryTimeframe !== undefined ? entryTimeframe : undefined,
-        // Core trade fields
-        symbol: symbol !== undefined ? symbol : undefined,
-        direction: direction !== undefined ? direction : undefined,
-        lot_size: lotSize !== undefined ? parseFloat(lotSize) : undefined,
-        open_price: openPrice !== undefined ? parseFloat(openPrice) : undefined,
-        open_time: openTime !== undefined ? new Date(openTime) : undefined,
-        // Close/reopen fields
-        close_time: closeTime !== undefined ? (closeTime === null ? null : new Date(closeTime)) : undefined,
-        close_price: closePrice !== undefined ? (closePrice === null ? null : parseFloat(closePrice)) : undefined,
-        profit_usd: profitUsd !== undefined ? parseFloat(profitUsd) : undefined,
-        commission: commission !== undefined ? parseFloat(commission) : undefined,
-        swap: swap !== undefined ? parseFloat(swap) : undefined,
-        pips: pipsUpdate !== undefined ? pipsUpdate : undefined,
-      },
+    // Recompute profit_usd when core pricing fields change
+    let profitUsdUpdate: number | undefined = undefined;
+    const isPnlChange = openPrice !== undefined || closePrice !== undefined || lotSize !== undefined || direction !== undefined || commission !== undefined || swap !== undefined;
+    if (isPnlChange && effClosePrice !== null && effOpenPrice > 0) {
+      const isBuy = effDirection === 'BUY';
+      const effLot = lotSize !== undefined ? parseFloat(lotSize) : existing.lot_size;
+      const priceDiff = isBuy ? (effClosePrice - effOpenPrice) : (effOpenPrice - effClosePrice);
+      profitUsdUpdate = priceDiff * effLot * 10000 + effCommission + effSwap;
+    }
+
+    const updated = await prisma.$transaction(async (tx) => {
+      const trade = await tx.trade.update({
+        where: { id },
+        data: {
+          account_id: accountId !== undefined ? accountId : undefined,
+          notes: notes !== undefined ? notes : undefined,
+          emotion: emotion !== undefined ? emotion : undefined,
+          stop_loss: stopLoss !== undefined ? (stopLoss === null ? null : parseFloat(stopLoss)) : undefined,
+          take_profit: takeProfit !== undefined ? (takeProfit === null ? null : parseFloat(takeProfit)) : undefined,
+          tags: tags !== undefined ? tags : undefined,
+          r_multiple: rMultipleUpdate !== undefined ? rMultipleUpdate : undefined,
+          analysis_timeframe: analysisTimeframe !== undefined ? analysisTimeframe : undefined,
+          entry_timeframe: entryTimeframe !== undefined ? entryTimeframe : undefined,
+          symbol: symbol !== undefined ? symbol : undefined,
+          direction: direction !== undefined ? direction : undefined,
+          lot_size: lotSize !== undefined ? parseFloat(lotSize) : undefined,
+          open_price: openPrice !== undefined ? parseFloat(openPrice) : undefined,
+          open_time: openTime !== undefined ? new Date(openTime) : undefined,
+          close_time: closeTime !== undefined ? (closeTime === null ? null : new Date(closeTime)) : undefined,
+          close_price: closePrice !== undefined ? (closePrice === null ? null : parseFloat(closePrice)) : undefined,
+          profit_usd: profitUsdUpdate !== undefined ? profitUsdUpdate : (profitUsd !== undefined ? parseFloat(profitUsd) : undefined),
+          commission: commission !== undefined ? parseFloat(commission) : undefined,
+          swap: swap !== undefined ? parseFloat(swap) : undefined,
+          pips: pipsUpdate !== undefined ? pipsUpdate : undefined,
+        },
+      });
+
+      // Handle EXIT execution creation on close
+      const isBeingClosed = closeTime !== undefined && closeTime !== null && closePrice !== undefined && closePrice !== null;
+      const isBeingReopened = closeTime !== undefined && closeTime === null;
+
+      if (isBeingClosed) {
+        // Remove any existing EXIT executions (replace with new one)
+        await tx.execution.deleteMany({
+          where: { trade_id: id, type: 'EXIT' },
+        });
+
+        const closePriceVal = parseFloat(closePrice);
+        const closeTimeVal = new Date(closeTime);
+        const lotSizeVal = lotSize !== undefined ? parseFloat(lotSize) : existing.lot_size;
+        const openPriceVal = openPrice !== undefined ? parseFloat(openPrice) : existing.open_price;
+        const dir = direction || existing.direction;
+
+        // Calculate pips for this exit
+        let exitPips = 0;
+        let digits = 5;
+        const sym = (symbol || existing.symbol).toUpperCase();
+        if (sym.includes('JPY')) digits = 3;
+        else if (sym.includes('BTC') || sym.includes('ETH')) digits = 0;
+        else if (sym.includes('XAU') || sym.includes('GOLD')) digits = 1;
+        let pipSize = Math.pow(10, -digits);
+        if (digits === 3 || digits === 5) pipSize *= 10;
+        exitPips = dir === 'BUY'
+          ? (closePriceVal - openPriceVal) / pipSize
+          : (openPriceVal - closePriceVal) / pipSize;
+
+        // Calculate R-multiple for this exit
+        let exitR = 0;
+        const sl = stopLoss !== undefined ? (stopLoss === null ? null : parseFloat(stopLoss)) : existing.stop_loss;
+        if (sl && sl > 0 && openPriceVal > 0) {
+          const isBuy = dir === 'BUY';
+          const risk = isBuy ? (openPriceVal - sl) : (sl - openPriceVal);
+          if (risk > 0) {
+            const reward = isBuy ? (closePriceVal - openPriceVal) : (openPriceVal - closePriceVal);
+            exitR = reward / risk;
+          }
+        }
+
+        const exitProfitUsd = profitUsdUpdate !== undefined ? profitUsdUpdate : (profitUsd !== undefined ? parseFloat(profitUsd) : 0);
+
+        await tx.execution.create({
+          data: {
+            trade_id: id,
+            type: 'EXIT',
+            lot_size: lotSizeVal,
+            price: closePriceVal,
+            profit_usd: exitProfitUsd,
+            commission: commission !== undefined ? parseFloat(commission) : 0,
+            swap: swap !== undefined ? parseFloat(swap) : 0,
+            pips: exitPips,
+            r_multiple: exitR,
+            close_time: closeTimeVal,
+            executed_at: closeTimeVal,
+          },
+        });
+      } else if (isBeingReopened) {
+        // Remove all EXIT executions when reopening
+        await tx.execution.deleteMany({
+          where: { trade_id: id, type: 'EXIT' },
+        });
+      }
+
+      return trade;
     });
+
+    // Sync aggregates from executions
+    await syncTradeAggregates(id);
 
     res.status(200).json(updated);
   } catch (err: any) {
@@ -1365,6 +1486,42 @@ router.post('/import-mt4', authenticate, checkImportPermission, uploadMemory.sin
             import_source: fileSource as any,
           },
         });
+
+        // Create ENTRY execution
+        await prisma.execution.create({
+          data: {
+            trade_id: newTrade.id,
+            type: 'ENTRY',
+            lot_size: trade.lotSize,
+            price: trade.openPrice,
+            profit_usd: 0,
+            commission: trade.commission,
+            swap: 0,
+            pips: 0,
+            r_multiple: 0,
+            executed_at: trade.openTime,
+          },
+        });
+
+        // Create EXIT execution if trade is closed
+        if (trade.closeTime && trade.closePrice !== null) {
+          await prisma.execution.create({
+            data: {
+              trade_id: newTrade.id,
+              type: 'EXIT',
+              lot_size: trade.lotSize,
+              price: trade.closePrice,
+              profit_usd: trade.profitUsd,
+              commission: 0,
+              swap: trade.swap,
+              pips: trade.pips,
+              r_multiple: trade.rMultiple,
+              close_time: trade.closeTime,
+              executed_at: trade.closeTime,
+            },
+          });
+        }
+
         imported++;
 
         // Collect closed losing trades for batch mistake detection

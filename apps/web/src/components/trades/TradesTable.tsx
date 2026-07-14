@@ -121,6 +121,8 @@ export default function TradesTable({
   const [isFabOpen, setIsFabOpen] = useState(false);
   const [dateFilter, setDateFilter] = useState<string | null>(null);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
+  const [sortKey, setSortKey] = useState<string>('date');
+  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc');
 
   const user = useAuthStore(state => state.user);
 
@@ -324,7 +326,7 @@ export default function TradesTable({
 
   // Filtered trades
   const filteredTrades = useMemo(() => {
-    return trades.filter(trade => {
+    const result = trades.filter(trade => {
       if (filterDatesArray.length > 0) {
         const closeDate = getLocalDateStr(trade.closeTime, selectedTimezone);
         const matchClose = closeDate ? filterDatesArray.includes(closeDate) : false;
@@ -367,7 +369,37 @@ export default function TradesTable({
       if (selectedStatus === 'MISSED' && !isMissed) return false;
       return true;
     });
-  }, [trades, selectedSymbol, selectedDirection, selectedTimeframe, searchQuery, selectedStatus, filterDatesArray, selectedTimezone, ignoredTagsSet]);
+
+    // Client-side sort
+    result.sort((a, b) => {
+      let cmp = 0;
+      switch (sortKey) {
+        case 'date':
+          cmp = new Date(a.openTime).getTime() - new Date(b.openTime).getTime();
+          break;
+        case 'symbol':
+          cmp = a.symbol.localeCompare(b.symbol);
+          break;
+        case 'direction':
+          cmp = a.direction.localeCompare(b.direction);
+          break;
+        case 'volume':
+          cmp = a.lotSize - b.lotSize;
+          break;
+        case 'pnl':
+          cmp = a.profitUsd - b.profitUsd;
+          break;
+        case 'rr':
+          cmp = a.rMultiple - b.rMultiple;
+          break;
+        default:
+          cmp = new Date(a.openTime).getTime() - new Date(b.openTime).getTime();
+      }
+      return sortDir === 'asc' ? cmp : -cmp;
+    });
+
+    return result;
+  }, [trades, selectedSymbol, selectedDirection, selectedTimeframe, searchQuery, selectedStatus, filterDatesArray, selectedTimezone, ignoredTagsSet, sortKey, sortDir]);
 
   // Summary Metrics
   const summary = useMemo(() => {
@@ -393,6 +425,12 @@ export default function TradesTable({
     if (page >= 1 && page <= totalPages) {
       setCurrentPage(page);
     }
+  };
+
+  const handleSort = (key: string) => {
+    setSortDir(prev => sortKey === key ? (prev === 'asc' ? 'desc' : 'asc') : 'desc');
+    setSortKey(key);
+    setCurrentPage(1);
   };
 
   const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -790,6 +828,9 @@ export default function TradesTable({
             accounts={accounts}
             ignoredTags={ignoredTagsSet}
             allTags={allTags}
+            sortKey={sortKey}
+            sortDir={sortDir}
+            onSort={handleSort}
           />
         </div>
 

@@ -250,7 +250,7 @@ export default function ImportMT4Modal({ isOpen, onClose, onSuccess, accounts }:
             </div>
           </div>
 
-          {errorMsg && <div className="form-error-alert">{errorMsg}</div>}
+          {errorMsg && <div className="form-error-alert" role="alert" aria-live="assertive">{errorMsg}</div>}
 
           {step === 'FILE' ? (
             <>
@@ -333,7 +333,7 @@ export default function ImportMT4Modal({ isOpen, onClose, onSuccess, accounts }:
                   ))}
                 </div>
               ) : (
-                <div className="form-error-alert">{p.noAccountError}</div>
+                <div className="form-error-alert" role="alert">{p.noAccountError}</div>
               )}
             </div>
           )}

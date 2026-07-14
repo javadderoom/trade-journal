@@ -87,15 +87,15 @@ model Trade {
   open_time     DateTime
   close_time    DateTime?
   open_price    Float
-  close_price   Float?
-  lot_size      Float
+  close_price   Float?       // Aggregated: last exit price (null if still open)
+  lot_size      Float        // Aggregated: original entry lot size
   stop_loss     Float?
   take_profit   Float?
-  profit_usd    Float
-  commission    Float
-  swap          Float
-  pips          Float
-  r_multiple    Float
+  profit_usd    Float        // Aggregated: sum of all exit P&L
+  commission    Float        // Aggregated: sum of all execution commissions
+  swap          Float        // Aggregated: sum of all execution swaps
+  pips          Float        // Aggregated: pips from last exit
+  r_multiple    Float        // Aggregated: R-multiple from last exit
   tags          String[]
   emotion       String?
   notes         String?
@@ -107,10 +107,37 @@ model Trade {
   entry_timeframe    String?
   created_at         DateTime     @default(now())
 
+  executions    Execution[]
+
   @@unique([account_id, ticket])
   @@index([user_id])
   @@index([account_id])
   mistakeIncidents MistakeIncident[]
+}
+
+model Execution {
+  id          String        @id @default(uuid())
+  trade_id    String
+  trade       Trade         @relation(fields: [trade_id], references: [id], onDelete: Cascade)
+  type        ExecutionType
+  lot_size    Float
+  price       Float
+  profit_usd  Float         @default(0)  // Realized P&L for this execution (exits only)
+  commission  Float         @default(0)
+  swap        Float         @default(0)
+  pips        Float         @default(0)
+  r_multiple  Float         @default(0)
+  close_time  DateTime?     // When this exit was closed
+  executed_at DateTime      @default(now())
+  notes       String?
+
+  @@index([trade_id])
+  @@index([executed_at])
+}
+
+enum ExecutionType {
+  ENTRY
+  EXIT
 }
 
 model MistakeIncident {
