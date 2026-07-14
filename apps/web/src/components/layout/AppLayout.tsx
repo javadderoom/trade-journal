@@ -2,12 +2,21 @@
 
 import React, { useEffect } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
+import { SWRConfig } from 'swr';
 import SideNavBar from './SideNavBar';
 import BottomNavBar from './BottomNavBar';
 import { useAuthStore } from '../../lib/auth';
+import { fetcher } from '../../lib/api';
 import { useTranslation } from '../../store/useAppStore';
 import Toaster from '../ui/Toaster';
 import { Agentation } from 'agentation';
+
+const swrConfigValue = {
+  fetcher,
+  revalidateOnFocus: true,
+  dedupingInterval: 2000,
+  errorRetryCount: 3,
+};
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -177,32 +186,38 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   // Public pages (landing) render full-bleed, no app chrome
   if (isPublicPage) {
     return (
-      <div className={fontClass}>
-        <Toaster />
-        {children}
-        {process.env.NODE_ENV === 'development' && <Agentation />}
-      </div>
+      <SWRConfig value={swrConfigValue}>
+        <div className={fontClass}>
+          <Toaster />
+          {children}
+          {process.env.NODE_ENV === 'development' && <Agentation />}
+        </div>
+      </SWRConfig>
     );
   }
 
   if (isAuthPage) {
     return (
-      <div className={`auth-wrapper ${fontClass}`}>
-        <Toaster />
-        {children}
-        {process.env.NODE_ENV === 'development' && <Agentation />}
-      </div>
+      <SWRConfig value={swrConfigValue}>
+        <div className={`auth-wrapper ${fontClass}`}>
+          <Toaster />
+          {children}
+          {process.env.NODE_ENV === 'development' && <Agentation />}
+        </div>
+      </SWRConfig>
     );
   }
 
   return (
-    <div className={`app-container ${fontClass}`} dir={dir}>
-      <SideNavBar />
-      <div className="main-content-wrapper">{children}</div>
-      <BottomNavBar />
-      <Toaster />
-      {process.env.NODE_ENV === 'development' && <Agentation />}
-    </div>
+    <SWRConfig value={swrConfigValue}>
+      <div className={`app-container ${fontClass}`} dir={dir}>
+        <SideNavBar />
+        <div className="main-content-wrapper">{children}</div>
+        <BottomNavBar />
+        <Toaster />
+        {process.env.NODE_ENV === 'development' && <Agentation />}
+      </div>
+    </SWRConfig>
   );
 }
 

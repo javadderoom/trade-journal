@@ -1,7 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { api } from '../lib/api';
+import useSWR from 'swr';
 
 const DEFAULT_PRICES = {
   FREE: { monthly: 0, annual: 0 },
@@ -10,13 +9,9 @@ const DEFAULT_PRICES = {
 };
 
 export function usePrices() {
-  const [prices, setPrices] = useState<any>(null);
+  const { data } = useSWR<any>('/api/payments/prices', {
+    fallbackData: DEFAULT_PRICES,
+  });
 
-  useEffect(() => {
-    api.get('/api/payments/prices')
-      .then(res => setPrices(res.data))
-      .catch(() => {});
-  }, []);
-
-  return prices || DEFAULT_PRICES;
+  return data || DEFAULT_PRICES;
 }

@@ -1,21 +1,9 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
-import { api } from '../lib/api';
+import useSWR from 'swr';
 
 export function useTradesEmotions() {
-  const [emotions, setEmotions] = useState<{ value: string; label: string; emoji?: string }[]>([]);
+  const { data: emotions = [], mutate } = useSWR<{ value: string; label: string; emoji?: string }[]>('/api/trades/emotions');
 
-  const fetchEmotions = useCallback(async () => {
-    try {
-      const res = await api.get(`/api/trades/emotions?t=${Date.now()}`);
-      setEmotions(res.data);
-    } catch {}
-  }, []);
-
-  useEffect(() => {
-    fetchEmotions();
-  }, [fetchEmotions]);
-
-  return { emotions, refetch: fetchEmotions };
+  return { emotions, refetch: mutate };
 }

@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { mutate } from 'swr';
 import { Trade } from '../components/trades/TradesTable';
 import { api } from '../lib/api';
 
@@ -298,7 +299,11 @@ export const useTradeStore = create<TradeState>((set, get) => ({
         entryTimeframe: updatedTrade.entryTimeframe,
       });
 
-      return res.status >= 200 && res.status < 300;
+      if (res.status >= 200 && res.status < 300) {
+        mutate('/api/payments/status');
+        return true;
+      }
+      return false;
     } catch (err) {
       console.error('Failed to update trade on backend:', err);
       return true; // Return true so frontend local change persists
@@ -311,7 +316,11 @@ export const useTradeStore = create<TradeState>((set, get) => ({
 
       const res = await api.delete(`/api/trades/${tradeId}`);
 
-      return res.status >= 200 && res.status < 300;
+      if (res.status >= 200 && res.status < 300) {
+        mutate('/api/payments/status');
+        return true;
+      }
+      return false;
     } catch (err) {
       console.error('Failed to delete trade on backend:', err);
       return true;
@@ -325,7 +334,11 @@ export const useTradeStore = create<TradeState>((set, get) => ({
 
       const res = await api.post(`/api/trades/bulk-delete`, { ids: realIds });
 
-      return res.status >= 200 && res.status < 300;
+      if (res.status >= 200 && res.status < 300) {
+        mutate('/api/payments/status');
+        return true;
+      }
+      return false;
     } catch (err) {
       console.error('Failed to delete multiple trades on backend:', err);
       return true;

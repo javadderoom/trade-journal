@@ -24,6 +24,12 @@ api.interceptors.request.use(
   }
 );
 
+// SWR fetcher — uses the same Axios instance (with auth interceptors + 401 refresh)
+export const fetcher = async <T = any>(url: string): Promise<T> => {
+  const res = await api.get<T>(url);
+  return res.data;
+};
+
 // Response interceptor to handle token refresh on 401
 let isRefreshing = false;
 let failedQueue: any[] = [];

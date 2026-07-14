@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
-import { api } from '../lib/api';
+import { useState } from 'react';
+import useSWR from 'swr';
 
 export interface SubStatus {
   plan: string;
@@ -16,21 +16,8 @@ export interface SubStatus {
 }
 
 export function useSubscriptionStatus() {
-  const [subStatus, setSubStatus] = useState<SubStatus | null>(null);
+  const { data: subStatus, mutate } = useSWR<SubStatus>('/api/payments/status');
   const [dismissedRejectionId, setDismissedRejectionId] = useState<string | null>(null);
 
-  const fetchSubStatus = useCallback(async () => {
-    try {
-      const res = await api.get('/api/payments/status');
-      setSubStatus(res.data);
-    } catch (err) {
-      console.error('Failed to fetch subscription status:', err);
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchSubStatus();
-  }, [fetchSubStatus]);
-
-  return { subStatus, dismissedRejectionId, setDismissedRejectionId, refetch: fetchSubStatus };
+  return { subStatus: subStatus ?? null, dismissedRejectionId, setDismissedRejectionId, refetch: mutate };
 }

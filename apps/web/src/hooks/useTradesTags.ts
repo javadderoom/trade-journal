@@ -1,7 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
-import { api } from '../lib/api';
+import useSWR from 'swr';
 
 export interface TagObject {
   name: string;
@@ -10,18 +9,7 @@ export interface TagObject {
 }
 
 export function useTradesTags() {
-  const [tags, setTags] = useState<TagObject[]>([]);
+  const { data: tags = [], mutate } = useSWR<TagObject[]>('/api/trades/tags');
 
-  const fetchTags = useCallback(async () => {
-    try {
-      const res = await api.get(`/api/trades/tags?t=${Date.now()}`);
-      setTags(res.data);
-    } catch {}
-  }, []);
-
-  useEffect(() => {
-    fetchTags();
-  }, [fetchTags]);
-
-  return { tags, refetch: fetchTags };
+  return { tags, refetch: mutate };
 }

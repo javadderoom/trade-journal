@@ -1,7 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { api } from '../lib/api';
+import useSWR from 'swr';
 
 const DEFAULT_CRYPTO = {
   usdtAddress: '',
@@ -11,13 +10,9 @@ const DEFAULT_CRYPTO = {
 };
 
 export function useCryptoDetails() {
-  const [details, setDetails] = useState<any>(null);
+  const { data } = useSWR<any>('/api/settings/crypto-details', {
+    fallbackData: DEFAULT_CRYPTO,
+  });
 
-  useEffect(() => {
-    api.get('/api/settings/crypto-details')
-      .then(res => setDetails(res.data))
-      .catch(() => {});
-  }, []);
-
-  return details || DEFAULT_CRYPTO;
+  return data || DEFAULT_CRYPTO;
 }

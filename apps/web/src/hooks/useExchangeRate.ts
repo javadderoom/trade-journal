@@ -1,18 +1,16 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import useSWR from 'swr';
+
+const fetchJson = (url: string) => fetch(url).then(r => r.json());
 
 export function useExchangeRate(defaultRate = 90000) {
-  const [rate, setRate] = useState<number>(defaultRate);
+  const { data } = useSWR<{ usdToToman: number }>('/api/exchange-rate', fetchJson, {
+    refreshInterval: 60000,
+    revalidateOnFocus: false,
+    dedupingInterval: 10000,
+    fallbackData: { usdToToman: defaultRate },
+  });
 
-  useEffect(() => {
-    fetch('/api/exchange-rate')
-      .then(r => r.json())
-      .then(d => {
-        if (d?.usdToToman && d.usdToToman > 0) setRate(d.usdToToman);
-      })
-      .catch(() => {});
-  }, []);
-
-  return rate;
+  return data?.usdToToman ?? defaultRate;
 }
