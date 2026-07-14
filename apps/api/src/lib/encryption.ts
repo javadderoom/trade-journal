@@ -2,22 +2,27 @@ import crypto from 'node:crypto';
 
 const ALGORITHM = 'aes-256-gcm';
 
-// Standard 32-byte key fallback for local development
-const DEV_KEY = '000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f';
-const rawKey = process.env.API_ENCRYPTION_KEY || DEV_KEY;
+const rawKey = process.env.API_ENCRYPTION_KEY;
 
-if (!process.env.API_ENCRYPTION_KEY && process.env.NODE_ENV === 'production') {
-  console.warn('⚠️ WARNING: API_ENCRYPTION_KEY environment variable is not defined in production! Falling back to default development key.');
+if (!rawKey) {
+  if (process.env.NODE_ENV === 'production') {
+    throw new Error('FATAL: API_ENCRYPTION_KEY environment variable is not set. Refusing to start in production.');
+  }
+  console.warn('⚠️  API_ENCRYPTION_KEY not set — using INSECURE dev fallback. Exchange API keys are NOT safely encrypted.');
 }
 
+const DEV_KEY = '000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f';
+const keyInput = rawKey || DEV_KEY;
+
 let KEY: Buffer;
-if (rawKey.length === 64 && /^[0-9a-fA-F]+$/.test(rawKey)) {
-  KEY = Buffer.from(rawKey, 'hex');
+if (keyInput.length === 64 && /^[0-9a-fA-F]+$/.test(keyInput)) {
+  KEY = Buffer.from(keyInput, 'hex');
 } else {
-  // Securely hash the input key using SHA-256 to guarantee a valid 32-byte buffer
-  KEY = crypto.createHash('sha256').update(rawKey).digest();
-  if (process.env.NODE_ENV === 'production') {
-    console.warn('⚠️ WARNING: API_ENCRYPTION_KEY is not a valid 64-character hex string. Derived a 32-byte key using SHA-256.');
+  KEY = crypto.createHash('sha256').update(keyInput).digest();
+  if (!rawKey && process.env.NODE_ENV !== 'production') {
+    // Only warn about derivation when using the dev fallback
+  } else if (rawKey) {
+    console.warn('⚠️  API_ENCRYPTION_KEY is not a valid 64-character hex string. Derived a 32-byte key using SHA-256.');
   }
 }
 

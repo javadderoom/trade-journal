@@ -24,13 +24,27 @@ app.use(express.json({ limit: '10mb' }));
 app.use(cookieParser());
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
-// CORS — allow credentials and dynamically match request origin
+// CORS — allow only trusted origins
+const ALLOWED_ORIGINS: (string | RegExp)[] = (process.env.CORS_ORIGINS || '')
+  .split(',')
+  .map(s => s.trim())
+  .filter(Boolean);
+
+// In development, allow localhost on any port
+if (process.env.NODE_ENV !== 'production') {
+  ALLOWED_ORIGINS.push(/^http:\/\/localhost:\d+$/);
+}
+
 app.use((req, res, next) => {
   const origin = req.headers.origin;
   if (origin) {
-    res.header('Access-Control-Allow-Origin', origin);
-  } else {
-    res.header('Access-Control-Allow-Origin', '*');
+    const allowed = ALLOWED_ORIGINS.some(allowed => {
+      if (allowed instanceof RegExp) return allowed.test(origin);
+      return allowed === origin;
+    });
+    if (allowed) {
+      res.header('Access-Control-Allow-Origin', origin);
+    }
   }
   res.header('Access-Control-Allow-Credentials', 'true');
   res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, x-api-token');

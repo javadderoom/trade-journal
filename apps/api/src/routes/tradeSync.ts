@@ -634,27 +634,9 @@ router.post('/tags/bulk', authenticate, async (req: AuthRequest, res: Response) 
         },
       });
 
-      // Remove from Trade tags arrays
-      const tradesWithTags = await prisma.trade.findMany({
-        where: {
-          user_id: userId,
-          tags: {
-            hasSome: deletes,
-          },
-        },
-        select: {
-          id: true,
-          tags: true,
-        },
-      });
-
-      for (const trade of tradesWithTags) {
-        await prisma.trade.update({
-          where: { id: trade.id },
-          data: {
-            tags: trade.tags.filter(t => !deletes.includes(t)),
-          },
-        });
+      // Remove from Trade tags arrays — single query per tag using array_remove
+      for (const tagName of deletes) {
+        await prisma.$executeRaw`UPDATE "Trade" SET tags = array_remove(tags, ${tagName}) WHERE user_id = ${userId} AND ${tagName} = ANY(tags)`;
       }
     }
 
@@ -742,29 +724,8 @@ router.delete('/tags/:name', authenticate, async (req: AuthRequest, res: Respons
       },
     });
 
-    // 2. Fetch all trades of this user containing this tag
-    const tradesWithTag = await prisma.trade.findMany({
-      where: {
-        user_id: userId,
-        tags: {
-          has: name,
-        },
-      },
-      select: {
-        id: true,
-        tags: true,
-      },
-    });
-
-    // 3. Update trades to filter out the deleted tag
-    for (const trade of tradesWithTag) {
-      await prisma.trade.update({
-        where: { id: trade.id },
-        data: {
-          tags: trade.tags.filter(t => t !== name),
-        },
-      });
-    }
+    // 2. Remove tag from all trades — single query
+    await prisma.$executeRaw`UPDATE "Trade" SET tags = array_remove(tags, ${name}) WHERE user_id = ${userId} AND ${name} = ANY(tags)`;
 
     res.status(200).json({ success: true });
   } catch (err: any) {
@@ -1450,21 +1411,31 @@ router.post('/import-mt4', authenticate, checkImportPermission, uploadMemory.sin
     // Detect file source (MT4 report vs MT5 report)
     const fileSource = htmlContent.toLowerCase().includes('metatrader 5') ? 'MT5_CSV' : 'MT4_HTM';
 
-    for (const trade of parsedTrades) {
-      try {
-        const existing = await prisma.trade.findFirst({
-          where: {
-            account_id: accountId,
-            ticket: trade.ticket,
-          },
-        });
+    // Batch dedup: fetch all existing tickets for this account in one query
+    const incomingTickets = parsedTrades.map(t => t.ticket).filter((t): t is number => t !== null);
+    const existingTrades = await prisma.trade.findMany({
+      where: {
+        account_id: accountId,
+        ticket: { in: incomingTickets },
+      },
+      select: { ticket: true },
+    });
+    const existingTicketSet = new Set(existingTrades.map(t => t.ticket));
 
-        if (existing) {
-          skipped++;
-          continue;
-        }
+    // Filter out duplicates before entering the transaction
+    const tradesToImport = parsedTrades.filter(t => {
+      if (t.ticket !== null && existingTicketSet.has(t.ticket)) {
+        skipped++;
+        return false;
+      }
+      return true;
+    });
 
-        const newTrade = await prisma.trade.create({
+    // Process imports inside a transaction for atomicity
+    const importedTrades = await prisma.$transaction(async (tx) => {
+      const results: any[] = [];
+      for (const trade of tradesToImport) {
+        const newTrade = await tx.trade.create({
           data: {
             account_id: accountId,
             user_id: userId,
@@ -1488,7 +1459,7 @@ router.post('/import-mt4', authenticate, checkImportPermission, uploadMemory.sin
         });
 
         // Create ENTRY execution
-        await prisma.execution.create({
+        await tx.execution.create({
           data: {
             trade_id: newTrade.id,
             type: 'ENTRY',
@@ -1505,7 +1476,7 @@ router.post('/import-mt4', authenticate, checkImportPermission, uploadMemory.sin
 
         // Create EXIT execution if trade is closed
         if (trade.closeTime && trade.closePrice !== null) {
-          await prisma.execution.create({
+          await tx.execution.create({
             data: {
               trade_id: newTrade.id,
               type: 'EXIT',
@@ -1522,16 +1493,13 @@ router.post('/import-mt4', authenticate, checkImportPermission, uploadMemory.sin
           });
         }
 
-        imported++;
-
-        // Collect closed losing trades for batch mistake detection
-        if (trade.profitUsd < 0 && trade.closeTime !== null) {
-          newLosingTrades.push(newTrade);
-        }
-      } catch (err: any) {
-        console.error(`Failed to insert trade ticket ${trade.ticket}:`, err.message);
+        results.push(newTrade);
       }
-    }
+      return results;
+    });
+
+    imported = importedTrades.length;
+    newLosingTrades.push(...importedTrades.filter((t: any) => t.profit_usd < 0 && t.close_time !== null));
 
     // Record the ImportJob
     try {

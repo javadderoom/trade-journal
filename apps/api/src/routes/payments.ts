@@ -724,9 +724,12 @@ router.get('/status', authenticate, async (req: AuthRequest, res: Response) => {
 
 /**
  * GET /api/payments/mock-gateway
- * Render mock gate for development testing
+ * Render mock gate for development testing — disabled in production
  */
 router.get('/mock-gateway', async (req, res) => {
+  if (process.env.NODE_ENV === 'production') {
+    return res.status(404).json({ error: 'Not found' });
+  }
   const { Authority, Amount, CallbackUrl } = req.query;
 
   if (!Authority || !Amount || !CallbackUrl) {
@@ -1114,9 +1117,12 @@ router.all('/payping/callback', async (req, res) => {
 
 /**
  * GET /api/payments/payping/mock-gateway
- * Render mock gate for PayPing development testing
+ * Render mock gate for PayPing development testing — disabled in production
  */
 router.get('/payping/mock-gateway', async (req, res) => {
+  if (process.env.NODE_ENV === 'production') {
+    return res.status(404).json({ error: 'Not found' });
+  }
   const { Code, Amount, CallbackUrl } = req.query;
 
   if (!Code || !Amount || !CallbackUrl) {
