@@ -1,0 +1,303 @@
+'use client';
+
+import React, { useEffect, useState } from 'react';
+import { useSupportStore, Conversation } from '../../../store/useSupportStore';
+import { StatusBadge, PriorityBadge, CategoryBadge } from '../../../components/support/StatusBadge';
+import MessageBubble from '../../../components/support/MessageBubble';
+import ChatInput from '../../../components/support/ChatInput';
+import { useAuthStore } from '../../../lib/auth';
+
+type View = 'list' | 'detail';
+type StatusFilter = 'ALL' | 'OPEN' | 'WAITING' | 'RESOLVED' | 'CLOSED';
+
+const STATUS_OPTIONS: { value: StatusFilter; label: string }[] = [
+  { value: 'ALL', label: 'همه' },
+  { value: 'OPEN', label: 'باز' },
+  { value: 'WAITING', label: 'در انتظار' },
+  { value: 'RESOLVED', label: 'حل شده' },
+  { value: 'CLOSED', label: 'بسته شده' },
+];
+
+export default function AdminSupportPage() {
+  const {
+    conversations, stats, messages, activeConversation,
+    adminFetchConversations, adminFetchStats, adminFetchConversation,
+    adminReply, adminAssign, adminChangeStatus, adminChangePriority, sending,
+  } = useSupportStore();
+  const user = useAuthStore((s) => s.user);
+
+  const [view, setView] = useState<View>('list');
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>('ALL');
+  const [searchQuery, setSearchQuery] = useState('');
+
+  useEffect(() => {
+    adminFetchStats();
+    adminFetchConversations();
+  }, [adminFetchStats, adminFetchConversations]);
+
+  const handleSelect = async (id: string) => {
+    setSelectedId(id);
+    setView('detail');
+    await adminFetchConversation(id);
+  };
+
+  const handleBack = () => {
+    setView('list');
+    setSelectedId(null);
+    adminFetchConversations(statusFilter !== 'ALL' ? { status: statusFilter } : undefined);
+    adminFetchStats();
+  };
+
+  const handleFilterChange = async (filter: StatusFilter) => {
+    setStatusFilter(filter);
+    const params = filter !== 'ALL' ? { status: filter } : undefined;
+    await adminFetchConversations(params);
+  };
+
+  const handleReply = async (body: string, attachments?: File[]) => {
+    if (selectedId) {
+      await adminReply(selectedId, body, attachments);
+      await adminFetchConversation(selectedId);
+    }
+  };
+
+  const handleAssign = async (adminId: string | null) => {
+    if (selectedId) {
+      await adminAssign(selectedId, adminId);
+      await adminFetchConversation(selectedId);
+    }
+  };
+
+  const filteredConversations = conversations.filter((c) => {
+    if (!searchQuery) return true;
+    const q = searchQuery.toLowerCase();
+    return (
+      c.subject.toLowerCase().includes(q) ||
+      c.user?.name?.toLowerCase().includes(q) ||
+      c.user?.email?.toLowerCase().includes(q)
+    );
+  });
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', background: '#16171d' }}>
+      {view === 'list' ? (
+        <>
+          {/* Header */}
+          <div style={{ padding: '16px 20px', borderBottom: '1px solid rgba(60, 74, 65, 0.3)', flexShrink: 0 }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+              <h1 style={{ fontSize: 18, fontWeight: 700, color: '#e2e2eb', margin: 0 }}>پشتیبانی</h1>
+            </div>
+
+            {/* Stats */}
+            {stats && (
+              <div style={{ display: 'flex', gap: 8, marginBottom: 12, flexWrap: 'wrap' }}>
+                {[
+                  { label: 'باز', value: stats.open, color: '#3ddc97' },
+                  { label: 'در انتظار', value: stats.waiting, color: '#f59e0b' },
+                  { label: 'حل شده', value: stats.resolved, color: '#60a5fa' },
+                  { label: 'بسته شده', value: stats.closed, color: '#94a3b8' },
+                ].map((s) => (
+                  <div
+                    key={s.label}
+                    style={{
+                      padding: '6px 12px',
+                      borderRadius: 8,
+                      background: 'rgba(255,255,255,0.04)',
+                      border: '1px solid rgba(60, 74, 65, 0.25)',
+                    }}
+                  >
+                    <span style={{ fontSize: 11, color: '#94a3b8' }}>{s.label}:</span>{' '}
+                    <span style={{ fontSize: 13, fontWeight: 700, color: s.color }}>{s.value}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Filters */}
+            <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+              <div style={{ display: 'flex', gap: 4 }}>
+                {STATUS_OPTIONS.map((opt) => (
+                  <button
+                    key={opt.value}
+                    onClick={() => handleFilterChange(opt.value)}
+                    style={{
+                      padding: '5px 12px',
+                      borderRadius: 7,
+                      border: `1px solid ${statusFilter === opt.value ? '#61f9b1' : 'rgba(60, 74, 65, 0.3)'}`,
+                      background: statusFilter === opt.value ? 'rgba(97, 249, 177, 0.1)' : 'transparent',
+                      color: statusFilter === opt.value ? '#61f9b1' : '#94a3b8',
+                      fontSize: 12,
+                      fontWeight: statusFilter === opt.value ? 600 : 400,
+                      cursor: 'pointer',
+                    }}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="جستجو..."
+                style={{
+                  flex: 1,
+                  padding: '6px 12px',
+                  borderRadius: 8,
+                  border: '1px solid rgba(60, 74, 65, 0.3)',
+                  background: '#1e1f26',
+                  color: '#e2e2eb',
+                  fontSize: 13,
+                  outline: 'none',
+                }}
+              />
+            </div>
+          </div>
+
+          {/* Conversation List */}
+          <div style={{ flex: 1, overflow: 'auto' }}>
+            {filteredConversations.length === 0 ? (
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: 200, color: '#94a3b8', opacity: 0.5 }}>
+                <span className="material-symbols-outlined" style={{ fontSize: 40 }}>forum</span>
+                <span style={{ fontSize: 14, marginTop: 8 }}>تیکتی یافت نشد</span>
+              </div>
+            ) : (
+              filteredConversations.map((conv) => (
+                <button
+                  key={conv.id}
+                  onClick={() => handleSelect(conv.id)}
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 6,
+                    padding: '14px 20px',
+                    width: '100%',
+                    border: 'none',
+                    borderBottom: '1px solid rgba(60, 74, 65, 0.2)',
+                    borderRadius: 0,
+                    background: selectedId === conv.id ? 'rgba(97, 249, 177, 0.06)' : 'transparent',
+                    cursor: 'pointer',
+                    textAlign: 'right',
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
+                    <span style={{ fontSize: 14, fontWeight: 600, color: '#e2e2eb', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>
+                      {conv.subject}
+                    </span>
+                    <span style={{ fontSize: 11, color: '#94a3b8', flexShrink: 0, opacity: 0.6 }}>
+                      {new Date(conv.created_at).toLocaleDateString('fa-IR')}
+                    </span>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                    <StatusBadge status={conv.status} />
+                    <PriorityBadge priority={conv.priority} />
+                    <CategoryBadge category={conv.category} />
+                    {conv.user && (
+                      <span style={{ fontSize: 11, color: '#94a3b8', opacity: 0.6 }}>
+                        {conv.user.name || conv.user.email}
+                      </span>
+                    )}
+                    {conv._count && (
+                      <span style={{ fontSize: 11, color: '#94a3b8', opacity: 0.6 }}>
+                        {conv._count.messages} پیام
+                      </span>
+                    )}
+                  </div>
+                </button>
+              ))
+            )}
+          </div>
+        </>
+      ) : (
+        /* Detail View */
+        <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+          {/* Header */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', borderBottom: '1px solid rgba(60, 74, 65, 0.3)', flexShrink: 0 }}>
+            <button
+              onClick={handleBack}
+              style={{
+                width: 36, height: 36, borderRadius: '50%', border: 'none',
+                background: 'rgba(255,255,255,0.06)', color: '#94a3b8',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', flexShrink: 0,
+              }}
+            >
+              <span className="material-symbols-outlined" style={{ fontSize: 20 }}>arrow_forward</span>
+            </button>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontSize: 15, fontWeight: 700, color: '#e2e2eb', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 4 }}>
+                {activeConversation?.subject}
+              </div>
+              <div style={{ display: 'flex', gap: 6 }}>
+                {activeConversation && <StatusBadge status={activeConversation.status} />}
+                {activeConversation && <PriorityBadge priority={activeConversation.priority} />}
+                {activeConversation && <CategoryBadge category={activeConversation.category} />}
+              </div>
+            </div>
+          </div>
+
+          {/* Controls */}
+          {activeConversation && (
+            <div style={{ display: 'flex', gap: 8, padding: '8px 16px', borderBottom: '1px solid rgba(60, 74, 65, 0.2)', flexWrap: 'wrap', flexShrink: 0 }}>
+              <select
+                value={activeConversation.status}
+                onChange={(e) => adminChangeStatus(activeConversation.id, e.target.value)}
+                style={{
+                  padding: '5px 10px', borderRadius: 7, border: '1px solid rgba(60, 74, 65, 0.3)',
+                  background: '#1e1f26', color: '#e2e2eb', fontSize: 12, cursor: 'pointer',
+                }}
+              >
+                <option value="OPEN">باز</option>
+                <option value="WAITING">در انتظار</option>
+                <option value="RESOLVED">حل شده</option>
+                <option value="CLOSED">بسته شده</option>
+              </select>
+              <select
+                value={activeConversation.priority}
+                onChange={(e) => adminChangePriority(activeConversation.id, e.target.value)}
+                style={{
+                  padding: '5px 10px', borderRadius: 7, border: '1px solid rgba(60, 74, 65, 0.3)',
+                  background: '#1e1f26', color: '#e2e2eb', fontSize: 12, cursor: 'pointer',
+                }}
+              >
+                <option value="LOW">کم</option>
+                <option value="NORMAL">عادی</option>
+                <option value="HIGH">بالا</option>
+                <option value="URGENT">فوری</option>
+              </select>
+              {activeConversation.user && (
+                <span style={{ fontSize: 12, color: '#94a3b8', display: 'flex', alignItems: 'center', gap: 4 }}>
+                  <span className="material-symbols-outlined" style={{ fontSize: 14 }}>person</span>
+                  {activeConversation.user.name || activeConversation.user.email}
+                </span>
+              )}
+            </div>
+          )}
+
+          {/* Messages */}
+          <div style={{ flex: 1, overflow: 'auto', display: 'flex', flexDirection: 'column', gap: 12, padding: '16px' }}>
+            {messages.map((msg) => (
+              <MessageBubble
+                key={msg.id}
+                senderId={msg.sender_id}
+                body={msg.body}
+                attachments={msg.attachments}
+                timestamp={msg.created_at}
+                isOwn={msg.sender_id === user?.id}
+              />
+            ))}
+          </div>
+
+          {/* Input */}
+          {(activeConversation?.status === 'OPEN' || activeConversation?.status === 'WAITING') ? (
+            <ChatInput onSend={handleReply} sending={sending} placeholder="پاسخ به کاربر..." />
+          ) : (
+            <div style={{ padding: '16px', textAlign: 'center', color: '#94a3b8', fontSize: 13, borderTop: '1px solid rgba(60, 74, 65, 0.3)' }}>
+              این تیکت بسته شده است
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}

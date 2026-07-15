@@ -1,104 +1,87 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
-import { useTranslation } from '../../store/useAppStore';
+import React, { useState, useEffect } from 'react';
+import { useSupportStore } from '../../store/useSupportStore';
+import ConversationList from '../../components/support/ConversationList';
+import ConversationDetail from '../../components/support/ConversationDetail';
+import NewConversationModal from '../../components/support/NewConversationModal';
 import './support.scss';
 
-interface Message {
-  id: string;
-  text: string;
-  sender: 'user' | 'support';
-  timestamp: Date;
-}
+type View = 'list' | 'detail';
 
 export default function SupportPage() {
-  const { t, language } = useTranslation();
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: '1',
-      text: language === 'fa'
-        ? 'سلام! چطور می‌تونم کمکتون کنم؟'
-        : 'Hi! How can I help you?',
-      sender: 'support',
-      timestamp: new Date(),
-    },
-  ]);
-  const [input, setInput] = useState('');
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const { conversations, fetchConversations, createConversation } = useSupportStore();
+  const [view, setView] = useState<View>('list');
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [showNewModal, setShowNewModal] = useState(false);
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+    fetchConversations();
+  }, [fetchConversations]);
 
-  const sendMessage = () => {
-    if (!input.trim()) return;
-    const userMsg: Message = {
-      id: Date.now().toString(),
-      text: input.trim(),
-      sender: 'user',
-      timestamp: new Date(),
-    };
-    setMessages((prev) => [...prev, userMsg]);
-    setInput('');
-
-    setTimeout(() => {
-      const reply: Message = {
-        id: (Date.now() + 1).toString(),
-        text: language === 'fa'
-          ? 'پیام شما دریافت شد. تیم پشتیبانی به زودی پاسخ خواهد داد.'
-          : 'Your message has been received. Our support team will respond shortly.',
-        sender: 'support',
-        timestamp: new Date(),
-      };
-      setMessages((prev) => [...prev, reply]);
-    }, 1200);
+  const handleSelect = (id: string) => {
+    setSelectedId(id);
+    setView('detail');
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      sendMessage();
-    }
+  const handleBack = () => {
+    setView('list');
+    setSelectedId(null);
+  };
+
+  const handleCreate = async (subject: string, category: string, body: string) => {
+    const conv = await createConversation(subject, category, body);
+    setSelectedId(conv.id);
+    setView('detail');
   };
 
   return (
     <div className="support-page">
-      <header className="support-header">
-        <h1>{language === 'fa' ? 'پشتیبانی' : 'Support'}</h1>
-      </header>
-
-      <div className="support-chat-container">
-        <div className="support-messages">
-          {messages.map((msg) => (
-            <div key={msg.id} className={`support-message ${msg.sender}`}>
-              <div className="support-message-bubble">
-                {msg.text}
-              </div>
-              <span className="support-message-time">
-                {msg.timestamp.toLocaleTimeString(language === 'fa' ? 'fa-IR' : 'en-US', {
-                  hour: '2-digit',
-                  minute: '2-digit',
-                })}
-              </span>
+      {view === 'list' ? (
+        <>
+          <header className="support-header">
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <h1>پشتیبانی</h1>
+              <button
+                onClick={() => setShowNewModal(true)}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 6,
+                  padding: '8px 16px',
+                  borderRadius: 10,
+                  border: 'none',
+                  background: '#61f9b1',
+                  color: '#003822',
+                  fontSize: 13,
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                }}
+              >
+                <span className="material-symbols-outlined" style={{ fontSize: 18 }}>add</span>
+                تیکت جدید
+              </button>
             </div>
-          ))}
-          <div ref={messagesEndRef} />
+          </header>
+          <div className="support-list">
+            <ConversationList
+              conversations={conversations}
+              selectedId={selectedId}
+              onSelect={handleSelect}
+            />
+          </div>
+        </>
+      ) : (
+        <div className="support-detail">
+          {selectedId && <ConversationDetail conversationId={selectedId} onBack={handleBack} />}
         </div>
+      )}
 
-        <div className="support-input-bar">
-          <input
-            type="text"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={handleKeyDown}
-            placeholder={language === 'fa' ? 'پیام خود را بنویسید...' : 'Type your message...'}
-            className="support-input"
-          />
-          <button className="support-send-btn" onClick={sendMessage} disabled={!input.trim()}>
-            <span className="material-symbols-outlined">send</span>
-          </button>
-        </div>
-      </div>
+      <NewConversationModal
+        open={showNewModal}
+        onClose={() => setShowNewModal(false)}
+        onSubmit={handleCreate}
+      />
     </div>
   );
 }

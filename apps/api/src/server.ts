@@ -14,6 +14,8 @@ import paymentsRouter from './routes/payments';
 import adminRouter from './routes/admin';
 import tradeExportRouter from './routes/tradeExport';
 import cryptoSyncRouter from './routes/cryptoSync';
+import supportRouter from './routes/support';
+import adminSupportRouter from './routes/adminSupport';
 import { syncExchangeTrades } from './services/ccxtSync';
 
 const app = express();
@@ -66,6 +68,8 @@ app.use('/api/dashboard', dashboardRouter);
 app.use('/api/settings', settingsRouter);
 app.use('/api/payments', paymentsRouter);
 app.use('/api/admin', adminRouter);
+app.use('/api/admin/support', adminSupportRouter);
+app.use('/api/support', supportRouter);
 app.use('/api/crypto', cryptoSyncRouter);
 
 // Health check

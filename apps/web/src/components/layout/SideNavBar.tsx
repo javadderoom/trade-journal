@@ -29,6 +29,7 @@ export default function SideNavBar() {
 
   if (user?.role === 'ADMIN') {
     navItems.push({ href: '/admin', label: t('nav.admin'), icon: 'admin_panel_settings' });
+    navItems.push({ href: '/admin/support', label: t('nav.adminSupport'), icon: 'support_agent' });
   }
 
   return (

@@ -32,9 +32,13 @@ model User {
   refresh_tokens   RefreshToken[]
   userDiscounts    UserDiscount[]
   manualReceipts   ManualReceipt[]
-  mistakeIncidents MistakeIncident[]
-  cryptoTransactions CryptoTransaction[]
-  checkoutSessions CheckoutSession[]
+   mistakeIncidents MistakeIncident[]
+   cryptoTransactions CryptoTransaction[]
+   checkoutSessions CheckoutSession[]
+   conversations Conversation[]             @relation("UserConversations")
+   assignedConversations Conversation[]     @relation("AdminConversations")
+   sentMessages Message[]                   @relation("MessageSender")
+   activities ConversationActivity[]        @relation("ActivityActor")
 }
 
 model Account {
@@ -396,5 +400,78 @@ model CheckoutSession {
 
   @@index([user_id])
   @@index([authority])
+}
+
+// ─── Support Chat ──────────────────────────────────────────────────────────────
+
+model Conversation {
+  id               String             @id @default(uuid())
+  user_id          String
+  user             User               @relation("UserConversations", fields: [user_id], references: [id], onDelete: Cascade)
+  subject          String
+  status           ConversationStatus @default(OPEN)
+  priority         Priority           @default(NORMAL)
+  category         SupportCategory    @default(GENERAL)
+  assigned_admin_id String?
+  assigned_admin   User?              @relation("AdminConversations", fields: [assigned_admin_id], references: [id], onDelete: SetNull)
+  created_at       DateTime           @default(now())
+  updated_at       DateTime           @updatedAt
+  resolved_at      DateTime?
+  closed_at        DateTime?
+  messages         Message[]
+  activities       ConversationActivity[]
+
+  @@index([user_id])
+  @@index([status])
+  @@index([assigned_admin_id])
+}
+
+model Message {
+  id              String       @id @default(uuid())
+  conversation_id String
+  conversation    Conversation @relation(fields: [conversation_id], references: [id], onDelete: Cascade)
+  sender_id       String
+  sender          User         @relation("MessageSender", fields: [sender_id], references: [id], onDelete: Cascade)
+  body            String
+  attachments     String[]     @default([])
+  read_at         DateTime?
+  created_at      DateTime     @default(now())
+
+  @@index([conversation_id, created_at])
+}
+
+model ConversationActivity {
+  id              String       @id @default(uuid())
+  conversation_id String
+  conversation    Conversation @relation(fields: [conversation_id], references: [id], onDelete: Cascade)
+  actor_id        String
+  actor           User         @relation("ActivityActor", fields: [actor_id], references: [id], onDelete: Cascade)
+  action          String
+  details         Json?
+  created_at      DateTime     @default(now())
+
+  @@index([conversation_id, created_at])
+}
+
+enum ConversationStatus {
+  OPEN
+  WAITING
+  RESOLVED
+  CLOSED
+}
+
+enum Priority {
+  LOW
+  NORMAL
+  HIGH
+  URGENT
+}
+
+enum SupportCategory {
+  GENERAL
+  TECHNICAL
+  BILLING
+  FEATURE_REQUEST
+  BUG_REPORT
 }
 
