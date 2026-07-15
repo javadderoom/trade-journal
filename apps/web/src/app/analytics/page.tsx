@@ -496,14 +496,6 @@ export default function JournalPage() {
   const isNetProfit = stats.netPnl >= 0;
   const radialDashOffset = 251.2 - (251.2 * stats.winRateOverall) / 100;
 
-  if (loading) {
-    return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', backgroundColor: '#111319', color: '#61f9b1' }}>
-        <div style={{ fontSize: '20px', fontFamily: 'Vazirmatn' }}>{t('analytics.loading')}</div>
-      </div>
-    );
-  }
-
   return (
     <div className="journal-container">
       {/* Header */}

@@ -347,13 +347,6 @@ export default function JournalPage() {
 
       {/* Main Journal Note Card */}
       <div className="journal-content-card">
-        {loading ? (
-          <div className="loading-card-state">
-            <div className="spinner"></div>
-            <span>{p.loadingNote}</span>
-          </div>
-        ) : (
-          <>
             {/* Mood selector */}
             <div className="mood-selection-bar">
               <span className="lbl">{p.moodLabel}</span>
@@ -387,8 +380,6 @@ export default function JournalPage() {
               onSave={() => saveJournalEntry(body, mood)}
               saveStatus={saveStatus}
             />
-          </>
-        )}
       </div>
 
       {/* Trades of the day section */}

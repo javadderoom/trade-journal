@@ -172,15 +172,6 @@ export default function TradesPage() {
     }
   };
 
-  if (loading) {
-    return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', backgroundColor: '#111319', color: '#61f9b1' }}>
-        <div style={{ fontSize: '20px', fontFamily: isEn ? 'inherit' : 'Vazirmatn' }}>
-          {isEn ? 'Loading trades data...' : 'در حال دریافت اطلاعات معاملات...'}
-        </div>
-      </div>
-    );
-  }
   return (
     <main style={{ minHeight: '100vh', backgroundColor: '#111319' }}>
       <SubscriptionBanners
