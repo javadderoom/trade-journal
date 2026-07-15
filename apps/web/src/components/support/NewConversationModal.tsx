@@ -1,14 +1,9 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useTranslation } from '../../store/useAppStore';
 
-const CATEGORIES = [
-  { value: 'GENERAL', label: 'عمومی' },
-  { value: 'TECHNICAL', label: 'فنی' },
-  { value: 'BILLING', label: 'مالی' },
-  { value: 'FEATURE_REQUEST', label: 'درخواست امکان جدید' },
-  { value: 'BUG_REPORT', label: 'گزارش باگ' },
-];
+const CATEGORIES = ['GENERAL', 'TECHNICAL', 'BILLING', 'FEATURE_REQUEST', 'BUG_REPORT'];
 
 interface NewConversationModalProps {
   open: boolean;
@@ -17,12 +12,21 @@ interface NewConversationModalProps {
 }
 
 export default function NewConversationModal({ open, onClose, onSubmit }: NewConversationModalProps) {
+  const { t } = useTranslation();
   const [subject, setSubject] = useState('');
   const [category, setCategory] = useState('GENERAL');
   const [body, setBody] = useState('');
   const [loading, setLoading] = useState(false);
 
   if (!open) return null;
+
+  const categoryLabels: Record<string, string> = {
+    GENERAL: t('support.catGeneral'),
+    TECHNICAL: t('support.catTechnical'),
+    BILLING: t('support.catBilling'),
+    FEATURE_REQUEST: t('support.catFeatureRequest'),
+    BUG_REPORT: t('support.catBugReport'),
+  };
 
   const handleSubmit = async () => {
     if (!subject.trim() || !body.trim()) return;
@@ -74,7 +78,7 @@ export default function NewConversationModal({ open, onClose, onSubmit }: NewCon
             borderBottom: '1px solid rgba(60, 74, 65, 0.3)',
           }}
         >
-          <span style={{ fontSize: 16, fontWeight: 700, color: '#e2e2eb' }}>تیکت جدید</span>
+          <span style={{ fontSize: 16, fontWeight: 700, color: '#e2e2eb' }}>{t('support.newTicket')}</span>
           <button
             onClick={onClose}
             style={{
@@ -98,13 +102,13 @@ export default function NewConversationModal({ open, onClose, onSubmit }: NewCon
         <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: 16 }}>
           <div>
             <label style={{ display: 'block', fontSize: 13, color: '#94a3b8', marginBottom: 6 }}>
-              عنوان
+              {t('support.ticketSubject')}
             </label>
             <input
               type="text"
               value={subject}
               onChange={(e) => setSubject(e.target.value)}
-              placeholder="موضوع تیکت را وارد کنید..."
+              placeholder={t('support.subjectPlaceholder')}
               style={{
                 width: '100%',
                 padding: '10px 14px',
@@ -120,25 +124,25 @@ export default function NewConversationModal({ open, onClose, onSubmit }: NewCon
 
           <div>
             <label style={{ display: 'block', fontSize: 13, color: '#94a3b8', marginBottom: 6 }}>
-              دسته‌بندی
+              {t('support.categoryLabel')}
             </label>
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
               {CATEGORIES.map((cat) => (
                 <button
-                  key={cat.value}
-                  onClick={() => setCategory(cat.value)}
+                  key={cat}
+                  onClick={() => setCategory(cat)}
                   style={{
                     padding: '6px 14px',
                     borderRadius: 8,
-                    border: `1px solid ${category === cat.value ? '#61f9b1' : 'rgba(60, 74, 65, 0.4)'}`,
-                    background: category === cat.value ? 'rgba(97, 249, 177, 0.1)' : '#282a30',
-                    color: category === cat.value ? '#61f9b1' : '#94a3b8',
+                    border: `1px solid ${category === cat ? '#61f9b1' : 'rgba(60, 74, 65, 0.4)'}`,
+                    background: category === cat ? 'rgba(97, 249, 177, 0.1)' : '#282a30',
+                    color: category === cat ? '#61f9b1' : '#94a3b8',
                     fontSize: 13,
-                    fontWeight: category === cat.value ? 600 : 400,
+                    fontWeight: category === cat ? 600 : 400,
                     cursor: 'pointer',
                   }}
                 >
-                  {cat.label}
+                  {categoryLabels[cat]}
                 </button>
               ))}
             </div>
@@ -146,12 +150,12 @@ export default function NewConversationModal({ open, onClose, onSubmit }: NewCon
 
           <div>
             <label style={{ display: 'block', fontSize: 13, color: '#94a3b8', marginBottom: 6 }}>
-              متن پیام
+              {t('support.messageBody')}
             </label>
             <textarea
               value={body}
               onChange={(e) => setBody(e.target.value)}
-              placeholder="توضیحات خود را بنویسید..."
+              placeholder={t('support.bodyPlaceholder')}
               rows={5}
               style={{
                 width: '100%',
@@ -190,7 +194,7 @@ export default function NewConversationModal({ open, onClose, onSubmit }: NewCon
               cursor: 'pointer',
             }}
           >
-            انصراف
+            {t('support.cancel')}
           </button>
           <button
             onClick={handleSubmit}
@@ -207,7 +211,7 @@ export default function NewConversationModal({ open, onClose, onSubmit }: NewCon
               opacity: loading || !subject.trim() || !body.trim() ? 0.5 : 1,
             }}
           >
-            {loading ? 'در حال ارسال...' : 'ارسال'}
+            {loading ? t('support.sending') : t('support.submit')}
           </button>
         </div>
       </div>

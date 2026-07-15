@@ -2,14 +2,16 @@
 
 import React, { useState, useEffect } from 'react';
 import { useSupportStore } from '../../store/useSupportStore';
+import { useTranslation } from '../../store/useAppStore';
 import ConversationList from '../../components/support/ConversationList';
 import ConversationDetail from '../../components/support/ConversationDetail';
 import NewConversationModal from '../../components/support/NewConversationModal';
-import './support.scss';
+import '../../components/support/support-components.scss';
 
 type View = 'list' | 'detail';
 
 export default function SupportPage() {
+  const { t } = useTranslation();
   const { conversations, fetchConversations, createConversation } = useSupportStore();
   const [view, setView] = useState<View>('list');
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -41,7 +43,7 @@ export default function SupportPage() {
         <>
           <header className="support-header">
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <h1>پشتیبانی</h1>
+              <h1>{t('support.title')}</h1>
               <button
                 onClick={() => setShowNewModal(true)}
                 style={{
@@ -59,7 +61,7 @@ export default function SupportPage() {
                 }}
               >
                 <span className="material-symbols-outlined" style={{ fontSize: 18 }}>add</span>
-                تیکت جدید
+                {t('support.newTicket')}
               </button>
             </div>
           </header>

@@ -1,11 +1,12 @@
 'use client';
 
 import React, { useEffect, useRef } from 'react';
-import { useSupportStore, Conversation } from '../../store/useSupportStore';
+import { useSupportStore } from '../../store/useSupportStore';
 import { StatusBadge, PriorityBadge, CategoryBadge } from './StatusBadge';
 import MessageBubble from './MessageBubble';
 import ChatInput from './ChatInput';
 import { useAuthStore } from '../../lib/auth';
+import { useTranslation } from '../../store/useAppStore';
 
 interface ConversationDetailProps {
   conversationId: string;
@@ -13,6 +14,7 @@ interface ConversationDetailProps {
 }
 
 export default function ConversationDetail({ conversationId, onBack }: ConversationDetailProps) {
+  const { t } = useTranslation();
   const { activeConversation: conversation, messages, sendMessage, fetchConversation, closeConversation, sending } =
     useSupportStore();
   const user = useAuthStore((s) => s.user);
@@ -33,7 +35,7 @@ export default function ConversationDetail({ conversationId, onBack }: Conversat
   };
 
   const handleClose = async () => {
-    if (confirm('آیا مطمئن هستید که می‌خواهید این تیکت را ببندید؟')) {
+    if (confirm(t('support.closeConfirm'))) {
       await closeConversation(conversationId);
     }
   };
@@ -41,7 +43,7 @@ export default function ConversationDetail({ conversationId, onBack }: Conversat
   if (!conversation) {
     return (
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: '#94a3b8' }}>
-        در حال بارگذاری...
+        {t('support.loading')}
       </div>
     );
   }
@@ -51,16 +53,7 @@ export default function ConversationDetail({ conversationId, onBack }: Conversat
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
       {/* Header */}
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 12,
-          padding: '12px 16px',
-          borderBottom: '1px solid rgba(60, 74, 65, 0.3)',
-          flexShrink: 0,
-        }}
-      >
+      <div className="conversation-detail-header">
         <button
           onClick={onBack}
           style={{
@@ -79,13 +72,11 @@ export default function ConversationDetail({ conversationId, onBack }: Conversat
         >
           <span className="material-symbols-outlined" style={{ fontSize: 20 }}>arrow_forward</span>
         </button>
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-            <span style={{ fontSize: 15, fontWeight: 700, color: '#e2e2eb', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-              {conversation.subject}
-            </span>
+        <div className="conversation-detail-title">
+          <div className="conversation-detail-subject">
+            {conversation.subject}
           </div>
-          <div style={{ display: 'flex', gap: 6 }}>
+          <div className="conversation-detail-badges">
             <StatusBadge status={conversation.status} />
             <PriorityBadge priority={conversation.priority} />
             <CategoryBadge category={conversation.category} />
@@ -106,7 +97,7 @@ export default function ConversationDetail({ conversationId, onBack }: Conversat
               flexShrink: 0,
             }}
           >
-            بستن تیکت
+            {t('support.closeTicket')}
           </button>
         )}
       </div>
@@ -140,7 +131,7 @@ export default function ConversationDetail({ conversationId, onBack }: Conversat
         <ChatInput
           onSend={handleSend}
           sending={sending}
-          placeholder="پاسخ خود را بنویسید..."
+          placeholder={t('support.replyPlaceholder')}
         />
       ) : (
         <div
@@ -152,7 +143,7 @@ export default function ConversationDetail({ conversationId, onBack }: Conversat
             borderTop: '1px solid rgba(60, 74, 65, 0.3)',
           }}
         >
-          این تیکت بسته شده است
+          {t('support.ticketClosed')}
         </div>
       )}
     </div>

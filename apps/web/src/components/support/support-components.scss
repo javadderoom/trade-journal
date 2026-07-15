@@ -1,0 +1,364 @@
+@use '../../app/variables.scss' as *;
+
+// ─── Support Page Responsive ──────────────────────────────────────────────────
+.support-page {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: $surface;
+}
+
+.support-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid rgba($outline-variant, 0.3);
+  flex-shrink: 0;
+
+  h1 {
+    font-size: 18px;
+    font-weight: 700;
+    color: $on-surface;
+    margin: 0;
+    font-family: $font-primary;
+  }
+}
+
+.support-list {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.support-detail {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+// ─── Admin Support Responsive ─────────────────────────────────────────────────
+.admin-support-page {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: #16171d;
+}
+
+.admin-support-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid rgba(60, 74, 65, 0.3);
+  flex-shrink: 0;
+}
+
+.admin-support-stats {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.admin-support-filters {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.admin-support-filter-buttons {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.admin-support-search {
+  flex: 1;
+  min-width: 120px;
+}
+
+.admin-support-list {
+  flex: 1;
+  overflow: auto;
+}
+
+.admin-support-detail {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.admin-support-detail-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba(60, 74, 65, 0.3);
+  flex-shrink: 0;
+}
+
+.admin-support-controls {
+  display: flex;
+  gap: 8px;
+  padding: 8px 16px;
+  border-bottom: 1px solid rgba(60, 74, 65, 0.2);
+  flex-wrap: wrap;
+  flex-shrink: 0;
+}
+
+.admin-support-messages {
+  flex: 1;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+}
+
+// ─── Conversation Detail Responsive ───────────────────────────────────────────
+.conversation-detail-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba(60, 74, 65, 0.3);
+  flex-shrink: 0;
+}
+
+.conversation-detail-title {
+  flex: 1;
+  min-width: 0;
+}
+
+.conversation-detail-subject {
+  font-size: 15px;
+  font-weight: 700;
+  color: #e2e2eb;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin-bottom: 4px;
+}
+
+.conversation-detail-badges {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+// ─── New Conversation Modal Responsive ────────────────────────────────────────
+.new-conversation-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(4px);
+  padding: 16px;
+}
+
+.new-conversation-modal {
+  width: 100%;
+  max-width: 480;
+  background: #1e1f26;
+  border: 1px solid rgba(60, 74, 65, 0.4);
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.new-conversation-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid rgba(60, 74, 65, 0.3);
+}
+
+.new-conversation-modal-body {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.new-conversation-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 12px 20px;
+  border-top: 1px solid rgba(60, 74, 65, 0.3);
+}
+
+.category-buttons {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+// ─── Media Queries ────────────────────────────────────────────────────────────
+
+// Tablet breakpoint (sidebar hidden)
+@media (max-width: 1024px) {
+  .support-page {
+    padding-bottom: 96px; // Space for bottom nav
+  }
+
+  .support-header {
+    padding: 12px 16px;
+
+    h1 {
+      font-size: 16px;
+    }
+  }
+
+  .admin-support-header {
+    padding: 12px 16px;
+  }
+
+  .admin-support-filters {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .admin-support-filter-buttons {
+    justify-content: flex-start;
+  }
+
+  .admin-support-search {
+    width: 100%;
+  }
+
+  .conversation-detail-header {
+    padding: 10px 12px;
+  }
+
+  .conversation-detail-subject {
+    font-size: 14px;
+  }
+
+  .new-conversation-modal-body {
+    padding: 16px;
+  }
+
+  .new-conversation-modal-footer {
+    padding: 10px 16px;
+  }
+}
+
+// Mobile breakpoint
+@media (max-width: 768px) {
+  .support-header {
+    padding: 10px 12px;
+
+    h1 {
+      font-size: 15px;
+    }
+  }
+
+  .admin-support-header {
+    padding: 10px 12px;
+  }
+
+  .admin-support-stats {
+    gap: 6px;
+  }
+
+  .admin-support-filter-buttons {
+    gap: 3px;
+  }
+
+  .admin-support-controls {
+    padding: 6px 12px;
+    gap: 6px;
+  }
+
+  .admin-support-messages {
+    padding: 12px;
+  }
+
+  .conversation-detail-header {
+    padding: 8px 10px;
+    gap: 8px;
+  }
+
+  .conversation-detail-subject {
+    font-size: 13px;
+    margin-bottom: 2px;
+  }
+
+  .conversation-detail-badges {
+    gap: 4px;
+  }
+
+  .new-conversation-modal-overlay {
+    padding: 12px;
+    align-items: flex-end;
+  }
+
+  .new-conversation-modal {
+    max-width: 100%;
+    border-radius: 16px 16px 0 0;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+
+  .new-conversation-modal-header {
+    padding: 12px 16px;
+  }
+
+  .new-conversation-modal-body {
+    padding: 12px 16px;
+    gap: 12px;
+  }
+
+  .new-conversation-modal-footer {
+    padding: 10px 16px;
+  }
+}
+
+// Small mobile breakpoint
+@media (max-width: 480px) {
+  .support-header {
+    padding: 8px 10px;
+
+    h1 {
+      font-size: 14px;
+    }
+  }
+
+  .admin-support-header {
+    padding: 8px 10px;
+  }
+
+  .admin-support-stats {
+    gap: 4px;
+  }
+
+  .admin-support-filter-buttons {
+    gap: 2px;
+  }
+
+  .admin-support-controls {
+    padding: 4px 8px;
+    gap: 4px;
+  }
+
+  .admin-support-messages {
+    padding: 8px;
+  }
+
+  .conversation-detail-header {
+    padding: 6px 8px;
+    gap: 6px;
+  }
+
+  .conversation-detail-subject {
+    font-size: 12px;
+  }
+
+  .new-conversation-modal-body {
+    padding: 10px 12px;
+    gap: 10px;
+  }
+
+  .new-conversation-modal-footer {
+    padding: 8px 12px;
+  }
+}

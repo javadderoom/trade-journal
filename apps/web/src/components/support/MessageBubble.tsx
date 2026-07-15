@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { useAuthStore } from '../../lib/auth';
+import { useTranslation } from '../../store/useAppStore';
 
 interface MessageBubbleProps {
   senderId: string;
@@ -12,8 +12,8 @@ interface MessageBubbleProps {
 }
 
 export default function MessageBubble({ senderId, body, attachments, timestamp, isOwn }: MessageBubbleProps) {
-  const user = useAuthStore((s) => s.user);
-  const time = new Date(timestamp).toLocaleTimeString('fa-IR', {
+  const { t, language } = useTranslation();
+  const time = new Date(timestamp).toLocaleTimeString(language === 'fa' ? 'fa-IR' : 'en-US', {
     hour: '2-digit',
     minute: '2-digit',
   });
@@ -67,7 +67,7 @@ export default function MessageBubble({ senderId, body, attachments, timestamp, 
                 <span className="material-symbols-outlined" style={{ fontSize: 14 }}>
                   attach_file
                 </span>
-                فایل پیوست
+                {t('support.attachment')}
               </a>
             ))}
           </div>

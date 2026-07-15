@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { useTranslation } from '../../store/useAppStore';
 import { StatusBadge, PriorityBadge, CategoryBadge } from './StatusBadge';
 import type { Conversation } from '../../store/useSupportStore';
 
@@ -11,6 +12,8 @@ interface ConversationListProps {
 }
 
 export default function ConversationList({ conversations, selectedId, onSelect }: ConversationListProps) {
+  const { t, language } = useTranslation();
+
   if (conversations.length === 0) {
     return (
       <div
@@ -26,7 +29,7 @@ export default function ConversationList({ conversations, selectedId, onSelect }
         }}
       >
         <span className="material-symbols-outlined" style={{ fontSize: 40 }}>forum</span>
-        <span style={{ fontSize: 14 }}>هنوز تیکتی ایجاد نشده</span>
+        <span style={{ fontSize: 14 }}>{t('support.noTickets')}</span>
       </div>
     );
   }
@@ -36,8 +39,8 @@ export default function ConversationList({ conversations, selectedId, onSelect }
       {conversations.map((conv) => {
         const lastMessage = conv.messages?.[0];
         const time = lastMessage
-          ? new Date(lastMessage.created_at).toLocaleTimeString('fa-IR', { hour: '2-digit', minute: '2-digit' })
-          : new Date(conv.created_at).toLocaleDateString('fa-IR');
+          ? new Date(lastMessage.created_at).toLocaleTimeString(language === 'fa' ? 'fa-IR' : 'en-US', { hour: '2-digit', minute: '2-digit' })
+          : new Date(conv.created_at).toLocaleDateString(language === 'fa' ? 'fa-IR' : 'en-US');
 
         return (
           <button
@@ -69,7 +72,7 @@ export default function ConversationList({ conversations, selectedId, onSelect }
               <CategoryBadge category={conv.category} />
               {conv._count && conv._count.messages > 0 && (
                 <span style={{ fontSize: 11, color: '#94a3b8', opacity: 0.6 }}>
-                  {conv._count.messages} پیام
+                  {conv._count.messages} {t('support.messageCount')}
                 </span>
               )}
             </div>

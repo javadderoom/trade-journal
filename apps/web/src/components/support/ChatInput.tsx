@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useRef } from 'react';
+import { useTranslation } from '../../store/useAppStore';
 
 interface ChatInputProps {
   onSend: (body: string, attachments?: File[]) => Promise<void>;
@@ -10,6 +11,7 @@ interface ChatInputProps {
 }
 
 export default function ChatInput({ onSend, sending, disabled, placeholder }: ChatInputProps) {
+  const { t } = useTranslation();
   const [body, setBody] = useState('');
   const [files, setFiles] = useState<File[]>([]);
   const fileRef = useRef<HTMLInputElement>(null);
@@ -116,7 +118,7 @@ export default function ChatInput({ onSend, sending, disabled, placeholder }: Ch
           value={body}
           onChange={(e) => setBody(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder={placeholder || 'پیام خود را بنویسید...'}
+          placeholder={placeholder || t('support.messagePlaceholder')}
           disabled={disabled}
           style={{
             flex: 1,

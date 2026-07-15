@@ -2,23 +2,18 @@
 
 import React, { useEffect, useState } from 'react';
 import { useSupportStore, Conversation } from '../../../store/useSupportStore';
+import { useTranslation } from '../../../store/useAppStore';
 import { StatusBadge, PriorityBadge, CategoryBadge } from '../../../components/support/StatusBadge';
 import MessageBubble from '../../../components/support/MessageBubble';
 import ChatInput from '../../../components/support/ChatInput';
 import { useAuthStore } from '../../../lib/auth';
+import '../../../components/support/support-components.scss';
 
 type View = 'list' | 'detail';
 type StatusFilter = 'ALL' | 'OPEN' | 'WAITING' | 'RESOLVED' | 'CLOSED';
 
-const STATUS_OPTIONS: { value: StatusFilter; label: string }[] = [
-  { value: 'ALL', label: 'همه' },
-  { value: 'OPEN', label: 'باز' },
-  { value: 'WAITING', label: 'در انتظار' },
-  { value: 'RESOLVED', label: 'حل شده' },
-  { value: 'CLOSED', label: 'بسته شده' },
-];
-
 export default function AdminSupportPage() {
+  const { t, language } = useTranslation();
   const {
     conversations, stats, messages, activeConversation,
     adminFetchConversations, adminFetchStats, adminFetchConversation,
@@ -30,6 +25,14 @@ export default function AdminSupportPage() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('ALL');
   const [searchQuery, setSearchQuery] = useState('');
+
+  const STATUS_OPTIONS: { value: StatusFilter; label: string }[] = [
+    { value: 'ALL', label: t('support.all') },
+    { value: 'OPEN', label: t('support.statusOpen') },
+    { value: 'WAITING', label: t('support.statusWaiting') },
+    { value: 'RESOLVED', label: t('support.statusResolved') },
+    { value: 'CLOSED', label: t('support.statusClosed') },
+  ];
 
   useEffect(() => {
     adminFetchStats();
@@ -62,13 +65,6 @@ export default function AdminSupportPage() {
     }
   };
 
-  const handleAssign = async (adminId: string | null) => {
-    if (selectedId) {
-      await adminAssign(selectedId, adminId);
-      await adminFetchConversation(selectedId);
-    }
-  };
-
   const filteredConversations = conversations.filter((c) => {
     if (!searchQuery) return true;
     const q = searchQuery.toLowerCase();
@@ -80,23 +76,23 @@ export default function AdminSupportPage() {
   });
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', background: '#16171d' }}>
+    <div className="admin-support-page">
       {view === 'list' ? (
         <>
           {/* Header */}
-          <div style={{ padding: '16px 20px', borderBottom: '1px solid rgba(60, 74, 65, 0.3)', flexShrink: 0 }}>
+          <div className="admin-support-header">
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
-              <h1 style={{ fontSize: 18, fontWeight: 700, color: '#e2e2eb', margin: 0 }}>پشتیبانی</h1>
+              <h1 style={{ fontSize: 18, fontWeight: 700, color: '#e2e2eb', margin: 0 }}>{t('support.title')}</h1>
             </div>
 
             {/* Stats */}
             {stats && (
-              <div style={{ display: 'flex', gap: 8, marginBottom: 12, flexWrap: 'wrap' }}>
+              <div className="admin-support-stats">
                 {[
-                  { label: 'باز', value: stats.open, color: '#3ddc97' },
-                  { label: 'در انتظار', value: stats.waiting, color: '#f59e0b' },
-                  { label: 'حل شده', value: stats.resolved, color: '#60a5fa' },
-                  { label: 'بسته شده', value: stats.closed, color: '#94a3b8' },
+                  { label: t('support.statusOpen'), value: stats.open, color: '#3ddc97' },
+                  { label: t('support.statusWaiting'), value: stats.waiting, color: '#f59e0b' },
+                  { label: t('support.statusResolved'), value: stats.resolved, color: '#60a5fa' },
+                  { label: t('support.statusClosed'), value: stats.closed, color: '#94a3b8' },
                 ].map((s) => (
                   <div
                     key={s.label}
@@ -115,8 +111,8 @@ export default function AdminSupportPage() {
             )}
 
             {/* Filters */}
-            <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-              <div style={{ display: 'flex', gap: 4 }}>
+            <div className="admin-support-filters">
+              <div className="admin-support-filter-buttons">
                 {STATUS_OPTIONS.map((opt) => (
                   <button
                     key={opt.value}
@@ -140,7 +136,8 @@ export default function AdminSupportPage() {
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="جستجو..."
+                placeholder={t('support.search')}
+                className="admin-support-search"
                 style={{
                   flex: 1,
                   padding: '6px 12px',
@@ -156,11 +153,11 @@ export default function AdminSupportPage() {
           </div>
 
           {/* Conversation List */}
-          <div style={{ flex: 1, overflow: 'auto' }}>
+          <div className="admin-support-list">
             {filteredConversations.length === 0 ? (
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: 200, color: '#94a3b8', opacity: 0.5 }}>
                 <span className="material-symbols-outlined" style={{ fontSize: 40 }}>forum</span>
-                <span style={{ fontSize: 14, marginTop: 8 }}>تیکتی یافت نشد</span>
+                <span style={{ fontSize: 14, marginTop: 8 }}>{t('support.noResults')}</span>
               </div>
             ) : (
               filteredConversations.map((conv) => (
@@ -186,7 +183,7 @@ export default function AdminSupportPage() {
                       {conv.subject}
                     </span>
                     <span style={{ fontSize: 11, color: '#94a3b8', flexShrink: 0, opacity: 0.6 }}>
-                      {new Date(conv.created_at).toLocaleDateString('fa-IR')}
+                      {new Date(conv.created_at).toLocaleDateString(language === 'fa' ? 'fa-IR' : 'en-US')}
                     </span>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
@@ -200,7 +197,7 @@ export default function AdminSupportPage() {
                     )}
                     {conv._count && (
                       <span style={{ fontSize: 11, color: '#94a3b8', opacity: 0.6 }}>
-                        {conv._count.messages} پیام
+                        {conv._count.messages} {t('support.messageCount')}
                       </span>
                     )}
                   </div>
@@ -211,9 +208,9 @@ export default function AdminSupportPage() {
         </>
       ) : (
         /* Detail View */
-        <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+        <div className="admin-support-detail">
           {/* Header */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', borderBottom: '1px solid rgba(60, 74, 65, 0.3)', flexShrink: 0 }}>
+          <div className="admin-support-detail-header">
             <button
               onClick={handleBack}
               style={{
@@ -238,7 +235,7 @@ export default function AdminSupportPage() {
 
           {/* Controls */}
           {activeConversation && (
-            <div style={{ display: 'flex', gap: 8, padding: '8px 16px', borderBottom: '1px solid rgba(60, 74, 65, 0.2)', flexWrap: 'wrap', flexShrink: 0 }}>
+            <div className="admin-support-controls">
               <select
                 value={activeConversation.status}
                 onChange={(e) => adminChangeStatus(activeConversation.id, e.target.value)}
@@ -247,10 +244,10 @@ export default function AdminSupportPage() {
                   background: '#1e1f26', color: '#e2e2eb', fontSize: 12, cursor: 'pointer',
                 }}
               >
-                <option value="OPEN">باز</option>
-                <option value="WAITING">در انتظار</option>
-                <option value="RESOLVED">حل شده</option>
-                <option value="CLOSED">بسته شده</option>
+                <option value="OPEN">{t('support.statusOpen')}</option>
+                <option value="WAITING">{t('support.statusWaiting')}</option>
+                <option value="RESOLVED">{t('support.statusResolved')}</option>
+                <option value="CLOSED">{t('support.statusClosed')}</option>
               </select>
               <select
                 value={activeConversation.priority}
@@ -260,10 +257,10 @@ export default function AdminSupportPage() {
                   background: '#1e1f26', color: '#e2e2eb', fontSize: 12, cursor: 'pointer',
                 }}
               >
-                <option value="LOW">کم</option>
-                <option value="NORMAL">عادی</option>
-                <option value="HIGH">بالا</option>
-                <option value="URGENT">فوری</option>
+                <option value="LOW">{t('support.priorityLow')}</option>
+                <option value="NORMAL">{t('support.priorityNormal')}</option>
+                <option value="HIGH">{t('support.priorityHigh')}</option>
+                <option value="URGENT">{t('support.priorityUrgent')}</option>
               </select>
               {activeConversation.user && (
                 <span style={{ fontSize: 12, color: '#94a3b8', display: 'flex', alignItems: 'center', gap: 4 }}>
@@ -275,7 +272,7 @@ export default function AdminSupportPage() {
           )}
 
           {/* Messages */}
-          <div style={{ flex: 1, overflow: 'auto', display: 'flex', flexDirection: 'column', gap: 12, padding: '16px' }}>
+          <div className="admin-support-messages">
             {messages.map((msg) => (
               <MessageBubble
                 key={msg.id}
@@ -290,10 +287,10 @@ export default function AdminSupportPage() {
 
           {/* Input */}
           {(activeConversation?.status === 'OPEN' || activeConversation?.status === 'WAITING') ? (
-            <ChatInput onSend={handleReply} sending={sending} placeholder="پاسخ به کاربر..." />
+            <ChatInput onSend={handleReply} sending={sending} placeholder={t('support.replyPlaceholder')} />
           ) : (
             <div style={{ padding: '16px', textAlign: 'center', color: '#94a3b8', fontSize: 13, borderTop: '1px solid rgba(60, 74, 65, 0.3)' }}>
-              این تیکت بسته شده است
+              {t('support.ticketClosed')}
             </div>
           )}
         </div>
