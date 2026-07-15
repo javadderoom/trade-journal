@@ -16,7 +16,9 @@
     "settings": "Settings",
     "admin": "Admin",
     "contact": "Contact Us",
-    "help": "Help"
+    "help": "Help",
+    "support": "Support",
+    "more": "More"
   },
   "landing": {
     "metaTitle": "TradeKav | Smart Trading Journal",

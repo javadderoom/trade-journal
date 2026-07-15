@@ -535,6 +535,150 @@
   }
 }
 
+// Radial menu overlay and items
+.radial-menu-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.2s ease;
+}
+
+.radial-menu {
+  display: flex;
+  gap: 16px;
+  padding: 16px 24px;
+  background: rgba($surface-container, 0.92);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba($outline-variant, 0.45);
+  border-radius: 20px;
+  box-shadow:
+    0 16px 48px -8px rgba(0, 0, 0, 0.7),
+    0 8px 20px -4px rgba(0, 0, 0, 0.5);
+  animation: radialMenuIn 0.25s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.radial-menu-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  text-decoration: none;
+  color: $on-surface-variant;
+  padding: 8px;
+  border-radius: 14px;
+  transition: color 0.2s ease, transform 0.15s ease;
+  animation: radialItemIn 0.25s cubic-bezier(0.23, 1, 0.32, 1) both;
+  -webkit-tap-highlight-color: transparent;
+
+  &:hover {
+    color: $on-surface;
+    transform: translateY(-2px);
+  }
+
+  &:active {
+    transform: scale(0.92);
+  }
+
+  &.active {
+    color: $primary;
+  }
+}
+
+.radial-menu-icon-wrapper {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: $surface-container-high;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease;
+
+  .radial-menu-item:hover & {
+    background: rgba($primary, 0.15);
+  }
+
+  .radial-menu-item.active & {
+    background: rgba($primary, 0.2);
+  }
+
+  .material-symbols-outlined {
+    font-size: 22px;
+  }
+}
+
+.radial-menu-label {
+  font-size: 11px;
+  font-weight: 500;
+  font-family: $font-primary;
+  white-space: nowrap;
+
+  .radial-menu-item.active & {
+    font-weight: 700;
+    color: $primary;
+  }
+}
+
+// Center FAB menu-open state
+@media (max-width: 1024px) {
+  .bottom-nav-raised-wrapper {
+    .bottom-nav-raised-item.menu-open {
+      background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+      color: #fff;
+      box-shadow:
+        0 12px 30px -4px rgba(255, 107, 107, 0.55),
+        0 6px 14px -2px rgba(238, 90, 36, 0.35),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+
+      .icon {
+        transform: rotate(45deg) scale(1.08);
+      }
+    }
+
+    .bottom-nav-raised-item.menu-open ~ .raised-label {
+      color: #ff6b6b;
+    }
+  }
+
+  .bottom-nav-container.menu-open {
+    pointer-events: none;
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes radialMenuIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes radialItemIn {
+  from {
+    opacity: 0;
+    transform: scale(0.5) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
 /* LTR layout alignment overrides for SideNavBar */
 .app-container[dir="ltr"] {
   .sidenav-container {
