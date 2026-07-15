@@ -1,5 +1,4 @@
 import { Router, Response } from 'express';
-import { Prisma } from '@prisma/client';
 import { prisma } from '../services/tradeSync';
 import { authenticate, AuthRequest } from '../middleware/auth';
 
@@ -508,30 +507,23 @@ router.get('/summary', authenticate, async (req: AuthRequest, res: Response) => 
       hasTradedToday: todayTrades.length > 0,
     };
 
-    // ─── SECTION 2: THIS MONTH — SQL aggregation for KPIs ─────────────────────
-    // Use raw SQL for timezone-aware month grouping (Prisma can't do AT TIME ZONE)
-    const monthAccountClause = filterAccount
-      ? Prisma.sql`AND account_id = ${accountId}`
-      : Prisma.sql``;
-    const monthRows = await prisma.$queryRaw<
-      { day: string; net: number; is_win: boolean; r_multiple: number }[]
-    >`
-      SELECT
-        TO_CHAR(close_time AT TIME ZONE 'Asia/Tehran', 'YYYY-MM-DD') AS day,
-        (profit_usd + COALESCE(commission, 0) + COALESCE(swap, 0))::float AS net,
-        (profit_usd > 0) AS is_win,
-        COALESCE(r_multiple, 0)::float AS r_multiple
-      FROM trades
-      WHERE user_id = ${userId}
-        AND close_time IS NOT NULL
-        AND TO_CHAR(close_time AT TIME ZONE 'Asia/Tehran', 'YYYY-MM') = ${monthStr}
-        ${monthAccountClause}
-    `;
+    // ─── SECTION 2: THIS MONTH ─────────────────────────────────────────────────
+    const monthTrades = allTrades.filter((t) => {
+      const closeDay = dateToTehranDay(t.close_time);
+      const openDay = dateToTehranDay(t.open_time);
+      const day = closeDay || openDay;
+      return day !== null && day.startsWith(monthStr);
+    });
 
-    // Equity curve from SQL results
+    const monthClosed = monthTrades.filter((t) => t.close_time !== null);
+
+    // Equity curve: daily cumulative P&L
     const dailyPnl: Record<string, number> = {};
-    for (const row of monthRows) {
-      dailyPnl[row.day] = (dailyPnl[row.day] || 0) + row.net;
+    for (const t of monthClosed) {
+      const day = dateToTehranDay(t.close_time)!;
+      const net = t.profit_usd + (t.commission ?? 0) + (t.swap ?? 0);
+      if (!dailyPnl[day]) dailyPnl[day] = 0;
+      dailyPnl[day] += net;
     }
     const sortedDays = Object.keys(dailyPnl).sort();
     let cumPnl = 0;
@@ -540,27 +532,30 @@ router.get('/summary', authenticate, async (req: AuthRequest, res: Response) => 
       return { date: day, cumPnl: parseFloat(cumPnl.toFixed(2)) };
     });
 
-    // Month KPIs from SQL results
-    const monthClosed = monthRows;
-    const monthWinners = monthClosed.filter((t) => t.is_win);
-    const monthLosers = monthClosed.filter((t) => !t.is_win);
-    const grossProfit = monthWinners.reduce((s, t) => s + t.net, 0);
-    const grossLoss = Math.abs(monthLosers.reduce((s, t) => s + t.net, 0));
+    // Month KPIs
+    const monthWinners = monthClosed.filter((t) => t.profit_usd > 0);
+    const monthLosers = monthClosed.filter((t) => t.profit_usd <= 0);
+    const grossProfit = monthWinners.reduce((s, t) => s + t.profit_usd, 0);
+    const grossLoss = Math.abs(monthLosers.reduce((s, t) => s + t.profit_usd, 0));
 
     const winRate = monthClosed.length > 0
       ? Math.round((monthWinners.length / monthClosed.length) * 100)
       : 0;
     const profitFactor = grossLoss === 0 ? (grossProfit > 0 ? 99 : 0) : grossProfit / grossLoss;
     const avgR = monthClosed.length > 0
-      ? monthClosed.reduce((s, t) => s + t.r_multiple, 0) / monthClosed.length
+      ? monthClosed.reduce((s, t) => s + (t.r_multiple ?? 0), 0) / monthClosed.length
       : 0;
 
-    // Max drawdown from SQL results (sorted by close_time already)
+    // Max drawdown
     let peak = 0;
     let maxDrawdown = 0;
     let runningSum = 0;
-    for (const t of monthClosed) {
-      runningSum += t.net;
+    const chronoMonth = [...monthClosed].sort(
+      (a, b) => new Date(a.close_time!).getTime() - new Date(b.close_time!).getTime()
+    );
+    for (const t of chronoMonth) {
+      const net = t.profit_usd + (t.commission ?? 0) + (t.swap ?? 0);
+      runningSum += net;
       if (runningSum > peak) peak = runningSum;
       const dd = peak - runningSum;
       if (dd > maxDrawdown) maxDrawdown = dd;
