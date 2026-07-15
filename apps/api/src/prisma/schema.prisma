@@ -475,3 +475,25 @@ enum SupportCategory {
   BUG_REPORT
 }
 
+// ─── System Logs ──────────────────────────────────────────────────────────────
+
+enum LogLevel {
+  INFO
+  WARN
+  ERROR
+  FATAL
+}
+
+model SystemLog {
+  id         String    @id @default(uuid())
+  level      LogLevel
+  source     String
+  message    String
+  details    Json?
+  created_at DateTime @default(now())
+
+  @@index([level])
+  @@index([source])
+  @@index([created_at])
+}
+

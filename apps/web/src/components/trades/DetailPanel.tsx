@@ -400,49 +400,7 @@ export default function DetailPanel({
                         </span>
                       );
                     })()}
-                  </span>
-
-                  <span className="grid-label">{p.analysisTimeframe}</span>
-                  <span className="grid-value">
-                    <select
-                      className="grid-input"
-                      value={activeTrade.analysisTimeframe || ''}
-                      onChange={e => updateActiveTradeField('analysisTimeframe', e.target.value || null)}
-                      style={inputStyle}
-                    >
-                      <option value="" style={{ backgroundColor: '#1e222b', color: '#fff' }}>—</option>
-                      <option value="M1" style={{ backgroundColor: '#1e222b', color: '#fff' }}>{language === 'fa' ? '۱ دقیقه (M1)' : '1 Minute (M1)'}</option>
-                      <option value="M5" style={{ backgroundColor: '#1e222b', color: '#fff' }}>{language === 'fa' ? '۵ دقیقه (M5)' : '5 Minutes (M5)'}</option>
-                      <option value="M15" style={{ backgroundColor: '#1e222b', color: '#fff' }}>{language === 'fa' ? '۱۵ دقیقه (M15)' : '15 Minutes (M15)'}</option>
-                      <option value="M30" style={{ backgroundColor: '#1e222b', color: '#fff' }}>{language === 'fa' ? '۳۰ دقیقه (M30)' : '30 Minutes (M30)'}</option>
-                      <option value="H1" style={{ backgroundColor: '#1e222b', color: '#fff' }}>{language === 'fa' ? '۱ ساعته (H1)' : '1 Hour (H1)'}</option>
-                      <option value="H4" style={{ backgroundColor: '#1e222b', color: '#fff' }}>{language === 'fa' ? '۴ ساعته (H4)' : '4 Hours (H4)'}</option>
-                      <option value="D1" style={{ backgroundColor: '#1e222b', color: '#fff' }}>{language === 'fa' ? 'روزانه (D1)' : 'Daily (D1)'}</option>
-                      <option value="W1" style={{ backgroundColor: '#1e222b', color: '#fff' }}>{language === 'fa' ? 'هفتگی (W1)' : 'Weekly (W1)'}</option>
-                      <option value="MN" style={{ backgroundColor: '#1e222b', color: '#fff' }}>{language === 'fa' ? 'ماهانه (MN)' : 'Monthly (MN)'}</option>
-                    </select>
-                  </span>
-
-                  <span className="grid-label">{p.entryTimeframe}</span>
-                  <span className="grid-value">
-                    <select
-                      className="grid-input"
-                      value={activeTrade.entryTimeframe || ''}
-                      onChange={e => updateActiveTradeField('entryTimeframe', e.target.value || null)}
-                      style={inputStyle}
-                    >
-                      <option value="" style={{ backgroundColor: '#1e222b', color: '#fff' }}>—</option>
-                      <option value="M1" style={{ backgroundColor: '#1e222b', color: '#fff' }}>{language === 'fa' ? '۱ دقیقه (M1)' : '1 Minute (M1)'}</option>
-                      <option value="M5" style={{ backgroundColor: '#1e222b', color: '#fff' }}>{language === 'fa' ? '۵ دقیقه (M5)' : '5 Minutes (M5)'}</option>
-                      <option value="M15" style={{ backgroundColor: '#1e222b', color: '#fff' }}>{language === 'fa' ? '۱۵ دقیقه (M15)' : '15 Minutes (M15)'}</option>
-                      <option value="M30" style={{ backgroundColor: '#1e222b', color: '#fff' }}>{language === 'fa' ? '۳۰ دقیقه (M30)' : '30 Minutes (M30)'}</option>
-                      <option value="H1" style={{ backgroundColor: '#1e222b', color: '#fff' }}>{language === 'fa' ? '۱ ساعته (H1)' : '1 Hour (H1)'}</option>
-                      <option value="H4" style={{ backgroundColor: '#1e222b', color: '#fff' }}>{language === 'fa' ? '۴ ساعته (H4)' : '4 Hours (H4)'}</option>
-                      <option value="D1" style={{ backgroundColor: '#1e222b', color: '#fff' }}>{language === 'fa' ? 'روزانه (D1)' : 'Daily (D1)'}</option>
-                      <option value="W1" style={{ backgroundColor: '#1e222b', color: '#fff' }}>{language === 'fa' ? 'هفتگی (W1)' : 'Weekly (W1)'}</option>
-                      <option value="MN" style={{ backgroundColor: '#1e222b', color: '#fff' }}>{language === 'fa' ? 'ماهانه (MN)' : 'Monthly (MN)'}</option>
-                    </select>
-                  </span>
+                   </span>
 
                   <span className="grid-label">{p.openPrice}</span>
                  <span className="grid-value font-mono direction-ltr">

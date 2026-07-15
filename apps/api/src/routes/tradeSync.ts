@@ -135,8 +135,11 @@ router.post('/', authenticate, checkTradeLimit, async (req: AuthRequest, res: Re
   try {
     const parsed = createTradeSchema.safeParse(req.body);
     if (!parsed.success) {
-      const msg = parsed.error.issues[0]?.message || 'Invalid trade data';
-      res.status(400).json({ error: msg });
+      const errors = parsed.error.issues.map(i => ({
+        field: i.path.join('.'),
+        message: i.message,
+      }));
+      res.status(400).json({ error: 'Validation failed', details: errors });
       return;
     }
     const {
@@ -295,8 +298,11 @@ router.put('/:id', authenticate, async (req: AuthRequest, res: Response) => {
 
     const parsed = updateTradeSchema.safeParse(req.body);
     if (!parsed.success) {
-      const msg = parsed.error.issues[0]?.message || 'Invalid trade data';
-      res.status(400).json({ error: msg });
+      const errors = parsed.error.issues.map(i => ({
+        field: i.path.join('.'),
+        message: i.message,
+      }));
+      res.status(400).json({ error: 'Validation failed', details: errors });
       return;
     }
     const {

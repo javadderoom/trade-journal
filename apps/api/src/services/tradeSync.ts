@@ -1,6 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { SyncResult, TradeData } from '../types';
+import { logError } from './logger';
 
 const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
 export const prisma = new PrismaClient({ adapter });
@@ -19,6 +20,8 @@ export async function syncTradesFromEA(
   trades: TradeData[]
 ): Promise<SyncResult> {
   const result: SyncResult = { created: 0, updated: 0, skipped: 0, errors: [] };
+
+  console.log(`[Sync] accountId=${accountId} incoming=${trades.length} tickets=${trades.map(t => t.ticket).join(',')}`);
 
   // Verify account exists
   const account = await prisma.account.findFirst({
@@ -43,6 +46,8 @@ export async function syncTradesFromEA(
       })
     : [];
 
+  console.log(`[Sync] existingInDB=${existingTrades.length} tickets=${existingTrades.map(t => t.ticket).join(',')}`);
+
   // Map existing trades by ticket ID for O(1) lookup
   const existingMap = new Map<number, typeof existingTrades[0]>();
   for (const t of existingTrades) {
@@ -57,6 +62,7 @@ export async function syncTradesFromEA(
   for (const trade of trades) {
     // Skip trades without a valid ticket
     if (!trade.ticket || trade.ticket <= 0) {
+      console.log(`[Sync] SKIP ticket=${trade.ticket} reason=invalid_ticket`);
       result.skipped++;
       continue;
     }
@@ -67,6 +73,7 @@ export async function syncTradesFromEA(
       // Prepare CREATE operation
       operations.push(async () => {
         try {
+          console.log(`[Sync] CREATE ticket=${trade.ticket} symbol=${trade.symbol} dir=${trade.direction}`);
           const newTrade = await prisma.trade.create({
             data: {
               account_id: accountId,
@@ -127,14 +134,18 @@ export async function syncTradesFromEA(
           }
 
           result.created++;
+          console.log(`[Sync] CREATED ticket=${trade.ticket}`);
         } catch (err: any) {
+          console.error(`[Sync] ERROR ticket=${trade.ticket} [Create]: ${err.message}`);
           result.errors.push(`Ticket ${trade.ticket} [Create]: ${err.message}`);
+          logError('SYNC', `CREATE failed ticket=${trade.ticket}: ${err.message}`, { ticket: trade.ticket, accountId, operation: 'CREATE' });
         }
       });
     } else if (existing.close_time === null) {
       // Prepare UPDATE operation for active (open) trades
       operations.push(async () => {
         try {
+          console.log(`[Sync] UPDATE ticket=${trade.ticket} closing=${!!trade.closeTime}`);
           // MT5 strips SL/TP from the payload when a trade closes.
           // Only overwrite stop_loss / take_profit when the incoming value is a real
           // positive number — otherwise keep whatever was recorded while trade was open.
@@ -188,12 +199,16 @@ export async function syncTradesFromEA(
           }
 
           result.updated++;
+          console.log(`[Sync] UPDATED ticket=${trade.ticket}`);
         } catch (err: any) {
+          console.error(`[Sync] ERROR ticket=${trade.ticket} [Update]: ${err.message}`);
           result.errors.push(`Ticket ${trade.ticket} [Update]: ${err.message}`);
+          logError('SYNC', `UPDATE failed ticket=${trade.ticket}: ${err.message}`, { ticket: trade.ticket, accountId, operation: 'UPDATE' });
         }
       });
     } else {
       // Skipped closed trades (finalized in DB already)
+      console.log(`[Sync] SKIP ticket=${trade.ticket} reason=already_closed`);
       result.skipped++;
     }
   }
@@ -213,6 +228,12 @@ export async function syncTradesFromEA(
     });
   } catch (err: any) {
     console.error('Failed to update account last_sync_at:', err);
+  }
+
+  console.log(`[Sync] RESULT created=${result.created} updated=${result.updated} skipped=${result.skipped} errors=${result.errors.length}`);
+  if (result.errors.length > 0) {
+    console.error(`[Sync] ERRORS:`, result.errors);
+    logError('SYNC', `Batch errors (${result.errors.length}): ${result.errors.join('; ')}`, { accountId, created: result.created, updated: result.updated, skipped: result.skipped, errors: result.errors });
   }
 
   return result;

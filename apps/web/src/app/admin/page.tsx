@@ -8,7 +8,7 @@ import { toPersianDigits } from '../../utils/farsi';
 import { notify } from '../../lib/notify';
 import './admin.scss';
 
-type AdminTab = 'stats' | 'users' | 'receipts' | 'coupons' | 'pricing' | 'contact' | 'crypto';
+type AdminTab = 'stats' | 'users' | 'receipts' | 'coupons' | 'pricing' | 'contact' | 'crypto' | 'diagnosis';
 
 interface AdminStats {
   totalUsers: number;
@@ -109,6 +109,16 @@ export default function AdminPage() {
   });
 
   const [updatingCrypto, setUpdatingCrypto] = useState(false);
+
+  // Diagnosis state
+  const [diagnosisLogs, setDiagnosisLogs] = useState<any[]>([]);
+  const [diagnosisSources, setDiagnosisSources] = useState<string[]>([]);
+  const [diagnosisStats, setDiagnosisStats] = useState({ errors24h: 0, errors7d: 0, total: 0 });
+  const [diagnosisLevelFilter, setDiagnosisLevelFilter] = useState('ALL');
+  const [diagnosisSourceFilter, setDiagnosisSourceFilter] = useState('ALL');
+  const [diagnosisSearch, setDiagnosisSearch] = useState('');
+  const [diagnosisDays, setDiagnosisDays] = useState('30');
+  const [diagnosisAutoRefresh, setDiagnosisAutoRefresh] = useState(false);
 
   // Modal states
   const [selectedReceipt, setSelectedReceipt] = useState<AdminReceipt | null>(null);
@@ -221,6 +231,50 @@ export default function AdminPage() {
     }
   }, []);
 
+  // Diagnosis fetch
+  const fetchDiagnosisLogs = useCallback(async () => {
+    try {
+      const params = new URLSearchParams();
+      if (diagnosisLevelFilter !== 'ALL') params.set('level', diagnosisLevelFilter);
+      if (diagnosisSourceFilter !== 'ALL') params.set('source', diagnosisSourceFilter);
+      if (diagnosisSearch) params.set('search', diagnosisSearch);
+      if (diagnosisDays) params.set('days', diagnosisDays);
+      params.set('limit', '200');
+
+      const res = await api.get(`/api/admin/diagnosis/logs?${params.toString()}`);
+      setDiagnosisLogs(res.data.logs);
+      setDiagnosisSources(res.data.sources);
+    } catch (err) {
+      console.error('Failed to fetch diagnosis logs:', err);
+    }
+  }, [diagnosisLevelFilter, diagnosisSourceFilter, diagnosisSearch, diagnosisDays]);
+
+  const fetchDiagnosisStats = useCallback(async () => {
+    try {
+      const res = await api.get('/api/admin/diagnosis/stats');
+      setDiagnosisStats(res.data);
+    } catch (err) {
+      console.error('Failed to fetch diagnosis stats:', err);
+    }
+  }, []);
+
+  const handleClearDiagnosisLogs = async () => {
+    const ok = await notify.confirm({
+      title: 'پاک کردن لاگ‌ها',
+      message: `آیا می‌خواهید لاگ‌های بیشتر از ${diagnosisDays} روز پیش را پاک کنید؟`,
+    });
+    if (!ok) return;
+
+    try {
+      const res = await api.delete(`/api/admin/diagnosis/logs?days=${diagnosisDays}`);
+      notify.success(`${res.data.deleted} لاگ پاک شد`);
+      fetchDiagnosisLogs();
+      fetchDiagnosisStats();
+    } catch (err: any) {
+      notify.error(err.response?.data?.error || 'خطا در پاک کردن لاگ‌ها');
+    }
+  };
+
   // Fetch initial data based on active tab
   useEffect(() => {
     if (!user || user.role !== 'ADMIN') return;
@@ -239,7 +293,21 @@ export default function AdminPage() {
     if (activeTab === 'crypto') {
       fetchCryptoSetting();
     }
-  }, [activeTab, user, fetchStats, fetchUsers, fetchReceipts, fetchCoupons, fetchPricesSetting, fetchExchangeRateSetting, fetchContactSetting, fetchCardSetting, fetchCryptoSetting]);
+    if (activeTab === 'diagnosis') {
+      fetchDiagnosisLogs();
+      fetchDiagnosisStats();
+    }
+  }, [activeTab, user, fetchStats, fetchUsers, fetchReceipts, fetchCoupons, fetchPricesSetting, fetchExchangeRateSetting, fetchContactSetting, fetchCardSetting, fetchCryptoSetting, fetchDiagnosisLogs, fetchDiagnosisStats]);
+
+  // Auto-refresh for diagnosis
+  useEffect(() => {
+    if (!diagnosisAutoRefresh || activeTab !== 'diagnosis') return;
+    const interval = setInterval(() => {
+      fetchDiagnosisLogs();
+      fetchDiagnosisStats();
+    }, 10000);
+    return () => clearInterval(interval);
+  }, [diagnosisAutoRefresh, activeTab, fetchDiagnosisLogs, fetchDiagnosisStats]);
 
   // Actions
   const handleVerifyReceipt = async (id: string, status: 'APPROVED' | 'REJECTED', inlineReason?: string) => {
@@ -453,6 +521,16 @@ export default function AdminPage() {
         >
           <span className="material-symbols-outlined">currency_bitcoin</span>
           <span>کیف پول رمزارز</span>
+        </button>
+        <button
+          className={`admin-tab-btn ${activeTab === 'diagnosis' ? 'active' : ''}`}
+          onClick={() => setActiveTab('diagnosis')}
+        >
+          <span className="material-symbols-outlined">troubleshoot</span>
+          <span>عیب‌یابی</span>
+          {diagnosisStats.errors24h > 0 && (
+            <span className="tab-badge">{toPersianDigits(diagnosisStats.errors24h)}</span>
+          )}
         </button>
       </div>
 
@@ -1024,6 +1102,142 @@ export default function AdminPage() {
               </button>
             </div>
           </form>
+        </div>
+      )}
+
+      {/* Diagnosis Tab */}
+      {activeTab === 'diagnosis' && (
+        <div className="admin-panel-card">
+          <div className="card-header-actions">
+            <h3>عیب‌یابی و لاگ سیستم</h3>
+            <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer', fontSize: '0.85rem', color: '#a0aec0' }}>
+                <input
+                  type="checkbox"
+                  checked={diagnosisAutoRefresh}
+                  onChange={(e) => setDiagnosisAutoRefresh(e.target.checked)}
+                />
+                بروزرسانی خودکار (۱۰ ثانیه)
+              </label>
+              <button className="admin-btn btn-secondary" onClick={fetchDiagnosisLogs}>بروزرسانی</button>
+              <button className="admin-btn btn-danger" onClick={handleClearDiagnosisLogs}>پاک کردن لاگ‌های قدیمی</button>
+            </div>
+          </div>
+
+          {/* Stats */}
+          <div style={{ display: 'flex', gap: '20px', marginBottom: '20px' }}>
+            <div className="stat-card" style={{ flex: 1, padding: '16px' }}>
+              <div className="stat-info">
+                <span className="stat-label">خطا (۲۴ ساعت اخیر)</span>
+                <span className="stat-value" style={{ color: diagnosisStats.errors24h > 0 ? '#f56565' : '#61f9b1' }}>
+                  {toPersianDigits(diagnosisStats.errors24h)}
+                </span>
+              </div>
+            </div>
+            <div className="stat-card" style={{ flex: 1, padding: '16px' }}>
+              <div className="stat-info">
+                <span className="stat-label">خطا (۷ روز اخیر)</span>
+                <span className="stat-value" style={{ color: diagnosisStats.errors7d > 0 ? '#f56565' : '#61f9b1' }}>
+                  {toPersianDigits(diagnosisStats.errors7d)}
+                </span>
+              </div>
+            </div>
+            <div className="stat-card" style={{ flex: 1, padding: '16px' }}>
+              <div className="stat-info">
+                <span className="stat-label">کل خطاها</span>
+                <span className="stat-value" style={{ color: diagnosisStats.total > 0 ? '#f56565' : '#61f9b1' }}>
+                  {toPersianDigits(diagnosisStats.total)}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Filters */}
+          <div style={{ display: 'flex', gap: '12px', marginBottom: '20px', flexWrap: 'wrap' }}>
+            <select
+              value={diagnosisLevelFilter}
+              onChange={(e) => setDiagnosisLevelFilter(e.target.value)}
+              style={{ background: '#0b0d19', border: '1px solid rgba(255,255,255,0.1)', padding: '8px 12px', color: '#fff', borderRadius: '6px', fontSize: '0.85rem' }}
+            >
+              <option value="ALL">همه سطوح</option>
+              <option value="INFO">INFO</option>
+              <option value="WARN">WARN</option>
+              <option value="ERROR">ERROR</option>
+              <option value="FATAL">FATAL</option>
+            </select>
+            <select
+              value={diagnosisSourceFilter}
+              onChange={(e) => setDiagnosisSourceFilter(e.target.value)}
+              style={{ background: '#0b0d19', border: '1px solid rgba(255,255,255,0.1)', padding: '8px 12px', color: '#fff', borderRadius: '6px', fontSize: '0.85rem' }}
+            >
+              <option value="ALL">همه منابع</option>
+              {diagnosisSources.map((src) => (
+                <option key={src} value={src}>{src}</option>
+              ))}
+            </select>
+            <select
+              value={diagnosisDays}
+              onChange={(e) => setDiagnosisDays(e.target.value)}
+              style={{ background: '#0b0d19', border: '1px solid rgba(255,255,255,0.1)', padding: '8px 12px', color: '#fff', borderRadius: '6px', fontSize: '0.85rem' }}
+            >
+              <option value="1">۱ روز اخیر</option>
+              <option value="7">۷ روز اخیر</option>
+              <option value="30">۳۰ روز اخیر</option>
+              <option value="90">۹۰ روز اخیر</option>
+            </select>
+            <input
+              type="text"
+              placeholder="جستجو در پیام..."
+              value={diagnosisSearch}
+              onChange={(e) => setDiagnosisSearch(e.target.value)}
+              style={{ background: '#0b0d19', border: '1px solid rgba(255,255,255,0.1)', padding: '8px 12px', color: '#fff', borderRadius: '6px', fontSize: '0.85rem', minWidth: '200px', direction: 'rtl' }}
+            />
+          </div>
+
+          {/* Logs table */}
+          {diagnosisLogs.length === 0 ? (
+            <p style={{ color: '#a0aec0', textAlign: 'center', padding: '40px 0' }}>هیچ لاگی یافت نشد</p>
+          ) : (
+            <div style={{ overflowX: 'auto' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
+                <thead>
+                  <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.1)', textAlign: 'right' }}>
+                    <th style={{ padding: '12px 8px', color: '#a0aec0', fontWeight: 500 }}>زمان</th>
+                    <th style={{ padding: '12px 8px', color: '#a0aec0', fontWeight: 500 }}>سطح</th>
+                    <th style={{ padding: '12px 8px', color: '#a0aec0', fontWeight: 500 }}>منبع</th>
+                    <th style={{ padding: '12px 8px', color: '#a0aec0', fontWeight: 500 }}>پیام</th>
+                    <th style={{ padding: '12px 8px', color: '#a0aec0', fontWeight: 500 }}>جزئیات</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {diagnosisLogs.map((log) => (
+                    <tr key={log.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                      <td style={{ padding: '10px 8px', color: '#a0aec0', whiteSpace: 'nowrap', direction: 'ltr', textAlign: 'right' }}>
+                        {new Date(log.created_at).toLocaleString('fa-IR')}
+                      </td>
+                      <td style={{ padding: '10px 8px' }}>
+                        <span style={{
+                          padding: '2px 8px',
+                          borderRadius: '4px',
+                          fontSize: '0.75rem',
+                          fontWeight: 600,
+                          background: log.level === 'ERROR' ? 'rgba(245,101,101,0.15)' : log.level === 'FATAL' ? 'rgba(229,62,62,0.2)' : log.level === 'WARN' ? 'rgba(236,201,75,0.15)' : 'rgba(97,249,177,0.1)',
+                          color: log.level === 'ERROR' ? '#f56565' : log.level === 'FATAL' ? '#e53e3e' : log.level === 'WARN' ? '#ecc94b' : '#61f9b1',
+                        }}>
+                          {log.level}
+                        </span>
+                      </td>
+                      <td style={{ padding: '10px 8px', color: '#e2e2eb', fontWeight: 500 }}>{log.source}</td>
+                      <td style={{ padding: '10px 8px', color: '#e2e2eb', maxWidth: '400px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{log.message}</td>
+                      <td style={{ padding: '10px 8px', color: '#a0aec0', fontSize: '0.8rem', maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {log.details ? JSON.stringify(log.details) : '-'}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
       )}
 

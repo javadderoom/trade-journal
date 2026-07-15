@@ -16,6 +16,7 @@ import tradeExportRouter from './routes/tradeExport';
 import cryptoSyncRouter from './routes/cryptoSync';
 import supportRouter from './routes/support';
 import adminSupportRouter from './routes/adminSupport';
+import adminDiagnosisRouter from './routes/adminDiagnosis';
 import { syncExchangeTrades } from './services/ccxtSync';
 
 const app = express();
@@ -50,7 +51,7 @@ app.use((req, res, next) => {
   }
   res.header('Access-Control-Allow-Credentials', 'true');
   res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, x-api-token');
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
   if (req.method === 'OPTIONS') {
     res.sendStatus(204);
     return;
@@ -69,6 +70,7 @@ app.use('/api/settings', settingsRouter);
 app.use('/api/payments', paymentsRouter);
 app.use('/api/admin', adminRouter);
 app.use('/api/admin/support', adminSupportRouter);
+app.use('/api/admin/diagnosis', adminDiagnosisRouter);
 app.use('/api/support', supportRouter);
 app.use('/api/crypto', cryptoSyncRouter);
 
