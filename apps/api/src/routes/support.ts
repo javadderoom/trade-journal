@@ -86,10 +86,10 @@ router.post('/conversations', authenticate, async (req: AuthRequest, res: Respon
 router.get('/conversations/:id', authenticate, async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user!.userId;
-    const { id } = req.params;
+    const conversationId = String(req.params.id);
 
     const conversation = await prisma.conversation.findFirst({
-      where: { id, user_id: userId },
+      where: { id: conversationId, user_id: userId },
       include: {
         messages: { orderBy: { created_at: 'asc' } },
         activities: { orderBy: { created_at: 'asc' } },
@@ -102,8 +102,8 @@ router.get('/conversations/:id', authenticate, async (req: AuthRequest, res: Res
 
     // Mark unread messages as read
     const unreadIds = conversation.messages
-      .filter((m) => m.sender_id !== userId && !m.read_at)
-      .map((m) => m.id);
+      .filter((m: { sender_id: string; read_at: Date | null }) => m.sender_id !== userId && !m.read_at)
+      .map((m: { id: string }) => m.id);
 
     if (unreadIds.length > 0) {
       await prisma.message.updateMany({
@@ -127,7 +127,7 @@ router.post(
   async (req: AuthRequest, res: Response) => {
     try {
       const userId = req.user!.userId;
-      const { id } = req.params;
+      const conversationId = String(req.params.id);
       const { body } = req.body;
 
       if (!body && (!req.files || (req.files as Express.Multer.File[]).length === 0)) {
@@ -135,7 +135,7 @@ router.post(
       }
 
       const conversation = await prisma.conversation.findFirst({
-        where: { id, user_id: userId },
+        where: { id: conversationId, user_id: userId },
       });
 
       if (!conversation) {
@@ -151,7 +151,7 @@ router.post(
 
       const message = await prisma.message.create({
         data: {
-          conversation_id: id,
+          conversation_id: conversationId,
           sender_id: userId,
           body: body || '',
           attachments,
@@ -160,14 +160,14 @@ router.post(
 
       // Update conversation timestamp
       await prisma.conversation.update({
-        where: { id },
+        where: { id: conversationId },
         data: { updated_at: new Date() },
       });
 
       // If conversation was RESOLVED, reopen it
       if (conversation.status === 'RESOLVED') {
         await prisma.conversation.update({
-          where: { id },
+          where: { id: conversationId },
           data: { status: 'OPEN', resolved_at: null },
         });
       }
@@ -184,10 +184,10 @@ router.post(
 router.patch('/conversations/:id/close', authenticate, async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user!.userId;
-    const { id } = req.params;
+    const conversationId = String(req.params.id);
 
     const conversation = await prisma.conversation.findFirst({
-      where: { id, user_id: userId },
+      where: { id: conversationId, user_id: userId },
     });
 
     if (!conversation) {
@@ -195,7 +195,7 @@ router.patch('/conversations/:id/close', authenticate, async (req: AuthRequest, 
     }
 
     const updated = await prisma.conversation.update({
-      where: { id },
+      where: { id: conversationId },
       data: { status: 'CLOSED', closed_at: new Date() },
     });
 

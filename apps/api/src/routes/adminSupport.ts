@@ -84,10 +84,10 @@ router.get('/conversations', async (req: AuthRequest, res: Response) => {
 // ─── GET /api/admin/support/conversations/:id — get conversation detail ────────
 router.get('/conversations/:id', async (req: AuthRequest, res: Response) => {
   try {
-    const { id } = req.params;
+    const conversationId = String(req.params.id);
 
     const conversation = await prisma.conversation.findUnique({
-      where: { id },
+      where: { id: conversationId },
       include: {
         user: { select: { id: true, name: true, email: true, plan: true, phone: true } },
         messages: { orderBy: { created_at: 'asc' } },
@@ -102,8 +102,8 @@ router.get('/conversations/:id', async (req: AuthRequest, res: Response) => {
     // Mark admin-unread messages as read
     const adminId = req.user!.userId;
     const unreadIds = conversation.messages
-      .filter((m) => m.sender_id !== adminId && !m.read_at)
-      .map((m) => m.id);
+      .filter((m: { sender_id: string; read_at: Date | null }) => m.sender_id !== adminId && !m.read_at)
+      .map((m: { id: string }) => m.id);
 
     if (unreadIds.length > 0) {
       await prisma.message.updateMany({
@@ -126,14 +126,14 @@ router.post(
   async (req: AuthRequest, res: Response) => {
     try {
       const adminId = req.user!.userId;
-      const { id } = req.params;
+      const conversationId = String(req.params.id);
       const { body } = req.body;
 
       if (!body && (!req.files || (req.files as Express.Multer.File[]).length === 0)) {
         return res.status(400).json({ error: 'پیام الزامی است' });
       }
 
-      const conversation = await prisma.conversation.findUnique({ where: { id } });
+      const conversation = await prisma.conversation.findUnique({ where: { id: conversationId } });
       if (!conversation) {
         return res.status(404).json({ error: 'مکالمه یافت نشد' });
       }
@@ -143,7 +143,7 @@ router.post(
 
       const message = await prisma.message.create({
         data: {
-          conversation_id: id,
+          conversation_id: conversationId,
           sender_id: adminId,
           body: body || '',
           attachments,
@@ -152,7 +152,7 @@ router.post(
 
       // Update conversation + set status to WAITING if it was OPEN
       await prisma.conversation.update({
-        where: { id },
+        where: { id: conversationId },
         data: {
           updated_at: new Date(),
           ...(conversation.status === 'OPEN' ? { status: 'WAITING' } : {}),
@@ -170,23 +170,23 @@ router.post(
 // ─── PATCH /api/admin/support/conversations/:id/assign ─────────────────────────
 router.patch('/conversations/:id/assign', async (req: AuthRequest, res: Response) => {
   try {
-    const { id } = req.params;
+    const conversationId = String(req.params.id);
     const { admin_id } = req.body;
     const actorId = req.user!.userId;
 
-    const conversation = await prisma.conversation.findUnique({ where: { id } });
+    const conversation = await prisma.conversation.findUnique({ where: { id: conversationId } });
     if (!conversation) {
       return res.status(404).json({ error: 'مکالمه یافت نشد' });
     }
 
     const updated = await prisma.conversation.update({
-      where: { id },
+      where: { id: conversationId },
       data: { assigned_admin_id: admin_id || null },
     });
 
     await prisma.conversationActivity.create({
       data: {
-        conversation_id: id,
+        conversation_id: conversationId,
         actor_id: actorId,
         action: 'ASSIGNED',
         details: { admin_id: admin_id || null },
@@ -203,7 +203,7 @@ router.patch('/conversations/:id/assign', async (req: AuthRequest, res: Response
 // ─── PATCH /api/admin/support/conversations/:id/status ─────────────────────────
 router.patch('/conversations/:id/status', async (req: AuthRequest, res: Response) => {
   try {
-    const { id } = req.params;
+    const conversationId = String(req.params.id);
     const { status } = req.body;
     const actorId = req.user!.userId;
 
@@ -215,11 +215,11 @@ router.patch('/conversations/:id/status', async (req: AuthRequest, res: Response
     if (status === 'RESOLVED') data.resolved_at = new Date();
     if (status === 'CLOSED') data.closed_at = new Date();
 
-    const updated = await prisma.conversation.update({ where: { id }, data });
+    const updated = await prisma.conversation.update({ where: { id: conversationId }, data });
 
     await prisma.conversationActivity.create({
       data: {
-        conversation_id: id,
+        conversation_id: conversationId,
         actor_id: actorId,
         action: 'STATUS_CHANGE',
         details: { status },
@@ -236,7 +236,7 @@ router.patch('/conversations/:id/status', async (req: AuthRequest, res: Response
 // ─── PATCH /api/admin/support/conversations/:id/priority ───────────────────────
 router.patch('/conversations/:id/priority', async (req: AuthRequest, res: Response) => {
   try {
-    const { id } = req.params;
+    const conversationId = String(req.params.id);
     const { priority } = req.body;
     const actorId = req.user!.userId;
 
@@ -245,13 +245,13 @@ router.patch('/conversations/:id/priority', async (req: AuthRequest, res: Respon
     }
 
     const updated = await prisma.conversation.update({
-      where: { id },
+      where: { id: conversationId },
       data: { priority },
     });
 
     await prisma.conversationActivity.create({
       data: {
-        conversation_id: id,
+        conversation_id: conversationId,
         actor_id: actorId,
         action: 'PRIORITY_CHANGE',
         details: { priority },
