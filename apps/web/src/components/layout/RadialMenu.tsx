@@ -41,21 +41,32 @@ export default function RadialMenu({ items, open, onClose }: RadialMenuProps) {
 
   if (!open) return null;
 
+  // Calculate arc positions: spread items in a semicircle above the FAB
+  const totalItems = items.length;
+  const arcSpread = 160; // total degrees of the arc
+  const startAngle = -arcSpread / 2; // e.g., -80
+  const angleStep = totalItems > 1 ? arcSpread / (totalItems - 1) : 0;
+
   return (
     <div className="radial-menu-overlay" onClick={onClose}>
       <div
         ref={menuRef}
-        className="radial-menu"
+        className="radial-menu-container"
         onClick={(e) => e.stopPropagation()}
       >
         {items.map((item, i) => {
           const isActive = pathname === item.href;
+          // For 1 item, center it at top; for 2+, spread along arc
+          const angle = totalItems === 1 ? 0 : startAngle + i * angleStep;
           return (
             <Link
               key={item.href}
               href={item.href}
               className={`radial-menu-item ${isActive ? 'active' : ''}`}
-              style={{ animationDelay: `${i * 50}ms` }}
+              style={{
+                '--item-angle': `${angle}deg`,
+                '--item-delay': `${i * 60}ms`,
+              } as React.CSSProperties}
               onClick={onClose}
             >
               <div className="radial-menu-icon-wrapper">

@@ -535,90 +535,104 @@
   }
 }
 
-// Radial menu overlay and items
+// Radial menu — half-circle arc above FAB with rotation animation
 .radial-menu-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.4);
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
   z-index: 999;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   animation: fadeIn 0.2s ease;
 }
 
-.radial-menu {
-  display: flex;
-  gap: 16px;
-  padding: 16px 24px;
-  background: rgba($surface-container, 0.92);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border: 1px solid rgba($outline-variant, 0.45);
-  border-radius: 20px;
-  box-shadow:
-    0 16px 48px -8px rgba(0, 0, 0, 0.7),
-    0 8px 20px -4px rgba(0, 0, 0, 0.5);
-  animation: radialMenuIn 0.25s cubic-bezier(0.23, 1, 0.32, 1);
+.radial-menu-container {
+  position: fixed;
+  // Position at the FAB location (bottom center of screen)
+  bottom: calc(12px + env(safe-area-inset-bottom, 0px) + 34px); // nav bottom + half FAB height
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  z-index: 1000;
+  // The container itself rotates in
+  animation: radialArcIn 0.35s cubic-bezier(0.23, 1, 0.32, 1) both;
 }
 
 .radial-menu-item {
+  position: absolute;
+  // Each item is offset by its arc angle from the top (negative Y = upward)
+  // Using CSS custom property --item-angle set per item
+  transform:
+    rotate(var(--item-angle, 0deg))
+    translateY(-90px)
+    rotate(calc(-1 * var(--item-angle, 0deg)));
+  transform-origin: center center;
+  // Staggered entrance
+  animation: radialItemArcIn 0.3s cubic-bezier(0.23, 1, 0.32, 1) both;
+  animation-delay: var(--item-delay, 0ms);
+
+  // Shift items up so their center aligns with the arc radius
+  margin-left: -28px;
+  margin-top: -28px;
+
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 6px;
   text-decoration: none;
   color: $on-surface-variant;
-  padding: 8px;
-  border-radius: 14px;
-  transition: color 0.2s ease, transform 0.15s ease;
-  animation: radialItemIn 0.25s cubic-bezier(0.23, 1, 0.32, 1) both;
   -webkit-tap-highlight-color: transparent;
 
   &:hover {
     color: $on-surface;
-    transform: translateY(-2px);
+    .radial-menu-icon-wrapper {
+      background: rgba($primary, 0.2);
+      transform: scale(1.1);
+    }
   }
 
   &:active {
-    transform: scale(0.92);
+    .radial-menu-icon-wrapper {
+      transform: scale(0.92);
+    }
   }
 
   &.active {
     color: $primary;
+    .radial-menu-icon-wrapper {
+      background: rgba($primary, 0.25);
+    }
   }
 }
 
 .radial-menu-icon-wrapper {
-  width: 48px;
-  height: 48px;
+  width: 52px;
+  height: 52px;
   border-radius: 50%;
-  background: $surface-container-high;
+  background: rgba($surface-container, 0.95);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border: 1px solid rgba($outline-variant, 0.5);
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background-color 0.2s ease;
-
-  .radial-menu-item:hover & {
-    background: rgba($primary, 0.15);
-  }
-
-  .radial-menu-item.active & {
-    background: rgba($primary, 0.2);
-  }
+  box-shadow:
+    0 8px 24px -4px rgba(0, 0, 0, 0.5),
+    0 4px 10px -2px rgba(0, 0, 0, 0.3);
+  transition: transform 0.2s cubic-bezier(0.23, 1, 0.32, 1), background 0.2s ease;
 
   .material-symbols-outlined {
-    font-size: 22px;
+    font-size: 24px;
   }
 }
 
 .radial-menu-label {
   font-size: 11px;
-  font-weight: 500;
+  font-weight: 600;
   font-family: $font-primary;
   white-space: nowrap;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
 
   .radial-menu-item.active & {
     font-weight: 700;
@@ -657,25 +671,33 @@
   to { opacity: 1; }
 }
 
-@keyframes radialMenuIn {
+@keyframes radialArcIn {
   from {
     opacity: 0;
-    transform: scale(0.8) translateY(20px);
+    transform: translateX(-50%) rotate(-90deg) scale(0.3);
   }
   to {
     opacity: 1;
-    transform: scale(1) translateY(0);
+    transform: translateX(-50%) rotate(0deg) scale(1);
   }
 }
 
-@keyframes radialItemIn {
+@keyframes radialItemArcIn {
   from {
     opacity: 0;
-    transform: scale(0.5) translateY(10px);
+    transform:
+      rotate(var(--item-angle, 0deg))
+      translateY(-20px)
+      rotate(calc(-1 * var(--item-angle, 0deg)))
+      scale(0.3);
   }
   to {
     opacity: 1;
-    transform: scale(1) translateY(0);
+    transform:
+      rotate(var(--item-angle, 0deg))
+      translateY(-90px)
+      rotate(calc(-1 * var(--item-angle, 0deg)))
+      scale(1);
   }
 }
 
