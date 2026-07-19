@@ -134,6 +134,17 @@ export default function DashboardPage() {
     });
   };
 
+  if (loading && !data) {
+    return (
+      <main className="dashboard-page">
+        <div className="dash-loading">
+          <div className="dash-spinner" />
+          <span>{t('common.loading')}</span>
+        </div>
+      </main>
+    );
+  }
+
   if (error || !data) {
     return (
       <main className="dashboard-page">
