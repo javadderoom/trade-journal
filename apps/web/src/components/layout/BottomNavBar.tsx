@@ -8,7 +8,7 @@ import RadialMenu, { RadialMenuItem } from './RadialMenu';
 
 export default function BottomNavBar() {
   const pathname = usePathname();
-  const { t } = useTranslation();
+  const { t, language, setLanguage } = useTranslation();
   const [menuOpen, setMenuOpen] = useState(false);
 
   const isTradesActive = pathname === '/trades' || pathname.startsWith('/trades');
@@ -16,9 +16,17 @@ export default function BottomNavBar() {
   const isDashboardActive = pathname === '/dashboard' || pathname === '/';
   const isSettingsActive = pathname === '/settings';
 
+  const toggleLanguage = useCallback(() => {
+    setLanguage(language === 'fa' ? 'en' : 'fa');
+  }, [language, setLanguage]);
+
+  const langLabel = language === 'fa' ? 'English' : 'فارسی';
+  const langIcon = language === 'fa' ? 'translate' : 'translate';
+
   const radialItems: RadialMenuItem[] = [
-    { href: '/dashboard', label: t('nav.dashboard'), icon: 'dashboard' },
     { href: '/support', label: t('nav.support'), icon: 'contact_support' },
+    { href: '/dashboard', label: t('nav.dashboard'), icon: 'dashboard' },
+    { label: langLabel, icon: langIcon, onClick: toggleLanguage },
   ];
 
   const closeMenu = useCallback(() => setMenuOpen(false), []);
@@ -59,13 +67,12 @@ export default function BottomNavBar() {
               className="material-symbols-outlined icon"
               style={{
                 transition: 'transform 0.3s cubic-bezier(0.23, 1, 0.32, 1)',
-                transform: menuOpen ? 'rotate(45deg)' : undefined,
+                transform: menuOpen ? 'rotate(90deg)' : undefined,
               }}
             >
-              {menuOpen ? 'close' : 'add'}
+              {menuOpen ? 'close' : 'apps'}
             </span>
           </button>
-          <span className="raised-label">{t('nav.more')}</span>
         </div>
 
         {/* 4. Journal */}

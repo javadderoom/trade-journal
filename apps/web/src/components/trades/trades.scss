@@ -2972,6 +2972,7 @@ input[type="checkbox"] {
   align-items: flex-start; // RTL start = right
   gap: 16px;
   transition: bottom 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform;
 
   // If bulk action bar is active, shift FAB up
   .floating-bulk-actions-bar ~ & {
@@ -2992,10 +2993,16 @@ input[type="checkbox"] {
     box-shadow: 0 4px 20px rgba($primary, 0.35);
     transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.2s ease;
     outline: none;
+    -webkit-tap-highlight-color: transparent;
 
     &:hover {
       background-color: color.adjust($primary, $lightness: 5%);
       transform: scale(1.05);
+    }
+
+    &:focus-visible {
+      outline: none;
+      box-shadow: 0 4px 20px rgba($primary, 0.35);
     }
 
     .fab-icon {
@@ -3024,6 +3031,7 @@ input[type="checkbox"] {
       cursor: pointer;
       padding: 0;
       outline: none;
+      -webkit-tap-highlight-color: transparent;
 
       .fab-label {
         background-color: $surface-container-highest;
@@ -3104,12 +3112,26 @@ input[type="checkbox"] {
 
 @media (max-width: 768px) {
   .fab-container {
-    bottom: 80px;
+    bottom: 90px;
     right: 12px;
 
     // Shift up even more on mobile when bulk actions bar is active
     .floating-bulk-actions-bar ~ & {
       bottom: 180px;
     }
+  }
+}
+
+// LTR overrides: flip FAB alignment so sub-buttons stay on the inward side
+[dir="ltr"] .fab-container {
+  right: 16px;
+  align-items: flex-end;
+
+  .fab-options {
+    align-items: flex-end;
+  }
+
+  @media (max-width: 768px) {
+    right: 12px;
   }
 }

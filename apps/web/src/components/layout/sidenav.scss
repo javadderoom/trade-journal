@@ -442,6 +442,8 @@
         font-family: $font-primary;
         transition: font-weight 0.2s ease, color 0.2s ease;
         opacity: 0.85;
+        text-align: center;
+        white-space: nowrap;
 
         .bottom-nav-item.active & {
           font-weight: 700;
@@ -515,22 +517,6 @@
           }
         }
       }
-
-      .raised-label {
-        margin-top: 36px;
-        font-size: 10px;
-        font-weight: 500;
-        color: $on-surface-variant;
-        font-family: $font-primary;
-        transition: font-weight 0.2s ease, color 0.2s ease;
-        opacity: 0.85;
-
-        .bottom-nav-raised-item.active ~ & {
-          font-weight: 700;
-          opacity: 1;
-          color: $primary;
-        }
-      }
     }
   }
 }
@@ -548,13 +534,14 @@
 
 .radial-menu-container {
   position: fixed;
-  // Position at the FAB location (bottom center of screen)
-  bottom: calc(12px + env(safe-area-inset-bottom, 0px) + 34px); // nav bottom + half FAB height
+  // Position at the FAB center (nav bottom 12px + nav height 68px + FAB raised 26px + FAB half 27px)
+  bottom: calc(17px + env(safe-area-inset-bottom, 0px) + 68px + 26px + 27px);
   left: 50%;
   transform: translateX(-50%);
   width: 0;
   height: 0;
   z-index: 1000;
+  direction: ltr; // Prevent RTL from shifting the centering
   // The container itself rotates in
   animation: radialArcIn 0.35s cubic-bezier(0.23, 1, 0.32, 1) both;
 }
@@ -565,7 +552,7 @@
   // Using CSS custom property --item-angle set per item
   transform:
     rotate(var(--item-angle, 0deg))
-    translateY(-90px)
+    translateY(-72px)
     rotate(calc(-1 * var(--item-angle, 0deg)));
   transform-origin: center center;
   // Staggered entrance
@@ -574,7 +561,6 @@
 
   // Shift items up so their center aligns with the arc radius
   margin-left: -28px;
-  margin-top: -28px;
 
   display: flex;
   flex-direction: column;
@@ -583,6 +569,14 @@
   text-decoration: none;
   color: $on-surface-variant;
   -webkit-tap-highlight-color: transparent;
+
+  // Reset default button styling for onClick items
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font: inherit;
+  outline: none;
 
   &:hover {
     color: $on-surface;
@@ -652,12 +646,8 @@
         inset 0 1px 0 rgba(255, 255, 255, 0.3);
 
       .icon {
-        transform: rotate(45deg) scale(1.08);
+        transform: rotate(90deg) scale(1.08);
       }
-    }
-
-    .bottom-nav-raised-item.menu-open ~ .raised-label {
-      color: #ff6b6b;
     }
   }
 
@@ -695,13 +685,13 @@
     opacity: 1;
     transform:
       rotate(var(--item-angle, 0deg))
-      translateY(-90px)
+      translateY(-72px)
       rotate(calc(-1 * var(--item-angle, 0deg)))
       scale(1);
   }
 }
 
-/* LTR layout alignment overrides for SideNavBar */
+/* LTR layout alignment overrides */
 .app-container[dir="ltr"] {
   .sidenav-container {
     right: auto;
@@ -725,5 +715,38 @@
         margin-left: 12px !important;
       }
     }
+  }
+
+  /* Bottom nav: keep items ordered correctly in LTR */
+  .bottom-nav-container {
+    direction: ltr;
+  }
+
+  /* Radial menu: mirror arc angles so items fan out symmetrically in LTR */
+  .radial-menu-item {
+    transform:
+      rotate(calc(-1 * var(--item-angle, 0deg)))
+      translateY(-72px)
+      rotate(var(--item-angle, 0deg));
+    animation-name: radialItemArcInLtr;
+  }
+}
+
+@keyframes radialItemArcInLtr {
+  from {
+    opacity: 0;
+    transform:
+      rotate(calc(-1 * var(--item-angle, 0deg)))
+      translateY(-20px)
+      rotate(var(--item-angle, 0deg))
+      scale(0.3);
+  }
+  to {
+    opacity: 1;
+    transform:
+      rotate(calc(-1 * var(--item-angle, 0deg)))
+      translateY(-72px)
+      rotate(var(--item-angle, 0deg))
+      scale(1);
   }
 }

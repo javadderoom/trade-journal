@@ -1,6 +1,15 @@
-import 'dotenv/config';
-import express from 'express';
+// Load .env BEFORE any imports so process.env is populated
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const _envResult = require('dotenv').config({
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  path: require('path').resolve(__dirname, '../../../.env'),
+});
+if (_envResult.error) {
+  console.warn('[dotenv] Could not load .env:', _envResult.error.message);
+}
+
 import path from 'node:path';
+import express from 'express';
 import cookieParser from 'cookie-parser';
 import cron from 'node-cron';
 import { prisma } from './services/tradeSync';

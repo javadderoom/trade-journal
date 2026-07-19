@@ -3,12 +3,12 @@
 import React, { useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useTranslation } from '../../store/useAppStore';
 
 export interface RadialMenuItem {
-  href: string;
+  href?: string;
   label: string;
   icon: string;
+  onClick?: () => void;
 }
 
 interface RadialMenuProps {
@@ -41,10 +41,9 @@ export default function RadialMenu({ items, open, onClose }: RadialMenuProps) {
 
   if (!open) return null;
 
-  // Calculate arc positions: spread items in a semicircle above the FAB
   const totalItems = items.length;
-  const arcSpread = 160; // total degrees of the arc
-  const startAngle = -arcSpread / 2; // e.g., -80
+  const arcSpread = 160;
+  const startAngle = -arcSpread / 2;
   const angleStep = totalItems > 1 ? arcSpread / (totalItems - 1) : 0;
 
   return (
@@ -55,20 +54,18 @@ export default function RadialMenu({ items, open, onClose }: RadialMenuProps) {
         onClick={(e) => e.stopPropagation()}
       >
         {items.map((item, i) => {
-          const isActive = pathname === item.href;
-          // For 1 item, center it at top; for 2+, spread along arc
+          const isActive = !!item.href && pathname === item.href;
           const angle = totalItems === 1 ? 0 : startAngle + i * angleStep;
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={`radial-menu-item ${isActive ? 'active' : ''}`}
-              style={{
-                '--item-angle': `${angle}deg`,
-                '--item-delay': `${i * 60}ms`,
-              } as React.CSSProperties}
-              onClick={onClose}
-            >
+          const sharedProps = {
+            className: `radial-menu-item ${isActive ? 'active' : ''}`,
+            style: {
+              '--item-angle': `${angle}deg`,
+              '--item-delay': `${i * 60}ms`,
+            } as React.CSSProperties,
+          };
+
+          const inner = (
+            <>
               <div className="radial-menu-icon-wrapper">
                 <span
                   className="material-symbols-outlined"
@@ -78,6 +75,32 @@ export default function RadialMenu({ items, open, onClose }: RadialMenuProps) {
                 </span>
               </div>
               <span className="radial-menu-label">{item.label}</span>
+            </>
+          );
+
+          if (item.onClick) {
+            return (
+              <button
+                key={item.label}
+                {...sharedProps}
+                onClick={() => {
+                  item.onClick?.();
+                  onClose();
+                }}
+              >
+                {inner}
+              </button>
+            );
+          }
+
+          return (
+            <Link
+              key={item.href}
+              href={item.href!}
+              {...sharedProps}
+              onClick={onClose}
+            >
+              {inner}
             </Link>
           );
         })}
