@@ -42,11 +42,11 @@ export const updateTradeSchema = z.object({
   commission: z.number({ error: 'Commission must be a number' }).optional(),
   swap: z.number({ error: 'Swap must be a number' }).optional(),
   accountId: z.string({ error: 'Account ID must be a string' }).optional(),
-  analysisTimeframe: z.string().max(MAX_TIMEFRAME_LENGTH).optional(),
-  entryTimeframe: z.string().max(MAX_TIMEFRAME_LENGTH).optional(),
-  tags: z.array(z.string().max(MAX_TAG_LENGTH)).optional(),
-  notes: z.string().max(MAX_NOTES_LENGTH).optional(),
-  emotion: z.string().max(MAX_EMOTION_LENGTH).optional(),
+  analysisTimeframe: z.string().max(MAX_TIMEFRAME_LENGTH).nullable().optional(),
+  entryTimeframe: z.string().max(MAX_TIMEFRAME_LENGTH).nullable().optional(),
+  tags: z.array(z.string().max(MAX_TAG_LENGTH)).nullable().optional(),
+  notes: z.string().max(MAX_NOTES_LENGTH).nullable().optional(),
+  emotion: z.string().max(MAX_EMOTION_LENGTH).nullable().optional(),
 });
 
 export type CreateTradeInput = z.infer<typeof createTradeSchema>;

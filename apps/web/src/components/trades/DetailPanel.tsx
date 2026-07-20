@@ -8,6 +8,7 @@ import { useTranslation } from '../../store/useAppStore';
 import { getSharedTranslations } from '../../locales/components';
 import {
   formatCurrency,
+  getNetPnl,
   getEmotionEmoji,
   getEmotionLabel,
   formatDate,
@@ -271,7 +272,7 @@ export default function DetailPanel({
         {activeTab === 'stats' ? (
           <>
             {/* Financial Summary Box */}
-            <div className={`financial-box ${activeTrade.profitUsd < 0 ? 'loss-box' : ''}`}>
+            <div className={`financial-box ${getNetPnl(activeTrade) < 0 ? 'loss-box' : ''}`}>
               <div className="box-bar"></div>
               <div className="box-header">
                 <span className="label">{p.netProfit}</span>
@@ -280,12 +281,12 @@ export default function DetailPanel({
                 </span>
               </div>
               <div className="pnl-value">
-                {formatCurrency(activeTrade.profitUsd)}
+                {formatCurrency(getNetPnl(activeTrade))}
               </div>
               <div className="pnl-toman">
                 {isEn 
-                  ? `${Math.round(activeTrade.profitUsd * usdToToman).toLocaleString('en-US')} Toman` 
-                  : formatToman(activeTrade.profitUsd, usdToToman)}
+                  ? `${Math.round(getNetPnl(activeTrade) * usdToToman).toLocaleString('en-US')} Toman` 
+                  : formatToman(getNetPnl(activeTrade), usdToToman)}
               </div>
               <div className="metrics-grid">
                 <div className="metric-item">

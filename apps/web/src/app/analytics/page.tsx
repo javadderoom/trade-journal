@@ -394,7 +394,7 @@ export default function JournalPage() {
       emotions: emotionsList,
       timeframeMatrix,
     };
-  }, [trades]);
+  }, [trades, ignoredTags]);
 
   // ─── TIER 3 CHARTS & RISK CALCULATIONS ───────────────────────────────────
 

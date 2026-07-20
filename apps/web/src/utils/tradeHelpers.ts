@@ -14,6 +14,9 @@ export const formatCurrency = (val: number, decimals = 2, showPlus = false): str
   return formatPersianCurrency(val);
 };
 
+export const getNetPnl = (trade: { profitUsd: number; commission?: number | null; swap?: number | null }): number =>
+  trade.profitUsd + (trade.commission ?? 0) + (trade.swap ?? 0);
+
 export const getEmotionEmoji = (emotion: string | null, emotionsList?: { value: string; label: string; emoji?: string }[]): string => {
   if (!emotion) return '💭';
   if (emotionsList) {

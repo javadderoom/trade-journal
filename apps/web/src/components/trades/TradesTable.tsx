@@ -13,7 +13,7 @@ import FilterBar from './FilterBar';
 import DesktopTable from './DesktopTable';
 import MobileCardsList from './MobileCardsList';
 import DetailPanel from './DetailPanel';
-import { getMainPair } from '../../utils/tradeHelpers';
+import { getMainPair, getNetPnl } from '../../utils/tradeHelpers';
 import { useAuthStore } from '../../lib/auth';
 import ExportModal from '../modals/ExportModal';
 import { Trade } from '../../types/trade';
@@ -387,7 +387,7 @@ export default function TradesTable({
           cmp = a.lotSize - b.lotSize;
           break;
         case 'pnl':
-          cmp = a.profitUsd - b.profitUsd;
+          cmp = getNetPnl(a) - getNetPnl(b);
           break;
         case 'rr':
           cmp = a.rMultiple - b.rMultiple;
@@ -407,9 +407,9 @@ export default function TradesTable({
       t => !t.tags?.some(tag => ignoredTagsSet.has(tag))
     );
     const count = activeTrades.length;
-    const wins = activeTrades.filter(t => t.profitUsd > 0).length;
+    const wins = activeTrades.filter(t => getNetPnl(t) > 0).length;
     const winRate = count > 0 ? Math.round((wins / count) * 100) : 0;
-    const totalProfit = activeTrades.reduce((sum, t) => sum + t.profitUsd, 0);
+    const totalProfit = activeTrades.reduce((sum, t) => sum + getNetPnl(t), 0);
     return { count, winRate, totalProfit };
   }, [filteredTrades, ignoredTagsSet]);
 

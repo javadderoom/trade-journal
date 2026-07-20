@@ -6,6 +6,7 @@ import { toPersianDigits, formatToman } from '../../utils/farsi';
 import { useTranslation } from '../../store/useAppStore';
 import {
   formatCurrency,
+  getNetPnl,
   getEmotionEmoji,
   getEmotionLabel,
   formatDate,
@@ -101,9 +102,10 @@ export default function DesktopTable({
 
               // P&L color logic
               const isMissed = trade.tags?.some(tag => ignoredTags.has(tag));
+              const netPnl = getNetPnl(trade);
               let profitClass = 'profit-zero';
-              if (trade.profitUsd > 0) profitClass = 'profit-positive';
-              else if (trade.profitUsd < 0) profitClass = 'profit-negative';
+              if (netPnl > 0) profitClass = 'profit-positive';
+              else if (netPnl < 0) profitClass = 'profit-negative';
               if (!isClosed) profitClass = 'profit-open';
               if (isMissed) profitClass = 'profit-missed';
 
@@ -220,9 +222,9 @@ export default function DesktopTable({
                     {toPersianDigits(trade.rMultiple.toFixed(1))}R
                   </td>
                   <td className={`col-profit ${profitClass}`}>
-                    <span className="profit-usd">{formatCurrency(trade.profitUsd)}</span>
+                    <span className="profit-usd">{formatCurrency(netPnl)}</span>
                     {language === 'fa' && (
-                      <span className="profit-toman">{formatToman(trade.profitUsd, usdToToman)}</span>
+                      <span className="profit-toman">{formatToman(netPnl, usdToToman)}</span>
                     )}
                   </td>
                   <td style={{ textAlign: 'center' }}>
