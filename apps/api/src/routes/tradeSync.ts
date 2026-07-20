@@ -399,7 +399,7 @@ router.put('/:id', authenticate, async (req: AuthRequest, res: Response) => {
           emotion: emotion !== undefined ? emotion : undefined,
           stop_loss: stopLoss !== undefined ? stopLoss : undefined,
           take_profit: takeProfit !== undefined ? takeProfit : undefined,
-          tags: tags !== undefined ? tags : undefined,
+          tags: tags !== undefined ? (tags ?? []) : undefined,
           r_multiple: rMultipleUpdate !== undefined ? rMultipleUpdate : undefined,
           analysis_timeframe: analysisTimeframe !== undefined ? analysisTimeframe : undefined,
           entry_timeframe: entryTimeframe !== undefined ? entryTimeframe : undefined,
