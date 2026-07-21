@@ -380,14 +380,26 @@ router.put('/:id', authenticate, async (req: AuthRequest, res: Response) => {
       }
     }
 
-    // Recompute profit_usd when core pricing fields change
+    // Recompute profit_usd when core pricing fields change (skip if user explicitly set profitUsd)
     let profitUsdUpdate: number | undefined = undefined;
-    const isPnlChange = openPrice !== undefined || closePrice !== undefined || lotSize !== undefined || direction !== undefined || commission !== undefined || swap !== undefined;
-    if (isPnlChange && effClosePrice !== null && effOpenPrice > 0) {
-      const isBuy = effDirection === 'BUY';
-      const effLot = lotSize !== undefined ? lotSize : existing.lot_size;
-      const priceDiff = isBuy ? (effClosePrice - effOpenPrice) : (effOpenPrice - effClosePrice);
-      profitUsdUpdate = priceDiff * effLot * 10000 + effCommission + effSwap;
+    if (profitUsd !== undefined) {
+      // User explicitly provided profitUsd — use it directly
+      profitUsdUpdate = profitUsd;
+    } else {
+      const isPnlChange = openPrice !== undefined || closePrice !== undefined || lotSize !== undefined || direction !== undefined;
+      if (isPnlChange && effClosePrice !== null && effOpenPrice > 0) {
+        const isBuy = effDirection === 'BUY';
+        const effLot = lotSize !== undefined ? lotSize : existing.lot_size;
+        const priceDiff = isBuy ? (effClosePrice - effOpenPrice) : (effOpenPrice - effClosePrice);
+        // Use symbol-appropriate multiplier based on digits
+        const sym = (symbol || existing.symbol).toUpperCase();
+        let multiplier = 10000;
+        if (sym.includes('JPY')) multiplier = 1000;
+        else if (sym.includes('XAU') || sym.includes('GOLD')) multiplier = 100;
+        else if (sym.includes('BTC')) multiplier = 1;
+        else if (sym.includes('ETH')) multiplier = 1;
+        profitUsdUpdate = priceDiff * effLot * multiplier + effCommission + effSwap;
+      }
     }
 
     const updated = await prisma.$transaction(async (tx) => {

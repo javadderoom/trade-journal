@@ -510,34 +510,34 @@ export default function DetailPanel({
                </div>
 
                {!activeTrade.closeTime ? (
-                 <button
-                   type="button"
-                   className="btn-save"
-                   style={{ marginTop: '12px', width: '100%' }}
-                   onClick={() => {
-                     const now = new Date().toISOString();
-                     if (activeTrade.closePrice === null) {
-                       updateActiveTradeField('closePrice', activeTrade.openPrice);
-                     }
-                     updateActiveTradeField('closeTime', now);
-                   }}
-                 >
-                   <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>check_circle</span>
-                   {p.closeTrade}
-                 </button>
+                  <button
+                    type="button"
+                    className="btn btn-primary"
+                    style={{ marginTop: '12px', width: '100%' }}
+                    onClick={() => {
+                      const now = new Date().toISOString();
+                      if (activeTrade.closePrice === null) {
+                        updateActiveTradeField('closePrice', activeTrade.openPrice);
+                      }
+                      updateActiveTradeField('closeTime', now);
+                    }}
+                  >
+                    <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>check_circle</span>
+                    {p.closeTrade}
+                  </button>
                ) : (
-                 <button
-                   type="button"
-                   className="btn-ghost"
-                   style={{ marginTop: '12px', width: '100%', justifyContent: 'center', display: 'flex', alignItems: 'center', gap: '6px', background: 'transparent', border: '1px solid rgba(255,255,255,0.15)', color: '#8898aa', borderRadius: '8px', padding: '8px 16px', cursor: 'pointer', fontFamily: language === 'fa' ? 'Vazirmatn' : 'inherit', fontSize: '13px' }}
-                   onClick={() => {
-                     updateActiveTradeField('closeTime', null);
-                     updateActiveTradeField('closePrice', null);
-                   }}
-                 >
-                   <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>undo</span>
-                   {p.reopenTrade}
-                 </button>
+                  <button
+                    type="button"
+                    className="btn btn-secondary"
+                    style={{ marginTop: '12px', width: '100%' }}
+                    onClick={() => {
+                      updateActiveTradeField('closeTime', null);
+                      updateActiveTradeField('closePrice', null);
+                    }}
+                  >
+                    <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>undo</span>
+                    {p.reopenTrade}
+                  </button>
                )}
               </div>
             </>
