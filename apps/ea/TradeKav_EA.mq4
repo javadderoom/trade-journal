@@ -5,7 +5,7 @@
 //+------------------------------------------------------------------+
 #property copyright "TradeKav"
 #property link      "https://tradekav.ir"
-#property version   "1.00"
+#property version   "1.10"
 #property strict
 
 //--- Input parameters
@@ -28,7 +28,6 @@ int OnInit()
    if (StringLen(InpApiToken) > 0)
       g_authHeader = "Authorization: Bearer " + InpApiToken;
 
-   // Load last synced ticket from global variable
    string gvName = "TradeKav_LastTicket_" + IntegerToString(InpAccountId);
    if (GlobalVariableCheck(gvName))
       g_lastTicket = (int)GlobalVariableGet(gvName);
@@ -36,13 +35,10 @@ int OnInit()
    if (InpSyncInterval > 0)
       EventSetTimer(InpSyncInterval);
 
-   // Initial sync
-   SyncOpenPositions();
-   SyncClosedTrades();
+   SyncAll();
 
    Print("TradeKav EA initialized. Last ticket: ", g_lastTicket);
 
-   // Draw manual sync button
    CreateSyncButton();
 
    return (INIT_SUCCEEDED);
@@ -62,8 +58,7 @@ void OnDeinit(const int reason)
 //+------------------------------------------------------------------+
 void OnTimer()
 {
-   SyncOpenPositions();
-   SyncClosedTrades();
+   SyncAll();
 }
 
 //+------------------------------------------------------------------+
@@ -74,8 +69,7 @@ void OnChartEvent(const int id, const long &lparam, const double &dparam, const 
    if (id == CHARTEVENT_OBJECT_CLICK && sparam == "btnSyncNow")
    {
       Print("Manual sync triggered...");
-      SyncOpenPositions();
-      SyncClosedTrades();
+      SyncAll();
       ObjectSetInteger(0, "btnSyncNow", OBJPROP_STATE, false);
    }
 }
@@ -99,12 +93,42 @@ void CreateSyncButton()
 }
 
 //+------------------------------------------------------------------+
-//| Sync open (active) positions                                      |
+//| Combined sync — single API call for both open + closed trades     |
 //+------------------------------------------------------------------+
-void SyncOpenPositions()
+void SyncAll()
+{
+   string openJson = BuildOpenPositionsJson();
+   string closedJson = BuildClosedTradesJson();
+
+   bool hasOpen = (StringLen(openJson) > 2);
+   bool hasClosed = (StringLen(closedJson) > 2);
+
+   if (!hasOpen && !hasClosed) return;
+
+   string combined = "[";
+   if (hasOpen)
+      combined += StringSubstr(openJson, 1, StringLen(openJson) - 2);
+   if (hasOpen && hasClosed)
+      combined += ",";
+   if (hasClosed)
+      combined += StringSubstr(closedJson, 1, StringLen(closedJson) - 2);
+   combined += "]";
+
+   if (SendToApi(combined))
+   {
+      string gvName = "TradeKav_LastTicket_" + IntegerToString(InpAccountId);
+      GlobalVariableSet(gvName, g_lastTicket);
+      Print("Synced successfully. Last ticket: ", g_lastTicket);
+   }
+}
+
+//+------------------------------------------------------------------+
+//| Build JSON for open positions (no API call)                       |
+//+------------------------------------------------------------------+
+string BuildOpenPositionsJson()
 {
    int total = OrdersTotal();
-   if (total == 0) return;
+   if (total == 0) return "[]";
 
    string jsonPayload = "[";
    int count = 0;
@@ -114,11 +138,10 @@ void SyncOpenPositions()
    {
       if (!OrderSelect(i, SELECT_BY_POS, MODE_TRADES)) continue;
 
-      int    ticket    = (int)OrderTicket();
+      int    ticket   = (int)OrderTicket();
       string symbol   = OrderSymbol();
       int    type     = (int)OrderType();
 
-      // Only BUY / SELL positions
       if (type != OP_BUY && type != OP_SELL) continue;
 
       string direction = (type == OP_BUY) ? "BUY" : "SELL";
@@ -133,10 +156,8 @@ void SyncOpenPositions()
       double curPrice  = (direction == "BUY") ? MarketInfo(symbol, MODE_ASK) : MarketInfo(symbol, MODE_BID);
 
       datetime utcOpenTime = openTime - timezoneOffset;
-
       int digits = (int)MarketInfo(symbol, MODE_DIGITS);
 
-      // Calculate live pips
       double pipSize = MathPow(10, -digits);
       if (digits == 3 || digits == 5)
          pipSize *= 10;
@@ -150,13 +171,11 @@ void SyncOpenPositions()
             pips = (openPrice - curPrice) / pipSize;
       }
 
-      // R-multiple (price-based)
       double entryRisk = MathAbs(openPrice - sl);
       double rMultiple = 0;
       if (entryRisk > 0)
       {
-         double exitPrice = curPrice;
-         double reward = (direction == "BUY") ? (exitPrice - openPrice) : (openPrice - exitPrice);
+         double reward = (direction == "BUY") ? (curPrice - openPrice) : (openPrice - curPrice);
          rMultiple = reward / entryRisk;
       }
 
@@ -185,17 +204,13 @@ void SyncOpenPositions()
    }
 
    jsonPayload += "]";
-
-   if (count == 0) return;
-
-   if (SendToApi(jsonPayload))
-      Print("Synced ", count, " open position(s).");
+   return jsonPayload;
 }
 
 //+------------------------------------------------------------------+
-//| Sync closed trades from order history                             |
+//| Build JSON for closed trades (no API call)                        |
 //+------------------------------------------------------------------+
-void SyncClosedTrades()
+string BuildClosedTradesJson()
 {
    datetime fromDate;
    if (g_lastTicket == 0)
@@ -204,7 +219,7 @@ void SyncClosedTrades()
       fromDate = g_lastSyncTime > 0 ? g_lastSyncTime - 86400 : TimeCurrent() - 86400;
 
    int total = OrdersHistoryTotal();
-   if (total == 0) return;
+   if (total == 0) return "[]";
 
    string jsonPayload = "[";
    int newTrades = 0;
@@ -217,10 +232,8 @@ void SyncClosedTrades()
 
       int ticket = (int)OrderTicket();
 
-      // Skip already synced
       if (ticket <= g_lastTicket) continue;
 
-      // Filter by close time
       datetime closeTime = OrderCloseTime();
       if (closeTime < fromDate) continue;
 
@@ -244,7 +257,6 @@ void SyncClosedTrades()
 
       int digits = (int)MarketInfo(symbol, MODE_DIGITS);
 
-      // Pips
       double pipSize = MathPow(10, -digits);
       if (digits == 3 || digits == 5)
          pipSize *= 10;
@@ -258,7 +270,6 @@ void SyncClosedTrades()
             pips = (openPrice - closePrice) / pipSize;
       }
 
-      // R-multiple (price-based)
       double entryRisk = MathAbs(openPrice - sl);
       double rMultiple = 0;
       if (entryRisk > 0)
@@ -295,17 +306,12 @@ void SyncClosedTrades()
 
    jsonPayload += "]";
 
-   if (newTrades == 0) return;
+   if (newTrades == 0) return "[]";
 
-   if (SendToApi(jsonPayload))
-   {
-      g_lastTicket = maxTicket;
-      g_lastSyncTime = TimeCurrent();
-      string gvName = "TradeKav_LastTicket_" + IntegerToString(InpAccountId);
-      GlobalVariableSet(gvName, g_lastTicket);
+   g_lastTicket = maxTicket;
+   g_lastSyncTime = TimeCurrent();
 
-      Print("Synced ", newTrades, " closed trade(s). Last ticket: ", g_lastTicket);
-   }
+   return jsonPayload;
 }
 
 //+------------------------------------------------------------------+
@@ -374,7 +380,6 @@ string GetChartDataJson(string symbol, datetime openTime, datetime closeTime, in
    datetime curTime = TimeCurrent();
    datetime end = (closeTime == 0) ? curTime : closeTime;
 
-   // Determine appropriate timeframe based on trade duration
    ENUM_TIMEFRAMES timeframe = PERIOD_M1;
    long duration = (long)(end - openTime);
 
@@ -393,7 +398,6 @@ string GetChartDataJson(string symbol, datetime openTime, datetime closeTime, in
    int copied = CopyRates(symbol, timeframe, startSearch, endSearch, rates);
    if (copied <= 0) return "null";
 
-   // Limit to max 120 bars, center around the trade
    int startIdx = 0;
    int endIdx = copied - 1;
    if (copied > 120)
