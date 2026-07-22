@@ -189,7 +189,19 @@
     "showingRange": "نمایش {start} تا {end} از {total} معامله",
     "pageIndicator": "صفحه {current} از {total}",
     "prevPage": "قبلی",
-    "nextPage": "بعدی"
+    "nextPage": "بعدی",
+    "importSource": {
+      "MANUAL": "دستی",
+      "MT4_CSV": "MT4 CSV",
+      "MT4_HTM": "MT4 HTM",
+      "MT5_CSV": "MT5 CSV",
+      "MT5_EA": "MT5 EA",
+      "CRYPTO_API": "API ارز دیجیتال"
+    },
+    "accountType": {
+      "DEMO": "دمو",
+      "LIVE": "حقیقی"
+    }
   },
   "settings": {
     "title": "تنظیمات",
@@ -214,6 +226,7 @@
     "brokerName": "نام بروکر",
     "accountNumber": "شماره حساب",
     "accountCurrency": "ارز حساب",
+    "accountType": "نوع حساب",
     "newImport": "واردات جدید",
     "edit": "ویرایش",
     "delete": "حذف",

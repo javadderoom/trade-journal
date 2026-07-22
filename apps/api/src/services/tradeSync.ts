@@ -387,6 +387,8 @@ export async function getTradesForAccount(params: {
       chart_data: true,
       analysis_timeframe: true,
       entry_timeframe: true,
+      import_source: true,
+      account: { select: { account_type: true } },
     },
   });
 
@@ -415,5 +417,7 @@ export async function getTradesForAccount(params: {
     chartData: t.chart_data,
     analysisTimeframe: t.analysis_timeframe,
     entryTimeframe: t.entry_timeframe,
+    importSource: t.import_source,
+    accountType: t.account.account_type,
   }));
 }

@@ -189,7 +189,19 @@
     "showingRange": "Showing {start} to {end} of {total} trades",
     "pageIndicator": "Page {current} of {total}",
     "prevPage": "Previous",
-    "nextPage": "Next"
+    "nextPage": "Next",
+    "importSource": {
+      "MANUAL": "Manual",
+      "MT4_CSV": "MT4 CSV",
+      "MT4_HTM": "MT4 HTM",
+      "MT5_CSV": "MT5 CSV",
+      "MT5_EA": "MT5 EA",
+      "CRYPTO_API": "Crypto API"
+    },
+    "accountType": {
+      "DEMO": "Demo",
+      "LIVE": "Live"
+    }
   },
   "settings": {
     "title": "Settings",
@@ -214,6 +226,7 @@
     "brokerName": "Broker Name",
     "accountNumber": "Account Number",
     "accountCurrency": "Account Currency",
+    "accountType": "Account Type",
     "newImport": "New Import",
     "edit": "Edit",
     "delete": "Delete",

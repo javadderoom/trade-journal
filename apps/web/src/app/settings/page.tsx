@@ -27,6 +27,7 @@ interface BrokerAccount {
   broker_name: string | null;
   account_number: string | null;
   currency: string;
+  account_type: string;
   created_at: string;
   trade_count: number;
   last_import: string | null;
@@ -167,8 +168,9 @@ export default function SettingsPage() {
     broker_name: '',
     account_number: '',
     currency: 'USD',
+    account_type: 'LIVE',
   });
-  const [editAccount, setEditAccount] = useState({ broker_name: '', account_number: '', currency: 'USD' });
+  const [editAccount, setEditAccount] = useState({ broker_name: '', account_number: '', currency: 'USD', account_type: 'LIVE' });
 
   // ─── Subscription state ──────────────────────────────────────────────────
   const [subscription, setSubscription] = useState<any>(null);
@@ -335,7 +337,7 @@ export default function SettingsPage() {
     try {
       await api.post('/api/settings/accounts', newAccount);
       setShowAddAccount(false);
-      setNewAccount({ broker_name: '', account_number: '', currency: 'USD' });
+      setNewAccount({ broker_name: '', account_number: '', currency: 'USD', account_type: 'LIVE' });
       fetchAccounts();
       notify.success(t('settings.accountCreateSuccess'));
     } catch (err: any) {
@@ -750,6 +752,18 @@ export default function SettingsPage() {
                           ))}
                         </div>
                       </div>
+                      <div className="form-field">
+                        <label>{t('settings.accountType')}</label>
+                        <div className="toggle-group">
+                          {['DEMO', 'LIVE'].map((t2) => (
+                            <button
+                              key={t2}
+                              className={`toggle-btn ${editAccount.account_type === t2 ? 'active' : ''}`}
+                              onClick={() => setEditAccount({ ...editAccount, account_type: t2 })}
+                            >{t(`trades.accountType.${t2}`)}</button>
+                          ))}
+                        </div>
+                      </div>
                     </div>
                     <div className="broker-edit-actions">
                       <button className="settings-save-btn" onClick={() => handleUpdateAccount(acc.id)}>{t('settings.save')}</button>
@@ -765,6 +779,10 @@ export default function SettingsPage() {
                         <h4>{acc.broker_name || (language === 'fa' ? 'نامشخص' : 'Unknown')}</h4>
                         <span>{language === 'fa' ? 'حساب شماره' : 'Account No'}: {acc.account_number ? `#${acc.account_number}` : (language === 'fa' ? 'نامشخص' : 'Unknown')}</span>
                         <span>{language === 'fa' ? 'ارز' : 'Currency'}: {acc.currency}</span>
+                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                          <span className={`material-symbols-outlined`} style={{ fontSize: '14px' }}>{acc.account_type === 'DEMO' ? 'science' : 'account_balance'}</span>
+                          {t(`trades.accountType.${acc.account_type || 'LIVE'}`)}
+                        </span>
                         <span>{formatNum(acc.trade_count)} {t('trades.tradeUnit')}</span>
                       </div>
                     </div>
@@ -805,6 +823,7 @@ export default function SettingsPage() {
                               broker_name: acc.broker_name || '',
                               account_number: acc.account_number || '',
                               currency: acc.currency,
+                              account_type: acc.account_type || 'LIVE',
                             });
                           }}>{t('settings.edit')}</button>
                           <button 
@@ -903,6 +922,18 @@ export default function SettingsPage() {
                           className={`toggle-btn ${newAccount.currency === c ? 'active' : ''}`}
                           onClick={() => setNewAccount({ ...newAccount, currency: c })}
                         >{c}</button>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="form-field">
+                    <label>{t('settings.accountType')}</label>
+                    <div className="toggle-group">
+                      {['DEMO', 'LIVE'].map((t2) => (
+                        <button
+                          key={t2}
+                          className={`toggle-btn ${newAccount.account_type === t2 ? 'active' : ''}`}
+                          onClick={() => setNewAccount({ ...newAccount, account_type: t2 })}
+                        >{t(`trades.accountType.${t2}`)}</button>
                       ))}
                     </div>
                   </div>

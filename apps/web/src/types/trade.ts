@@ -23,4 +23,6 @@ export interface Trade {
   chartData?: any;
   analysisTimeframe?: string | null;
   entryTimeframe?: string | null;
+  importSource?: string;
+  accountType?: string;
 }

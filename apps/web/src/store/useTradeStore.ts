@@ -252,8 +252,10 @@ export const useTradeStore = create<TradeState>((set, get) => ({
             notes: item.notes ?? null,
             screenshots: item.screenshots ?? [],
             chartData: item.chartData ?? null,
-            analysisTimeframe: item.analysisTimeframe ?? null,
-            entryTimeframe: item.entryTimeframe ?? null,
+    analysisTimeframe: item.analysisTimeframe ?? null,
+    entryTimeframe: item.entryTimeframe ?? null,
+    importSource: item.importSource ?? null,
+    accountType: item.accountType ?? null,
           };
         });
         set({ trades: mapped, error: null });

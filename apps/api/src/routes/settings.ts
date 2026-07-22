@@ -330,6 +330,7 @@ router.get('/accounts', authenticate, async (req: AuthRequest, res: Response) =>
       broker_name: acc.broker_name,
       account_number: acc.account_number,
       currency: acc.currency,
+      account_type: acc.account_type,
       created_at: acc.created_at,
       trade_count: acc._count.trades,
       last_import: acc.trades[0]?.created_at || null,
@@ -348,7 +349,7 @@ router.get('/accounts', authenticate, async (req: AuthRequest, res: Response) =>
 router.post('/accounts', authenticate, checkAccountLimit, async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user!.userId;
-    const { broker_name, account_number, currency, description } = req.body;
+    const { broker_name, account_number, currency, description, account_type } = req.body;
 
     if (!broker_name) {
       return res.status(400).json({ error: 'نام بروکر الزامی است' });
@@ -360,6 +361,7 @@ router.post('/accounts', authenticate, checkAccountLimit, async (req: AuthReques
         broker_name,
         account_number: account_number || null,
         currency: currency || 'USD',
+        account_type: account_type === 'DEMO' ? 'DEMO' : 'LIVE',
       },
     });
 
@@ -377,7 +379,7 @@ router.put('/accounts/:id', authenticate, async (req: AuthRequest, res: Response
   try {
     const accountId = req.params.id as string;
     const userId = req.user!.userId;
-    const { broker_name, account_number, currency } = req.body;
+    const { broker_name, account_number, currency, account_type } = req.body;
 
     const account = await prisma.account.findFirst({
       where: { id: accountId, user_id: userId },
@@ -392,6 +394,7 @@ router.put('/accounts/:id', authenticate, async (req: AuthRequest, res: Response
         ...(broker_name !== undefined ? { broker_name } : {}),
         ...(account_number !== undefined ? { account_number } : {}),
         ...(currency !== undefined ? { currency } : {}),
+        ...(account_type !== undefined ? { account_type: account_type === 'DEMO' ? 'DEMO' : 'LIVE' } : {}),
       },
     });
 

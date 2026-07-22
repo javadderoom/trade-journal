@@ -48,6 +48,7 @@ model Account {
   broker_name        String?
   account_number     String?
   currency           String              @default("USD")
+  account_type       AccountType         @default(LIVE)
   created_at         DateTime            @default(now())
   trades             Trade[]
   importJobs         ImportJob[]
@@ -315,6 +316,11 @@ enum ImportSource {
   MT5_CSV
   MT5_EA
   CRYPTO_API
+}
+
+enum AccountType {
+  DEMO
+  LIVE
 }
 
 enum ImportStatus {

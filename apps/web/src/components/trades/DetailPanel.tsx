@@ -506,10 +506,26 @@ export default function DetailPanel({
                       onChange={e => updateActiveTradeField('swap', parseFloat(normalizeNumericInput(e.target.value)) || 0)}
                      style={inputStyle}
                    />
-                 </span>
-               </div>
+                  </span>
+                </div>
 
-               {!activeTrade.closeTime ? (
+                {/* Read-only metadata badges */}
+                <div style={{ display: 'flex', gap: '8px', marginTop: '12px', flexWrap: 'wrap' }}>
+                  {activeTrade.importSource && (
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '4px 10px', borderRadius: '6px', fontSize: '12px', fontWeight: 500, background: 'rgba(97, 249, 177, 0.1)', color: '#61f9b1', border: '1px solid rgba(97, 249, 177, 0.2)' }}>
+                      <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>input</span>
+                      {t(`trades.importSource.${activeTrade.importSource}`)}
+                    </span>
+                  )}
+                  {activeTrade.accountType && (
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '4px 10px', borderRadius: '6px', fontSize: '12px', fontWeight: 500, background: activeTrade.accountType === 'DEMO' ? 'rgba(255, 180, 171, 0.1)' : 'rgba(97, 249, 177, 0.1)', color: activeTrade.accountType === 'DEMO' ? '#ffb4ab' : '#61f9b1', border: `1px solid ${activeTrade.accountType === 'DEMO' ? 'rgba(255, 180, 171, 0.2)' : 'rgba(97, 249, 177, 0.2)'}` }}>
+                      <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>{activeTrade.accountType === 'DEMO' ? 'science' : 'account_balance'}</span>
+                      {t(`trades.accountType.${activeTrade.accountType}`)}
+                    </span>
+                  )}
+                </div>
+
+                {!activeTrade.closeTime ? (
                   <button
                     type="button"
                     className="btn btn-primary"
