@@ -14,9 +14,11 @@
   "dependencies": {
     "@prisma/adapter-pg": "^7.8.0",
     "@prisma/client": "^7.8.0",
+    "@types/compression": "^1.8.1",
     "@types/pdfkit": "^0.17.6",
     "bcryptjs": "^3.0.3",
     "ccxt": "^4.5.64",
+    "compression": "^1.8.1",
     "cookie-parser": "^1.4.7",
     "csv-parser": "^3.2.1",
     "depd": "^2.0.0",

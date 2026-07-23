@@ -11,6 +11,7 @@ if (_envResult.error) {
 import path from 'node:path';
 import express from 'express';
 import cookieParser from 'cookie-parser';
+import compression from 'compression';
 import cron from 'node-cron';
 import { prisma } from './services/tradeSync';
 import tradeSyncRouter from './routes/tradeSync';
@@ -32,6 +33,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Middleware
+app.use(compression());
 app.use(express.json({ limit: '2mb' }));
 app.use(cookieParser());
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
@@ -132,33 +134,31 @@ cron.schedule('*/5 * * * *', async () => {
       }
     });
 
-    for (const conn of activeConnections) {
-      try {
-        const plan = conn.account.user.plan;
+    const chunkSize = 5;
+    for (let i = 0; i < activeConnections.length; i += chunkSize) {
+      const chunk = activeConnections.slice(i, i + chunkSize);
+      await Promise.all(
+        chunk.map(async (conn) => {
+          try {
+            const plan = conn.account.user.plan;
+            if (plan === 'FREE') return;
 
-        if (plan === 'FREE') {
-          // Skip FREE users in background sync
-          continue;
-        }
+            const lastSync = conn.account.last_sync_at;
+            const now = new Date();
 
-        const lastSync = conn.account.last_sync_at;
-        const now = new Date();
+            if (plan === 'STANDARD') {
+              const oneHourAgo = new Date(now.getTime() - 55 * 60 * 1000);
+              if (lastSync && lastSync > oneHourAgo) return;
+            }
 
-        if (plan === 'STANDARD') {
-          const oneHourAgo = new Date(now.getTime() - 55 * 60 * 1000); // 55 mins threshold for hourly standard sync
-          if (lastSync && lastSync > oneHourAgo) {
-            // Not enough time has elapsed for Standard plan users
-            continue;
+            console.log(`[Cron] Syncing trades for account ${conn.account_id} (${conn.exchange_id}) - Plan: ${plan}...`);
+            const syncRes = await syncExchangeTrades(conn.account.user_id, conn.account_id);
+            console.log(`[Cron] Sync finished for account ${conn.account_id}: created ${syncRes.created}, skipped ${syncRes.skipped}`);
+          } catch (syncErr: any) {
+            console.error(`[Cron] Failed to sync exchange connection for account ${conn.account_id}:`, syncErr);
           }
-        }
-
-        // PRO users sync every 5 minutes (every cron run)
-        console.log(`[Cron] Syncing trades for account ${conn.account_id} (${conn.exchange_id}) - Plan: ${plan}...`);
-        const syncRes = await syncExchangeTrades(conn.account.user_id, conn.account_id);
-        console.log(`[Cron] Sync finished for account ${conn.account_id}: created ${syncRes.created}, skipped ${syncRes.skipped}`);
-      } catch (syncErr: any) {
-        console.error(`[Cron] Failed to sync exchange connection for account ${conn.account_id}:`, syncErr);
-      }
+        })
+      );
     }
   } catch (err) {
     console.error('[Cron] Exchange sync scheduler failed:', err);

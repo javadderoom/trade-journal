@@ -2500,8 +2500,17 @@ input[type="checkbox"] {
 
  // Mobile adjustments
  @media (max-width: 768px) {
+   .trades-workspace {
+     height: auto !important;
+     min-height: 100%;
+     overflow: visible !important;
+   }
+
    .trades-main-content {
      padding: 16px;
+     overflow-y: visible !important;
+     height: auto !important;
+     min-height: auto !important;
    }
 
    .trades-page-header {
@@ -2638,6 +2647,7 @@ input[type="checkbox"] {
      gap: 12px;
      cursor: pointer;
      position: relative;
+     overflow: hidden;
      transition: border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
 
      &:hover {
@@ -2653,13 +2663,12 @@ input[type="checkbox"] {
        &::before {
          content: '';
          position: absolute;
-         right: 0;
          top: 0;
          bottom: 0;
          width: 4px;
          background-color: $primary;
-         border-top-right-radius: 12px;
-         border-bottom-right-radius: 12px;
+         right: 0;
+         left: auto;
        }
      }
 
@@ -2670,16 +2679,22 @@ input[type="checkbox"] {
        &::before {
          content: '';
          position: absolute;
-         right: 0;
          top: 0;
          bottom: 0;
          width: 4px;
          background-color: $secondary;
-         border-top-right-radius: 12px;
-         border-bottom-right-radius: 12px;
+         right: 0;
+         left: auto;
          box-shadow: 0 0 8px rgba($secondary, 0.5);
          animation: border-glow 2s ease-in-out infinite;
        }
+     }
+
+     // LTR (English) accent bar position override
+     [dir="ltr"] &.active-card::before,
+     [dir="ltr"] &.open-card::before {
+       left: 0;
+       right: auto;
      }
 
      .card-top-row {

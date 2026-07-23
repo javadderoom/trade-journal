@@ -157,7 +157,10 @@ label.small {
     margin-right: 0;
     width: 100%;
     padding-bottom: 96px;
-    overflow: hidden;
+    overflow-x: hidden;
+    overflow-y: visible;
+    min-height: 100dvh;
+    box-sizing: border-box;
   }
 }
 
@@ -177,7 +180,10 @@ label.small {
     .main-content-wrapper {
       margin-left: 0;
       width: 100%;
-      overflow: hidden;
+      overflow-x: hidden;
+      overflow-y: visible;
+      min-height: 100dvh;
+      box-sizing: border-box;
     }
   }
 }

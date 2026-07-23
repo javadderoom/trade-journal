@@ -70,7 +70,15 @@ router.get('/', authenticate, async (req: AuthRequest, res: Response) => {
     const limit = limitRaw ? Number.parseInt(limitRaw, 10) : undefined;
     const offset = offsetRaw ? Number.parseInt(offsetRaw, 10) : undefined;
 
-    const items = await getTradesForAccount({ userId, accountId, limit, offset, sortKey, sortDir });
+    const items = await getTradesForAccount({
+      userId,
+      accountId,
+      limit,
+      offset,
+      sortKey,
+      sortDir,
+      plan: req.user?.plan,
+    });
 
     res.status(200).json({
       items,

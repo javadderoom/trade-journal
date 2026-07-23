@@ -318,6 +318,7 @@ export async function getTradesForAccount(params: {
   offset?: number;
   sortKey?: string;
   sortDir?: 'asc' | 'desc';
+  plan?: string;
 }): Promise<TradeListRow[]> {
   const { userId, accountId } = params;
   const limit = Math.min(Math.max(params.limit ?? 100, 1), 500);
@@ -337,13 +338,15 @@ export async function getTradesForAccount(params: {
   const sortCol = sortColumnMap[params.sortKey || ''] || 'open_time';
   const sortDir = params.sortDir === 'asc' ? 'asc' : 'desc';
 
-  // Retrieve user plan to apply historical limit
-  const user = await prisma.user.findUnique({
-    where: { id: userId },
-    select: { plan: true },
-  });
+  let plan = params.plan;
+  if (!plan) {
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { plan: true },
+    });
+    plan = user?.plan || 'FREE';
+  }
 
-  const plan = user?.plan || 'FREE';
   let dateLimit: Date | null = null;
   if (plan === 'FREE') {
     dateLimit = new Date();

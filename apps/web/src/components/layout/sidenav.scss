@@ -280,6 +280,17 @@
     display: none; // Hide on mobile/tablet view
   }
 }
+// Dimmed background overlay when navbar is expanded
+.bottom-nav-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  z-index: 998;
+  animation: fadeIn 0.2s ease-out forwards;
+}
+
 // Bottom navigation bar for mobile view
 .bottom-nav-container {
   display: none;
@@ -291,23 +302,160 @@
     bottom: calc(12px + env(safe-area-inset-bottom, 0px));
     left: 16px;
     right: 16px;
-    height: 68px;
-    background: rgba($surface-container, 0.85);
+    background: rgba($surface-container, 0.97);
     backdrop-filter: blur(20px) saturate(180%);
     -webkit-backdrop-filter: blur(20px) saturate(180%);
     border: 1px solid rgba($outline-variant, 0.45);
     border-radius: 20px;
     display: flex;
-    justify-content: space-around;
-    align-items: center;
+    flex-direction: column;
     z-index: 1000;
-    padding: 0 4px;
+    padding: 0;
     direction: rtl;
     box-shadow: 
       0 12px 32px -4px rgba(0, 0, 0, 0.6),
       0 4px 12px -2px rgba(0, 0, 0, 0.4),
       0 0 0 1px rgba($primary, 0.03);
-    transition: transform 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+    transition: border-color 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
+
+    &.expanded {
+      border-color: rgba($primary, 0.4);
+      background: rgba($surface-container, 0.99);
+      box-shadow: 
+        0 20px 48px -4px rgba(0, 0, 0, 0.8),
+        0 0 24px rgba($primary, 0.15);
+
+      .bottom-nav-drawer {
+        max-height: 260px;
+        opacity: 1;
+        padding: 16px 16px 12px;
+        border-bottom: 1px solid rgba($outline-variant, 0.3);
+      }
+
+      .bottom-nav-raised-item {
+        background: linear-gradient(135deg, #ef4444, #dc2626) !important;
+        box-shadow: 0 8px 24px -4px rgba(239, 68, 68, 0.5) !important;
+      }
+    }
+
+    // Upper expansion deck (drawer)
+    .bottom-nav-drawer {
+      max-height: 0;
+      opacity: 0;
+      overflow: hidden;
+      transition: max-height 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+                  opacity 0.25s ease,
+                  padding 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      width: 100%;
+      box-sizing: border-box;
+
+      .bottom-nav-drawer-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-bottom: 2px;
+
+        .bottom-nav-drawer-title {
+          font-size: 11px;
+          font-weight: 700;
+          color: $primary;
+          letter-spacing: 0.3px;
+        }
+      }
+
+      .bottom-nav-drawer-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 12px 8px;
+        width: 100%;
+      }
+
+      .bottom-nav-drawer-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 6px;
+        text-decoration: none;
+        color: $on-surface-variant;
+        background: none;
+        border: none;
+        padding: 6px 4px;
+        border-radius: 14px;
+        cursor: pointer;
+        font-family: inherit;
+        outline: none;
+        -webkit-tap-highlight-color: transparent;
+        transition: transform 0.2s ease, color 0.2s ease;
+
+        &:hover {
+          color: $on-surface;
+          .drawer-icon-box {
+            background: rgba($primary, 0.2);
+            border-color: rgba($primary, 0.4);
+            transform: translateY(-2px);
+          }
+        }
+
+        &:active {
+          transform: scale(0.92);
+          .drawer-icon-box {
+            transform: scale(0.92);
+          }
+        }
+
+        &.active {
+          color: $primary;
+          .drawer-icon-box {
+            background: rgba($primary, 0.22);
+            border-color: $primary;
+            color: $primary;
+          }
+        }
+
+        .drawer-icon-box {
+          width: 46px;
+          height: 46px;
+          border-radius: 16px;
+          background: rgba($surface-container, 0.85);
+          border: 1px solid rgba($outline-variant, 0.4);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: $on-surface;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+          transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+
+          .icon {
+            font-size: 22px;
+          }
+        }
+
+        .drawer-label {
+          font-size: 10px;
+          font-weight: 500;
+          font-family: $font-primary;
+          text-align: center;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          max-width: 100%;
+        }
+      }
+    }
+
+    // Main 5-item Nav Row
+    .bottom-nav-main-row {
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      height: 68px;
+      width: 100%;
+      padding: 0 4px;
+      box-sizing: border-box;
+    }
 
     .bottom-nav-item {
       flex: 1;
@@ -407,7 +555,7 @@
         transition: transform 0.22s cubic-bezier(0.23, 1, 0.32, 1),
                     box-shadow 0.22s cubic-bezier(0.23, 1, 0.32, 1),
                     background 0.22s ease;
-        border: 3px solid $surface-container; // Blends perfectly with $surface-container and blur back
+        border: 3px solid $surface-container;
 
         .icon {
           font-size: 24px;
@@ -443,119 +591,6 @@
         }
       }
     }
-  }
-}
-
-// Radial menu — half-circle arc above FAB with rotation animation
-.radial-menu-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.4);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
-  z-index: 999;
-  animation: fadeIn 0.2s ease;
-}
-
-.radial-menu-container {
-  position: fixed;
-  // Position at the FAB center (nav bottom 12px + nav height 68px + FAB raised 26px + FAB half 27px)
-  bottom: calc(17px + env(safe-area-inset-bottom, 0px) + 68px + 26px + 27px);
-  left: 50%;
-  transform: translateX(-50%);
-  width: 0;
-  height: 0;
-  z-index: 1000;
-  direction: ltr; // Prevent RTL from shifting the centering
-  // The container itself rotates in
-  animation: radialArcIn 0.35s cubic-bezier(0.23, 1, 0.32, 1) both;
-}
-
-.radial-menu-item {
-  position: absolute;
-  // Each item is offset by its arc angle from the top (negative Y = upward)
-  // Using CSS custom property --item-angle set per item
-  transform:
-    rotate(var(--item-angle, 0deg))
-    translateY(-72px)
-    rotate(calc(-1 * var(--item-angle, 0deg)));
-  transform-origin: center center;
-  // Staggered entrance
-  animation: radialItemArcIn 0.3s cubic-bezier(0.23, 1, 0.32, 1) both;
-  animation-delay: var(--item-delay, 0ms);
-
-  // Shift items up so their center aligns with the arc radius
-  margin-left: -28px;
-
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-  text-decoration: none;
-  color: $on-surface-variant;
-  -webkit-tap-highlight-color: transparent;
-
-  // Reset default button styling for onClick items
-  background: none;
-  border: none;
-  padding: 0;
-  cursor: pointer;
-  font: inherit;
-  outline: none;
-
-  &:hover {
-    color: $on-surface;
-    .radial-menu-icon-wrapper {
-      background: rgba($primary, 0.2);
-      transform: scale(1.1);
-    }
-  }
-
-  &:active {
-    .radial-menu-icon-wrapper {
-      transform: scale(0.92);
-    }
-  }
-
-  &.active {
-    color: $primary;
-    .radial-menu-icon-wrapper {
-      background: rgba($primary, 0.25);
-    }
-  }
-}
-
-.radial-menu-icon-wrapper {
-  width: 52px;
-  height: 52px;
-  border-radius: 50%;
-  background: rgba($surface-container, 0.95);
-  backdrop-filter: blur(16px) saturate(180%);
-  -webkit-backdrop-filter: blur(16px) saturate(180%);
-  border: 1px solid rgba($outline-variant, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow:
-    0 8px 24px -4px rgba(0, 0, 0, 0.5),
-    0 4px 10px -2px rgba(0, 0, 0, 0.3);
-  transition: transform 0.2s cubic-bezier(0.23, 1, 0.32, 1), background 0.2s ease;
-
-  .material-symbols-outlined {
-    font-size: 24px;
-  }
-}
-
-.radial-menu-label {
-  font-size: 11px;
-  font-weight: 600;
-  font-family: $font-primary;
-  white-space: nowrap;
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
-
-  .radial-menu-item.active & {
-    font-weight: 700;
-    color: $primary;
   }
 }
 

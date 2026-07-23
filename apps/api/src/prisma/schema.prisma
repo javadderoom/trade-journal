@@ -55,6 +55,8 @@ model Account {
   account_tokens     AccountToken[]
   last_sync_at       DateTime?
   exchangeConnection ExchangeConnection?
+
+  @@index([user_id])
 }
 
 model RefreshToken {
@@ -119,6 +121,8 @@ model Trade {
   @@index([account_id])
   @@index([open_time])
   @@index([user_id, open_time])
+  @@index([user_id, account_id, open_time])
+  @@index([user_id, close_time])
   mistakeIncidents MistakeIncident[]
 }
 
@@ -139,6 +143,7 @@ model Execution {
   notes       String?
 
   @@index([trade_id])
+  @@index([trade_id, type])
   @@index([executed_at])
 }
 
@@ -430,6 +435,8 @@ model Conversation {
   @@index([user_id])
   @@index([status])
   @@index([assigned_admin_id])
+  @@index([user_id, updated_at])
+  @@index([status, updated_at])
 }
 
 model Message {

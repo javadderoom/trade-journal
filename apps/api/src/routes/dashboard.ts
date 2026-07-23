@@ -378,16 +378,7 @@ router.get('/summary', authenticate, async (req: AuthRequest, res: Response) => 
     const accountId = (req.query.accountId as string | undefined) || 'all';
     const locale = (req.query.locale as string) || 'fa';
 
-    const user = await prisma.user.findUnique({
-      where: { id: userId },
-      select: { plan: true },
-    });
-
-    if (!user) {
-      return res.status(404).json({ error: 'کاربر یافت نشد' });
-    }
-
-    const plan = user.plan;
+    const plan = req.user?.plan || 'FREE';
     let dateLimit: Date | null = null;
     if (plan === 'FREE') {
       dateLimit = new Date();
@@ -408,37 +399,40 @@ router.get('/summary', authenticate, async (req: AuthRequest, res: Response) => 
     const todayStr = getTehranDateStr(now);
     const monthStr = getTehranMonthStr(now);
 
-    // ─── Fetch user trades — limited to last 5000 for performance ────
-    const allTrades = await prisma.trade.findMany({
-      where: accountWhere,
-      orderBy: { open_time: 'desc' },
-      take: 5000,
-      select: {
-        id: true,
-        account_id: true,
-        ticket: true,
-        symbol: true,
-        direction: true,
-        open_time: true,
-        close_time: true,
-        open_price: true,
-        close_price: true,
-        lot_size: true,
-        stop_loss: true,
-        take_profit: true,
-        profit_usd: true,
-        commission: true,
-        swap: true,
-        pips: true,
-        r_multiple: true,
-        tags: true,
-        emotion: true,
-        notes: true,
-        import_source: true,
-        analysis_timeframe: true,
-        entry_timeframe: true,
-      },
-    });
+    // ─── Fetch user trades and total count in parallel ────
+    const [allTrades, totalTrades] = await Promise.all([
+      prisma.trade.findMany({
+        where: accountWhere,
+        orderBy: { open_time: 'desc' },
+        take: 2000,
+        select: {
+          id: true,
+          account_id: true,
+          ticket: true,
+          symbol: true,
+          direction: true,
+          open_time: true,
+          close_time: true,
+          open_price: true,
+          close_price: true,
+          lot_size: true,
+          stop_loss: true,
+          take_profit: true,
+          profit_usd: true,
+          commission: true,
+          swap: true,
+          pips: true,
+          r_multiple: true,
+          tags: true,
+          emotion: true,
+          notes: true,
+          import_source: true,
+          analysis_timeframe: true,
+          entry_timeframe: true,
+        },
+      }),
+      prisma.trade.count({ where: accountWhere }),
+    ]);
 
     // ─── SECTION 1: TODAY ──────────────────────────────────────────────────────
     const todayTrades = allTrades.filter((t) => {
@@ -627,8 +621,6 @@ router.get('/summary', authenticate, async (req: AuthRequest, res: Response) => 
     };
 
     // ─── Total trade count (for empty-state decisions) ────────────────────────
-    const totalTrades = allTrades.length;
-
     return res.status(200).json({
       today,
       month,
