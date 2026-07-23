@@ -4,6 +4,8 @@ import React, { useState, useCallback } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useTranslation } from '../../store/useAppStore';
+import { useAuthStore } from '../../lib/auth';
+import { notify } from '../../lib/notify';
 import RadialMenu, { RadialMenuItem } from './RadialMenu';
 
 export default function BottomNavBar() {
@@ -16,9 +18,24 @@ export default function BottomNavBar() {
   const isDashboardActive = pathname === '/dashboard' || pathname === '/';
   const isSettingsActive = pathname === '/settings';
 
+  const logout = useAuthStore((state) => state.logout);
+
   const toggleLanguage = useCallback(() => {
     setLanguage(language === 'fa' ? 'en' : 'fa');
   }, [language, setLanguage]);
+
+  const handleLogout = useCallback(async () => {
+    const ok = await notify.confirm({
+      title: language === 'fa' ? 'خروج از حساب کاربری' : 'Log Out of Account',
+      message:
+        language === 'fa'
+          ? 'آیا برای خروج از حساب کاربری خود اطمینان دارید؟'
+          : 'Are you sure you want to log out of your account?',
+      confirmLabel: language === 'fa' ? 'خروج' : 'Log Out',
+      cancelLabel: language === 'fa' ? 'لغو' : 'Cancel',
+    });
+    if (ok) await logout();
+  }, [language, logout]);
 
   const langLabel = language === 'fa' ? 'English' : 'فارسی';
   const langIcon = language === 'fa' ? 'translate' : 'translate';
@@ -27,6 +44,7 @@ export default function BottomNavBar() {
     { href: '/support', label: t('nav.support'), icon: 'contact_support' },
     { href: '/dashboard', label: t('nav.dashboard'), icon: 'dashboard' },
     { label: langLabel, icon: langIcon, onClick: toggleLanguage },
+    { label: t('common.logout'), icon: 'logout', onClick: handleLogout },
   ];
 
   const closeMenu = useCallback(() => setMenuOpen(false), []);
