@@ -43,6 +43,16 @@ function setCookie(name: string, value: string, days = 365) {
   document.cookie = `${name}=${value};expires=${date.toUTCString()};path=/`;
 }
 
+function getInitialLanguage(): 'fa' | 'en' {
+  if (typeof window !== 'undefined') {
+    const saved = localStorage.getItem('language') as 'fa' | 'en' | null;
+    if (saved === 'en' || saved === 'fa') return saved;
+    const match = document.cookie.match(/(?:^|; )locale=([^;]*)/);
+    if (match && (match[1] === 'en' || match[1] === 'fa')) return match[1] as 'fa' | 'en';
+  }
+  return 'fa';
+}
+
 export const useAppStore = create<AppState>((set) => ({
   // Initial states
   accounts: [],
@@ -52,7 +62,7 @@ export const useAppStore = create<AppState>((set) => ({
   activeTradeId: null,
   isManualTradeModalOpen: false,
   isImportMT4ModalOpen: false,
-  language: 'fa', // Default to fa for SSR hydration safety
+  language: getInitialLanguage(),
 
   // Setters
   setAccounts: (accounts) => set({ accounts }),

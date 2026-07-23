@@ -12,6 +12,7 @@ import Link from 'next/link';
 import { useSubscriptionStatus } from '../../hooks/useSubscriptionStatus';
 import SubscriptionBanners from '../../components/SubscriptionBanners';
 import { useExchangeRate } from '../../hooks/useExchangeRate';
+import PageLoader from '../../components/ui/PageLoader';
 import './dashboard.scss';
 
 // ─── Types matching the /api/dashboard/summary response ────────────────────────
@@ -121,10 +122,7 @@ export default function DashboardPage() {
   if (isLoading && !data) {
     return (
       <main className="dashboard-page">
-        <div className="dash-loading">
-          <div className="dash-spinner" />
-          <span>{t('common.loading')}</span>
-        </div>
+        <PageLoader />
       </main>
     );
   }

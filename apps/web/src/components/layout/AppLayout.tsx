@@ -9,6 +9,7 @@ import { useAuthStore } from '../../lib/auth';
 import { fetcher } from '../../lib/api';
 import { useTranslation } from '../../store/useAppStore';
 import Toaster from '../ui/Toaster';
+import PageLoader from '../ui/PageLoader';
 import { Agentation } from 'agentation';
 
 const swrConfigValue = {
@@ -181,13 +182,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         justifyContent: 'center',
         height: '100vh',
         background: '#0B0F19',
-        color: '#E2E8F0',
-        fontFamily: 'Vazirmatn, sans-serif'
       }}>
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem' }}>
-          <div className="dash-spinner" />
-          <span style={{ fontSize: '0.9rem', color: '#94A3B8' }}>{language === 'en' ? 'Loading TradeKav...' : 'در حال بارگذاری تریدکاو...'}</span>
-        </div>
+        <PageLoader fullScreen minHeight="100vh" />
       </div>
     );
   }
