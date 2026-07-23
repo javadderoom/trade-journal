@@ -2,7 +2,8 @@
 
 import React, { useEffect, useState, useMemo, useCallback, memo } from 'react';
 import { useRouter } from 'next/navigation';
-import { api } from '../../lib/api';
+import useSWR from 'swr';
+import { api, fetcher } from '../../lib/api';
 import { useAuthStore } from '../../lib/auth';
 import { useAppStore, useTranslation } from '../../store/useAppStore';
 import { toPersianDigits, formatPersianCurrency, formatToman } from '../../utils/farsi';
@@ -55,9 +56,6 @@ export default function DashboardPage() {
   const { accounts, selectedAccountId, setSelectedAccountId, usdToToman, setUsdToToman } = useAppStore();
   const { t, language } = useTranslation();
 
-  const [data, setData] = useState<DashboardData | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [edgeRefreshSpin, setEdgeRefreshSpin] = useState(false);
   const { subStatus, dismissedRejectionId, setDismissedRejectionId } = useSubscriptionStatus();
 
@@ -75,29 +73,15 @@ export default function DashboardPage() {
     }
   }, []);
 
-  const fetchDashboard = useCallback(async (signal?: AbortSignal) => {
-    try {
-      setLoading(true);
-      setError(null);
-      const res = await api.get(
-        `/api/dashboard/summary?accountId=${selectedAccountId}&locale=${language}&t=${Date.now()}`,
-        { signal }
-      );
-      setData(res.data);
-    } catch (err: any) {
-      if (err?.name === 'CanceledError' || err?.code === 'ERR_CANCELED') return;
-      console.error('Dashboard fetch error:', err);
-      setError(err.message || t('dashboard.errorOccurred'));
-    } finally {
-      setLoading(false);
+  const dashboardKey = `/api/dashboard/summary?accountId=${selectedAccountId}&locale=${language}`;
+  const { data, error, isLoading, mutate: refetchDashboard } = useSWR<DashboardData>(
+    dashboardKey,
+    fetcher,
+    {
+      revalidateOnFocus: false,
+      dedupingInterval: 5000,
     }
-  }, [selectedAccountId, language, t]);
-
-  useEffect(() => {
-    const controller = new AbortController();
-    fetchDashboard(controller.signal);
-    return () => controller.abort();
-  }, [fetchDashboard]);
+  );
 
   const liveRate = useExchangeRate();
   useEffect(() => {
@@ -129,12 +113,12 @@ export default function DashboardPage() {
 
   const handleRefreshEdge = () => {
     setEdgeRefreshSpin(true);
-    fetchDashboard().finally(() => {
+    refetchDashboard().finally(() => {
       setTimeout(() => setEdgeRefreshSpin(false), 400);
     });
   };
 
-  if (loading && !data) {
+  if (isLoading && !data) {
     return (
       <main className="dashboard-page">
         <div className="dash-loading">
@@ -149,8 +133,8 @@ export default function DashboardPage() {
     return (
       <main className="dashboard-page">
         <div className="dash-loading">
-          <span style={{ color: '#ff5370' }}>{error || t('dashboard.errorOccurred')}</span>
-          <button className="dash-empty-cta-btn" onClick={() => fetchDashboard()}>
+          <span style={{ color: '#ff5370' }}>{error?.message || t('dashboard.errorOccurred')}</span>
+          <button className="dash-empty-cta-btn" onClick={() => refetchDashboard()}>
             {t('dashboard.retry')}
           </button>
         </div>

@@ -187,3 +187,19 @@ label.small {
     }
   }
 }
+
+// Standard Dashboard Spinner Style across the app
+.dash-spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid rgba($primary, 0.15);
+  border-top: 3px solid $primary;
+  border-radius: 50%;
+  animation: dash-spin 0.8s linear infinite;
+}
+
+@keyframes dash-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
