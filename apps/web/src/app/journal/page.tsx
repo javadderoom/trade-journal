@@ -8,6 +8,7 @@ import { useTradeStore } from '../../store/useTradeStore';
 import JournalEditor from '../../components/journal/JournalEditor';
 import { toPersianDigits, formatToman, getJalaliParts, jalaliToGregorian, getJalaliMonthLength } from '../../utils/farsi';
 import { JALALI_MONTH_NAMES, GREGORIAN_MONTH_NAMES, WEEKDAY_NAMES_FA_SHORT, GREGORIAN_WEEKDAY_NAMES_SHORT } from '../../constants/dates';
+import { notify } from '../../lib/notify';
 import './journal.scss';
 
 // --- JALALI CALENDAR HELPERS (Using native Intl API) ---
@@ -151,9 +152,10 @@ export default function JournalPage() {
         mood: currentMood,
       });
       setSaveStatus('saved');
-    } catch (err) {
+    } catch (err: any) {
       console.error('Failed to save journal entry:', err);
       setSaveStatus('error');
+      notify.error(isEn ? 'Failed to auto-save journal entry.' : 'خطا در ذخیره خودکار یادداشت روزانه.');
     }
   };
 

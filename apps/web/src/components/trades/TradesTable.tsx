@@ -463,6 +463,8 @@ export default function TradesTable({
       const success = await onUpdateTrade(activeTrade);
       if (success) {
         notify.success(isEn ? 'Changes saved successfully.' : 'تغییرات با موفقیت ذخیره شد.');
+      } else {
+        notify.error(isEn ? 'Failed to save trade changes. Please try again.' : 'خطا در ذخیره تغییرات معامله. لطفا دوباره تلاش کنید.');
       }
     } else {
       notify.info(isEn ? 'Changes saved locally.' : 'تغییرات به صورت محلی ذخیره شد.');

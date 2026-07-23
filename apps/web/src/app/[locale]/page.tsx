@@ -372,7 +372,7 @@ export default function LandingPage({ params }: PageProps) {
               ) : (
                 <>
                   ژورنال معاملاتی هوشمند <br />
-                  <span className="gradient-text">تریدکاو (TradeKav)</span>
+                  <span className="gradient-text">تریدکاو</span>
                 </>
               )}
             </h1>

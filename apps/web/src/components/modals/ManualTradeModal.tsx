@@ -6,6 +6,7 @@ import { SuggestedMistake } from './MistakeReviewModal';
 import { useTranslation } from '../../store/useAppStore';
 import { getSharedTranslations } from '../../locales/components';
 import { normalizeNumericInput } from '../../utils/farsi';
+import { notify } from '../../lib/notify';
 
 interface ManualTradeModalProps {
   isOpen: boolean;
@@ -126,16 +127,17 @@ export default function ManualTradeModal({ isOpen, onClose, onSuccess }: ManualT
         emotion: null,
         notes: null,
       };
-      onSuccess(optimisticTrade);
-      resetForm();
-      onClose();
 
-      // Server request in background — replace temp with real data
       const res = await api.post('/api/trades', payload);
       const newTrade = res.data;
       onSuccess(newTrade, res.data.suggestedMistakes);
+      notify.success(isEn ? 'Manual trade created successfully.' : 'معامله دستی با موفقیت ثبت شد.');
+      resetForm();
+      onClose();
     } catch (err: any) {
-      setErrorMsg(err.response?.data?.error || err.message || (isEn ? 'Error connecting to server' : 'خطا در اتصال به سرور'));
+      const msg = err.response?.data?.error || err.message || (isEn ? 'Error connecting to server' : 'خطا در اتصال به سرور');
+      setErrorMsg(msg);
+      notify.error(msg);
     } finally {
       setIsSubmitting(false);
     }

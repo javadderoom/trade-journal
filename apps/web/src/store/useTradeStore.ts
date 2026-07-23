@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { mutate } from 'swr';
 import { Trade } from '../components/trades/TradesTable';
 import { api } from '../lib/api';
+import { notify } from '../lib/notify';
 
 export const MOCK_TRADES: Trade[] = [
   {
@@ -308,11 +309,13 @@ export const useTradeStore = create<TradeState>((set, get) => ({
       }
       // Revert on failure
       set({ trades: currentTrades });
+      notify.error('خطا در ذخیره تغییرات معامله در سرور');
       return false;
-    } catch (err) {
+    } catch (err: any) {
       console.error('Failed to update trade on backend:', err);
       // Revert optimistic update
       set({ trades: currentTrades });
+      notify.error(err.response?.data?.error || err.message || 'خطا در ذخیره تغییرات معامله');
       return false;
     }
   },
@@ -333,11 +336,13 @@ export const useTradeStore = create<TradeState>((set, get) => ({
       }
       // Revert on failure
       set({ trades: currentTrades });
+      notify.error('خطا در حذف معامله در سرور');
       return false;
-    } catch (err) {
+    } catch (err: any) {
       console.error('Failed to delete trade on backend:', err);
       // Revert optimistic removal
       set({ trades: currentTrades });
+      notify.error(err.response?.data?.error || err.message || 'خطا در حذف معامله');
       return false;
     }
   },
@@ -359,11 +364,13 @@ export const useTradeStore = create<TradeState>((set, get) => ({
       }
       // Revert on failure
       set({ trades: currentTrades });
+      notify.error('خطا در حذف گروهی معاملات در سرور');
       return false;
-    } catch (err) {
+    } catch (err: any) {
       console.error('Failed to delete multiple trades on backend:', err);
       // Revert optimistic removal
       set({ trades: currentTrades });
+      notify.error(err.response?.data?.error || err.message || 'خطا در حذف گروهی معاملات');
       return false;
     }
   }
