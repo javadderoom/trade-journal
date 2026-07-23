@@ -75,12 +75,13 @@ export default function DashboardPage() {
   }, []);
 
   const dashboardKey = `/api/dashboard/summary?accountId=${selectedAccountId}&locale=${language}`;
-  const { data, error, isLoading, mutate: refetchDashboard } = useSWR<DashboardData>(
+  const { data, error, mutate: refetchDashboard } = useSWR<DashboardData>(
     dashboardKey,
     fetcher,
     {
       revalidateOnFocus: false,
       dedupingInterval: 5000,
+      suspense: true,
     }
   );
 
@@ -118,14 +119,6 @@ export default function DashboardPage() {
       setTimeout(() => setEdgeRefreshSpin(false), 400);
     });
   };
-
-  if (isLoading && !data) {
-    return (
-      <main className="dashboard-page">
-        <PageLoader />
-      </main>
-    );
-  }
 
   if (error || !data) {
     return (
