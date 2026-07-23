@@ -5,19 +5,32 @@ import "./contact/contact.scss";
 import AppLayout from "../components/layout/AppLayout";
 
 export const metadata: Metadata = {
-  title: "تریدکاو | ژورنال معاملاتی هوشمند",
-  description: "تریدکاو اولین ژورنال معاملاتی هوشمند ایرانی؛ ثبت خودکار معاملات متاتریدر ۴ و ۵، تحلیل دقیق عملکرد، هیت‌مپ روزانه، مدیریت ریسک و روانشناسی معاملات.",
+  title: "تریدکاو (TradeKav) | ژورنال معاملاتی هوشمند - Smart Trading Journal",
+  description: "تریدکاو (TradeKav) اولین ژورنال معاملاتی هوشمند؛ ثبت خودکار معاملات متاتریدر ۴ و ۵، تحلیل دقیق عملکرد، هیت‌مپ روزانه، مدیریت ریسک و روانشناسی ترید.",
   keywords: [
+    "تریدکاو",
+    "ترید کاو",
+    "TradeKav",
+    "Trade Kav",
+    "tradekav",
+    "tradekav.ir",
     "ژورنال معاملاتی",
+    "ژورنال معاملاتی فارسی",
+    "ژورنال معاملاتی تریدکاو",
     "دفترچه معاملاتی",
-    "ثبت معاملات",
+    "ثبت خودکار معاملات",
     "متاتریدر",
     "تحلیل معاملات",
     "روانشناسی معاملات",
     "مدیریت ریسک",
     "فارکس",
     "بورس",
-    "کریپتو"
+    "کریپتو",
+    "trade Forex",
+    "Trade Crypto",
+    "Trade Analysis",
+    "Trading Journal",
+    "Smart Trading Journal"
   ],
   metadataBase: new URL("https://tradekav.ir"),
   alternates: {
@@ -25,36 +38,46 @@ export const metadata: Metadata = {
     languages: {
       "fa": "/",
       "en": "/en",
+      "fa-IR": "/",
     },
   },
   icons: {
     icon: "/logo.png",
+    apple: "/logo.png",
   },
   openGraph: {
-    title: "تریدکاو | ژورنال معاملاتی هوشمند",
-    description: "ثبت خودکار و تحلیل معاملات متاتریدر ۴ و ۵، بهبود مستمر عملکرد معاملاتی با ژورنال هوشمند تریدکاو.",
+    title: "تریدکاو (TradeKav) | ژورنال معاملاتی هوشمند",
+    description: "ثبت خودکار و تحلیل معاملات متاتریدر ۴ و ۵ با ژورنال هوشمند تریدکاو (TradeKav). بهینه‌سازی استراتژی، مدیریت ریسک و روانشناسی معامله‌گری.",
     url: "https://tradekav.ir",
-    siteName: "تریدکاو",
+    siteName: "تریدکاو | TradeKav",
     locale: "fa_IR",
+    alternateLocale: ["en_US"],
     type: "website",
     images: [
       {
         url: "/logo.png",
         width: 512,
         height: 512,
-        alt: "لوگوی تریدکاو",
+        alt: "لوگوی تریدکاو - TradeKav Logo",
       }
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "تریدکاو | ژورنال معاملاتی هوشمند",
-    description: "ثبت خودکار و تحلیل معاملات متاتریدر ۴ و ۵، بهبود مستمر عملکرد معاملاتی با ژورنال هوشمند تریدکاو.",
+    title: "تریدکاو (TradeKav) | ژورنال معاملاتی هوشمند",
+    description: "ثبت خودکار و تحلیل معاملات متاتریدر ۴ و ۵ با ژورنال هوشمند تریدکاو (TradeKav).",
     images: ["/logo.png"],
   },
   robots: {
     index: true,
     follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
   },
   verification: {
     google: "B2DBktEUzJzG5nYciLfIYUeDIQk05tzcpFtUWUyiKKw",
@@ -62,21 +85,31 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "SoftwareApplication",
-    "name": "تریدکاو",
-    "alternateName": "TradeKav",
-    "url": "https://tradekav.ir",
-    "applicationCategory": "BusinessApplication",
-    "operatingSystem": "All",
-    "description": "تریدکاو اولین ژورنال معاملاتی هوشمند ایرانی؛ ثبت خودکار معاملات متاتریدر ۴ و ۵، تحلیل دقیق عملکرد، هیت‌مپ روزانه، مدیریت ریسک و روانشناسی معاملات.",
-    "offers": {
-      "@type": "Offer",
-      "price": "0",
-      "priceCurrency": "IRR",
+  const jsonLd = [
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "تریدکاو",
+      "alternateName": ["TradeKav", "Trade Kav", "ترید کاو", "TradeKav Journal"],
+      "url": "https://tradekav.ir",
+      "applicationCategory": "BusinessApplication",
+      "operatingSystem": "All",
+      "description": "تریدکاو (TradeKav) اولین ژورنال معاملاتی هوشمند ایرانی؛ ثبت خودکار معاملات متاتریدر ۴ و ۵، تحلیل دقیق عملکرد، هیت‌مپ روزانه، مدیریت ریسک و روانشناسی معاملات.",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "IRR",
+      },
     },
-  };
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "تریدکاو | TradeKav",
+      "alternateName": ["TradeKav", "Trade Kav", "ترید کاو", "تریدکاو"],
+      "url": "https://tradekav.ir",
+      "inLanguage": ["fa-IR", "en-US"],
+    }
+  ];
 
   return (
     <html suppressHydrationWarning lang="fa" dir="rtl">

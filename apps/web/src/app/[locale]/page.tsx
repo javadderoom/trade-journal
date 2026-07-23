@@ -364,9 +364,17 @@ export default function LandingPage({ params }: PageProps) {
         <div className="hero-inner">
           <div className="hero-copy">
             <h1 className="hero-title">
-              {isEn ? 'Smart Trading' : 'ژورنال هوشمند'}
-              <br />
-              <span className="gradient-text">{isEn ? 'Journal Log' : 'ترید'}</span>
+              {isEn ? (
+                <>
+                  TradeKav Smart Trading <br />
+                  <span className="gradient-text">Journal Log</span>
+                </>
+              ) : (
+                <>
+                  ژورنال معاملاتی هوشمند <br />
+                  <span className="gradient-text">تریدکاو (TradeKav)</span>
+                </>
+              )}
             </h1>
             <p className="hero-sub">{copy.heroSubtitle}</p>
             <div className="hero-ctas">
