@@ -2,6 +2,7 @@
 
 import React, { useEffect, useCallback } from 'react';
 import { useNotificationStore, Toast, ToastType } from '../../store/useNotificationStore';
+import { useTranslation } from '../../store/useAppStore';
 import './toaster.scss';
 
 const ICON_MAP: Record<ToastType, string> = {
@@ -27,6 +28,8 @@ function ToastItem({ toast, onDismiss }: { toast: Toast; onDismiss: (id: string)
 }
 
 export default function Toaster() {
+  const { language } = useTranslation();
+  const isEn = language === 'en';
   const toasts = useNotificationStore((s) => s.toasts);
   const confirmPromise = useNotificationStore((s) => s.confirmPromise);
   const removeToast = useNotificationStore((s) => s.removeToast);
@@ -58,7 +61,7 @@ export default function Toaster() {
     <>
       {/* Toast container */}
       {toasts.length > 0 && (
-        <div className="toaster-container" dir="rtl">
+        <div className="toaster-container" dir={isEn ? 'ltr' : 'rtl'}>
           {toasts.map((toast) => (
             <ToastItem key={toast.id} toast={toast} onDismiss={handleDismiss} />
           ))}
@@ -67,7 +70,7 @@ export default function Toaster() {
 
       {/* Confirm dialog */}
       {confirmPromise && (
-        <div className="toaster-overlay" onClick={() => resolveConfirm(false)} onKeyDown={handleKeyDown}>
+        <div className="toaster-overlay" dir={isEn ? 'ltr' : 'rtl'} onClick={() => resolveConfirm(false)} onKeyDown={handleKeyDown}>
           <div className="confirm-dialog" onClick={(e) => e.stopPropagation()}>
             <div className="confirm-header">
               <span className="material-symbols-outlined confirm-icon">help</span>
@@ -78,13 +81,13 @@ export default function Toaster() {
             </div>
             <div className="confirm-footer">
               <button className="confirm-btn cancel" onClick={() => resolveConfirm(false)}>
-                {confirmPromise.config.cancelLabel || 'انصراف'}
+                {confirmPromise.config.cancelLabel || (isEn ? 'Cancel' : 'انصراف')}
               </button>
               <button
                 className={`confirm-btn confirm ${confirmPromise.config.danger ? 'danger' : ''}`}
                 onClick={() => resolveConfirm(true)}
               >
-                {confirmPromise.config.confirmLabel || 'تایید'}
+                {confirmPromise.config.confirmLabel || (isEn ? 'Confirm' : 'تایید')}
               </button>
             </div>
           </div>

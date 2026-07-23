@@ -27,11 +27,11 @@ services:
     restart: unless-stopped
     ports:
       - '6379:6379'
-    command: redis-server --requirepass ${REDIS_PASSWORD:-tradejournald dev} --maxmemory 64mb --maxmemory-policy allkeys-lru
+    command: redis-server --requirepass ${REDIS_PASSWORD:-tradejournaldev} --maxmemory 64mb --maxmemory-policy allkeys-lru
     volumes:
       - redis_data:/data
     healthcheck:
-      test: ['CMD', 'redis-cli', '-a', '${REDIS_PASSWORD:-tradejournald dev}', 'ping']
+      test: ['CMD', 'redis-cli', '-a', '${REDIS_PASSWORD:-tradejournaldev}', 'ping']
       interval: 10s
       timeout: 5s
       retries: 3

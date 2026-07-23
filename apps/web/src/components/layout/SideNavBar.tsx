@@ -1,18 +1,17 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuthStore } from '../../lib/auth';
 import { useTranslation } from '../../store/useAppStore';
+import { notify } from '../../lib/notify';
 
 export default function SideNavBar() {
   const pathname = usePathname();
   const router = useRouter();
   const user = useAuthStore(state => state.user);
   const logout = useAuthStore(state => state.logout);
-  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
-
   const { t, language, setLanguage } = useTranslation();
 
   const planLabel = language === 'fa'
@@ -123,11 +122,8 @@ export default function SideNavBar() {
             href="/contact"
             className="logout-link"
             style={{
-              display: 'flex',
-              alignItems: 'center',
               color: 'inherit',
               textDecoration: 'none',
-              padding: 0,
             }}
           >
             <span className="material-symbols-outlined icon">contact_support</span>
@@ -135,17 +131,25 @@ export default function SideNavBar() {
           </Link>
 
           <button
-            onClick={() => setShowLogoutConfirm(true)}
+            onClick={async () => {
+              const ok = await notify.confirm({
+                title: language === 'fa' ? 'خروج از حساب کاربری' : 'Log Out of Account',
+                message: language === 'fa'
+                  ? 'آیا برای خروج از حساب کاربری خود اطمینان دارید؟'
+                  : 'Are you sure you want to log out of your account?',
+                danger: true,
+                confirmLabel: language === 'fa' ? 'خروج' : 'Log Out',
+                cancelLabel: language === 'fa' ? 'انصراف' : 'Cancel',
+              });
+              if (ok) await logout();
+            }}
             className="logout-link"
             style={{
               background: 'none',
               border: 'none',
               width: '100%',
-              display: 'flex',
-              alignItems: 'center',
               cursor: 'pointer',
               color: 'inherit',
-              padding: 0,
               fontFamily: 'inherit',
             }}
           >
@@ -154,39 +158,6 @@ export default function SideNavBar() {
           </button>
         </div>
       </div>
-
-      {showLogoutConfirm && (
-        <div className="logout-confirm-overlay" onClick={() => setShowLogoutConfirm(false)}>
-          <div className="logout-confirm-modal" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <span className="material-symbols-outlined modal-icon">logout</span>
-              <h3>{language === 'fa' ? 'خروج از حساب کاربری' : 'Log Out of Account'}</h3>
-            </div>
-            <p className="modal-desc">
-              {language === 'fa' 
-                ? 'آیا برای خروج از حساب کاربری خود اطمینان دارید؟' 
-                : 'Are you sure you want to log out of your account?'}
-            </p>
-            <div className="modal-actions">
-              <button
-                className="confirm-btn"
-                onClick={async () => {
-                  setShowLogoutConfirm(false);
-                  await logout();
-                }}
-              >
-                {t('common.logout')}
-              </button>
-              <button
-                className="cancel-btn"
-                onClick={() => setShowLogoutConfirm(false)}
-              >
-                {t('common.cancel')}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </nav>
   );
 }

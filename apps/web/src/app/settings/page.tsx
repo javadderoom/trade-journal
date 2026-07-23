@@ -288,6 +288,7 @@ export default function SettingsPage() {
         : 'Are you sure you want to disconnect this exchange API? Existing trades will be kept, but automatic sync will stop.',
       danger: true,
       confirmLabel: language === 'fa' ? 'قطع اتصال' : 'Disconnect',
+      cancelLabel: language === 'fa' ? 'انصراف' : 'Cancel',
     });
     if (!ok) return;
     try {
@@ -364,6 +365,7 @@ export default function SettingsPage() {
         : `Deleting this account will also delete all ${tradeCount} trades associated with it. Are you sure?`,
       danger: true,
       confirmLabel: language === 'fa' ? 'حذف حساب' : 'Delete Account',
+      cancelLabel: language === 'fa' ? 'انصراف' : 'Cancel',
     });
     if (!ok) return;
     try {
@@ -412,6 +414,7 @@ export default function SettingsPage() {
         : 'Are you sure you want to delete this connection key? Connected Expert Advisors will stop working.',
       danger: true,
       confirmLabel: language === 'fa' ? 'حذف کلید' : 'Delete Key',
+      cancelLabel: language === 'fa' ? 'انصراف' : 'Cancel',
     });
     if (!ok) return;
     try {

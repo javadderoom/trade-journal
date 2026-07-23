@@ -130,10 +130,12 @@ export default function TradesTable({
     const isPro = user?.plan === 'PRO';
     if (!isPro) {
       const ok = await notify.confirm({
-        title: 'قابلیت مخصوص کاربران حرفه‌ای',
-        message: 'خروجی داده فقط برای کاربران حرفه‌ای در دسترس است. برای دسترسی به این قابلیت و امکانات پیشرفته دیگر، لطفاً حساب خود را به حرفه‌ای ارتقا دهید.',
-        confirmLabel: 'ارتقای حساب',
-        cancelLabel: 'بستن',
+        title: isEn ? 'PRO Feature' : 'قابلیت مخصوص کاربران حرفه‌ای',
+        message: isEn
+          ? 'Data export is available exclusively for PRO users. Please upgrade your plan to access this feature.'
+          : 'خروجی داده فقط برای کاربران حرفه‌ای در دسترس است. برای دسترسی به این قابلیت و امکانات پیشرفته دیگر، لطفاً حساب خود را به حرفه‌ای ارتقا دهید.',
+        confirmLabel: isEn ? 'Upgrade Plan' : 'ارتقای حساب',
+        cancelLabel: isEn ? 'Close' : 'بستن',
       });
       if (ok) {
         window.location.href = '/settings?tab=subscription';

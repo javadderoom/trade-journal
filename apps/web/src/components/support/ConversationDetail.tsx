@@ -7,6 +7,7 @@ import MessageBubble from './MessageBubble';
 import ChatInput from './ChatInput';
 import { useAuthStore } from '../../lib/auth';
 import { useTranslation } from '../../store/useAppStore';
+import { notify } from '../../lib/notify';
 
 interface ConversationDetailProps {
   conversationId: string;
@@ -35,7 +36,12 @@ export default function ConversationDetail({ conversationId, onBack }: Conversat
   };
 
   const handleClose = async () => {
-    if (confirm(t('support.closeConfirm'))) {
+    const ok = await notify.confirm({
+      title: t('support.closeTicket'),
+      message: t('support.closeConfirm'),
+      danger: true,
+    });
+    if (ok) {
       await closeConversation(conversationId);
     }
   };
