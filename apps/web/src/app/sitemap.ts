@@ -3,60 +3,83 @@ import { MetadataRoute } from "next";
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = "https://tradekav.ir";
 
-  return [
+  const publicPages = [
+    // Landing pages (separate locale routes)
     {
       url: baseUrl,
       lastModified: new Date(),
-      changeFrequency: "daily",
+      changeFrequency: "daily" as const,
       priority: 1.0,
-    },
-    {
-      url: `${baseUrl}/fa`,
-      lastModified: new Date(),
-      changeFrequency: "daily",
-      priority: 1.0,
+      alternates: {
+        languages: {
+          fa: `${baseUrl}/`,
+          en: `${baseUrl}/en`,
+        },
+      },
     },
     {
       url: `${baseUrl}/en`,
       lastModified: new Date(),
-      changeFrequency: "daily",
+      changeFrequency: "daily" as const,
       priority: 1.0,
+      alternates: {
+        languages: {
+          fa: `${baseUrl}/`,
+          en: `${baseUrl}/en`,
+        },
+      },
+    },
+    // Contact (separate locale routes)
+    {
+      url: `${baseUrl}/fa/contact`,
+      lastModified: new Date(),
+      changeFrequency: "monthly" as const,
+      priority: 0.5,
+      alternates: {
+        languages: {
+          fa: `${baseUrl}/fa/contact`,
+          en: `${baseUrl}/en/contact`,
+        },
+      },
     },
     {
-      url: `${baseUrl}/namad`,
+      url: `${baseUrl}/en/contact`,
       lastModified: new Date(),
-      changeFrequency: "monthly",
-      priority: 0.3,
+      changeFrequency: "monthly" as const,
+      priority: 0.5,
+      alternates: {
+        languages: {
+          fa: `${baseUrl}/fa/contact`,
+          en: `${baseUrl}/en/contact`,
+        },
+      },
     },
+    // Shared pages (no separate locale routes, language switches client-side)
     {
       url: `${baseUrl}/login`,
       lastModified: new Date(),
-      changeFrequency: "monthly",
+      changeFrequency: "monthly" as const,
       priority: 0.5,
     },
     {
       url: `${baseUrl}/register`,
       lastModified: new Date(),
-      changeFrequency: "monthly",
+      changeFrequency: "monthly" as const,
       priority: 0.5,
     },
     {
-      url: `${baseUrl}/contact`,
+      url: `${baseUrl}/help/ea-setup`,
       lastModified: new Date(),
-      changeFrequency: "monthly",
-      priority: 0.5,
+      changeFrequency: "monthly" as const,
+      priority: 0.4,
     },
     {
-      url: `${baseUrl}/fa/contact`,
+      url: `${baseUrl}/namad`,
       lastModified: new Date(),
-      changeFrequency: "monthly",
-      priority: 0.5,
-    },
-    {
-      url: `${baseUrl}/en/contact`,
-      lastModified: new Date(),
-      changeFrequency: "monthly",
-      priority: 0.5,
+      changeFrequency: "monthly" as const,
+      priority: 0.3,
     },
   ];
+
+  return publicPages;
 }

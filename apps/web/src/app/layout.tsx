@@ -22,6 +22,10 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://tradekav.ir"),
   alternates: {
     canonical: "/",
+    languages: {
+      "fa": "/",
+      "en": "/en",
+    },
   },
   icons: {
     icon: "/logo.png",

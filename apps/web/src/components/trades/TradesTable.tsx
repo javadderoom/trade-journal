@@ -166,8 +166,8 @@ export default function TradesTable({
 
   // Filter states
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedSymbol, setSelectedSymbol] = useState(isEn ? 'All Symbols' : 'همه نمادها');
-  const [selectedDirection, setSelectedDirection] = useState(isEn ? 'All Directions' : 'همه جهت‌ها');
+  const [selectedSymbol, setSelectedSymbol] = useState(t('filters.allSymbols'));
+  const [selectedDirection, setSelectedDirection] = useState(t('filters.allDirections'));
   const [selectedTimeframe, setSelectedTimeframe] = useState('ALL');
   const [selectedStatus, setSelectedStatus] = useState<'ALL' | 'OPEN' | 'CLOSED' | 'MISSED'>('ALL');
   const [isAdvancedFiltersOpen, setIsAdvancedFiltersOpen] = useState(false);
@@ -195,7 +195,7 @@ export default function TradesTable({
   const symbolOptions = useMemo(() => {
     const symbols = new Set<string>();
     trades.forEach(t => symbols.add(t.symbol));
-    return [isEn ? 'All Symbols' : 'همه نمادها', ...Array.from(symbols)];
+    return [t('filters.allSymbols'), ...Array.from(symbols)];
   }, [trades]);
 
   const [allTags, setAllTags] = useState<TagObject[]>([]);
@@ -336,7 +336,7 @@ export default function TradesTable({
           return false;
         }
       }
-      if (selectedSymbol !== 'همه نمادها' && selectedSymbol !== 'All Symbols') {
+      if (selectedSymbol !== t('filters.allSymbols')) {
         if (selectedSymbol.startsWith('main:')) {
           const mainPair = selectedSymbol.substring(5);
           if (getMainPair(trade.symbol) !== mainPair) {
@@ -346,8 +346,8 @@ export default function TradesTable({
           return false;
         }
       }
-      if (selectedDirection !== 'همه جهت‌ها' && selectedDirection !== 'All Directions') {
-        const dir = (selectedDirection === 'خرید (Buy)' || selectedDirection === 'Buy') ? 'BUY' : 'SELL';
+      if (selectedDirection !== t('filters.allDirections')) {
+        const dir = selectedDirection === t('filters.buy') ? 'BUY' : 'SELL';
         if (trade.direction !== dir) return false;
       }
       if (selectedTimeframe !== 'ALL') {
@@ -642,7 +642,7 @@ export default function TradesTable({
         </header>
 
         {/* Active Filter Badges */}
-        {(dateFilter || searchQuery || selectedSymbol !== (isEn ? 'All Symbols' : 'همه نمادها') || selectedDirection !== (isEn ? 'All Directions' : 'همه جهت‌ها') || selectedStatus !== 'ALL' || (selectedAccountId && selectedAccountId !== 'all')) && (
+        {(dateFilter || searchQuery || selectedSymbol !== t('filters.allSymbols') || selectedDirection !== t('filters.allDirections') || selectedStatus !== 'ALL' || (selectedAccountId && selectedAccountId !== 'all')) && (
           <div className="active-filters-container animate-fade-in">
             {/* Date Filter */}
             {dateFilter && (
@@ -652,8 +652,8 @@ export default function TradesTable({
                   {filterDatesArray.length === 1 
                     ? `${p.dateLabel} ${getJalaliDisplayDate(filterDatesArray[0])}` 
                     : isEn 
-                      ? `${filterDatesArray.length} ${p.daysSelected}`
-                      : `${toPersianDigits(filterDatesArray.length)} روز انتخاب شده`
+                      ? `${filterDatesArray.length} ${t('filters.badgeDaysSelected')}`
+                      : `${toPersianDigits(filterDatesArray.length)} ${t('filters.badgeDaysSelected')}`
                   }
                 </span>
                 <button 
@@ -667,7 +667,7 @@ export default function TradesTable({
                     }
                   }}
                   className="badge-clear-btn"
-                  title="پاک کردن فیلتر تاریخ"
+                  title={t('filters.badgeClearDate')}
                 >
                   <span className="material-symbols-outlined badge-icon-close">close</span>
                 </button>
@@ -679,7 +679,7 @@ export default function TradesTable({
               <div className="active-filter-badge">
                 <span className="material-symbols-outlined badge-icon-lead">search</span>
                 <span className="badge-text">
-                  {`جستجو: "${searchQuery}"`}
+                  {`${t('filters.badgeSearch')} "${searchQuery}"`}
                 </span>
                 <button 
                   onClick={() => {
@@ -687,7 +687,7 @@ export default function TradesTable({
                     setCurrentPage(1);
                   }}
                   className="badge-clear-btn"
-                  title="پاک کردن جستجو"
+                  title={t('filters.badgeClearSearch')}
                 >
                   <span className="material-symbols-outlined badge-icon-close">close</span>
                 </button>
@@ -695,19 +695,19 @@ export default function TradesTable({
             )}
 
             {/* Symbol Filter */}
-            {selectedSymbol !== 'همه نمادها' && (
+            {selectedSymbol !== t('filters.allSymbols') && (
               <div className="active-filter-badge">
                 <span className="material-symbols-outlined badge-icon-lead">toll</span>
                 <span className="badge-text">
-                  {`نماد: ${selectedSymbol.startsWith('main:') ? `${selectedSymbol.substring(5)} (همه)` : selectedSymbol}`}
+                  {`${t('filters.badgeSymbol')} ${selectedSymbol.startsWith('main:') ? `${selectedSymbol.substring(5)} (${t('filters.badgeAll')})` : selectedSymbol}`}
                 </span>
                 <button 
                   onClick={() => {
-                    setSelectedSymbol('همه نمادها');
+                    setSelectedSymbol(t('filters.allSymbols'));
                     setCurrentPage(1);
                   }}
                   className="badge-clear-btn"
-                  title="پاک کردن فیلتر نماد"
+                  title={t('filters.badgeClearSymbol')}
                 >
                   <span className="material-symbols-outlined badge-icon-close">close</span>
                 </button>
@@ -715,19 +715,19 @@ export default function TradesTable({
             )}
 
             {/* Direction Filter */}
-            {selectedDirection !== 'همه جهت‌ها' && (
+            {selectedDirection !== t('filters.allDirections') && (
               <div className="active-filter-badge">
                 <span className="material-symbols-outlined badge-icon-lead">swap_vert</span>
                 <span className="badge-text">
-                  {`جهت: ${selectedDirection === 'خرید (Buy)' ? 'خرید' : 'فروش'}`}
+                  {`${t('filters.badgeDirection')} ${selectedDirection === t('filters.buy') ? t('filters.badgeBuy') : t('filters.badgeSell')}`}
                 </span>
                 <button 
                   onClick={() => {
-                    setSelectedDirection('همه جهت‌ها');
+                    setSelectedDirection(t('filters.allDirections'));
                     setCurrentPage(1);
                   }}
                   className="badge-clear-btn"
-                  title="پاک کردن فیلتر جهت"
+                  title={t('filters.badgeClearDirection')}
                 >
                   <span className="material-symbols-outlined badge-icon-close">close</span>
                 </button>
@@ -739,7 +739,7 @@ export default function TradesTable({
               <div className="active-filter-badge">
                 <span className="material-symbols-outlined badge-icon-lead">check_circle</span>
                 <span className="badge-text">
-                  {`وضعیت: ${selectedStatus === 'OPEN' ? 'باز' : selectedStatus === 'CLOSED' ? 'بسته' : 'فرصت سوخته'}`}
+                  {`${t('filters.badgeStatus')} ${selectedStatus === 'OPEN' ? t('filters.badgeStatusOpen') : selectedStatus === 'CLOSED' ? t('filters.badgeStatusClosed') : t('filters.badgeStatusMissed')}`}
                 </span>
                 <button 
                   onClick={() => {
@@ -747,7 +747,7 @@ export default function TradesTable({
                     setCurrentPage(1);
                   }}
                   className="badge-clear-btn"
-                  title="پاک کردن فیلتر وضعیت"
+                  title={t('filters.badgeClearStatus')}
                 >
                   <span className="material-symbols-outlined badge-icon-close">close</span>
                 </button>
@@ -759,7 +759,7 @@ export default function TradesTable({
               <div className="active-filter-badge">
                 <span className="material-symbols-outlined badge-icon-lead">account_balance_wallet</span>
                 <span className="badge-text">
-                  {`حساب: ${(() => {
+                  {`${t('filters.badgeAccount')} ${(() => {
                     const acc = accounts.find(a => a.id === selectedAccountId);
                     return acc ? `${acc.broker_name || 'MT5'} (${acc.account_number || acc.id})` : selectedAccountId;
                   })()}`}
@@ -772,7 +772,7 @@ export default function TradesTable({
                     setCurrentPage(1);
                   }}
                   className="badge-clear-btn"
-                  title="پاک کردن فیلتر حساب"
+                  title={t('filters.badgeClearAccount')}
                 >
                   <span className="material-symbols-outlined badge-icon-close">close</span>
                 </button>

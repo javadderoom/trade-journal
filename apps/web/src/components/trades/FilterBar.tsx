@@ -163,8 +163,8 @@ export default function FilterBar({
                   setCurrentPage(1);
                 }}
                 options={[
-                  { value: 'همه نمادها', label: t('filters.allSymbols') },
-                  ...getSymbolFilterOptions(symbolOptions.filter(s => s !== 'همه نمادها'))
+                  { value: t('filters.allSymbols'), label: t('filters.allSymbols') },
+                  ...getSymbolFilterOptions(symbolOptions.filter(s => s !== t('filters.allSymbols')))
                 ]}
               />
             </div>
@@ -178,9 +178,9 @@ export default function FilterBar({
                   setCurrentPage(1);
                 }}
                 options={[
-                  { value: 'همه جهت‌ها', label: t('filters.allDirections') },
-                  { value: 'خرید (Buy)', label: t('filters.buy') },
-                  { value: 'فروش (Sell)', label: t('filters.sell') },
+                  { value: t('filters.allDirections'), label: t('filters.allDirections') },
+                  { value: t('filters.buy'), label: t('filters.buy') },
+                  { value: t('filters.sell'), label: t('filters.sell') },
                 ]}
               />
             </div>
@@ -250,8 +250,8 @@ export default function FilterBar({
               className="btn btn-secondary btn-clear"
               onClick={() => {
                 setSearchQuery('');
-                setSelectedSymbol('همه نمادها');
-                setSelectedDirection('همه جهت‌ها');
+                setSelectedSymbol(t('filters.allSymbols'));
+                setSelectedDirection(t('filters.allDirections'));
                 setSelectedTimeframe('ALL');
                 setSelectedStatus('ALL');
                 setCurrentPage(1);
