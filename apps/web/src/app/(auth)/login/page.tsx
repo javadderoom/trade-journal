@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useAuthStore } from '../../../lib/auth';
 import { useTranslation } from '../../../store/useAppStore';
 import { notify } from '../../../lib/notify';
+import LoadingButton from '../../../components/ui/LoadingButton';
 import { formatTimer } from '../../../utils/otp';
 import '../auth.scss';
 
@@ -237,16 +238,9 @@ export default function LoginPage() {
               </div>
             </div>
 
-            <button type="submit" className="submit-btn" disabled={loading}>
-              {loading ? (
-                <>
-                  <div className="spinner"></div>
-                  <span>{language === 'fa' ? 'در حال ورود...' : 'Signing In...'}</span>
-                </>
-              ) : (
-                <span>{t('auth.submitLogin')}</span>
-              )}
-            </button>
+            <LoadingButton type="submit" className="submit-btn" disabled={loading} isLoading={loading}>
+              {t('auth.submitLogin')}
+            </LoadingButton>
           </form>
         )}
 

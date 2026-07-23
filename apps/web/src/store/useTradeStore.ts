@@ -3,6 +3,7 @@ import { mutate } from 'swr';
 import { Trade } from '../components/trades/TradesTable';
 import { api } from '../lib/api';
 import { notify } from '../lib/notify';
+import { useAppStore } from './useAppStore';
 
 export const MOCK_TRADES: Trade[] = [
   {
@@ -275,6 +276,8 @@ export const useTradeStore = create<TradeState>((set, get) => ({
     const tradeId = updatedTrade.id;
     if (tradeId.startsWith('mock-')) return true;
 
+    const isEn = useAppStore.getState().language === 'en';
+
     // Optimistic state update
     const currentTrades = get().trades;
     set({
@@ -309,19 +312,21 @@ export const useTradeStore = create<TradeState>((set, get) => ({
       }
       // Revert on failure
       set({ trades: currentTrades });
-      notify.error('خطا در ذخیره تغییرات معامله در سرور');
+      notify.error(isEn ? 'Failed to save trade changes on server.' : 'خطا در ذخیره تغییرات معامله در سرور');
       return false;
     } catch (err: any) {
       console.error('Failed to update trade on backend:', err);
       // Revert optimistic update
       set({ trades: currentTrades });
-      notify.error(err.response?.data?.error || err.message || 'خطا در ذخیره تغییرات معامله');
+      notify.error(err.response?.data?.error || err.message || (isEn ? 'Failed to save trade changes.' : 'خطا در ذخیره تغییرات معامله'));
       return false;
     }
   },
 
   deleteTrade: async (tradeId: string): Promise<boolean> => {
     if (tradeId.startsWith('mock-')) return true;
+
+    const isEn = useAppStore.getState().language === 'en';
 
     // Optimistic removal
     const currentTrades = get().trades;
@@ -336,13 +341,13 @@ export const useTradeStore = create<TradeState>((set, get) => ({
       }
       // Revert on failure
       set({ trades: currentTrades });
-      notify.error('خطا در حذف معامله در سرور');
+      notify.error(isEn ? 'Failed to delete trade on server.' : 'خطا در حذف معامله در سرور');
       return false;
     } catch (err: any) {
       console.error('Failed to delete trade on backend:', err);
       // Revert optimistic removal
       set({ trades: currentTrades });
-      notify.error(err.response?.data?.error || err.message || 'خطا در حذف معامله');
+      notify.error(err.response?.data?.error || err.message || (isEn ? 'Failed to delete trade.' : 'خطا در حذف معامله'));
       return false;
     }
   },
@@ -350,6 +355,8 @@ export const useTradeStore = create<TradeState>((set, get) => ({
   deleteMultipleTrades: async (tradeIds: string[]): Promise<boolean> => {
     const realIds = tradeIds.filter(id => !id.startsWith('mock-'));
     if (realIds.length === 0) return true;
+
+    const isEn = useAppStore.getState().language === 'en';
 
     // Optimistic removal
     const currentTrades = get().trades;
@@ -364,7 +371,7 @@ export const useTradeStore = create<TradeState>((set, get) => ({
       }
       // Revert on failure
       set({ trades: currentTrades });
-      notify.error('خطا در حذف گروهی معاملات در سرور');
+      notify.error(isEn ? 'Failed to bulk-delete trades on server.' : 'خطا در حذف گروهی معاملات در سرور');
       return false;
     } catch (err: any) {
       console.error('Failed to delete multiple trades on backend:', err);

@@ -4,6 +4,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { api } from '../../lib/api';
 import { useTranslation } from '../../store/useAppStore';
 import { getSharedTranslations } from '../../locales/components';
+import LoadingButton from '../ui/LoadingButton';
 
 interface ImportMT4ModalProps {
   isOpen: boolean;
@@ -354,13 +355,15 @@ export default function ImportMT4Modal({ isOpen, onClose, onSuccess, accounts }:
             >
               {step === 'ACCOUNT' ? p.back : p.cancel}
             </button>
-            <button
+
+            <LoadingButton
               type="submit"
-              className="btn btn-primary"
+              variant="primary"
               disabled={!file || isSubmitting || (step === 'ACCOUNT' && (!importAccountId || accounts.length === 0))}
+              isLoading={isSubmitting}
             >
-              {isSubmitting ? p.processing : step === 'FILE' ? p.next : p.import}
-            </button>
+              {step === 'FILE' ? p.next : p.import}
+            </LoadingButton>
           </div>
         </form>
       </div>

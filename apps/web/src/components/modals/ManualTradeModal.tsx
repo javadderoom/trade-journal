@@ -7,6 +7,7 @@ import { useTranslation } from '../../store/useAppStore';
 import { getSharedTranslations } from '../../locales/components';
 import { normalizeNumericInput } from '../../utils/farsi';
 import { notify } from '../../lib/notify';
+import LoadingButton from '../ui/LoadingButton';
 
 interface ManualTradeModalProps {
   isOpen: boolean;
@@ -393,13 +394,14 @@ export default function ManualTradeModal({ isOpen, onClose, onSuccess }: ManualT
             >
               {p.cancel}
             </button>
-            <button
+            <LoadingButton
               type="submit"
-              className="btn btn-primary"
+              variant="primary"
               disabled={isSubmitting}
+              isLoading={isSubmitting}
             >
-              {isSubmitting ? p.saving : p.save}
-            </button>
+              {p.save}
+            </LoadingButton>
           </div>
         </form>
       </div>

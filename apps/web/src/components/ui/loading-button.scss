@@ -1,0 +1,213 @@
+@import '../../app/variables';
+
+.loading-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: inherit;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  outline: none;
+  overflow: hidden;
+  user-select: none;
+  white-space: nowrap;
+  box-sizing: border-box;
+  transition:
+    width 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+    min-width 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+    border-radius 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+    background-color 0.25s ease,
+    border-color 0.25s ease,
+    box-shadow 0.25s ease,
+    transform 0.15s ease;
+
+  &:active {
+    transform: scale(0.98);
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.85;
+  }
+
+  // ─── Sizes ──────────────────────────────────────────────────────────────────
+  &.btn-size-sm {
+    height: 34px;
+    padding: 0 14px;
+    font-size: 0.82rem;
+  }
+  &.btn-size-md {
+    height: 42px;
+    padding: 0 20px;
+    font-size: 0.9rem;
+  }
+  &.btn-size-lg {
+    height: 48px;
+    padding: 0 28px;
+    font-size: 1rem;
+  }
+
+  // ─── Variants ────────────────────────────────────────────────────────────────
+  &.btn-var-primary {
+    background: linear-gradient(135deg, $primary, darken($primary, 8%));
+    color: #ffffff;
+    border-color: rgba($primary, 0.4);
+    box-shadow: 0 4px 14px rgba($primary, 0.25);
+
+    &:hover:not(:disabled) {
+      background: linear-gradient(135deg, lighten($primary, 4%), $primary);
+      box-shadow: 0 6px 18px rgba($primary, 0.35);
+    }
+  }
+
+  &.btn-var-secondary {
+    background: rgba(255, 255, 255, 0.06);
+    color: #e2e8f0;
+    border-color: rgba(255, 255, 255, 0.12);
+
+    &:hover:not(:disabled) {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+  }
+
+  &.btn-var-danger {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    color: #ffffff;
+    box-shadow: 0 4px 14px rgba(239, 68, 68, 0.25);
+
+    &:hover:not(:disabled) {
+      background: linear-gradient(135deg, #f87171, #ef4444);
+    }
+  }
+
+  &.btn-var-ghost {
+    background: transparent;
+    color: #94a3b8;
+    border-color: transparent;
+
+    &:hover:not(:disabled) {
+      background: rgba(255, 255, 255, 0.05);
+      color: #f1f5f9;
+    }
+  }
+
+  // ─── State 1: IDLE ───────────────────────────────────────────────────────────
+  .btn-label-idle {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: opacity 0.2s ease;
+
+    &.visible {
+      opacity: 1;
+    }
+    &.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+  }
+
+  // ─── State 2: LOADING (Collapses into 42px Circle) ───────────────────────────
+  &.btn-loading-state {
+    border-radius: 50% !important;
+    padding: 0 !important;
+    box-shadow: 0 0 16px rgba($primary, 0.3);
+
+    &.btn-size-sm {
+      width: 34px !important;
+      min-width: 34px !important;
+    }
+    &.btn-size-md {
+      width: 42px !important;
+      min-width: 42px !important;
+    }
+    &.btn-size-lg {
+      width: 48px !important;
+      min-width: 48px !important;
+    }
+
+    .btn-spinner-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      .btn-mini-spinner {
+        width: 20px;
+        height: 20px;
+        border: 2.5px solid rgba(255, 255, 255, 0.2);
+        border-top: 2.5px solid #ffffff;
+        border-radius: 50%;
+        animation: btn-spin 0.75s linear infinite;
+      }
+    }
+  }
+
+  // ─── State 3: SUCCESS (Expands + Green Highlight + Checkmark) ─────────────────
+  &.btn-success-state {
+    background: linear-gradient(135deg, #10b981, #059669) !important;
+    border-color: rgba(16, 185, 129, 0.5) !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 16px rgba(16, 185, 129, 0.35) !important;
+
+    .btn-success-content {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      animation: btn-pop-in 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+
+      .status-icon {
+        font-size: 1.1rem;
+      }
+    }
+  }
+
+  // ─── State 4: ERROR (Expands + Shake + Red Alert) ───────────────────────────
+  &.btn-error-state {
+    background: linear-gradient(135deg, #ef4444, #dc2626) !important;
+    border-color: rgba(239, 68, 68, 0.5) !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 16px rgba(239, 68, 68, 0.35) !important;
+    animation: btn-shake 0.4s ease;
+
+    .btn-error-content {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      animation: btn-pop-in 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+
+      .status-icon {
+        font-size: 1.1rem;
+      }
+    }
+  }
+}
+
+// ─── Keyframe Animations ──────────────────────────────────────────────────────
+@keyframes btn-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes btn-pop-in {
+  0% {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes btn-shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-6px); }
+  40% { transform: translateX(6px); }
+  60% { transform: translateX(-4px); }
+  80% { transform: translateX(4px); }
+}
