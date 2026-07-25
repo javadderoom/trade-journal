@@ -1,5 +1,5 @@
 import { Router, Response } from 'express';
-import { authenticateToken, AuthenticatedRequest } from '../middleware/auth';
+import { authenticate, AuthRequest } from '../middleware/auth';
 import { prisma } from '../services/tradeSync';
 
 const router = Router();
@@ -8,7 +8,7 @@ const router = Router();
  * GET /api/backtest
  * List saved backtest sessions for current user.
  */
-router.get('/', authenticateToken, async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+router.get('/', authenticate, async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const userId = req.user!.userId;
     const sessions = await prisma.backtestSession.findMany({
@@ -27,7 +27,7 @@ router.get('/', authenticateToken, async (req: AuthenticatedRequest, res: Respon
  * POST /api/backtest
  * Save a completed backtest session report.
  */
-router.post('/', authenticateToken, async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+router.post('/', authenticate, async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const userId = req.user!.userId;
     const {
@@ -72,10 +72,10 @@ router.post('/', authenticateToken, async (req: AuthenticatedRequest, res: Respo
  * DELETE /api/backtest/:id
  * Delete a backtest session.
  */
-router.delete('/:id', authenticateToken, async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+router.delete('/:id', authenticate, async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const userId = req.user!.userId;
-    const { id } = req.params;
+    const id = req.params.id as string;
 
     const session = await prisma.backtestSession.findUnique({ where: { id } });
     if (!session || session.user_id !== userId) {
