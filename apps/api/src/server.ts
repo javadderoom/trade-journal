@@ -41,10 +41,16 @@ app.use(cookieParser());
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
 // CORS — allow only trusted origins
-const ALLOWED_ORIGINS: (string | RegExp)[] = (process.env.CORS_ORIGINS || '')
-  .split(',')
-  .map(s => s.trim())
-  .filter(Boolean);
+const ALLOWED_ORIGINS: (string | RegExp)[] = [
+  'https://tradekav.ir',
+  'https://www.tradekav.ir',
+  'http://tradekav.ir',
+  'http://www.tradekav.ir',
+  ...(process.env.CORS_ORIGINS || '')
+    .split(',')
+    .map(s => s.trim())
+    .filter(Boolean),
+];
 
 // In development, allow localhost on any port
 if (process.env.NODE_ENV !== 'production') {
