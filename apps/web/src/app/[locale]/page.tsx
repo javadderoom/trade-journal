@@ -37,9 +37,9 @@ const DATA = {
       { href: '#faq', label: 'سوالات' },
     ],
     stats: [
-      { value: 500, suffix: '+', label: 'معامله‌گر فعال' },
-      { value: 50000, suffix: '+', label: 'معامله ثبت‌شده', compact: true },
-      { value: 23, suffix: '٪', label: 'میانگین بهبود نرخ موفقیت' },
+      { value: 100, suffix: '٪', label: 'ثبت خودکار متاتریدر ۴ و ۵' },
+      { value: 24, suffix: '/۷', label: 'دسترسی ابری و مدیریت ریسک' },
+      { value: 0, suffix: ' ثانیه', label: 'تاخیر در تحلیل و گزارش‌گیری' },
     ],
     painPoints: [
       { icon: 'edit_note', title: 'یادداشت کاغذی فراموش می‌شه', body: 'معاملاتت رو توی دفتر یا نوت گوشی می‌نویسی و هیچ‌وقت برنمی‌گردی بخونی.' },
@@ -117,9 +117,9 @@ const DATA = {
       { href: '#faq', label: 'FAQ' },
     ],
     stats: [
-      { value: 500, suffix: '+', label: 'Active Traders' },
-      { value: 50000, suffix: '+', label: 'Trades Logged', compact: true },
-      { value: 23, suffix: '%', label: 'Average Success Rate Increase' },
+      { value: 100, suffix: '%', label: 'Automated MT4/MT5 Sync' },
+      { value: 24, suffix: '/7', label: 'Cloud Access & Risk Shield' },
+      { value: 0, suffix: 's', label: 'Analytics & Sync Latency' },
     ],
     painPoints: [
       { icon: 'edit_note', title: 'Paper logs get forgotten', body: 'Writing trades in a notebook or phone app means you never look back at them.' },
