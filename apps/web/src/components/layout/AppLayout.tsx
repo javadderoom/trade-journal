@@ -141,7 +141,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const isLandingPage = cleanPath === '/' || cleanPath === '/namad';
   const isHelpPage = cleanPath.startsWith('/help');
   const isContactPage = cleanPath === '/contact';
-  const isPublicPage = isLandingPage || isHelpPage || isContactPage;
+  const isTopicPage = cleanPath.startsWith('/topic');
+  const isPublicPage = isLandingPage || isHelpPage || isContactPage || isTopicPage;
 
   useEffect(() => {
     if (!isInitialized || !pathname) return;

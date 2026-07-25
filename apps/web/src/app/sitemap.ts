@@ -79,6 +79,33 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly" as const,
       priority: 0.3,
     },
+    // Programmatic Topic SEO Landing Pages
+    ...['prop-firm-journal', 'metatrader-sync', 'crypto-journal', 'forex-journal'].flatMap((topicSlug) => [
+      {
+        url: `${baseUrl}/fa/topic/${topicSlug}`,
+        lastModified: new Date(),
+        changeFrequency: "weekly" as const,
+        priority: 0.8,
+        alternates: {
+          languages: {
+            fa: `${baseUrl}/fa/topic/${topicSlug}`,
+            en: `${baseUrl}/en/topic/${topicSlug}`,
+          },
+        },
+      },
+      {
+        url: `${baseUrl}/en/topic/${topicSlug}`,
+        lastModified: new Date(),
+        changeFrequency: "weekly" as const,
+        priority: 0.8,
+        alternates: {
+          languages: {
+            fa: `${baseUrl}/fa/topic/${topicSlug}`,
+            en: `${baseUrl}/en/topic/${topicSlug}`,
+          },
+        },
+      },
+    ]),
   ];
 
   return publicPages;

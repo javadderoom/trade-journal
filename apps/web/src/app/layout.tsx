@@ -1,4 +1,5 @@
 import { Metadata } from "next";
+import Script from "next/script";
 import "./globals.scss";
 import "./landing.scss";
 import "./contact/contact.scss";
@@ -149,29 +150,20 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <script src="https://cdn.kavenegar.com/sdk/page.js?appId=245422b2-eab2-4608-93ab-80526bd21f85" defer charSet="utf-8"></script>
         )}
         {/* Google Analytics 4 (GA4) */}
-        {(() => {
-          const gaId = process.env.NEXT_PUBLIC_GA_ID || 'G-T2148XPMH9';
-          return (
-            <>
-              <script
-                async
-                src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}
-              />
-              <script
-                dangerouslySetInnerHTML={{
-                  __html: `
-                    window.dataLayer = window.dataLayer || [];
-                    function gtag(){dataLayer.push(arguments);}
-                    gtag('js', new Date());
-                    gtag('config', '${gaId}', {
-                      page_path: window.location.pathname,
-                    });
-                  `,
-                }}
-              />
-            </>
-          );
-        })()}
+        <Script
+          src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_ID || 'G-T2148XPMH9'}`}
+          strategy="afterInteractive"
+        />
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', '${process.env.NEXT_PUBLIC_GA_ID || 'G-T2148XPMH9'}', {
+              page_path: window.location.pathname,
+            });
+          `}
+        </Script>
         {/* Structured Data */}
         <script
           type="application/ld+json"

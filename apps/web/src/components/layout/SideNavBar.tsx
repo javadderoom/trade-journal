@@ -49,7 +49,7 @@ export default function SideNavBar() {
               />
             </div>
             <div className="title-group">
-              <span className="title-text">{language === 'fa' ? 'پنل معامله‌گر' : 'Trader Panel'}</span>
+              <span className="title-text">{language === 'fa' ? 'پنل تریدر' : 'Trader Panel'}</span>
               <span className="subtitle-text">{planLabel}</span>
             </div>
           </div>
