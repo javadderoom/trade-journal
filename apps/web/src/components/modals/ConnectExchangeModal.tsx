@@ -5,6 +5,7 @@ import { api } from '../../lib/api';
 import { useTranslation } from '../../store/useAppStore';
 import { notify } from '../../lib/notify';
 import { getSharedTranslations } from '../../locales/components';
+import LoadingButton from '../ui/LoadingButton';
 
 interface ConnectExchangeModalProps {
   isOpen: boolean;
@@ -331,13 +332,14 @@ export default function ConnectExchangeModal({ isOpen, onClose, onSuccess }: Con
             >
               {p.cancel}
             </button>
-            <button
+            <LoadingButton
               type="submit"
               className="btn btn-primary"
               disabled={isSubmitting || !selectedExchange || !apiKey || !apiSecret}
+              isLoading={isSubmitting}
             >
-              {isSubmitting ? p.connecting : p.connect}
-            </button>
+              {p.connect}
+            </LoadingButton>
           </div>
         </form>
       </div>

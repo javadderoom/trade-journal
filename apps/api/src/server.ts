@@ -27,6 +27,8 @@ import cryptoSyncRouter from './routes/cryptoSync';
 import supportRouter from './routes/support';
 import adminSupportRouter from './routes/adminSupport';
 import adminDiagnosisRouter from './routes/adminDiagnosis';
+import marketDataRouter from './routes/marketData';
+import backtestRouter from './routes/backtest';
 import { syncExchangeTrades } from './services/ccxtSync';
 
 const app = express();
@@ -84,6 +86,8 @@ app.use('/api/admin/support', adminSupportRouter);
 app.use('/api/admin/diagnosis', adminDiagnosisRouter);
 app.use('/api/support', supportRouter);
 app.use('/api/crypto', cryptoSyncRouter);
+app.use('/api/market-data', marketDataRouter);
+app.use('/api/backtest', backtestRouter);
 
 // Health check
 app.get('/api/health', (_req, res) => {

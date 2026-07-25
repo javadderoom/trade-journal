@@ -23,6 +23,7 @@ export default function SideNavBar() {
     { href: '/trades', label: t('nav.trades'), icon: 'analytics', fillIcon: true },
     { href: '/analytics', label: t('nav.analytics'), icon: 'bar_chart' },
     { href: '/journal', label: t('nav.journal'), icon: 'sticky_note_2' },
+    { href: '/backtest', label: language === 'fa' ? 'بک‌تست' : 'Backtest', icon: 'query_stats' },
     { href: '/support', label: t('nav.support'), icon: 'contact_support' },
     { href: '/settings', label: t('nav.settings'), icon: 'settings' },
   ];

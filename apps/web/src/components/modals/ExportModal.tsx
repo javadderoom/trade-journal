@@ -5,6 +5,7 @@ import { api } from '../../lib/api';
 import { notify } from '../../lib/notify';
 import { useTranslation } from '../../store/useAppStore';
 import { getSharedTranslations } from '../../locales/components';
+import LoadingButton from '../ui/LoadingButton';
 import './export-modal.scss';
 
 interface ExportModalProps {
@@ -206,24 +207,16 @@ export default function ExportModal({
             >
               {p.cancel}
             </button>
-            <button
+            <LoadingButton
               type="button"
               className="btn btn-primary btn-download"
               onClick={handleDownload}
               disabled={isDownloading}
+              isLoading={isDownloading}
             >
-              {isDownloading ? (
-                <>
-                  <span className="spinner"></span>
-                  {p.preparing}
-                </>
-              ) : (
-                <>
-                  <span className="material-symbols-outlined">download</span>
-                  {p.downloadLabel}
-                </>
-              )}
-            </button>
+              <span className="material-symbols-outlined">download</span>
+              {p.downloadLabel}
+            </LoadingButton>
           </div>
         </div>
       </div>

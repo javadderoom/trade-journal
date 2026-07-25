@@ -6,6 +6,7 @@ import { useAuthStore } from '../../lib/auth';
 import { api } from '../../lib/api';
 import { toPersianDigits } from '../../utils/farsi';
 import { notify } from '../../lib/notify';
+import LoadingButton from '../../components/ui/LoadingButton';
 import './admin.scss';
 
 type AdminTab = 'stats' | 'users' | 'receipts' | 'coupons' | 'pricing' | 'contact' | 'crypto' | 'diagnosis';
@@ -1097,9 +1098,9 @@ export default function AdminPage() {
             </div>
 
             <div style={{ marginTop: '15px' }}>
-              <button type="submit" className="admin-btn" disabled={updatingCrypto}>
-                {updatingCrypto ? 'در حال ذخیره‌سازی...' : 'ذخیره تنظیمات کیف پول رمزارز'}
-              </button>
+              <LoadingButton type="submit" className="admin-btn" disabled={updatingCrypto} isLoading={updatingCrypto}>
+                ذخیره تنظیمات کیف پول رمزارز
+              </LoadingButton>
             </div>
           </form>
         </div>
@@ -1267,20 +1268,22 @@ export default function AdminPage() {
 
             {selectedReceipt.status === 'PENDING' && !isRejecting && (
               <div className="receipt-modal-actions">
-                <button
+                <LoadingButton
                   className="admin-btn"
                   disabled={loading}
                   onClick={() => handleVerifyReceipt(selectedReceipt.id, 'APPROVED')}
+                  isLoading={loading}
                 >
                   تایید و فعالسازی
-                </button>
-                <button
+                </LoadingButton>
+                <LoadingButton
                   className="admin-btn btn-danger"
                   disabled={loading}
                   onClick={() => setIsRejecting(true)}
+                  isLoading={loading}
                 >
                   رد فیش
-                </button>
+                </LoadingButton>
                 <button
                   className="admin-btn btn-secondary"
                   onClick={() => {
@@ -1313,13 +1316,14 @@ export default function AdminPage() {
                   }}
                 />
                 <div className="receipt-modal-actions">
-                  <button
+                  <LoadingButton
                     className="admin-btn btn-danger"
                     disabled={loading || !rejectionInput.trim()}
                     onClick={() => handleVerifyReceipt(selectedReceipt.id, 'REJECTED', rejectionInput)}
+                    isLoading={loading}
                   >
                     ثبت رد فیش
-                  </button>
+                  </LoadingButton>
                   <button
                     className="admin-btn btn-secondary"
                     onClick={() => {

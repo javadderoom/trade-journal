@@ -39,6 +39,7 @@ model User {
    assignedConversations Conversation[]     @relation("AdminConversations")
    sentMessages Message[]                   @relation("MessageSender")
    activities ConversationActivity[]        @relation("ActivityActor")
+   backtestSessions BacktestSession[]
 }
 
 model Account {
@@ -508,5 +509,28 @@ model SystemLog {
   @@index([level])
   @@index([source])
   @@index([created_at])
+}
+
+// ─── Backtesting Sessions ───────────────────────────────────────────────────
+
+model BacktestSession {
+  id              String   @id @default(uuid())
+  user_id         String
+  user            User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  title           String   @default("Backtest Session")
+  symbol          String
+  timeframe       String
+  initial_balance Float    @default(10000)
+  final_balance   Float    @default(10000)
+  total_trades    Int      @default(0)
+  win_rate        Float    @default(0)
+  profit_factor   Float    @default(0)
+  max_drawdown    Float    @default(0)
+  trade_log       Json?
+  equity_curve    Json?
+  created_at      DateTime @default(now())
+
+  @@index([user_id])
+  @@index([user_id, created_at])
 }
 

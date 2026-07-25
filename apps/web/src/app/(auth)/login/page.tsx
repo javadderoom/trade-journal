@@ -265,16 +265,9 @@ export default function LoginPage() {
                   </div>
                 </div>
 
-                <button type="submit" className="submit-btn" disabled={loading}>
-                  {loading ? (
-                    <>
-                      <div className="spinner"></div>
-                      <span>{language === 'fa' ? 'در حال ارسال...' : 'Sending...'}</span>
-                    </>
-                  ) : (
-                    <span>{t('auth.otpSendBtn')}</span>
-                  )}
-                </button>
+                <LoadingButton type="submit" className="submit-btn" disabled={loading} isLoading={loading}>
+                  {t('auth.otpSendBtn')}
+                </LoadingButton>
               </form>
             ) : (
               <form className="auth-form" onSubmit={handleVerifyOtp}>
@@ -297,16 +290,9 @@ export default function LoginPage() {
                   </div>
                 </div>
 
-                <button type="submit" className="submit-btn" disabled={loading}>
-                  {loading ? (
-                    <>
-                      <div className="spinner"></div>
-                      <span>{language === 'fa' ? 'در حال تایید...' : 'Verifying...'}</span>
-                    </>
-                  ) : (
-                    <span>{t('auth.submitLogin')}</span>
-                  )}
-                </button>
+                <LoadingButton type="submit" className="submit-btn" disabled={loading} isLoading={loading}>
+                  {t('auth.submitLogin')}
+                </LoadingButton>
 
                 <div className="otp-timer-text">
                   {timerActive ? (

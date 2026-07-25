@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { useTranslation } from '../../store/useAppStore';
+import LoadingButton from '../ui/LoadingButton';
 
 const CATEGORIES = ['GENERAL', 'TECHNICAL', 'BILLING', 'FEATURE_REQUEST', 'BUG_REPORT'];
 
@@ -196,9 +197,10 @@ export default function NewConversationModal({ open, onClose, onSubmit }: NewCon
           >
             {t('support.cancel')}
           </button>
-          <button
+          <LoadingButton
             onClick={handleSubmit}
             disabled={loading || !subject.trim() || !body.trim()}
+            isLoading={loading}
             style={{
               padding: '8px 20px',
               borderRadius: 8,
@@ -211,8 +213,8 @@ export default function NewConversationModal({ open, onClose, onSubmit }: NewCon
               opacity: loading || !subject.trim() || !body.trim() ? 0.5 : 1,
             }}
           >
-            {loading ? t('support.sending') : t('support.submit')}
-          </button>
+            {t('support.submit')}
+          </LoadingButton>
         </div>
       </div>
     </div>

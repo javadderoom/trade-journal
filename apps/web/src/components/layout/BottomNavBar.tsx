@@ -57,6 +57,7 @@ export default function BottomNavBar() {
 
   const drawerItems: NavDrawerItem[] = [
     { href: '/dashboard', label: t('nav.dashboard'), icon: 'dashboard' },
+    { href: '/backtest', label: language === 'fa' ? 'بک‌تست' : 'Backtest', icon: 'query_stats' },
     { href: '/support', label: t('nav.support'), icon: 'contact_support' },
     { label: langLabel, icon: langIcon, onClick: toggleLanguage },
     { label: t('common.logout'), icon: 'logout', onClick: handleLogout },

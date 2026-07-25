@@ -5,6 +5,7 @@ import { api } from '../../lib/api';
 import { notify } from '../../lib/notify';
 import { useTranslation } from '../../store/useAppStore';
 import { getSharedTranslations } from '../../locales/components';
+import LoadingButton from '../ui/LoadingButton';
 import './mistake-review-modal.scss';
 
 export interface SuggestedMistake {
@@ -227,13 +228,14 @@ export default function MistakeReviewModal({
           <button className="btn-skip" onClick={handleSkip}>
             {p.rejectAll}
           </button>
-          <button
+          <LoadingButton
             className="btn-submit"
             onClick={handleSubmit}
             disabled={isSubmitting}
+            isLoading={isSubmitting}
           >
-            {isSubmitting ? p.saving : p.save}
-          </button>
+            {p.save}
+          </LoadingButton>
         </div>
       </div>
     </div>

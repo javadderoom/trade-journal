@@ -1,0 +1,484 @@
+@import '../../app/variables';
+
+.backtest-page-container {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 70px);
+  width: 100%;
+  background-color: #0b0f19;
+  color: #f1f5f9;
+  overflow: hidden;
+
+  // ── Top Header Setup Bar ──────────────────────────────────────────────────────
+  .backtest-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 20px;
+    background: rgba(15, 23, 42, 0.8);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+
+    .header-title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+
+      h1 {
+        font-size: 1.15rem;
+        font-weight: 700;
+        margin: 0;
+        color: #f8fafc;
+      }
+
+      .backtest-badge {
+        padding: 3px 8px;
+        font-size: 0.72rem;
+        font-weight: 700;
+        border-radius: 4px;
+        background: rgba($primary, 0.15);
+        color: $primary;
+        border: 1px solid rgba($primary, 0.3);
+      }
+    }
+
+    .header-controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+
+      .selector-group {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+
+        label {
+          font-size: 0.8rem;
+          color: #94a3b8;
+        }
+
+        .select-input {
+          background: rgba(255, 255, 255, 0.06);
+          border: 1px solid rgba(255, 255, 255, 0.12);
+          color: #f1f5f9;
+          border-radius: 6px;
+          padding: 6px 12px;
+          font-size: 0.85rem;
+          outline: none;
+          cursor: pointer;
+
+          option {
+            background: #0f172a;
+            color: #f1f5f9;
+          }
+        }
+      }
+
+      .save-session-btn {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 14px;
+        background: linear-gradient(135deg, $primary, darken($primary, 10%));
+        color: #fff;
+        border: none;
+        border-radius: 6px;
+        font-weight: 600;
+        font-size: 0.85rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+
+        &:hover {
+          box-shadow: 0 4px 12px rgba($primary, 0.35);
+        }
+      }
+    }
+  }
+
+  // ── Main Workspace Split (Chart Canvas + Order Panel) ─────────────────────────
+  .backtest-workspace {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+    position: relative;
+
+    .chart-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+
+      .chart-wrapper {
+        flex: 1;
+        width: 100%;
+        position: relative;
+      }
+    }
+
+    .order-sidebar {
+      width: 320px;
+      background: #0f172a;
+      border-left: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+    }
+  }
+}
+
+// ── Replay Floating Toolbar ────────────────────────────────────────────────────
+.replay-toolbar-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 16px;
+  background: rgba(15, 23, 42, 0.9);
+  backdrop-filter: blur(12px);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+
+  .replay-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    .replay-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      height: 36px;
+      padding: 0 12px;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #e2e8f0;
+      cursor: pointer;
+      font-size: 0.85rem;
+      transition: all 0.2s ease;
+
+      &:hover:not(:disabled) {
+        background: rgba(255, 255, 255, 0.12);
+        color: #fff;
+      }
+
+      &:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+      }
+
+      &.play-btn {
+        background: rgba($primary, 0.2);
+        color: $primary;
+        border-color: rgba($primary, 0.4);
+
+        &.active {
+          background: #ef4444;
+          color: #fff;
+          border-color: #ef4444;
+        }
+      }
+
+      &.next-btn {
+        background: linear-gradient(135deg, $primary, darken($primary, 8%));
+        color: #fff;
+        font-weight: 600;
+      }
+    }
+
+    .speed-selector {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin: 0 8px;
+
+      .speed-label {
+        font-size: 0.78rem;
+        color: #94a3b8;
+      }
+
+      .speed-pills {
+        display: flex;
+        gap: 4px;
+
+        .speed-pill {
+          padding: 3px 6px;
+          font-size: 0.75rem;
+          border-radius: 4px;
+          background: rgba(255, 255, 255, 0.05);
+          border: 1px solid rgba(255, 255, 255, 0.08);
+          color: #94a3b8;
+          cursor: pointer;
+
+          &.active {
+            background: rgba($primary, 0.25);
+            color: $primary;
+            border-color: $primary;
+            font-weight: 700;
+          }
+        }
+      }
+    }
+  }
+
+  .replay-progress-wrap {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    .replay-progress-bar {
+      width: 140px;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 3px;
+      overflow: hidden;
+
+      .replay-progress-fill {
+        height: 100%;
+        background: $primary;
+        transition: width 0.2s ease;
+      }
+    }
+
+    .replay-counter {
+      font-size: 0.78rem;
+      color: #94a3b8;
+    }
+  }
+}
+
+// ── Order Panel Drawer ────────────────────────────────────────────────────────
+.order-panel-container {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  .panel-section {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 10px;
+    padding: 14px;
+
+    .section-title {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: #94a3b8;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+      display: block;
+    }
+  }
+
+  .balance-card {
+    .balance-value {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: #10b981;
+    }
+  }
+
+  .order-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+
+    .form-row {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+
+      label {
+        font-size: 0.78rem;
+        color: #cbd5e1;
+      }
+
+      &.split {
+        flex-direction: row;
+        gap: 10px;
+
+        div {
+          flex: 1;
+        }
+      }
+
+      .panel-input {
+        width: 100%;
+        background: rgba(0, 0, 0, 0.25);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        color: #fff;
+        padding: 8px 10px;
+        border-radius: 6px;
+        font-size: 0.85rem;
+        outline: none;
+
+        &:focus {
+          border-color: $primary;
+        }
+      }
+    }
+
+    .preset-buttons {
+      display: flex;
+      gap: 6px;
+
+      .preset-btn {
+        flex: 1;
+        padding: 4px;
+        font-size: 0.72rem;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        color: #94a3b8;
+        border-radius: 4px;
+        cursor: pointer;
+
+        &:hover {
+          background: rgba(255, 255, 255, 0.1);
+          color: #fff;
+        }
+      }
+    }
+
+    .action-buttons-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 6px;
+
+      .action-btn {
+        flex: 1;
+        height: 42px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        font-weight: 700;
+        border-radius: 6px;
+        border: none;
+        cursor: pointer;
+        color: #fff;
+        font-size: 0.9rem;
+        transition: transform 0.15s ease;
+
+        &:active {
+          transform: scale(0.97);
+        }
+
+        &.buy-btn {
+          background: linear-gradient(135deg, #10b981, #059669);
+          box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+
+        &.sell-btn {
+          background: linear-gradient(135deg, #ef4444, #dc2626);
+          box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+        }
+      }
+    }
+
+    .active-position-card {
+      background: rgba(59, 130, 246, 0.1);
+      border: 1px solid rgba(59, 130, 246, 0.3);
+      padding: 10px;
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+
+      .pos-badge-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        .pos-badge {
+          font-weight: 700;
+          font-size: 0.85rem;
+
+          &.BUY { color: #10b981; }
+          &.SELL { color: #ef4444; }
+        }
+
+        .pos-lots {
+          font-size: 0.78rem;
+          color: #94a3b8;
+        }
+      }
+
+      .close-pos-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+        width: 100%;
+        padding: 8px;
+        background: #ef4444;
+        color: #fff;
+        border: none;
+        border-radius: 6px;
+        font-weight: 700;
+        font-size: 0.8rem;
+        cursor: pointer;
+      }
+    }
+  }
+
+  .history-section {
+    .history-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      max-height: 240px;
+      overflow-y: auto;
+
+      .empty-history {
+        font-size: 0.78rem;
+        color: #64748b;
+        text-align: center;
+        padding: 12px 0;
+      }
+
+      .history-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 8px 10px;
+        background: rgba(0, 0, 0, 0.2);
+        border-radius: 6px;
+        font-size: 0.8rem;
+
+        &.win { border-right: 3px solid #10b981; }
+        &.loss { border-right: 3px solid #ef4444; }
+
+        .item-col {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+
+          .dir-tag {
+            font-size: 0.7rem;
+            font-weight: 800;
+            padding: 2px 5px;
+            border-radius: 3px;
+
+            &.BUY { background: rgba(16, 185, 129, 0.2); color: #10b981; }
+            &.SELL { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
+          }
+
+          .item-price {
+            color: #94a3b8;
+            font-size: 0.75rem;
+          }
+
+          .pnl-val {
+            font-weight: 700;
+            &.positive { color: #10b981; }
+            &.negative { color: #ef4444; }
+          }
+
+          .r-val {
+            font-size: 0.72rem;
+            color: #64748b;
+          }
+        }
+      }
+    }
+  }
+}

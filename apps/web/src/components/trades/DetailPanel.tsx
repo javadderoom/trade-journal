@@ -6,6 +6,7 @@ import TradeChart from './TradeChart';
 import { toPersianDigits, formatToman, normalizeNumericInput } from '../../utils/farsi';
 import { useTranslation } from '../../store/useAppStore';
 import { getSharedTranslations } from '../../locales/components';
+import LoadingButton from '../ui/LoadingButton';
 import {
   formatCurrency,
   getNetPnl,
@@ -60,6 +61,17 @@ export default function DetailPanel({
 }: DetailPanelProps) {
   const { t, language } = useTranslation();
   const isEn = language === 'en';
+  const [saving, setSaving] = useState(false);
+
+  const handleSaveWithLoading = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSaving(true);
+    try {
+      await handleSaveDetails(e);
+    } finally {
+      setSaving(false);
+    }
+  };
 
   const inputStyle: React.CSSProperties = {
     backgroundColor: 'transparent',
@@ -1046,9 +1058,9 @@ export default function DetailPanel({
 
       {/* Panel Footer Actions */}
       <div className="panel-footer">
-        <button className="btn-save" onClick={handleSaveDetails}>
+        <LoadingButton className="btn-save" onClick={handleSaveWithLoading} isLoading={saving}>
           {p.saveChanges}
-        </button>
+        </LoadingButton>
         <button className="btn-delete" onClick={handleDeleteClick} title={p.deleteTrade}>
           <span className="material-symbols-outlined">delete</span>
         </button>

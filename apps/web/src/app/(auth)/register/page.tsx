@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuthStore } from '../../../lib/auth';
 import { useTranslation } from '../../../store/useAppStore';
 import { notify } from '../../../lib/notify';
+import LoadingButton from '../../../components/ui/LoadingButton';
 import { formatTimer } from '../../../utils/otp';
 import '../auth.scss';
 
@@ -244,16 +245,9 @@ function RegisterForm() {
                 </div>
               </div>
 
-              <button type="submit" className="submit-btn" disabled={loading}>
-                {loading ? (
-                  <>
-                    <div className="spinner"></div>
-                    <span>{language === 'fa' ? 'در حال ارسال...' : 'Sending...'}</span>
-                  </>
-                ) : (
-                  <span>{t('auth.otpSendBtn')}</span>
-                )}
-              </button>
+              <LoadingButton type="submit" className="submit-btn" disabled={loading} isLoading={loading}>
+                {t('auth.otpSendBtn')}
+              </LoadingButton>
             </form>
 
             <div className="auth-divider" style={{ margin: '20px 0', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', color: '#64748b', fontSize: '0.85rem' }}>
@@ -304,16 +298,9 @@ function RegisterForm() {
               </div>
             </div>
 
-            <button type="submit" className="submit-btn" disabled={loading}>
-              {loading ? (
-                <>
-                  <div className="spinner"></div>
-                  <span>{language === 'fa' ? 'در حال تایید...' : 'Verifying...'}</span>
-                </>
-              ) : (
-                <span>{t('auth.otpVerifyBtn')}</span>
-              )}
-            </button>
+            <LoadingButton type="submit" className="submit-btn" disabled={loading} isLoading={loading}>
+              {t('auth.otpVerifyBtn')}
+            </LoadingButton>
 
             <div className="otp-timer-text">
               {timerActive ? (
@@ -459,16 +446,9 @@ function RegisterForm() {
               </div>
             </div>
 
-            <button type="submit" className="submit-btn" disabled={loading}>
-              {loading ? (
-                <>
-                  <div className="spinner"></div>
-                  <span>{language === 'fa' ? 'در حال تکمیل ثبت نام...' : 'Completing signup...'}</span>
-                </>
-              ) : (
-                <span>{t('auth.submitRegister')}</span>
-              )}
-            </button>
+            <LoadingButton type="submit" className="submit-btn" disabled={loading} isLoading={loading}>
+              {t('auth.submitRegister')}
+            </LoadingButton>
           </form>
         )}
 

@@ -8,6 +8,7 @@ import { toPersianDigits, formatNum } from '../../utils/farsi';
 import { notify } from '../../lib/notify';
 import { useTranslation } from '../../store/useAppStore';
 import ConnectExchangeModal from '../../components/modals/ConnectExchangeModal';
+import LoadingButton from '../../components/ui/LoadingButton';
 import './settings.scss';
 
 type Tab = 'profile' | 'accounts' | 'subscription' | 'security';
@@ -792,15 +793,14 @@ export default function SettingsPage() {
                     <div className="broker-card-actions">
                       {acc.account_number?.includes('API Connection') ? (
                         <>
-                          <button 
+                          <LoadingButton 
                             className="broker-action-btn" 
                             onClick={() => handleSyncExchange(acc.id)}
                             disabled={syncingAccountId === acc.id}
+                            isLoading={syncingAccountId === acc.id}
                           >
-                            {syncingAccountId === acc.id 
-                              ? (language === 'fa' ? 'در حال همگام‌سازی...' : 'Syncing...') 
-                              : (language === 'fa' ? 'همگام‌سازی صرافی' : 'Sync Exchange')}
-                          </button>
+                            {language === 'fa' ? 'همگام‌سازی صرافی' : 'Sync Exchange'}
+                          </LoadingButton>
                           {acc.account_number === 'API Connection' ? (
                             <button 
                               className="broker-action-btn danger" 
@@ -1364,14 +1364,15 @@ export default function SettingsPage() {
                             placeholder={language === 'fa' ? 'مثال: OFF50' : 'Example: OFF50'}
                             style={{ direction: 'ltr', textAlign: 'center' }}
                           />
-                          <button
+                          <LoadingButton
                             type="button"
                             className="discount-apply-btn"
                             disabled={validatingDiscount || !discountCode}
                             onClick={() => handleValidateDiscount(discountCode, checkoutTarget.plan, checkoutTarget.period)}
+                            isLoading={validatingDiscount}
                           >
-                            {validatingDiscount ? (language === 'fa' ? 'بررسی...' : 'Validating...') : (language === 'fa' ? 'اعمال' : 'Apply')}
-                          </button>
+                            {language === 'fa' ? 'اعمال' : 'Apply'}
+                          </LoadingButton>
                         </div>
                         {discountError && <span className="discount-error-msg">{discountError}</span>}
                         {discountDetails && <span className="discount-success-msg">{language === 'fa' ? 'کد تخفیف با موفقیت اعمال شد.' : 'Discount code applied successfully.'}</span>}
@@ -1618,39 +1619,42 @@ export default function SettingsPage() {
 
                     <div className="checkout-modal-footer">
                       {paymentMethod === 'manual' && (
-                        <button
+                        <LoadingButton
                           className="start-checkout-btn"
                           disabled={checkoutLoading || !receiptFile}
                           onClick={handleSubmitReceipt}
+                          isLoading={checkoutLoading}
                         >
-                          {checkoutLoading ? (language === 'fa' ? 'در حال ثبت اطلاعات...' : 'Submitting details...') : (language === 'fa' ? 'ثبت فیش پرداخت' : 'Submit Receipt')}
-                        </button>
+                          {language === 'fa' ? 'ثبت فیش پرداخت' : 'Submit Receipt'}
+                        </LoadingButton>
                       )}
                       {paymentMethod === 'crypto' && (
-                        <button
+                        <LoadingButton
                           className="start-checkout-btn"
                           disabled={checkoutLoading || !cryptoTxHash.trim()}
                           onClick={handleCryptoCheckout}
+                          isLoading={checkoutLoading}
                           style={{
                             background: '#9b59b6',
                             color: '#ffffff'
                           }}
                         >
-                          {checkoutLoading ? (language === 'fa' ? 'در حال تایید تراکنش...' : 'Verifying transaction...') : (language === 'fa' ? 'بررسی و فعال‌سازی اشتراک' : 'Verify & Activate Plan')}
-                        </button>
+                          {language === 'fa' ? 'بررسی و فعال‌سازی اشتراک' : 'Verify & Activate Plan'}
+                        </LoadingButton>
                       )}
                       {(paymentMethod === 'payping' || paymentMethod === 'zarinpal') && (
-                        <button
+                        <LoadingButton
                           className="start-checkout-btn"
                           disabled={checkoutLoading}
                           onClick={handleOnlineCheckout}
+                          isLoading={checkoutLoading}
                           style={{
                             background: paymentMethod === 'payping' ? '#2c7a7b' : '#b7791f',
                             color: '#ffffff'
                           }}
                         >
-                          {checkoutLoading ? (language === 'fa' ? 'در حال انتقال به درگاه...' : 'Redirecting to gateway...') : (language === 'fa' ? `اتصال به درگاه ${paymentMethod === 'payping' ? 'پی‌پینگ' : 'زرین‌پال'}` : `Proceed to ${paymentMethod === 'payping' ? 'PayPing' : 'ZarinPal'}`)}
-                        </button>
+                          {language === 'fa' ? `اتصال به درگاه ${paymentMethod === 'payping' ? 'پی‌پینگ' : 'زرین‌پال'}` : `Proceed to ${paymentMethod === 'payping' ? 'PayPing' : 'ZarinPal'}`}
+                        </LoadingButton>
                       )}
                     </div>
                   </div>
