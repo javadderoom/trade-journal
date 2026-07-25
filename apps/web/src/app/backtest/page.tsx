@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import AppLayout from '../../components/layout/AppLayout';
 import BacktestChart, { PositionState } from '../../components/backtest/BacktestChart';
 import ReplayToolbar from '../../components/backtest/ReplayToolbar';
 import OrderPanel, { ExecutedTrade } from '../../components/backtest/OrderPanel';
@@ -39,7 +38,7 @@ export default function BacktestPage() {
     try {
       const data = await fetchHistoricalCandles(sym, tf, 600);
       setCandles(data);
-      setVisibleCount(Math.min(100, data.length));
+      setVisibleCount(data.length);
       setPosition(null);
       setTradeHistory([]);
       setBalance(initialBalance);
@@ -169,14 +168,24 @@ export default function BacktestPage() {
     const isBuy = position.type === 'BUY';
     const priceDiff = isBuy ? exitPrice - position.entryPrice : position.entryPrice - exitPrice;
     
-    // Scale pip calculation based on asset class
     const isCrypto = symbol.includes('BTC') || symbol.includes('ETH') || symbol.includes('SOL');
-    const multiplier = isCrypto ? 1 : symbol.includes('JPY') ? 100 : 10000;
-    const pips = priceDiff * multiplier;
+    const isJpy = symbol.includes('JPY');
+    const isGold = symbol === 'XAUUSD';
 
-    // Approximate USD profit per lot
-    const lotValue = isCrypto ? 1 : 100000;
-    const pnlUsd = priceDiff * position.lotSize * (isCrypto ? 1 : 1);
+    const pipDivider = isCrypto ? 1 : isGold ? 0.1 : isJpy ? 0.01 : 0.0001;
+    const pips = priceDiff / pipDivider;
+
+    // Accurate USD profit per lot calculation
+    let pnlUsd = 0;
+    if (isCrypto) {
+      pnlUsd = priceDiff * position.lotSize;
+    } else if (isGold) {
+      pnlUsd = priceDiff * 100 * position.lotSize;
+    } else if (isJpy) {
+      pnlUsd = (priceDiff / exitPrice) * 100000 * position.lotSize;
+    } else {
+      pnlUsd = priceDiff * 100000 * position.lotSize;
+    }
 
     const slDiff = position.stopLoss
       ? Math.abs(position.entryPrice - position.stopLoss)
@@ -277,13 +286,11 @@ export default function BacktestPage() {
   };
 
   return (
-    <AppLayout>
-      <div className="backtest-page-container">
+    <div className="backtest-page-container">
         {/* Header Bar */}
         <div className="backtest-header">
           <div className="header-title-wrap">
             <h1>{isEn ? 'TradingView Backtester' : 'بک‌تستر پیشرفته تریدکاو'}</h1>
-            <span className="backtest-badge">{isEn ? 'Zero-Cost Data' : 'داده رایگان'}</span>
           </div>
 
           <div className="header-controls">
@@ -370,7 +377,7 @@ export default function BacktestPage() {
               onStepForward={handleStepForward}
               onStepBackward={() => setVisibleCount((prev) => Math.max(10, prev - 1))}
               onReset={() => {
-                setVisibleCount(100);
+                setVisibleCount(candles.length);
                 setPosition(null);
                 setTradeHistory([]);
                 setBalance(initialBalance);
@@ -379,6 +386,7 @@ export default function BacktestPage() {
               onSpeedChange={setSpeed}
               currentBarIndex={visibleCount}
               totalBars={candles.length}
+              onJumpToBar={(barIdx) => setVisibleCount(barIdx)}
             />
           </div>
 
@@ -395,6 +403,5 @@ export default function BacktestPage() {
           </div>
         </div>
       </div>
-    </AppLayout>
   );
 }

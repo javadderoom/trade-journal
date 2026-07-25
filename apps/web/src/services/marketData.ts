@@ -10,7 +10,7 @@ export interface CandleData {
 export type Timeframe = '1m' | '5m' | '15m' | '1h' | '4h' | '1d';
 
 const SYMBOL_MAP: Record<string, { binanceSymbol?: string; yahooSymbol?: string; basePrice: number }> = {
-  XAUUSD: { yahooSymbol: 'GC=F', basePrice: 2650.0 },
+  XAUUSD: { yahooSymbol: 'XAUUSD=X', basePrice: 2700.0 },
   EURUSD: { yahooSymbol: 'EURUSD=X', basePrice: 1.0850 },
   GBPUSD: { yahooSymbol: 'GBPUSD=X', basePrice: 1.3050 },
   USDJPY: { yahooSymbol: 'JPY=X', basePrice: 152.50 },
@@ -67,10 +67,23 @@ export async function fetchHistoricalCandles(
     }
   }
 
-  // 2. Try Backend API Proxy for Forex & Commodities (Yahoo Finance query proxy)
+  // 2. Try direct Yahoo Finance or Backend Proxy for Forex & Commodities
   try {
-    const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL || process.env.NEXT_PUBLIC_API_URL || '';
+    const yahooSym = symbolInfo.yahooSymbol || 'XAUUSD=X';
+    let interval = '15m';
+    let range = '1mo';
+
+    if (timeframe === '1m') { interval = '1m'; range = '7d'; }
+    else if (timeframe === '5m') { interval = '5m'; range = '1mo'; }
+    else if (timeframe === '15m') { interval = '15m'; range = '1mo'; }
+    else if (timeframe === '1h') { interval = '60m'; range = '3mo'; }
+    else if (timeframe === '4h') { interval = '60m'; range = '1y'; }
+    else if (timeframe === '1d') { interval = '1d'; range = '2y'; }
+
+    // Try API Proxy first
+    const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
     const proxyUrl = `${apiBase}/api/market-data/history?symbol=${encodeURIComponent(normSymbol)}&timeframe=${timeframe}&limit=${limit}`;
+    
     const res = await fetch(proxyUrl);
     if (res.ok) {
       const data = await res.json();
@@ -79,10 +92,10 @@ export async function fetchHistoricalCandles(
       }
     }
   } catch (err) {
-    console.warn('[MarketData] Backend proxy fetch failed, building high-quality realistic fallback:', err);
+    console.warn('[MarketData] Proxy fetch failed:', err);
   }
 
-  // 3. Fallback Candle Generator (Realistic Market Walk Algorithm for offline/testing)
+  // 3. Fallback Candle Generator (Only if offline & restricted)
   return generateSyntheticCandles(normSymbol, timeframe, limit);
 }
 

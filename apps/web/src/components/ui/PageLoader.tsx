@@ -34,6 +34,7 @@ export default function PageLoader({
     >
       <div className="dash-spinner" />
       <p
+        suppressHydrationWarning
         style={{
           color: '#94a3b8',
           fontSize: '14px',

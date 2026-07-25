@@ -4,7 +4,7 @@ import axios from 'axios';
 const router = Router();
 
 const YAHOO_SYMBOL_MAP: Record<string, string> = {
-  XAUUSD: 'GC=F',
+  XAUUSD: 'XAUUSD=X',
   EURUSD: 'EURUSD=X',
   GBPUSD: 'GBPUSD=X',
   USDJPY: 'JPY=X',
@@ -12,6 +12,36 @@ const YAHOO_SYMBOL_MAP: Record<string, string> = {
   ETHUSD: 'ETH-USD',
   SOLUSD: 'SOL-USD',
 };
+
+function aggregate4HourCandles(rawCandles: Array<{ time: number; open: number; high: number; low: number; close: number; volume: number }>) {
+  const aggregated = [];
+  for (let i = 0; i < rawCandles.length; i += 4) {
+    const chunk = rawCandles.slice(i, i + 4);
+    if (chunk.length === 0) continue;
+
+    const open = chunk[0].open;
+    const close = chunk[chunk.length - 1].close;
+    let high = chunk[0].high;
+    let low = chunk[0].low;
+    let volume = 0;
+
+    for (const c of chunk) {
+      if (c.high > high) high = c.high;
+      if (c.low < low) low = c.low;
+      volume += c.volume;
+    }
+
+    aggregated.push({
+      time: chunk[0].time,
+      open,
+      high,
+      low,
+      close,
+      volume,
+    });
+  }
+  return aggregated;
+}
 
 /**
  * GET /api/market-data/history
@@ -23,7 +53,10 @@ router.get('/history', async (req: Request, res: Response): Promise<void> => {
     const timeframe = (req.query.timeframe as string || '15m').toLowerCase();
     const limit = parseInt(req.query.limit as string || '500', 10);
 
-    const yahooSymbol = YAHOO_SYMBOL_MAP[symbol] || symbol;
+    let yahooSymbol = YAHOO_SYMBOL_MAP[symbol] || symbol;
+    if (symbol === 'XAUUSD' && timeframe !== '1d') {
+      yahooSymbol = 'GC=F';
+    }
 
     // Map timeframe to Yahoo Finance interval & range
     let interval = '15m';
@@ -36,14 +69,31 @@ router.get('/history', async (req: Request, res: Response): Promise<void> => {
     else if (timeframe === '4h') { interval = '60m'; range = '1y'; }
     else if (timeframe === '1d') { interval = '1d'; range = '2y'; }
 
-    const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(yahooSymbol)}?interval=${interval}&range=${range}`;
+    let url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(yahooSymbol)}?interval=${interval}&range=${range}`;
 
-    const response = await axios.get(url, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-      },
-      timeout: 8000,
-    });
+    let response;
+    try {
+      response = await axios.get(url, {
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        },
+        timeout: 8000,
+      });
+    } catch (fetchErr: any) {
+      // Fallback for Gold if primary symbol returns 404
+      if (symbol === 'XAUUSD') {
+        const altSymbol = yahooSymbol === 'GC=F' ? 'XAUUSD=X' : 'GC=F';
+        url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(altSymbol)}?interval=${interval}&range=${range}`;
+        response = await axios.get(url, {
+          headers: {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+          },
+          timeout: 8000,
+        });
+      } else {
+        throw fetchErr;
+      }
+    }
 
     const result = response.data?.chart?.result?.[0];
     if (!result || !result.timestamp || !result.indicators?.quote?.[0]) {
@@ -59,7 +109,7 @@ router.get('/history', async (req: Request, res: Response): Promise<void> => {
     const closes = quote.close || [];
     const volumes = quote.volume || [];
 
-    const candles = [];
+    let candles = [];
     for (let i = 0; i < timestamps.length; i++) {
       if (
         opens[i] !== null &&
@@ -77,6 +127,11 @@ router.get('/history', async (req: Request, res: Response): Promise<void> => {
           volume: volumes[i] ? Math.round(volumes[i]) : 0,
         });
       }
+    }
+
+    // If 4h timeframe, aggregate 1h candles into true 4-hour candles
+    if (timeframe === '4h') {
+      candles = aggregate4HourCandles(candles);
     }
 
     // Limit output count to requested limit

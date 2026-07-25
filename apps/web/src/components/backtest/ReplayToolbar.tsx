@@ -26,6 +26,7 @@ export default function ReplayToolbar({
   onSpeedChange,
   currentBarIndex,
   totalBars,
+  onJumpToBar,
 }: ReplayToolbarProps) {
   const { language } = useTranslation();
   const isEn = language === 'en';
@@ -100,9 +101,21 @@ export default function ReplayToolbar({
         </button>
       </div>
 
-      {/* Progress Bar */}
+      {/* Interactive Progress Bar */}
       <div className="replay-progress-wrap">
-        <div className="replay-progress-bar">
+        <div
+          className="replay-progress-bar"
+          onClick={(e) => {
+            if (!onJumpToBar || totalBars === 0) return;
+            const rect = e.currentTarget.getBoundingClientRect();
+            const clickX = e.clientX - rect.left;
+            const ratio = Math.max(0, Math.min(1, clickX / rect.width));
+            const targetBar = Math.max(10, Math.round(ratio * totalBars));
+            onJumpToBar(targetBar);
+          }}
+          style={{ cursor: 'pointer' }}
+          title={isEn ? 'Click to jump to candle position' : 'برای پریدن به موقعیت کندل کلیک کنید'}
+        >
           <div className="replay-progress-fill" style={{ width: `${progressPercent}%` }} />
         </div>
         <span className="replay-counter">
