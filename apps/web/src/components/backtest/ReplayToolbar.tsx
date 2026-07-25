@@ -119,7 +119,7 @@ export default function ReplayToolbar({
           <div className="replay-progress-fill" style={{ width: `${progressPercent}%` }} />
         </div>
         <span className="replay-counter">
-          {currentBarIndex} / {totalBars} {isEn ? 'bars' : 'کندل'} ({progressPercent}%)
+          ({progressPercent}%)
         </span>
       </div>
     </div>

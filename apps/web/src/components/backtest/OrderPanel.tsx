@@ -44,6 +44,14 @@ export default function OrderPanel({
   const [stopLoss, setStopLoss] = useState<string>('');
   const [takeProfit, setTakeProfit] = useState<string>('');
 
+  // Sync SL/TP when activePosition or chart drag updates them
+  React.useEffect(() => {
+    if (activePosition) {
+      if (activePosition.stopLoss !== null) setStopLoss(activePosition.stopLoss.toString());
+      if (activePosition.takeProfit !== null) setTakeProfit(activePosition.takeProfit.toString());
+    }
+  }, [activePosition?.stopLoss, activePosition?.takeProfit]);
+
   const handleBuy = () => {
     const slVal = stopLoss ? parseFloat(stopLoss) : null;
     const tpVal = takeProfit ? parseFloat(takeProfit) : null;
@@ -54,14 +62,6 @@ export default function OrderPanel({
     const slVal = stopLoss ? parseFloat(stopLoss) : null;
     const tpVal = takeProfit ? parseFloat(takeProfit) : null;
     onOpenPosition('SELL', lotSize, slVal, tpVal);
-  };
-
-  // Quick SL/TP helper presets (e.g. +20 pips, -10 pips)
-  const setPresetPips = (slPips: number, tpPips: number) => {
-    if (!currentPrice) return;
-    const pipScale = currentPrice > 500 ? 1 : 0.0001; // Scale for Gold/Crypto vs Forex
-    setStopLoss((currentPrice - slPips * pipScale).toFixed(2));
-    setTakeProfit((currentPrice + tpPips * pipScale).toFixed(2));
   };
 
   return (
@@ -110,13 +110,6 @@ export default function OrderPanel({
               className="panel-input tp-input"
             />
           </div>
-        </div>
-
-        {/* Preset R:R Helpers */}
-        <div className="preset-buttons">
-          <button type="button" className="preset-btn" onClick={() => setPresetPips(15, 30)}>1:2 R:R</button>
-          <button type="button" className="preset-btn" onClick={() => setPresetPips(20, 60)}>1:3 R:R</button>
-          <button type="button" className="preset-btn" onClick={() => setStopLoss('')}>{isEn ? 'Clear SL/TP' : 'حذف SL/TP'}</button>
         </div>
 
         {/* Active Position vs Buy/Sell Actions */}
