@@ -62,20 +62,27 @@ export function useTradingEngine({ symbol, initialBalance = 10000, isEn }: Tradi
 
       const trade = buildExecutedTrade(pos, exitPrice, exitReason, asset, currentCandle.time);
 
-      setTradeHistory((history) => [trade, ...history]);
-      setBalance((bal) => bal + trade.pnlUsd);
+      // Execute side-effects outside of the React state updater loop using a Microtask / setTimeout
+      setTimeout(() => {
+        setTradeHistory((history) => {
+          // Prevent duplicates
+          if (history.some((t) => t.id === trade.id)) return history;
+          return [trade, ...history];
+        });
+        setBalance((bal) => bal + trade.pnlUsd);
 
-      const message =
-        trade.result === 'WIN'
-          ? isEn
-            ? `Trade Hit ${exitReason}! Profit: +$${trade.pnlUsd.toFixed(2)}`
-            : `معامله با سود بسته‌شد (${exitReason}): +$${trade.pnlUsd.toFixed(2)}`
-          : isEn
-            ? `Trade Hit ${exitReason}! Loss: -$${Math.abs(trade.pnlUsd).toFixed(2)}`
-            : `معامله با حد ضرر بسته‌شد (${exitReason}): -$${Math.abs(trade.pnlUsd).toFixed(2)}`;
+        const message =
+          trade.result === 'WIN'
+            ? isEn
+              ? `Trade Hit ${exitReason}! Profit: +$${trade.pnlUsd.toFixed(2)}`
+              : `معامله با سود بسته‌شد (${exitReason}): +$${trade.pnlUsd.toFixed(2)}`
+            : isEn
+              ? `Trade Hit ${exitReason}! Loss: -$${Math.abs(trade.pnlUsd).toFixed(2)}`
+              : `معامله با حد ضرر بسته‌شد (${exitReason}): -$${Math.abs(trade.pnlUsd).toFixed(2)}`;
 
-      if (trade.result === 'WIN') notify.success(message);
-      else notify.error(message);
+        if (trade.result === 'WIN') notify.success(message);
+        else notify.error(message);
+      }, 0);
 
       return prev.filter((p) => p.id !== positionId);
     });
