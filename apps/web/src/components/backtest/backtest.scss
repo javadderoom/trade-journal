@@ -1,24 +1,29 @@
-@import '../../app/variables';
+@use '../../app/variables' as *;
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// Backtest Page — consistent with app design language:
+//   • transparent surfaces (not solid blocks)
+//   • generous whitespace
+//   • minimal colored backgrounds (only on interactive elements)
+// ═══════════════════════════════════════════════════════════════════════════════
 
 .backtest-page-container {
   display: flex;
   flex-direction: column;
   height: 100vh;
   width: 100%;
-  background-color: $background;
   color: $on-surface;
   overflow: hidden;
   box-sizing: border-box;
 
-  // ── Top Header Setup Bar ──────────────────────────────────────────────────────
+  // ── Top Header Setup Bar ────────────────────────────────────────────────────
   .backtest-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding: 10px 20px;
-    background: rgba($surface-container, 0.95);
-    backdrop-filter: blur(12px);
-    border-bottom: 1px solid rgba($outline-variant, 0.35);
+    background: transparent;
+    border-bottom: 1px solid rgba($outline-variant, 0.2);
 
     .header-title-wrap {
       display: flex;
@@ -26,77 +31,119 @@
       gap: 10px;
 
       h1 {
-        font-size: 1.15rem;
+        font-size: 1.1rem;
         font-weight: 700;
         margin: 0;
         color: $on-surface;
-      }
-
-      .backtest-badge {
-        padding: 3px 8px;
-        font-size: 0.72rem;
-        font-weight: 700;
-        border-radius: 4px;
-        background: rgba($primary, 0.15);
-        color: $primary;
-        border: 1px solid rgba($primary, 0.3);
       }
     }
 
     .header-controls {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 16px;
 
       .selector-group {
         display: flex;
         align-items: center;
-        gap: 6px;
+        gap: 8px;
 
         label {
-          font-size: 0.8rem;
+          font-size: 0.78rem;
           color: $on-surface-variant;
+          white-space: nowrap;
         }
+      }
 
-        .select-input {
-          background: rgba($surface-variant, 0.4);
-          border: 1px solid rgba($outline-variant, 0.4);
-          color: $on-surface;
-          border-radius: 8px;
-          padding: 6px 12px;
-          font-size: 0.85rem;
-          outline: none;
+      // ── Timeframe Pill Buttons ─────────────────────────────────────────────
+      .tf-pills {
+        display: flex;
+        gap: 2px;
+        background: rgba($surface-variant, 0.25);
+        border-radius: 8px;
+        padding: 2px;
+
+        .tf-pill {
+          padding: 5px 10px;
+          border-radius: 6px;
+          border: none;
+          background: transparent;
+          color: $on-surface-variant;
+          font-size: 0.78rem;
+          font-weight: 600;
           cursor: pointer;
+          transition: all 0.15s ease;
+          font-family: $font-primary;
 
-          option {
-            background: $surface-container-high;
+          &:hover {
             color: $on-surface;
+            background: rgba($surface-variant, 0.4);
+          }
+
+          &.active {
+            background: rgba($primary, 0.15);
+            color: $primary;
+            box-shadow: 0 0 8px rgba($primary, 0.15);
           }
         }
       }
 
+      // ── Import CSV Button ──────────────────────────────────────────────────
+      .import-csv-btn {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 14px;
+        border-radius: 8px;
+        border: 1px solid rgba($outline-variant, 0.4);
+        background: transparent;
+        color: $on-surface-variant;
+        font-size: 0.82rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.15s ease;
+        font-family: $font-primary;
+
+        .material-symbols-outlined {
+          font-size: 18px;
+        }
+
+        &:hover {
+          border-color: $outline;
+          color: $on-surface;
+          background: rgba($surface-variant, 0.3);
+        }
+      }
+
+      // ── Save Session Button ────────────────────────────────────────────────
       .save-session-btn {
         display: flex;
         align-items: center;
         gap: 6px;
         padding: 6px 14px;
-        background: linear-gradient(135deg, $primary, $primary-container);
-        color: $on-primary;
-        border: none;
         border-radius: 8px;
-        font-weight: 700;
-        font-size: 0.85rem;
+        border: 1px solid rgba($primary, 0.3);
+        background: transparent;
+        color: $primary;
+        font-size: 0.82rem;
+        font-weight: 600;
         cursor: pointer;
-        transition: all 0.2s ease;
+        transition: all 0.15s ease;
+        font-family: $font-primary;
+
+        .material-symbols-outlined {
+          font-size: 18px;
+        }
 
         &:hover {
-          box-shadow: 0 4px 12px rgba($primary, 0.35);
+          background: rgba($primary, 0.08);
+          border-color: rgba($primary, 0.5);
         }
       }
     }
   }
 
-  // ── Main Workspace Split (Chart Canvas + Order Panel) ─────────────────────────
+  // ── Main Workspace Split ────────────────────────────────────────────────────
   .backtest-workspace {
     display: flex;
     flex: 1;
@@ -110,58 +157,54 @@
       align-items: center;
       padding: 12px 8px;
       gap: 10px;
-      background: rgba($surface-container, 0.95);
-      backdrop-filter: blur(12px);
-      border-right: 1px solid rgba($outline-variant, 0.35);
+      background: transparent;
+      border-right: 1px solid rgba($outline-variant, 0.15);
       z-index: 15;
 
       .tools-group {
         display: flex;
         flex-direction: column;
-        gap: 6px;
+        gap: 4px;
       }
 
       .tools-divider {
         width: 20px;
         height: 1px;
-        background: rgba($outline-variant, 0.35);
+        background: rgba($outline-variant, 0.2);
         margin: 4px 0;
       }
 
       .draw-tool-btn {
-        width: 38px;
-        height: 38px;
+        width: 36px;
+        height: 36px;
         border-radius: 8px;
-        background: rgba($surface-variant, 0.3);
-        border: 1px solid rgba($outline-variant, 0.35);
+        background: transparent;
+        border: 1px solid transparent;
         color: $on-surface-variant;
         display: flex;
         align-items: center;
         justify-content: center;
         cursor: pointer;
-        transition: all 0.2s ease;
+        transition: all 0.15s ease;
 
         &:hover {
-          background: rgba($surface-variant, 0.6);
+          background: rgba($surface-variant, 0.3);
           color: $on-surface;
         }
 
         &.active {
-          background: rgba($primary, 0.2);
-          border-color: $primary;
+          background: rgba($primary, 0.1);
+          border-color: rgba($primary, 0.3);
           color: $primary;
-          box-shadow: 0 0 10px rgba($primary, 0.3);
         }
 
         &.cut-tool.active {
-          background: rgba($loss, 0.2);
-          border-color: $loss;
+          background: rgba($loss, 0.1);
+          border-color: rgba($loss, 0.3);
           color: $loss;
-          box-shadow: 0 0 10px rgba($loss, 0.3);
         }
 
         &.clear-btn:hover {
-          background: rgba($loss, 0.15);
           color: $loss;
         }
 
@@ -176,7 +219,6 @@
       display: flex;
       flex-direction: column;
       position: relative;
-      background: $background;
 
       .chart-wrapper {
         flex: 1;
@@ -187,8 +229,7 @@
 
     .order-sidebar {
       width: 320px;
-      background: $surface-container-low;
-      border-left: 1px solid rgba($outline-variant, 0.35);
+      border-left: 1px solid rgba($outline-variant, 0.15);
       display: flex;
       flex-direction: column;
       overflow-y: auto;
@@ -196,15 +237,14 @@
   }
 }
 
-// ── Replay Floating Toolbar ────────────────────────────────────────────────────
+// ── Replay Toolbar ───────────────────────────────────────────────────────────
 .replay-toolbar-container {
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 8px 16px;
-  background: rgba($surface-container, 0.95);
-  backdrop-filter: blur(12px);
-  border-top: 1px solid rgba($outline-variant, 0.35);
+  background: transparent;
+  border-top: 1px solid rgba($outline-variant, 0.15);
 
   .replay-controls {
     display: flex;
@@ -216,42 +256,42 @@
       align-items: center;
       justify-content: center;
       gap: 4px;
-      height: 36px;
+      height: 34px;
       padding: 0 12px;
       border-radius: 8px;
-      background: rgba($surface-variant, 0.3);
-      border: 1px solid rgba($outline-variant, 0.35);
-      color: $on-surface;
+      background: transparent;
+      border: 1px solid rgba($outline-variant, 0.3);
+      color: $on-surface-variant;
       cursor: pointer;
-      font-size: 0.85rem;
-      transition: all 0.2s ease;
+      font-size: 0.82rem;
+      transition: all 0.15s ease;
+      font-family: $font-primary;
 
       &:hover:not(:disabled) {
-        background: rgba($surface-variant, 0.6);
+        background: rgba($surface-variant, 0.3);
         color: $on-surface;
       }
 
       &:disabled {
-        opacity: 0.4;
+        opacity: 0.35;
         cursor: not-allowed;
       }
 
       &.play-btn {
-        background: rgba($primary, 0.15);
+        border-color: rgba($primary, 0.3);
         color: $primary;
-        border-color: rgba($primary, 0.35);
 
         &.active {
-          background: $loss;
-          color: #fff;
-          border-color: $loss;
+          background: rgba($loss, 0.15);
+          color: $loss;
+          border-color: rgba($loss, 0.3);
         }
       }
 
       &.next-btn {
-        background: linear-gradient(135deg, $primary, $primary-container);
-        color: $on-primary;
-        font-weight: 700;
+        border-color: rgba($primary, 0.3);
+        color: $primary;
+        font-weight: 600;
       }
     }
 
@@ -262,27 +302,33 @@
       margin: 0 8px;
 
       .speed-label {
-        font-size: 0.78rem;
+        font-size: 0.75rem;
         color: $on-surface-variant;
       }
 
       .speed-pills {
         display: flex;
-        gap: 4px;
+        gap: 2px;
 
         .speed-pill {
-          padding: 3px 6px;
-          font-size: 0.75rem;
+          padding: 3px 8px;
+          font-size: 0.72rem;
           border-radius: 6px;
-          background: rgba($surface-variant, 0.3);
-          border: 1px solid rgba($outline-variant, 0.3);
+          background: transparent;
+          border: 1px solid transparent;
           color: $on-surface-variant;
           cursor: pointer;
+          font-family: $font-primary;
+          transition: all 0.15s ease;
+
+          &:hover {
+            color: $on-surface;
+          }
 
           &.active {
-            background: rgba($primary, 0.25);
+            background: rgba($primary, 0.1);
             color: $primary;
-            border-color: $primary;
+            border-color: rgba($primary, 0.25);
             font-weight: 700;
           }
         }
@@ -297,125 +343,304 @@
 
     .replay-progress-bar {
       width: 140px;
-      height: 6px;
-      background: rgba($outline-variant, 0.3);
-      border-radius: 3px;
+      height: 4px;
+      background: rgba($outline-variant, 0.2);
+      border-radius: 2px;
       overflow: hidden;
 
       .replay-progress-fill {
         height: 100%;
         background: $primary;
+        border-radius: 2px;
         transition: width 0.2s ease;
       }
     }
 
     .replay-counter {
-      font-size: 0.78rem;
+      font-size: 0.75rem;
       color: $on-surface-variant;
     }
   }
 }
 
-// ── Order Panel Drawer ────────────────────────────────────────────────────────
+// ── Order Panel ──────────────────────────────────────────────────────────────
 .order-panel-container {
   padding: 16px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 14px;
 
   .panel-section {
-    background: $surface-container;
-    border: 1px solid rgba($outline-variant, 0.35);
-    border-radius: 12px;
+    border: 1px solid rgba($outline-variant, 0.2);
+    border-radius: 10px;
     padding: 14px;
 
     .section-title {
-      font-size: 0.8rem;
+      font-size: 0.75rem;
       font-weight: 700;
       color: $on-surface-variant;
       text-transform: uppercase;
-      margin-bottom: 8px;
+      letter-spacing: 0.04em;
+      margin-bottom: 10px;
       display: block;
     }
   }
 
   .balance-card {
     .balance-value {
-      font-size: 1.5rem;
+      font-size: 1.4rem;
       font-weight: 800;
       color: $profit;
     }
   }
 
+  // ── SL/TP Section (always visible) ───────────────────────────────────────
+  .sltp-section {
+    .apply-sltp-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      width: 100%;
+      padding: 8px;
+      border-radius: 8px;
+      border: 1px solid rgba($primary, 0.3);
+      background: rgba($primary, 0.08);
+      color: $primary;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: $font-primary;
+      transition: all 0.15s ease;
+
+      .material-symbols-outlined {
+        font-size: 18px;
+      }
+
+      &:hover {
+        background: rgba($primary, 0.15);
+        border-color: rgba($primary, 0.5);
+      }
+    }
+  }
+
+  // ── Active Position Section ──────────────────────────────────────────────
+  .positions-section {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .active-position-card {
+    background: rgba($primary, 0.05);
+    border: 1px solid rgba($primary, 0.15);
+    padding: 12px;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    cursor: pointer;
+    transition: border-color 0.15s ease, background 0.15s ease;
+
+    &:hover {
+      border-color: rgba($primary, 0.3);
+    }
+
+    &.selected {
+      border-color: rgba($primary, 0.5);
+      background: rgba($primary, 0.08);
+    }
+
+    .pos-badge-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      .pos-badge {
+        font-weight: 700;
+        font-size: 0.85rem;
+
+        &.BUY { color: $profit; }
+        &.SELL { color: $loss; }
+      }
+
+      .pos-lots {
+        font-size: 0.75rem;
+        color: $on-surface-variant;
+      }
+    }
+
+    .running-pnl {
+      font-size: 1.1rem;
+      font-weight: 800;
+      text-align: center;
+      padding: 4px 0;
+
+      &.positive { color: $profit; }
+      &.negative { color: $loss; }
+    }
+
+    .pos-sltp-info {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.72rem;
+      color: $on-surface-variant;
+
+      .sl-info { color: rgba($loss, 0.8); }
+      .tp-info { color: rgba($profit, 0.8); }
+    }
+
+    .close-pos-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      width: 100%;
+      padding: 6px;
+      background: rgba($loss, 0.12);
+      color: $loss;
+      border: 1px solid rgba($loss, 0.25);
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 0.78rem;
+      cursor: pointer;
+      font-family: $font-primary;
+      transition: background 0.15s ease;
+
+      &:hover {
+        background: rgba($loss, 0.2);
+      }
+    }
+  }
+
+  .quick-trade-row {
+    display: flex;
+    gap: 8px;
+    margin-top: 4px;
+
+    .action-btn {
+      flex: 1;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      font-weight: 700;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      color: #fff;
+      font-size: 0.82rem;
+      font-family: $font-primary;
+      transition: transform 0.12s ease, opacity 0.12s ease;
+
+      &:active { transform: scale(0.97); }
+
+      &.buy-btn {
+        background: $profit;
+        &:hover { opacity: 0.9; }
+      }
+
+      &.sell-btn {
+        background: $loss;
+        &:hover { opacity: 0.9; }
+      }
+    }
+  }
+
+  // ── Shared form styles (used by .sltp-section AND .order-form) ────────────
+  .form-row {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+
+    label {
+      font-size: 0.75rem;
+      color: $on-surface-variant;
+    }
+
+    &.split {
+      flex-direction: row;
+      gap: 10px;
+
+      div {
+        flex: 1;
+      }
+    }
+  }
+
+  .panel-input {
+    width: 100%;
+    background: transparent;
+    border: 1px solid rgba($outline-variant, 0.35);
+    color: $on-surface;
+    padding: 8px 10px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    outline: none;
+    font-family: $font-primary;
+    transition: border-color 0.15s ease;
+
+    &:focus {
+      border-color: $primary;
+      box-shadow: 0 0 0 2px rgba($primary, 0.1);
+    }
+
+    &::placeholder {
+      color: rgba($on-surface-variant, 0.4);
+    }
+  }
+
+  .sl-input:focus {
+    border-color: $loss;
+    box-shadow: 0 0 0 2px rgba($loss, 0.1);
+  }
+
+  .tp-input:focus {
+    border-color: $profit;
+    box-shadow: 0 0 0 2px rgba($profit, 0.1);
+  }
+
+  .preset-buttons {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+
+    .preset-btn {
+      flex: 1;
+      min-width: 0;
+      padding: 5px 4px;
+      font-size: 0.7rem;
+      background: transparent;
+      border: 1px solid rgba($outline-variant, 0.25);
+      color: $on-surface-variant;
+      border-radius: 6px;
+      cursor: pointer;
+      font-family: $font-primary;
+      transition: all 0.15s ease;
+
+      &:hover {
+        background: rgba($surface-variant, 0.3);
+        color: $on-surface;
+        border-color: $outline-variant;
+      }
+    }
+  }
+
+  // ── Order Form (lot size + BUY/SELL) ─────────────────────────────────────
   .order-form {
     display: flex;
     flex-direction: column;
     gap: 12px;
 
-    .form-row {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-
-      label {
-        font-size: 0.78rem;
-        color: $on-surface-variant;
-      }
-
-      &.split {
-        flex-direction: row;
-        gap: 10px;
-
-        div {
-          flex: 1;
-        }
-      }
-
-      .panel-input {
-        width: 100%;
-        background: $surface-container-lowest;
-        border: 1px solid rgba($outline-variant, 0.4);
-        color: $on-surface;
-        padding: 8px 10px;
-        border-radius: 8px;
-        font-size: 0.85rem;
-        outline: none;
-
-        &:focus {
-          border-color: $primary;
-        }
-      }
-    }
-
-    .preset-buttons {
-      display: flex;
-      gap: 6px;
-
-      .preset-btn {
-        flex: 1;
-        padding: 6px 4px;
-        font-size: 0.72rem;
-        background: rgba($surface-variant, 0.3);
-        border: 1px solid rgba($outline-variant, 0.3);
-        color: $on-surface-variant;
-        border-radius: 6px;
-        cursor: pointer;
-
-        &:hover {
-          background: rgba($surface-variant, 0.6);
-          color: $on-surface;
-        }
-      }
-    }
-
     .action-buttons-row {
       display: flex;
       gap: 10px;
-      margin-top: 6px;
+      margin-top: 4px;
 
       .action-btn {
         flex: 1;
-        height: 42px;
+        height: 40px;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -425,67 +650,23 @@
         border: none;
         cursor: pointer;
         color: #fff;
-        font-size: 0.9rem;
-        transition: transform 0.15s ease;
+        font-size: 0.88rem;
+        font-family: $font-primary;
+        transition: transform 0.12s ease, opacity 0.12s ease;
 
         &:active {
           transform: scale(0.97);
         }
 
         &.buy-btn {
-          background: linear-gradient(135deg, $profit, #059669);
-          box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+          background: $profit;
+          &:hover { opacity: 0.9; }
         }
 
         &.sell-btn {
-          background: linear-gradient(135deg, $loss, #dc2626);
-          box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+          background: $loss;
+          &:hover { opacity: 0.9; }
         }
-      }
-    }
-
-    .active-position-card {
-      background: rgba($primary, 0.08);
-      border: 1px solid rgba($primary, 0.3);
-      padding: 10px;
-      border-radius: 10px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-
-      .pos-badge-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-
-        .pos-badge {
-          font-weight: 700;
-          font-size: 0.85rem;
-
-          &.BUY { color: $profit; }
-          &.SELL { color: $loss; }
-        }
-
-        .pos-lots {
-          font-size: 0.78rem;
-          color: $on-surface-variant;
-        }
-      }
-
-      .close-pos-btn {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 4px;
-        width: 100%;
-        padding: 8px;
-        background: $loss;
-        color: #fff;
-        border: none;
-        border-radius: 8px;
-        font-weight: 700;
-        font-size: 0.8rem;
-        cursor: pointer;
       }
     }
   }
@@ -494,15 +675,15 @@
     .history-list {
       display: flex;
       flex-direction: column;
-      gap: 6px;
-      max-height: 240px;
+      gap: 4px;
+      max-height: 260px;
       overflow-y: auto;
 
       .empty-history {
         font-size: 0.78rem;
         color: $on-surface-variant;
         text-align: center;
-        padding: 12px 0;
+        padding: 16px 0;
       }
 
       .history-item {
@@ -510,9 +691,15 @@
         align-items: center;
         justify-content: space-between;
         padding: 8px 10px;
-        background: $surface-container-lowest;
+        background: transparent;
+        border: 1px solid rgba($outline-variant, 0.15);
         border-radius: 8px;
-        font-size: 0.8rem;
+        font-size: 0.78rem;
+        transition: background 0.12s ease;
+
+        &:hover {
+          background: rgba($surface-variant, 0.15);
+        }
 
         &.win { border-right: 3px solid $profit; }
         &.loss { border-right: 3px solid $loss; }
@@ -523,18 +710,18 @@
           gap: 6px;
 
           .dir-tag {
-            font-size: 0.7rem;
+            font-size: 0.68rem;
             font-weight: 800;
-            padding: 2px 5px;
+            padding: 2px 6px;
             border-radius: 4px;
 
-            &.BUY { background: rgba($profit, 0.2); color: $profit; }
-            &.SELL { background: rgba($loss, 0.2); color: $loss; }
+            &.BUY { background: rgba($profit, 0.12); color: $profit; }
+            &.SELL { background: rgba($loss, 0.12); color: $loss; }
           }
 
           .item-price {
             color: $on-surface-variant;
-            font-size: 0.75rem;
+            font-size: 0.73rem;
           }
 
           .pnl-val {
@@ -544,7 +731,7 @@
           }
 
           .r-val {
-            font-size: 0.72rem;
+            font-size: 0.7rem;
             color: $on-surface-variant;
           }
         }

@@ -35,7 +35,7 @@ export default function BacktestPage() {
   // Trading & Balance State
   const [initialBalance] = useState<number>(10000);
   const [balance, setBalance] = useState<number>(10000);
-  const [position, setPosition] = useState<PositionState | null>(null);
+  const [positions, setPositions] = useState<PositionState[]>([]);
   const [tradeHistory, setTradeHistory] = useState<ExecutedTrade[]>([]);
 
   const timerRef = useRef<NodeJS.Timeout | null>(null);
@@ -50,7 +50,7 @@ export default function BacktestPage() {
         if (parsed.symbol) setSymbol(parsed.symbol);
         if (parsed.timeframe) setTimeframe(parsed.timeframe);
         if (typeof parsed.balance === 'number') setBalance(parsed.balance);
-        if (parsed.position) setPosition(parsed.position);
+        if (Array.isArray(parsed.positions)) setPositions(parsed.positions);
         if (Array.isArray(parsed.tradeHistory)) setTradeHistory(parsed.tradeHistory);
         if (Array.isArray(parsed.drawings)) setDrawings(parsed.drawings);
         if (typeof parsed.visibleCount === 'number') setVisibleCount(parsed.visibleCount);
@@ -67,7 +67,7 @@ export default function BacktestPage() {
         symbol,
         timeframe,
         balance,
-        position,
+        positions,
         tradeHistory,
         drawings,
         visibleCount,
@@ -76,7 +76,7 @@ export default function BacktestPage() {
     } catch (e) {
       console.warn('Could not save backtest session to local storage:', e);
     }
-  }, [symbol, timeframe, balance, position, tradeHistory, drawings, visibleCount]);
+  }, [symbol, timeframe, balance, positions, tradeHistory, drawings, visibleCount]);
 
   // 3. Load Candles for Selected Symbol & Timeframe
   const loadCandles = useCallback(async (sym: string, tf: Timeframe) => {
@@ -103,13 +103,14 @@ export default function BacktestPage() {
   const currentCandle = candles[visibleCount - 1] || null;
   const currentPrice = currentCandle ? currentCandle.close : 0;
 
-  // 4. Close Position & Calculate PnL / R-Multiple
-  const closePositionAtPrice = useCallback((exitPrice: number, exitReason: string) => {
-    setPosition((prevPosition) => {
-      if (!prevPosition || !currentCandle) return null;
+  // 4. Close Position by ID
+  const closePositionAtPrice = useCallback((positionId: string, exitPrice: number, exitReason: string) => {
+    setPositions((prev) => {
+      const pos = prev.find((p) => p.id === positionId);
+      if (!pos || !currentCandle) return prev;
 
-      const isBuy = prevPosition.type === 'BUY';
-      const priceDiff = isBuy ? exitPrice - prevPosition.entryPrice : prevPosition.entryPrice - exitPrice;
+      const isBuy = pos.type === 'BUY';
+      const priceDiff = isBuy ? exitPrice - pos.entryPrice : pos.entryPrice - exitPrice;
       
       const isCrypto = symbol.includes('BTC') || symbol.includes('ETH') || symbol.includes('SOL');
       const isJpy = symbol.includes('JPY');
@@ -120,29 +121,29 @@ export default function BacktestPage() {
 
       let pnlUsd = 0;
       if (isCrypto) {
-        pnlUsd = priceDiff * prevPosition.lotSize;
+        pnlUsd = priceDiff * pos.lotSize;
       } else if (isGold) {
-        pnlUsd = priceDiff * 100 * prevPosition.lotSize;
+        pnlUsd = priceDiff * 100 * pos.lotSize;
       } else if (isJpy) {
-        pnlUsd = (priceDiff / exitPrice) * 100000 * prevPosition.lotSize;
+        pnlUsd = (priceDiff / exitPrice) * 100000 * pos.lotSize;
       } else {
-        pnlUsd = priceDiff * 100000 * prevPosition.lotSize;
+        pnlUsd = priceDiff * 100000 * pos.lotSize;
       }
 
-      const slDiff = prevPosition.stopLoss
-        ? Math.abs(prevPosition.entryPrice - prevPosition.stopLoss)
+      const slDiff = pos.stopLoss
+        ? Math.abs(pos.entryPrice - pos.stopLoss)
         : Math.abs(priceDiff);
       const rMultiple = slDiff > 0 ? priceDiff / slDiff : 0;
       const result = pnlUsd > 0 ? 'WIN' : pnlUsd < 0 ? 'LOSS' : 'BREAKEVEN';
 
       const executedTrade: ExecutedTrade = {
         id: `bt-trade-${Date.now()}`,
-        type: prevPosition.type,
-        entryPrice: prevPosition.entryPrice,
+        type: pos.type,
+        entryPrice: pos.entryPrice,
         exitPrice,
-        stopLoss: prevPosition.stopLoss,
-        takeProfit: prevPosition.takeProfit,
-        lotSize: prevPosition.lotSize,
+        stopLoss: pos.stopLoss,
+        takeProfit: pos.takeProfit,
+        lotSize: pos.lotSize,
         pnlUsd,
         pips,
         rMultiple,
@@ -166,37 +167,58 @@ export default function BacktestPage() {
       if (result === 'WIN') notify.success(message);
       else notify.error(message);
 
-      return null;
+      return prev.filter((p) => p.id !== positionId);
     });
   }, [currentCandle, isEn, symbol]);
 
-  // 5. Evaluate Active Position against New Candle (Auto SL/TP Hit Detection)
-  const evaluatePositionOnCandle = useCallback(
-    (candle: CandleData, activePos: PositionState) => {
-      let exitPrice: number | null = null;
-      let reason: string | null = null;
+  // 5. Evaluate ALL Active Positions against New Candle (Auto SL/TP Hit Detection)
+  const evaluatePositionsOnCandle = useCallback(
+    (candle: CandleData) => {
+      setPositions((currentPositions) => {
+        let changed = false;
+        const toClose: { id: string; price: number; reason: string }[] = [];
 
-      if (activePos.type === 'BUY') {
-        if (activePos.stopLoss && candle.low <= activePos.stopLoss) {
-          exitPrice = activePos.stopLoss;
-          reason = 'SL';
-        } else if (activePos.takeProfit && candle.high >= activePos.takeProfit) {
-          exitPrice = activePos.takeProfit;
-          reason = 'TP';
-        }
-      } else if (activePos.type === 'SELL') {
-        if (activePos.stopLoss && candle.high >= activePos.stopLoss) {
-          exitPrice = activePos.stopLoss;
-          reason = 'SL';
-        } else if (activePos.takeProfit && candle.low <= activePos.takeProfit) {
-          exitPrice = activePos.takeProfit;
-          reason = 'TP';
-        }
-      }
+        for (const pos of currentPositions) {
+          let exitPrice: number | null = null;
+          let reason: string | null = null;
 
-      if (exitPrice !== null) {
-        closePositionAtPrice(exitPrice, reason || 'AUTO');
-      }
+          if (pos.type === 'BUY') {
+            if (pos.stopLoss && candle.low <= pos.stopLoss) {
+              exitPrice = pos.stopLoss;
+              reason = 'SL';
+            } else if (pos.takeProfit && candle.high >= pos.takeProfit) {
+              exitPrice = pos.takeProfit;
+              reason = 'TP';
+            }
+          } else if (pos.type === 'SELL') {
+            if (pos.stopLoss && candle.high >= pos.stopLoss) {
+              exitPrice = pos.stopLoss;
+              reason = 'SL';
+            } else if (pos.takeProfit && candle.low <= pos.takeProfit) {
+              exitPrice = pos.takeProfit;
+              reason = 'TP';
+            }
+          }
+
+          if (exitPrice !== null) {
+            toClose.push({ id: pos.id, price: exitPrice, reason: reason || 'AUTO' });
+            changed = true;
+          }
+        }
+
+        // Close positions outside the state setter to avoid nesting
+        if (toClose.length > 0) {
+          // Use setTimeout to avoid state nesting
+          setTimeout(() => {
+            for (const { id, price, reason } of toClose) {
+              closePositionAtPrice(id, price, reason);
+            }
+          }, 0);
+          return currentPositions.filter((p) => !toClose.some((c) => c.id === p.id));
+        }
+
+        return currentPositions;
+      });
     },
     [closePositionAtPrice]
   );
@@ -212,10 +234,10 @@ export default function BacktestPage() {
     setVisibleCount(nextCount);
 
     const nextCandle = candles[nextCount - 1];
-    if (position && nextCandle) {
-      evaluatePositionOnCandle(nextCandle, position);
+    if (nextCandle && positions.length > 0) {
+      evaluatePositionsOnCandle(nextCandle);
     }
-  }, [visibleCount, candles, position, evaluatePositionOnCandle]);
+  }, [visibleCount, candles, positions, evaluatePositionsOnCandle]);
 
   // 7. Auto-Play Timer Loop
   useEffect(() => {
@@ -259,13 +281,17 @@ export default function BacktestPage() {
     tp: number | null
   ) => {
     if (!currentPrice) return;
-    setPosition({
+
+    const newPos: PositionState = {
+      id: `pos-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
       type,
       entryPrice: currentPrice,
       stopLoss: sl,
       takeProfit: tp,
       lotSize,
-    });
+    };
+
+    setPositions((prev) => [...prev, newPos]);
     notify.info(
       isEn
         ? `Opened ${type} @ ${currentPrice}`
@@ -273,7 +299,23 @@ export default function BacktestPage() {
     );
   };
 
-  // 10. Save Session to Database
+  // 10. Close a specific position
+  const handleClosePosition = (positionId: string, reason?: string) => {
+    closePositionAtPrice(positionId, currentPrice, reason || 'MANUAL');
+  };
+
+  // 11. Update SL/TP for a specific position
+  const handleUpdateSLTP = (positionId: string, newSL: number | null, newTP: number | null) => {
+    setPositions((prev) =>
+      prev.map((p) =>
+        p.id === positionId
+          ? { ...p, stopLoss: newSL, takeProfit: newTP }
+          : p
+      )
+    );
+  };
+
+  // 12. Save Session to Database
   const handleSaveSession = async () => {
     if (tradeHistory.length === 0) {
       notify.info(isEn ? 'Execute at least 1 trade before saving backtest report' : 'قبل از ذخیره گزارش حداقل یک معامله انجام دهید');
@@ -283,6 +325,28 @@ export default function BacktestPage() {
     const wins = tradeHistory.filter((t) => t.result === 'WIN').length;
     const winRate = Number(((wins / tradeHistory.length) * 100).toFixed(1));
 
+    // Compute real Profit Factor
+    const grossProfit = tradeHistory
+      .filter((t) => t.pnlUsd > 0)
+      .reduce((sum, t) => sum + t.pnlUsd, 0);
+    const grossLoss = Math.abs(
+      tradeHistory
+        .filter((t) => t.pnlUsd < 0)
+        .reduce((sum, t) => sum + t.pnlUsd, 0)
+    );
+    const profitFactor = grossLoss > 0 ? Number((grossProfit / grossLoss).toFixed(2)) : grossProfit > 0 ? 999 : 0;
+
+    // Compute real Max Drawdown
+    let peak = initialBalance;
+    let maxDrawdown = 0;
+    let runningBalance = initialBalance;
+    for (let i = tradeHistory.length - 1; i >= 0; i--) {
+      runningBalance += tradeHistory[i].pnlUsd;
+      if (runningBalance > peak) peak = runningBalance;
+      const dd = ((peak - runningBalance) / peak) * 100;
+      if (dd > maxDrawdown) maxDrawdown = dd;
+    }
+
     const payload = {
       title: `${symbol} (${timeframe}) Backtest`,
       symbol,
@@ -291,16 +355,21 @@ export default function BacktestPage() {
       finalBalance: balance,
       totalTrades: tradeHistory.length,
       winRate,
-      profitFactor: 1.5,
-      maxDrawdown: 3.2,
+      profitFactor,
+      maxDrawdown: Number(maxDrawdown.toFixed(2)),
       tradeLog: tradeHistory,
     };
 
-    await api.post('/api/backtest', payload);
-    notify.success(isEn ? 'Backtest report saved to database successfully!' : 'گزارش بک‌تست با موفقیت در دیتابیس ذخیره شد!');
+    try {
+      await api.post('/api/backtest', payload);
+      notify.success(isEn ? 'Backtest report saved!' : 'گزارش بک‌تست ذخیره شد!');
+    } catch (err) {
+      console.error('Failed to save backtest:', err);
+      notify.error(isEn ? 'Failed to save report' : 'خطا در ذخیره گزارش');
+    }
   };
 
-  // 11. Custom CSV File Upload Handler
+  // 13. Custom CSV File Upload Handler
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -313,7 +382,7 @@ export default function BacktestPage() {
         if (parsedCandles.length > 0) {
           setCandles(parsedCandles);
           setVisibleCount(Math.min(100, parsedCandles.length));
-          setPosition(null);
+          setPositions([]);
           setTradeHistory([]);
           setBalance(initialBalance);
           notify.success(isEn ? `Loaded ${parsedCandles.length} custom candles from CSV!` : `${parsedCandles.length} کندل سفارشی از فایل CSV بارگذاری شد!`);
@@ -352,7 +421,7 @@ export default function BacktestPage() {
         </div>
 
         <div className="header-controls">
-          {/* Custom Select for Symbol */}
+          {/* Symbol Selector */}
           <div className="selector-group">
             <label>{isEn ? 'Symbol:' : 'نماد:'}</label>
             <Select
@@ -362,14 +431,21 @@ export default function BacktestPage() {
             />
           </div>
 
-          {/* Custom Select for Timeframe */}
+          {/* Timeframe Pill Buttons (replaces dropdown — avoids z-index clash with chat) */}
           <div className="selector-group">
             <label>{isEn ? 'Timeframe:' : 'تایم‌فریم:'}</label>
-            <Select
-              value={timeframe}
-              onChange={(val) => setTimeframe(val as Timeframe)}
-              options={timeframeOptions}
-            />
+            <div className="tf-pills">
+              {timeframeOptions.map((tf) => (
+                <button
+                  key={tf.value}
+                  type="button"
+                  className={`tf-pill ${timeframe === tf.value ? 'active' : ''}`}
+                  onClick={() => setTimeframe(tf.value as Timeframe)}
+                >
+                  {tf.value}
+                </button>
+              ))}
+            </div>
           </div>
 
           {/* Custom CSV Upload */}
@@ -382,23 +458,24 @@ export default function BacktestPage() {
           />
           <button
             type="button"
-            className="select-input"
+            className="import-csv-btn"
             onClick={() => fileInputRef.current?.click()}
             title={isEn ? 'Upload MT4/MT5 CSV History' : 'بارگذاری فایل تاریخچه CSV'}
-            style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
           >
-            📁 {isEn ? 'Import CSV' : 'ورود CSV'}
+            <span className="material-symbols-outlined">upload_file</span>
+            <span>{isEn ? 'Import CSV' : 'ورود CSV'}</span>
           </button>
 
           {/* Save Session Report Button */}
           <LoadingButton
             onClick={handleSaveSession}
-            variant="primary"
+            className="save-session-btn"
+            variant="ghost"
             size="sm"
             successText={isEn ? 'Saved!' : 'ذخیره شد'}
           >
-            <span className="material-symbols-outlined" style={{ fontSize: '18px', marginRight: '4px' }}>cloud_upload</span>
-            <span>{isEn ? 'Save Session' : 'ذخیره گزارش'}</span>
+            <span className="material-symbols-outlined">cloud_upload</span>
+            <span>{isEn ? 'Save' : 'ذخیره'}</span>
           </LoadingButton>
         </div>
       </div>
@@ -423,7 +500,7 @@ export default function BacktestPage() {
               <BacktestChart
                 candles={candles}
                 visibleCount={visibleCount}
-                position={position}
+                positions={positions}
                 activeDrawingTool={activeTool}
                 onCutBarSelect={(barIdx) => {
                   setVisibleCount(barIdx);
@@ -432,15 +509,7 @@ export default function BacktestPage() {
                 }}
                 drawings={drawings}
                 onDrawingsChange={setDrawings}
-                onUpdateSLTP={(newSL, newTP) => {
-                  if (position) {
-                    setPosition({
-                      ...position,
-                      stopLoss: newSL,
-                      takeProfit: newTP,
-                    });
-                  }
-                }}
+                onUpdateSLTP={handleUpdateSLTP}
               />
             )}
           </div>
@@ -454,7 +523,7 @@ export default function BacktestPage() {
             onReset={() => {
               localStorage.removeItem(LOCAL_STORAGE_KEY);
               setVisibleCount(candles.length);
-              setPosition(null);
+              setPositions([]);
               setTradeHistory([]);
               setBalance(initialBalance);
               setDrawings([]);
@@ -473,10 +542,11 @@ export default function BacktestPage() {
           <OrderPanel
             currentPrice={currentPrice}
             balance={balance}
-            activePosition={position}
+            positions={positions}
             tradeHistory={tradeHistory}
             onOpenPosition={handleOpenPosition}
-            onClosePosition={(reason) => closePositionAtPrice(currentPrice, reason || 'MANUAL')}
+            onClosePosition={handleClosePosition}
+            onUpdateSLTP={handleUpdateSLTP}
           />
         </div>
       </div>

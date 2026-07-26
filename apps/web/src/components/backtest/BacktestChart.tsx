@@ -1,10 +1,11 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useCallback } from 'react';
 import { createChart, IChartApi, ISeriesApi } from 'lightweight-charts';
 import { CandleData } from '../../services/marketData';
 
 export interface PositionState {
+  id: string;
   type: 'BUY' | 'SELL';
   entryPrice: number;
   stopLoss: number | null;
@@ -24,19 +25,34 @@ export interface DrawingShape {
 interface BacktestChartProps {
   candles: CandleData[];
   visibleCount: number;
-  position: PositionState | null;
+  positions: PositionState[];
   onPriceSelect?: (price: number) => void;
-  onUpdateSLTP?: (sl: number | null, tp: number | null) => void;
+  onUpdateSLTP?: (positionId: string, sl: number | null, tp: number | null) => void;
   activeDrawingTool?: string;
   onCutBarSelect?: (candleIndex: number) => void;
   drawings?: DrawingShape[];
   onDrawingsChange?: (drawings: DrawingShape[]) => void;
 }
 
+/** When SL/TP not set, line sits exactly on entry price — user drags to set */
+function resolvedSL(pos: PositionState): number {
+  return pos.stopLoss ?? pos.entryPrice;
+}
+function resolvedTP(pos: PositionState): number {
+  return pos.takeProfit ?? pos.entryPrice;
+}
+
+// Track lines per position
+interface PositionLines {
+  entry: any;
+  sl: any;
+  tp: any;
+}
+
 export default function BacktestChart({
   candles,
   visibleCount,
-  position,
+  positions,
   onPriceSelect,
   onUpdateSLTP,
   activeDrawingTool = 'cursor',
@@ -47,17 +63,22 @@ export default function BacktestChart({
   const chartContainerRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<IChartApi | null>(null);
   const seriesRef = useRef<ISeriesApi<'Candlestick'> | null>(null);
-  
-  const entryLineRef = useRef<any>(null);
-  const slLineRef = useRef<any>(null);
-  const tpLineRef = useRef<any>(null);
 
-  // Store latest props in a ref so chart event handlers always see fresh state without re-creating chart
+  // Lines tracked per position id
+  const linesMapRef = useRef<Map<string, PositionLines>>(new Map());
+
+  // Drag state
+  const dragRef = useRef<{ positionId: string; field: 'sl' | 'tp' } | null>(null);
+  const isDragging = useRef(false);
+
+  // Store latest props in a ref so chart event handlers always see fresh state
   const propsRef = useRef({
     candles,
     activeDrawingTool,
     onCutBarSelect,
     onPriceSelect,
+    positions,
+    onUpdateSLTP,
   });
 
   useEffect(() => {
@@ -66,10 +87,12 @@ export default function BacktestChart({
       activeDrawingTool,
       onCutBarSelect,
       onPriceSelect,
+      positions,
+      onUpdateSLTP,
     };
-  }, [candles, activeDrawingTool, onCutBarSelect, onPriceSelect]);
+  }, [candles, activeDrawingTool, onCutBarSelect, onPriceSelect, positions, onUpdateSLTP]);
 
-  // 1. Initialize TradingView Lightweight Chart ONCE on mount
+  // ── 1. Initialize chart ONCE ──────────────────────────────────────────────
   useEffect(() => {
     if (!chartContainerRef.current) return;
 
@@ -81,18 +104,16 @@ export default function BacktestChart({
         fontFamily: 'Inter, sans-serif',
       },
       grid: {
-        vertLines: { color: 'rgba(60, 74, 65, 0.25)' },
-        horzLines: { color: 'rgba(60, 74, 65, 0.25)' },
+        vertLines: { color: 'rgba(60, 74, 65, 0.15)' },
+        horzLines: { color: 'rgba(60, 74, 65, 0.15)' },
       },
-      crosshair: {
-        mode: 1, // CrosshairMode.Normal
-      },
+      crosshair: { mode: 1 },
       rightPriceScale: {
-        borderColor: 'rgba(60, 74, 65, 0.4)',
+        borderColor: 'rgba(60, 74, 65, 0.3)',
         autoScale: true,
       },
       timeScale: {
-        borderColor: 'rgba(60, 74, 65, 0.4)',
+        borderColor: 'rgba(60, 74, 65, 0.3)',
         timeVisible: true,
         secondsVisible: false,
       },
@@ -127,7 +148,7 @@ export default function BacktestChart({
       }
     });
 
-    // Responsive resize handler
+    // Responsive resize
     const handleResize = () => {
       if (chartContainerRef.current && chartRef.current) {
         chartRef.current.applyOptions({
@@ -136,7 +157,6 @@ export default function BacktestChart({
         });
       }
     };
-
     const resizeObserver = new ResizeObserver(() => handleResize());
     resizeObserver.observe(chartContainerRef.current);
 
@@ -146,78 +166,264 @@ export default function BacktestChart({
       chartRef.current = null;
       seriesRef.current = null;
     };
-  }, []); // Run ONLY ONCE on mount!
+  }, []); // Run ONLY ONCE on mount
 
-  // 2. Update visible candle data slice on replay step or candle update
+  // ── 2. Update visible candle data ─────────────────────────────────────────
   useEffect(() => {
     if (!seriesRef.current || candles.length === 0) return;
-
     const visibleSlice = candles.slice(0, Math.min(visibleCount, candles.length));
     seriesRef.current.setData(visibleSlice as any);
-
     if (chartRef.current && visibleSlice.length > 0) {
       chartRef.current.timeScale().scrollToPosition(0, false);
     }
   }, [candles, visibleCount]);
 
-  // 3. Render Position Lines (Entry, Stop Loss, Take Profit) on Chart
+  // ── 3. Render Position Lines (Entry, SL, TP) for ALL positions ───────────
   useEffect(() => {
     const series = seriesRef.current;
     if (!series) return;
 
-    // Remove existing price lines
-    if (entryLineRef.current) {
-      try { series.removePriceLine(entryLineRef.current); } catch (e) {}
-      entryLineRef.current = null;
-    }
-    if (slLineRef.current) {
-      try { series.removePriceLine(slLineRef.current); } catch (e) {}
-      slLineRef.current = null;
-    }
-    if (tpLineRef.current) {
-      try { series.removePriceLine(tpLineRef.current); } catch (e) {}
-      tpLineRef.current = null;
+    const linesMap = linesMapRef.current;
+
+    // Remove lines for positions that no longer exist
+    const currentIds = new Set(positions.map((p) => p.id));
+    for (const [id, lines] of linesMap.entries()) {
+      if (!currentIds.has(id)) {
+        [lines.entry, lines.sl, lines.tp].forEach((line) => {
+          if (line) { try { series.removePriceLine(line); } catch (e) {} }
+        });
+        linesMap.delete(id);
+      }
     }
 
-    if (!position) return;
+    // Create/update lines — only the LAST (most recent) position is visually active
+    const lastPos = positions[positions.length - 1];
+    for (const pos of positions) {
+      let lines = linesMap.get(pos.id);
 
-    // Entry Line
-    const entryOptions = {
-      price: position.entryPrice,
-      color: '#3b82f6',
-      lineWidth: 2,
-      lineStyle: 0, // Solid
-      axisLabelVisible: true,
-      title: `${position.type} @ ${position.entryPrice}`,
-    };
-    entryLineRef.current = series.createPriceLine(entryOptions as any);
+      if (!lines) {
+        lines = { entry: null, sl: null, tp: null };
+        linesMap.set(pos.id, lines);
+      }
 
-    // Stop Loss Line
-    if (position.stopLoss) {
-      const slOptions = {
-        price: position.stopLoss,
+      // Remove old lines
+      [lines.entry, lines.sl, lines.tp].forEach((line) => {
+        if (line) { try { series.removePriceLine(line); } catch (e) {} }
+      });
+
+      // Only render lines for the latest position
+      if (pos.id !== lastPos.id) {
+        lines.entry = null;
+        lines.sl = null;
+        lines.tp = null;
+        continue;
+      }
+
+      const slPrice = resolvedSL(pos);
+      const tpPrice = resolvedTP(pos);
+      const slIsSet = pos.stopLoss !== null;
+      const tpIsSet = pos.takeProfit !== null;
+
+      // Entry line
+      lines.entry = series.createPriceLine({
+        price: pos.entryPrice,
+        color: '#3b82f6',
+        lineWidth: 2,
+        lineStyle: 0,
+        axisLabelVisible: true,
+        title: `${pos.type} @ ${pos.entryPrice.toFixed(2)}`,
+      } as any);
+
+      // SL line
+      lines.sl = series.createPriceLine({
+        price: slPrice,
         color: '#ef4444',
-        lineWidth: 2,
-        lineStyle: 2, // Dashed
+        lineWidth: 1,
+        lineStyle: 2,
         axisLabelVisible: true,
-        title: `SL @ ${position.stopLoss.toFixed(2)}`,
+        title: slIsSet ? `SL @ ${pos.stopLoss!.toFixed(2)}` : 'SL (drag to set)',
+      } as any);
+
+      // TP line
+      lines.tp = series.createPriceLine({
+        price: tpPrice,
+        color: '#10b981',
+        lineWidth: 1,
+        lineStyle: 2,
+        axisLabelVisible: true,
+        title: tpIsSet ? `TP @ ${pos.takeProfit!.toFixed(2)}` : 'TP (drag to set)',
+      } as any);
+    }
+  }, [positions]);
+
+  // ── 4. Drag-to-adjust SL/TP ───────────────────────────────────────────────
+  const handleMouseDown = useCallback((e: MouseEvent) => {
+    if (!seriesRef.current || !chartRef.current || propsRef.current.positions.length === 0) return;
+
+    const series = seriesRef.current;
+    const container = chartContainerRef.current;
+    if (!container) return;
+
+    const rect = container.getBoundingClientRect();
+    const mouseY = e.clientY - rect.top;
+
+    // Check all positions' lines, prioritize the last (most recent) position
+    let bestHit: { positionId: string; field: 'sl' | 'tp' } | null = null;
+
+    for (const pos of [...propsRef.current.positions].reverse()) {
+      const slPrice = resolvedSL(pos);
+      const tpPrice = resolvedTP(pos);
+
+      const checkHit = (price: number, field: 'sl' | 'tp'): boolean => {
+        const y = series.priceToCoordinate(price);
+        if (y === null) return false;
+        return Math.abs(mouseY - y) < 8;
       };
-      slLineRef.current = series.createPriceLine(slOptions as any);
+
+      if (checkHit(slPrice, 'sl')) {
+        bestHit = { positionId: pos.id, field: 'sl' };
+        break;
+      }
+      if (checkHit(tpPrice, 'tp')) {
+        bestHit = { positionId: pos.id, field: 'tp' };
+        break;
+      }
     }
 
-    // Take Profit Line
-    if (position.takeProfit) {
-      const tpOptions = {
-        price: position.takeProfit,
-        color: '#10b981',
-        lineWidth: 2,
-        lineStyle: 2, // Dashed
-        axisLabelVisible: true,
-        title: `TP @ ${position.takeProfit.toFixed(2)}`,
-      };
-      tpLineRef.current = series.createPriceLine(tpOptions as any);
+    if (bestHit) {
+      dragRef.current = bestHit;
+      isDragging.current = true;
+      container.style.cursor = 'ns-resize';
+      e.preventDefault();
     }
-  }, [position]);
+  }, []);
+
+  const handleMouseMove = useCallback((e: MouseEvent) => {
+    if (!seriesRef.current || !chartRef.current) return;
+    const container = chartContainerRef.current;
+    if (!container) return;
+
+    // ── During drag: update line position ──
+    if (isDragging.current && dragRef.current) {
+      const rect = container.getBoundingClientRect();
+      const mouseY = e.clientY - rect.top;
+      const series = seriesRef.current;
+
+      const price = series.coordinateToPrice(mouseY);
+      if (price == null) return;
+
+      const pos = propsRef.current.positions.find((p) => p.id === dragRef.current!.positionId);
+      if (!pos) return;
+
+      const entryPrice = pos.entryPrice;
+
+      if (dragRef.current.field === 'sl') {
+        const valid = pos.type === 'BUY' ? price < entryPrice : price > entryPrice;
+        if (!valid) return;
+      } else {
+        const valid = pos.type === 'BUY' ? price > entryPrice : price < entryPrice;
+        if (!valid) return;
+      }
+
+      // Update the price line visually
+      const lines = linesMapRef.current.get(dragRef.current.positionId);
+      const lineRef = dragRef.current.field === 'sl' ? lines?.sl : lines?.tp;
+      const color = dragRef.current.field === 'sl' ? '#ef4444' : '#10b981';
+      const label = dragRef.current.field === 'sl' ? 'SL' : 'TP';
+
+      if (lineRef) {
+        try { series.removePriceLine(lineRef); } catch (e) {}
+      }
+      const newLine = series.createPriceLine({
+        price,
+        color,
+        lineWidth: 1,
+        lineStyle: 2,
+        axisLabelVisible: true,
+        title: `${label} @ ${Number(price).toFixed(2)}`,
+      } as any);
+
+      if (lines) {
+        if (dragRef.current.field === 'sl') lines.sl = newLine;
+        else lines.tp = newLine;
+      }
+
+      e.preventDefault();
+      return;
+    }
+
+    // ── Hover detection: change cursor near SL/TP lines ──
+    const rect = container.getBoundingClientRect();
+    const mouseY = e.clientY - rect.top;
+    const series = seriesRef.current;
+
+    let nearLine = false;
+    for (const pos of propsRef.current.positions) {
+      const checkY = (price: number) => {
+        const y = series.priceToCoordinate(price);
+        if (y !== null && Math.abs(mouseY - y) < 8) nearLine = true;
+      };
+      checkY(resolvedSL(pos));
+      checkY(resolvedTP(pos));
+    }
+
+    container.style.cursor = nearLine ? 'ns-resize' : 'crosshair';
+  }, []);
+
+  const handleMouseUp = useCallback((e: MouseEvent) => {
+    if (!isDragging.current || !dragRef.current || !seriesRef.current) {
+      isDragging.current = false;
+      dragRef.current = null;
+      if (chartContainerRef.current) chartContainerRef.current.style.cursor = 'crosshair';
+      return;
+    }
+
+    const series = seriesRef.current;
+    const { positionId, field } = dragRef.current;
+
+    const pos = propsRef.current.positions.find((p) => p.id === positionId);
+    if (pos) {
+      const container = chartContainerRef.current;
+      if (container) {
+        const rect = container.getBoundingClientRect();
+        const mouseY = e.clientY - rect.top;
+        const price = series.coordinateToPrice(mouseY);
+
+        if (price != null) {
+          const rounded = Number(Number(price).toFixed(pos.entryPrice > 100 ? 2 : 5));
+          if (propsRef.current.onUpdateSLTP) {
+            if (field === 'sl') {
+              propsRef.current.onUpdateSLTP(positionId, rounded, pos.takeProfit);
+            } else {
+              propsRef.current.onUpdateSLTP(positionId, pos.stopLoss, rounded);
+            }
+          }
+        }
+      }
+    }
+
+    isDragging.current = false;
+    dragRef.current = null;
+    if (chartContainerRef.current) chartContainerRef.current.style.cursor = 'crosshair';
+  }, []);
+
+  // Attach drag handlers to chart container
+  useEffect(() => {
+    const container = chartContainerRef.current;
+    if (!container) return;
+
+    container.addEventListener('mousedown', handleMouseDown);
+    container.addEventListener('mousemove', handleMouseMove);
+    container.addEventListener('mouseup', handleMouseUp);
+
+    return () => {
+      container.removeEventListener('mousedown', handleMouseDown);
+      container.removeEventListener('mousemove', handleMouseMove);
+      container.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [handleMouseDown, handleMouseMove, handleMouseUp]);
+
+  const hasPositions = positions.length > 0;
 
   return (
     <div style={{ position: 'relative', width: '100%', height: '100%', minHeight: '480px' }}>
@@ -228,8 +434,8 @@ export default function BacktestChart({
             position: 'absolute',
             top: 12,
             left: 12,
-            background: 'rgba(239, 68, 68, 0.2)',
-            border: '1px solid #ef4444',
+            background: 'rgba(239, 68, 68, 0.15)',
+            border: '1px solid rgba(239, 68, 68, 0.4)',
             color: '#f8fafc',
             padding: '6px 14px',
             borderRadius: '8px',
@@ -239,7 +445,23 @@ export default function BacktestChart({
             zIndex: 10,
           }}
         >
-          ✂️ Cut Tool Active: Click any candle on the chart to jump replay to that bar!
+          ✂️ Click any candle to jump replay
+        </div>
+      )}
+      {hasPositions && (
+        <div
+          style={{
+            position: 'absolute',
+            bottom: 8,
+            left: 12,
+            display: 'flex',
+            gap: 8,
+            fontSize: '11px',
+            color: '#94a3b8',
+            pointerEvents: 'none',
+          }}
+        >
+          <span>🖱️ Drag <span style={{ color: '#ef4444' }}>red</span>/<span style={{ color: '#10b981' }}>green</span> lines away from entry to set SL/TP</span>
         </div>
       )}
     </div>
