@@ -196,7 +196,7 @@ export default function BacktestChart({
       }
     }
 
-    // Create/update lines — only the LAST (most recent) position is visually active
+    // Create/update lines for ALL positions — similar brightness, latest only is draggable
     const lastPos = positions[positions.length - 1];
     for (const pos of positions) {
       let lines = linesMap.get(pos.id);
@@ -210,14 +210,6 @@ export default function BacktestChart({
       [lines.entry, lines.sl, lines.tp].forEach((line) => {
         if (line) { try { series.removePriceLine(line); } catch (e) {} }
       });
-
-      // Only render lines for the latest position
-      if (pos.id !== lastPos.id) {
-        lines.entry = null;
-        lines.sl = null;
-        lines.tp = null;
-        continue;
-      }
 
       const slPrice = resolvedSL(pos);
       const tpPrice = resolvedTP(pos);
