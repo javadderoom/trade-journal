@@ -1,5 +1,6 @@
 import { Metadata } from "next";
 import Script from "next/script";
+import CanonicalTag from "../components/seo/CanonicalTag";
 import "./globals.scss";
 import "./landing.scss";
 import "./contact/contact.scss";
@@ -57,14 +58,6 @@ export const metadata: Metadata = {
     "Smart Trading Journal"
   ],
   metadataBase: new URL("https://tradekav.ir"),
-  alternates: {
-    canonical: "/",
-    languages: {
-      "fa": "/",
-      "en": "/en",
-      "fa-IR": "/",
-    },
-  },
   icons: {
     icon: "/logo.png",
     apple: "/logo.png",
@@ -138,6 +131,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html suppressHydrationWarning lang="fa" dir="rtl">
       <head>
+        {/* Dynamic canonical — one per page, replaces the old static "/" */}
+        <CanonicalTag />
         {/* Vazirmatn — self-hosted, no CDN (Google Fonts is blocked in Iran) */}
         <link rel="stylesheet" href="/fonts/vazirmatn.css" />
         {/* Material Symbols — keep CDN for icons (not blocked) */}
