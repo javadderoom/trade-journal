@@ -116,19 +116,24 @@
     border-radius: 50% !important;
     padding: 0 !important;
     margin-inline: auto;
+    flex: none !important;
+    aspect-ratio: 1 / 1 !important;
     box-shadow: 0 0 16px rgba($primary, 0.3);
 
     &.btn-size-sm {
       width: 34px !important;
       min-width: 34px !important;
+      max-width: 34px !important;
     }
     &.btn-size-md {
       width: 42px !important;
       min-width: 42px !important;
+      max-width: 42px !important;
     }
     &.btn-size-lg {
       width: 48px !important;
       min-width: 48px !important;
+      max-width: 48px !important;
     }
 
     .btn-spinner-wrap {

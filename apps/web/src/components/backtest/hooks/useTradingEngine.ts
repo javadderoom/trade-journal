@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { PositionState } from '../BacktestChart';
 import { ExecutedTrade } from '../OrderPanel';
 import { getAssetClass, buildExecutedTrade } from '../utils/pnl';
@@ -17,6 +17,10 @@ export function useTradingEngine({ symbol, initialBalance = 10000, isEn }: Tradi
   const [positions, setPositions] = useState<PositionState[]>([]);
   const [balance, setBalance] = useState<number>(initialBalance);
   const [tradeHistory, setTradeHistory] = useState<ExecutedTrade[]>([]);
+
+  // Keep a ref in sync with positions so closePosition can read it outside a setState updater
+  const positionsRef = useRef(positions);
+  useEffect(() => { positionsRef.current = positions; }, [positions]);
 
   const asset = getAssetClass(symbol);
 
@@ -56,36 +60,32 @@ export function useTradingEngine({ symbol, initialBalance = 10000, isEn }: Tradi
   ) => {
     if (!currentCandle) return;
 
-    setPositions((prev) => {
-      const pos = prev.find((p) => p.id === positionId);
-      if (!pos) return prev;
+    const pos = positionsRef.current.find((p) => p.id === positionId);
+    if (!pos) return;
 
-      const trade = buildExecutedTrade(pos, exitPrice, exitReason, asset, currentCandle.time);
+    const trade = buildExecutedTrade(pos, exitPrice, exitReason, asset, currentCandle.time);
 
-      // Execute side-effects outside of the React state updater loop using a Microtask / setTimeout
-      setTimeout(() => {
-        setTradeHistory((history) => {
-          // Prevent duplicates
-          if (history.some((t) => t.id === trade.id)) return history;
-          return [trade, ...history];
-        });
-        setBalance((bal) => bal + trade.pnlUsd);
+    // Remove position
+    setPositions((prev) => prev.filter((p) => p.id !== positionId));
 
-        const message =
-          trade.result === 'WIN'
-            ? isEn
-              ? `Trade Hit ${exitReason}! Profit: +$${trade.pnlUsd.toFixed(2)}`
-              : `معامله با سود بسته‌شد (${exitReason}): +$${trade.pnlUsd.toFixed(2)}`
-            : isEn
-              ? `Trade Hit ${exitReason}! Loss: -$${Math.abs(trade.pnlUsd).toFixed(2)}`
-              : `معامله با حد ضرر بسته‌شد (${exitReason}): -$${Math.abs(trade.pnlUsd).toFixed(2)}`;
-
-        if (trade.result === 'WIN') notify.success(message);
-        else notify.error(message);
-      }, 0);
-
-      return prev.filter((p) => p.id !== positionId);
+    // Add trade to history and update balance
+    setTradeHistory((history) => {
+      if (history.some((t) => t.id === trade.id)) return history;
+      return [trade, ...history];
     });
+    setBalance((bal) => bal + trade.pnlUsd);
+
+    const message =
+      trade.result === 'WIN'
+        ? isEn
+          ? `Trade Hit ${exitReason}! Profit: +$${trade.pnlUsd.toFixed(2)}`
+          : `معامله با سود بسته‌شد (${exitReason}): +$${trade.pnlUsd.toFixed(2)}`
+        : isEn
+          ? `Trade Hit ${exitReason}! Loss: -$${Math.abs(trade.pnlUsd).toFixed(2)}`
+          : `معامله با حد ضرر بسته‌شد (${exitReason}): -$${Math.abs(trade.pnlUsd).toFixed(2)}`;
+
+    if (trade.result === 'WIN') notify.success(message);
+    else notify.error(message);
   }, [asset, isEn]);
 
   // Close at market price (manual close)

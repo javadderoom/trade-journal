@@ -3,6 +3,7 @@
 import React, { useEffect, useRef, useCallback } from 'react';
 import { createChart, IChartApi, ISeriesApi } from 'lightweight-charts';
 import { CandleData } from '../../services/marketData';
+import { useTranslation } from '../../store/useAppStore';
 
 export interface PositionState {
   id: string;
@@ -60,6 +61,9 @@ export default function BacktestChart({
   drawings = [],
   onDrawingsChange,
 }: BacktestChartProps) {
+  const { language } = useTranslation();
+  const isEn = language === 'en';
+
   const chartContainerRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<IChartApi | null>(null);
   const seriesRef = useRef<ISeriesApi<'Candlestick'> | null>(null);
@@ -437,7 +441,7 @@ export default function BacktestChart({
             zIndex: 10,
           }}
         >
-          ✂️ Click any candle to jump replay
+          {isEn ? 'Click any candle to jump replay' : 'روی هر کندل کلیک کنید تا ریپلی به آن نقطه منتقل شود'}
         </div>
       )}
       {hasPositions && (
@@ -453,7 +457,11 @@ export default function BacktestChart({
             pointerEvents: 'none',
           }}
         >
-          <span>🖱️ Drag <span style={{ color: '#ef4444' }}>red</span>/<span style={{ color: '#10b981' }}>green</span> lines away from entry to set SL/TP</span>
+          {isEn ? (
+            <span>Drag <span style={{ color: '#ef4444' }}>red</span>/<span style={{ color: '#10b981' }}>green</span> lines away from entry to set SL/TP</span>
+          ) : (
+            <span>خطوط <span style={{ color: '#ef4444' }}>قرمز</span>/<span style={{ color: '#10b981' }}>سبز</span> را برای تنظیم حد ضرر/سود درگ کنید</span>
+          )}
         </div>
       )}
     </div>

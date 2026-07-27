@@ -370,6 +370,24 @@
   flex-direction: column;
   gap: 14px;
 
+  .loading-skeleton {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+
+    .skeleton-line {
+      border-radius: 6px;
+      background: linear-gradient(90deg, rgba($outline-variant, 0.12) 25%, rgba($outline-variant, 0.22) 50%, rgba($outline-variant, 0.12) 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+    }
+  }
+
+  @keyframes shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+
   .panel-section {
     border: 1px solid rgba($outline-variant, 0.2);
     border-radius: 10px;

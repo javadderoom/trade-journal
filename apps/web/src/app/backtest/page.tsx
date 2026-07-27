@@ -122,6 +122,7 @@ export default function BacktestPage() {
     } catch (err) {
       console.error('Failed to save backtest:', err);
       notify.error(isEn ? 'Failed to save report' : 'خطا در ذخیره گزارش');
+      throw err;
     }
   };
 
@@ -133,7 +134,18 @@ export default function BacktestPage() {
   };
 
   // 6. Reset Session
-  const handleReset = () => {
+  const handleReset = async () => {
+    const confirmed = await notify.confirm({
+      title: isEn ? 'Reset Session?' : 'بازنشانی جلسه؟',
+      message: isEn
+        ? 'Are you sure you want to reset all trades, balance, and drawings?'
+        : 'آیا از پاک کردن تمام معاملات، موجودی و رسم‌ها اطمینان دارید؟',
+      confirmLabel: isEn ? 'Reset' : 'بازنشانی',
+      cancelLabel: isEn ? 'Cancel' : 'انصراف',
+      danger: true,
+    });
+    if (!confirmed) return;
+
     localStorage.removeItem(LOCAL_STORAGE_KEY);
     replay.resetReplay();
     resetTrading();
@@ -188,7 +200,7 @@ export default function BacktestPage() {
             isPlaying={isPlaying}
             onTogglePlay={() => replay.setIsPlaying((prev: boolean) => !prev)}
             onStepForward={replay.stepForward}
-            onStepBackward={() => replay.jumpToBar(Math.max(10, visibleCount - 1))}
+            onStepBackward={() => replay.jumpToBar(Math.max(0, visibleCount - 1))}
             onReset={handleReset}
             speed={speed}
             onSpeedChange={replay.setSpeed}
@@ -200,10 +212,12 @@ export default function BacktestPage() {
 
         <div className="order-sidebar">
           <OrderPanel
+            symbol={symbol}
             currentPrice={currentPrice}
             balance={balance}
             positions={positions}
             tradeHistory={tradeHistory}
+            isLoading={isLoadingCandles}
             onOpenPosition={(type, lots, sl, tp) => openPosition(type, lots, sl, tp, currentPrice)}
             onClosePosition={(id, reason) => closeAtMarket(id, currentPrice, reason || 'MANUAL', currentCandle)}
             onUpdateSLTP={updateSLTP}

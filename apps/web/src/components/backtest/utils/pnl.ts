@@ -59,14 +59,13 @@ export function calcRMultiple(
   exitPrice: number,
   stopLoss: number | null,
 ): number {
+  if (!stopLoss) return 0;
+
   const priceDiff = type === 'BUY'
     ? exitPrice - entryPrice
     : entryPrice - exitPrice;
 
-  const slDiff = stopLoss
-    ? Math.abs(entryPrice - stopLoss)
-    : Math.abs(priceDiff);
-
+  const slDiff = Math.abs(entryPrice - stopLoss);
   return slDiff > 0 ? priceDiff / slDiff : 0;
 }
 
@@ -144,6 +143,8 @@ export function calcSessionStats(
   let peak = initialBalance;
   let maxDrawdown = 0;
   let runningBalance = initialBalance;
+  // tradeHistory is stored newest-first ([trade, ...history]), so index length - 1 is the oldest trade.
+  // We iterate backwards from oldest to newest to compute running balance & drawdown chronologically.
   for (let i = tradeHistory.length - 1; i >= 0; i--) {
     runningBalance += tradeHistory[i].pnlUsd;
     if (runningBalance > peak) peak = runningBalance;

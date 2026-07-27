@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { useTranslation } from '../../store/useAppStore';
 import { PositionState } from './BacktestChart';
+import { calcPnL, getAssetClass } from './utils/pnl';
 
 export interface ExecutedTrade {
   id: string;
@@ -21,20 +22,24 @@ export interface ExecutedTrade {
 }
 
 interface OrderPanelProps {
+  symbol?: string;
   currentPrice: number;
   balance: number;
   positions: PositionState[];
   tradeHistory: ExecutedTrade[];
+  isLoading?: boolean;
   onOpenPosition: (type: 'BUY' | 'SELL', lotSize: number, sl: number | null, tp: number | null) => void;
   onClosePosition: (positionId: string, reason?: string) => void;
   onUpdateSLTP?: (positionId: string, sl: number | null, tp: number | null) => void;
 }
 
 export default function OrderPanel({
+  symbol = 'XAUUSD',
   currentPrice,
   balance,
   positions,
   tradeHistory,
+  isLoading = false,
   onOpenPosition,
   onClosePosition,
   onUpdateSLTP,
@@ -82,6 +87,16 @@ export default function OrderPanel({
 
   return (
     <div className="order-panel-container">
+      {isLoading && (
+        <div className="panel-section loading-skeleton">
+          <div className="skeleton-line" style={{ width: '60%', height: 14 }} />
+          <div className="skeleton-line" style={{ width: '80%', height: 28, marginTop: 8 }} />
+          <div className="skeleton-line" style={{ width: '100%', height: 14, marginTop: 12 }} />
+          <div className="skeleton-line" style={{ width: '100%', height: 14, marginTop: 6 }} />
+        </div>
+      )}
+      {!isLoading && (
+      <>
       {/* 1. Account & Balance Summary */}
       <div className="panel-section balance-card">
         <span className="section-title">{isEn ? 'Account Equity' : 'موجودی حساب'}</span>
@@ -119,16 +134,16 @@ export default function OrderPanel({
         {/* Quick SL/TP Presets */}
         <div className="preset-buttons">
           <button type="button" className="preset-btn" onClick={() => { if (currentPrice) setStopLoss((currentPrice * 0.995).toFixed(2)); }}>
-            SL 0.5%
+            {isEn ? 'SL 0.5%' : 'ضرربانی ۰.۵٪'}
           </button>
           <button type="button" className="preset-btn" onClick={() => { if (currentPrice) setStopLoss((currentPrice * 0.99).toFixed(2)); }}>
-            SL 1%
+            {isEn ? 'SL 1%' : 'ضرربانی ۱٪'}
           </button>
           <button type="button" className="preset-btn" onClick={() => { if (currentPrice) setTakeProfit((currentPrice * 1.01).toFixed(2)); }}>
-            TP 1%
+            {isEn ? 'TP 1%' : 'سودبانی ۱٪'}
           </button>
           <button type="button" className="preset-btn" onClick={() => { if (currentPrice) setTakeProfit((currentPrice * 1.02).toFixed(2)); }}>
-            TP 2%
+            {isEn ? 'TP 2%' : 'سودبانی ۲٪'}
           </button>
         </div>
 
@@ -174,10 +189,8 @@ export default function OrderPanel({
         <div className="panel-section positions-section">
           <span className="section-title">{isEn ? 'Open Positions' : 'پوزیشن‌های باز'} ({positions.length})</span>
           {positions.map((pos) => {
-            const diff = pos.type === 'BUY'
-              ? currentPrice - pos.entryPrice
-              : pos.entryPrice - currentPrice;
-            const pnl = diff * pos.lotSize * (pos.entryPrice > 100 ? 100 : 100000);
+            const asset = getAssetClass(symbol);
+            const { pnlUsd: pnl } = calcPnL(asset, pos.type, pos.entryPrice, currentPrice, pos.lotSize);
             const isSelected = selectedPosId === pos.id || (!selectedPosId && pos.id === positions[positions.length - 1]?.id);
 
             return (
@@ -190,20 +203,20 @@ export default function OrderPanel({
                   <span className={`pos-badge ${pos.type}`}>
                     {pos.type} @ {pos.entryPrice.toFixed(2)}
                   </span>
-                  <span className="pos-lots">{pos.lotSize} Lots</span>
+                  <span className="pos-lots">{pos.lotSize} {isEn ? 'Lots' : 'لات'}</span>
                 </div>
 
                 {/* Running PnL */}
                 {currentPrice > 0 && (
                   <div className={`running-pnl ${pnl >= 0 ? 'positive' : 'negative'}`}>
-                    {pnl >= 0 ? '+' : ''}{pnl.toFixed(2)} USD
+                    {pnl >= 0 ? '+' : ''}${pnl.toFixed(2)}
                   </div>
                 )}
 
                 {/* SL/TP info */}
                 <div className="pos-sltp-info">
-                  <span className="sl-info">SL: {pos.stopLoss !== null ? pos.stopLoss.toFixed(2) : '—'}</span>
-                  <span className="tp-info">TP: {pos.takeProfit !== null ? pos.takeProfit.toFixed(2) : '—'}</span>
+                  <span className="sl-info">{isEn ? 'SL:' : 'حد ضرر:'} {pos.stopLoss !== null ? pos.stopLoss.toFixed(2) : '—'}</span>
+                  <span className="tp-info">{isEn ? 'TP:' : 'حد سود:'} {pos.takeProfit !== null ? pos.takeProfit.toFixed(2) : '—'}</span>
                 </div>
 
                 <button
@@ -256,6 +269,8 @@ export default function OrderPanel({
           )}
         </div>
       </div>
+      </>
+      )}
     </div>
   );
 }

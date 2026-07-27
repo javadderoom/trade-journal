@@ -43,15 +43,41 @@ export default function LoadingButton({
   const buttonRef = useRef<HTMLButtonElement>(null);
   const resetTimerRef = useRef<NodeJS.Timeout | null>(null);
 
+  const prevLoadingRef = useRef<boolean | undefined>(controlledLoading);
+
+  const triggerReset = useCallback(() => {
+    if (resetTimerRef.current) clearTimeout(resetTimerRef.current);
+    resetTimerRef.current = setTimeout(() => {
+      setStatus('idle');
+    }, autoResetDelay);
+  }, [autoResetDelay]);
+
   // Sync controlled state if passed
   useEffect(() => {
     if (controlledLoading !== undefined) {
-      if (controlledLoading) setStatus('loading');
-      else if (controlledSuccess) setStatus('success');
-      else if (controlledError) setStatus('error');
-      else setStatus('idle');
+      const wasLoading = prevLoadingRef.current;
+      prevLoadingRef.current = controlledLoading;
+
+      if (controlledLoading) {
+        setStatus('loading');
+      } else if (wasLoading) {
+        // Controlled loading state just completed!
+        if (controlledError) {
+          setStatus('error');
+          triggerReset();
+        } else {
+          setStatus('success');
+          triggerReset();
+        }
+      } else if (controlledSuccess) {
+        setStatus('success');
+        triggerReset();
+      } else if (controlledError) {
+        setStatus('error');
+        triggerReset();
+      }
     }
-  }, [controlledLoading, controlledSuccess, controlledError]);
+  }, [controlledLoading, controlledSuccess, controlledError, triggerReset]);
 
   // Capture initial button width for smooth morphing back & forth
   useEffect(() => {
@@ -69,13 +95,6 @@ export default function LoadingButton({
       if (resetTimerRef.current) clearTimeout(resetTimerRef.current);
     };
   }, []);
-
-  const triggerReset = useCallback(() => {
-    if (resetTimerRef.current) clearTimeout(resetTimerRef.current);
-    resetTimerRef.current = setTimeout(() => {
-      setStatus('idle');
-    }, autoResetDelay);
-  }, [autoResetDelay]);
 
   const handleClick = async (e: React.MouseEvent<HTMLButtonElement>) => {
     if (disabled || status !== 'idle') return;
@@ -113,7 +132,7 @@ export default function LoadingButton({
       disabled={disabled || status === 'loading'}
       onClick={handleClick}
       style={{
-        ...(btnWidth && status === 'idle' ? { minWidth: `${btnWidth}px` } : {}),
+        ...(btnWidth && status !== 'loading' ? { minWidth: `${btnWidth}px` } : {}),
         ...style,
       }}
       {...rest}

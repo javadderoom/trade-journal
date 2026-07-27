@@ -89,9 +89,9 @@ export function useReplayEngine({ candles, positions, onPositionHit }: ReplayEng
 
   // Reset
   const resetReplay = useCallback(() => {
-    setVisibleCount(candles.length);
+    setVisibleCount(0);
     setIsPlaying(false);
-  }, [candles.length]);
+  }, []);
 
   return {
     visibleCount,

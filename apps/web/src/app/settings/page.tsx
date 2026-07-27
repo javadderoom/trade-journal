@@ -702,9 +702,9 @@ export default function SettingsPage() {
               </div>
             </div>
 
-            <button className="settings-save-btn" onClick={handleProfileSave} disabled={!profileDirty}>
+            <LoadingButton className="settings-save-btn" onClick={handleProfileSave} disabled={!profileDirty}>
               {t('settings.saveChanges')}
-            </button>
+            </LoadingButton>
           </section>
         )}
 
@@ -770,7 +770,7 @@ export default function SettingsPage() {
                       </div>
                     </div>
                     <div className="broker-edit-actions">
-                      <button className="settings-save-btn" onClick={() => handleUpdateAccount(acc.id)}>{t('settings.save')}</button>
+                      <LoadingButton className="settings-save-btn" onClick={() => handleUpdateAccount(acc.id)}>{t('settings.save')}</LoadingButton>
                       <button className="settings-cancel-btn" onClick={() => setEditingId(null)}>{t('settings.cancel')}</button>
                     </div>
                   </div>
@@ -880,7 +880,7 @@ export default function SettingsPage() {
                             value={newTokenName}
                             onChange={(e) => setNewTokenName(e.target.value)}
                           />
-                          <button onClick={() => handleCreateToken(acc.id)}>{t('settings.createKey')}</button>
+                          <LoadingButton className="create-key-btn" onClick={() => handleCreateToken(acc.id)}>{t('settings.createKey')}</LoadingButton>
                         </div>
                       </div>
                     )}
@@ -942,7 +942,7 @@ export default function SettingsPage() {
                   </div>
                 </div>
                 <div className="broker-edit-actions">
-                  <button className="settings-save-btn" onClick={handleCreateAccount}>{t('settings.save')}</button>
+                  <LoadingButton className="settings-save-btn" onClick={handleCreateAccount}>{t('settings.save')}</LoadingButton>
                   <button className="settings-cancel-btn" onClick={() => setShowAddAccount(false)}>{t('settings.cancel')}</button>
                 </div>
               </div>
