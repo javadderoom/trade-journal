@@ -1,19 +1,17 @@
-// Landing page styles — معامله‌یار
-// Spec A "Trader's Terminal" + borrowings from Spec C (stats, comparison, persistent CTA) and B (single problem statement, balanced headlines)
-// Theme: locked dark. Accent: locked emerald (#3DDC97). Shape system: cards 14px, buttons 10px, pills full.
+@use 'variables' as *;
 
-$land-bg: #0b0f19;
-$land-surface: #141824;
-$land-surface-2: #181c27;
-$land-elevated: #1e2535;
-$land-accent: #3ddc97;
-$land-accent-hover: #4de9a8;
-$land-danger: #ff5370;
+$land-bg: #0b0d13;
+$land-surface: #111319;
+$land-surface-2: #161922;
+$land-elevated: #242836;
+$land-accent: $primary;
+$land-accent-hover: #34d399;
+$land-danger: #ef4444;
 $land-gold: #f5c542;
 $land-text: #f0f2f5;
 $land-muted: #8892a6;
 $land-muted-2: #5e6779;
-$land-border: #1e2535;
+$land-border: #2d3244;
 $land-border-soft: rgba(255, 255, 255, 0.06);
 
 $radius-card: 14px;

@@ -524,13 +524,13 @@ export default function DetailPanel({
                 {/* Read-only metadata badges */}
                 <div style={{ display: 'flex', gap: '8px', marginTop: '12px', flexWrap: 'wrap' }}>
                   {activeTrade.importSource && (
-                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '4px 10px', borderRadius: '6px', fontSize: '12px', fontWeight: 500, background: 'rgba(97, 249, 177, 0.1)', color: '#61f9b1', border: '1px solid rgba(97, 249, 177, 0.2)' }}>
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '4px 10px', borderRadius: '6px', fontSize: '12px', fontWeight: 500, background: 'rgba(16, 185, 129, 0.1)', color: '#10b981', border: '1px solid rgba(16, 185, 129, 0.2)' }}>
                       <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>input</span>
                       {t(`trades.importSource.${activeTrade.importSource}`)}
                     </span>
                   )}
                   {activeTrade.accountType && (
-                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '4px 10px', borderRadius: '6px', fontSize: '12px', fontWeight: 500, background: activeTrade.accountType === 'DEMO' ? 'rgba(255, 180, 171, 0.1)' : 'rgba(97, 249, 177, 0.1)', color: activeTrade.accountType === 'DEMO' ? '#ffb4ab' : '#61f9b1', border: `1px solid ${activeTrade.accountType === 'DEMO' ? 'rgba(255, 180, 171, 0.2)' : 'rgba(97, 249, 177, 0.2)'}` }}>
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '4px 10px', borderRadius: '6px', fontSize: '12px', fontWeight: 500, background: activeTrade.accountType === 'DEMO' ? 'rgba(255, 180, 171, 0.1)' : 'rgba(16, 185, 129, 0.1)', color: activeTrade.accountType === 'DEMO' ? '#ffb4ab' : '#10b981', border: `1px solid ${activeTrade.accountType === 'DEMO' ? 'rgba(255, 180, 171, 0.2)' : 'rgba(16, 185, 129, 0.2)'}` }}>
                       <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>{activeTrade.accountType === 'DEMO' ? 'science' : 'account_balance'}</span>
                       {t(`trades.accountType.${activeTrade.accountType}`)}
                     </span>
@@ -629,7 +629,7 @@ export default function DetailPanel({
                   style={{
                     background: 'transparent',
                     border: 'none',
-                    color: isConfiguringTags ? '#61f9b1' : '#8898aa',
+                    color: isConfiguringTags ? '#10b981' : '#8898aa',
                     cursor: 'pointer',
                     display: 'flex',
                     alignItems: 'center',
@@ -685,10 +685,10 @@ export default function DetailPanel({
                             setAllTags(prev => prev.map(t => t.name === tag.name ? { ...t, show_first: !t.show_first } : t));
                           }}
                           style={{
-                            background: tag.show_first ? 'rgba(97, 249, 177, 0.15)' : 'transparent',
-                            border: '1px solid ' + (tag.show_first ? '#61f9b1' : 'rgba(255,255,255,0.15)'),
+                            background: tag.show_first ? 'rgba(16, 185, 129, 0.15)' : 'transparent',
+                            border: '1px solid ' + (tag.show_first ? '#10b981' : 'rgba(255,255,255,0.15)'),
                             borderRadius: '4px',
-                            color: tag.show_first ? '#61f9b1' : '#8898aa',
+                            color: tag.show_first ? '#10b981' : '#8898aa',
                             padding: '2px 6px',
                             fontSize: '11px',
                             cursor: 'pointer',
@@ -749,7 +749,7 @@ export default function DetailPanel({
                           key={tag.name}
                           className={`tag ${isSelected ? 'selected' : ''}`}
                           style={{
-                            border: tag.show_first ? '1px dashed #61f9b1' : undefined,
+                            border: tag.show_first ? '1px dashed #10b981' : undefined,
                             display: 'inline-flex',
                             alignItems: 'center',
                             gap: '4px'
@@ -763,7 +763,7 @@ export default function DetailPanel({
                           }}
                         >
                           {tag.show_first && (
-                            <span className="material-symbols-outlined" style={{ fontSize: '10px', color: '#61f9b1' }}>star</span>
+                            <span className="material-symbols-outlined" style={{ fontSize: '10px', color: '#10b981' }}>star</span>
                           )}
                           {tag.name}
                           {tag.is_ignored && (
@@ -798,11 +798,11 @@ export default function DetailPanel({
                         display: 'inline-flex',
                         alignItems: 'center',
                         padding: '4px 12px',
-                        backgroundColor: 'rgba(97, 249, 177, 0.05)',
+                        backgroundColor: 'rgba(16, 185, 129, 0.05)',
                         color: '#fff',
                         borderRadius: '9999px',
                         fontSize: '12px',
-                        border: '1px dashed rgba(97, 249, 177, 0.5)',
+                        border: '1px dashed rgba(16, 185, 129, 0.5)',
                         outline: 'none',
                         width: '100px',
                         fontFamily: language === 'fa' ? 'Vazirmatn' : 'inherit'
@@ -830,7 +830,7 @@ export default function DetailPanel({
                   style={{
                     background: 'transparent',
                     border: 'none',
-                    color: isConfiguringEmotions ? '#61f9b1' : '#8898aa',
+                    color: isConfiguringEmotions ? '#10b981' : '#8898aa',
                     cursor: 'pointer',
                     display: 'flex',
                     alignItems: 'center',

@@ -55,19 +55,19 @@
     align-items: center;
     justify-content: center;
     gap: 8px;
-    background: linear-gradient(135deg, #61f9b1, #3ddc97);
-    color: #061e15;
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: #ffffff;
     font-weight: 700;
     border-radius: 10px;
     padding: 12px 24px;
     text-decoration: none;
     font-size: 0.95rem;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
-    box-shadow: 0 4px 16px rgba(97, 249, 177, 0.25);
+    box-shadow: 0 4px 16px rgba(16, 185, 129, 0.25);
 
     &:hover {
       transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(97, 249, 177, 0.35);
+      box-shadow: 0 6px 20px rgba(16, 185, 129, 0.35);
     }
   }
 
@@ -87,8 +87,8 @@
 
     &:hover {
       background: rgba(255, 255, 255, 0.1);
-      border-color: rgba(97, 249, 177, 0.4);
-      color: #61f9b1;
+      border-color: rgba(16, 185, 129, 0.4);
+      color: #10b981;
     }
   }
 
@@ -110,9 +110,9 @@
       gap: 8px;
       padding: 6px 16px;
       border-radius: 999px;
-      background: rgba(97, 249, 177, 0.12);
-      border: 1px solid rgba(97, 249, 177, 0.3);
-      color: #61f9b1;
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      color: #10b981;
       font-size: 0.88rem;
       font-weight: 600;
       margin-bottom: 24px;
@@ -178,7 +178,7 @@
 
       &:hover {
         transform: translateY(-4px);
-        border-color: rgba(97, 249, 177, 0.35);
+        border-color: rgba(16, 185, 129, 0.35);
         box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3);
       }
 
@@ -186,8 +186,8 @@
         width: 52px;
         height: 52px;
         border-radius: 14px;
-        background: rgba(97, 249, 177, 0.12);
-        color: #61f9b1;
+        background: rgba(16, 185, 129, 0.12);
+        color: #10b981;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -241,7 +241,7 @@
       h4 {
         font-size: 1.1rem;
         font-weight: 700;
-        color: #61f9b1;
+        color: #10b981;
         margin-bottom: 10px;
       }
 

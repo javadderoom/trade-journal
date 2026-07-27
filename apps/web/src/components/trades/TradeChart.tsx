@@ -87,10 +87,10 @@ export default function TradeChart({
 
     // 3. Add Candlestick Series
     const candlestickSeries = chart.addCandlestickSeries({
-      upColor: '#61f9b1',
+      upColor: '#10b981',
       downColor: '#ff6b6b',
       borderVisible: false,
-      wickUpColor: '#61f9b1',
+      wickUpColor: '#10b981',
       wickDownColor: '#ff6b6b',
     });
 
@@ -119,7 +119,7 @@ export default function TradeChart({
     markers.push({
       time: entryBarTime,
       position: isBuy ? 'belowBar' : 'aboveBar',
-      color: isBuy ? '#61f9b1' : '#ff6b6b',
+      color: isBuy ? '#10b981' : '#ff6b6b',
       shape: isBuy ? 'arrowUp' : 'arrowDown',
       text: isBuy ? 'خرید (Entry)' : 'فروش (Entry)',
       size: 1.5,
@@ -131,7 +131,7 @@ export default function TradeChart({
       markers.push({
         time: exitBarTime,
         position: isBuy ? 'aboveBar' : 'belowBar',
-        color: exitIsWin ? '#61f9b1' : '#ff6b6b',
+        color: exitIsWin ? '#10b981' : '#ff6b6b',
         shape: isBuy ? 'arrowDown' : 'arrowUp',
         text: 'خروج (Exit)',
         size: 1.5,

@@ -214,7 +214,7 @@ export default function ImportMT4Modal({ isOpen, onClose, onSuccess, accounts }:
         {uiState === 'IMPORTING' && (
           <div className="import-progress-wrap" style={{ padding: '0 16px 8px 16px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-              <span style={{ color: '#61f9b1', fontSize: 13 }}>{progressLabel}</span>
+              <span style={{ color: '#10b981', fontSize: 13 }}>{progressLabel}</span>
               <span style={{ color: '#cbd5e1', fontSize: 12 }}>{progressPct}%</span>
             </div>
             <div
@@ -231,7 +231,7 @@ export default function ImportMT4Modal({ isOpen, onClose, onSuccess, accounts }:
                 style={{
                   width: `${Math.min(100, Math.max(0, progressPct))}%`,
                   height: '100%',
-                  background: 'linear-gradient(90deg, #61f9b1, #22c55e)',
+                  background: 'linear-gradient(90deg, #10b981, #059669)',
                   transition: 'width 220ms ease',
                 }}
               />

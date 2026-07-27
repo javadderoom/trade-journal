@@ -284,7 +284,7 @@ export default function MobileCardsList({
             justifyContent: 'center',
             alignItems: 'center',
             padding: '24px 0',
-            color: '#61f9b1'
+            color: '#10b981'
           }}
         >
           <span

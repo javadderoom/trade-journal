@@ -40,9 +40,9 @@
   }
 
   &.toast-success {
-    border-right: 4px solid #3ddc97;
+    border-right: 4px solid #10b981;
     .toast-icon {
-      color: #3ddc97;
+      color: #10b981;
     }
   }
 
@@ -166,8 +166,8 @@
       }
 
       &.confirm {
-        background: #3ddc97;
-        color: #0f1117;
+        background: #10b981;
+        color: #ffffff;
 
         &:hover {
           filter: brightness(1.1);

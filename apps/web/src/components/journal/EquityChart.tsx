@@ -116,14 +116,14 @@ export default function EquityChart({ closedTrades }: EquityChartProps) {
 
     // 4. Add Area Series
     const areaSeries = chart.addAreaSeries({
-      lineColor: '#61f9b1',
-      topColor: 'rgba(97, 249, 177, 0.25)',
-      bottomColor: 'rgba(97, 249, 177, 0.0)',
+      lineColor: '#10b981',
+      topColor: 'rgba(16, 185, 129, 0.25)',
+      bottomColor: 'rgba(16, 185, 129, 0.0)',
       lineWidth: 3,
       crosshairMarkerVisible: true,
       crosshairMarkerRadius: 5,
       crosshairMarkerBorderColor: '#111319',
-      crosshairMarkerBackgroundColor: '#61f9b1',
+      crosshairMarkerBackgroundColor: '#10b981',
     });
 
     areaSeries.setData(finalData);

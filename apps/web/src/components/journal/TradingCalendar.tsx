@@ -365,7 +365,7 @@ ${uiLabels.netPnl}: ${day.netPnl >= 0 ? '+' : '-'}$${toPersianDigits(Math.abs(da
                 router.push(`/trades?date=${selectedDates.join(',')}`);
               }}
               className="btn btn-primary" 
-              style={{ padding: '6px 12px', fontSize: '12px', height: 'auto', background: '#61f9b1', border: 'none', color: '#003822', fontWeight: '700' }}
+              style={{ padding: '6px 12px', fontSize: '12px', height: 'auto', background: '#10b981', border: 'none', color: '#ffffff', fontWeight: '700' }}
             >
               {uiLabels.viewTrades}
             </button>

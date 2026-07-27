@@ -555,7 +555,7 @@ export default function JournalPage() {
             <div className="pnl-subtext-grid">
               <div className="sub-item">
                 <span className="sub-label">{t('analytics.grossPnl')}</span>
-                <span className="sub-val" style={{ color: stats.grossPnl >= 0 ? '#61f9b1' : '#ffb4ab', direction: 'ltr', display: 'inline-block' }}>
+                <span className="sub-val" style={{ color: stats.grossPnl >= 0 ? '#10b981' : '#ffb4ab', direction: 'ltr', display: 'inline-block' }}>
                   {formatCurrency(stats.grossPnl, 2)}
                 </span>
               </div>
@@ -774,8 +774,8 @@ export default function JournalPage() {
                         if (!hasFewerThan10 && cell.total > 0) {
                           if (winRate >= 50) {
                             const opacity = Math.min(0.05 + ((winRate - 50) / 50) * 0.4, 0.45);
-                            bgColor = `rgba(97, 249, 177, ${opacity})`;
-                            textColor = '#61f9b1';
+                            bgColor = `rgba(16, 185, 129, ${opacity})`;
+                            textColor = '#10b981';
                           } else {
                             const opacity = Math.min(0.05 + ((50 - winRate) / 50) * 0.4, 0.45);
                             bgColor = `rgba(255, 180, 171, ${opacity})`;
@@ -925,10 +925,10 @@ export default function JournalPage() {
                       <tr key={sym.symbol}>
                         <td style={{ fontWeight: '700' }}>{sym.symbol}</td>
                         <td>{formatNum(sym.total)}</td>
-                        <td style={{ color: sym.winRate >= 50 ? '#61f9b1' : '#ffb4ab', fontWeight: '600' }}>
+                        <td style={{ color: sym.winRate >= 50 ? '#10b981' : '#ffb4ab', fontWeight: '600' }}>
                           {language === 'fa' ? '%' + toPersianDigits(Math.round(sym.winRate).toString()) : Math.round(sym.winRate) + '%'}
                         </td>
-                        <td style={{ color: sym.pnl >= 0 ? '#61f9b1' : '#ffb4ab', fontWeight: '700', direction: 'ltr' }}>
+                        <td style={{ color: sym.pnl >= 0 ? '#10b981' : '#ffb4ab', fontWeight: '700', direction: 'ltr' }}>
                           {formatCurrency(sym.pnl, 2, true)}
                         </td>
                       </tr>

@@ -558,7 +558,7 @@ export default function AdminPage() {
               </div>
             </div>
             <div className="stat-card">
-              <div className="stat-icon-wrap" style={{ color: '#61f9b1', background: 'rgba(97, 249, 177, 0.1)' }}>
+              <div className="stat-icon-wrap" style={{ color: '#10b981', background: 'rgba(16, 185, 129, 0.1)' }}>
                 <span className="material-symbols-outlined">verified_user</span>
               </div>
               <div className="stat-info">
@@ -567,7 +567,7 @@ export default function AdminPage() {
               </div>
             </div>
             <div className="stat-card">
-              <div className="stat-icon-wrap" style={{ color: '#61f9b1', background: 'rgba(97, 249, 177, 0.1)' }}>
+              <div className="stat-icon-wrap" style={{ color: '#10b981', background: 'rgba(16, 185, 129, 0.1)' }}>
                 <span className="material-symbols-outlined">workspace_premium</span>
               </div>
               <div className="stat-info">
@@ -837,7 +837,7 @@ export default function AdminPage() {
             </div>
 
             <div>
-              <h4 style={{ color: '#61f9b1', marginBottom: '12px' }}>پلن حرفه‌ای (PRO)</h4>
+              <h4 style={{ color: '#10b981', marginBottom: '12px' }}>پلن حرفه‌ای (PRO)</h4>
               <div style={{ display: 'flex', gap: '16px' }}>
                 <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '6px' }}>
                   <label style={{ fontSize: '0.8rem', color: '#a0aec0' }}>قیمت ماهانه (تومان)</label>
@@ -954,7 +954,7 @@ export default function AdminPage() {
             </div>
 
             <div style={{ marginTop: '20px', paddingTop: '20px', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
-              <h3 style={{ fontSize: '1.1rem', color: '#61f9b1', marginBottom: '12px' }}>مشخصات کارت بانکی (کارت به کارت)</h3>
+              <h3 style={{ fontSize: '1.1rem', color: '#10b981', marginBottom: '12px' }}>مشخصات کارت بانکی (کارت به کارت)</h3>
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
@@ -1030,7 +1030,7 @@ export default function AdminPage() {
             </div>
 
             <div style={{ marginTop: '10px', paddingTop: '20px', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
-              <h4 style={{ fontSize: '1rem', color: '#61f9b1', marginBottom: '12px' }}>مبالغ دلاری پلن استاندارد (STANDARD)</h4>
+              <h4 style={{ fontSize: '1rem', color: '#10b981', marginBottom: '12px' }}>مبالغ دلاری پلن استاندارد (STANDARD)</h4>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
                   <label style={{ fontSize: '0.85rem', color: '#a0aec0' }}>هزینه ماهانه (USDT / USD)</label>
@@ -1064,7 +1064,7 @@ export default function AdminPage() {
             </div>
 
             <div style={{ marginTop: '10px', paddingTop: '10px' }}>
-              <h4 style={{ fontSize: '1rem', color: '#61f9b1', marginBottom: '12px' }}>مبالغ دلاری پلن حرفه‌ای (PRO)</h4>
+              <h4 style={{ fontSize: '1rem', color: '#10b981', marginBottom: '12px' }}>مبالغ دلاری پلن حرفه‌ای (PRO)</h4>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
                   <label style={{ fontSize: '0.85rem', color: '#a0aec0' }}>هزینه ماهانه (USDT / USD)</label>
@@ -1130,7 +1130,7 @@ export default function AdminPage() {
             <div className="stat-card" style={{ flex: 1, padding: '16px' }}>
               <div className="stat-info">
                 <span className="stat-label">خطا (۲۴ ساعت اخیر)</span>
-                <span className="stat-value" style={{ color: diagnosisStats.errors24h > 0 ? '#f56565' : '#61f9b1' }}>
+                <span className="stat-value" style={{ color: diagnosisStats.errors24h > 0 ? '#f56565' : '#10b981' }}>
                   {toPersianDigits(diagnosisStats.errors24h)}
                 </span>
               </div>
@@ -1138,7 +1138,7 @@ export default function AdminPage() {
             <div className="stat-card" style={{ flex: 1, padding: '16px' }}>
               <div className="stat-info">
                 <span className="stat-label">خطا (۷ روز اخیر)</span>
-                <span className="stat-value" style={{ color: diagnosisStats.errors7d > 0 ? '#f56565' : '#61f9b1' }}>
+                <span className="stat-value" style={{ color: diagnosisStats.errors7d > 0 ? '#f56565' : '#10b981' }}>
                   {toPersianDigits(diagnosisStats.errors7d)}
                 </span>
               </div>
@@ -1146,7 +1146,7 @@ export default function AdminPage() {
             <div className="stat-card" style={{ flex: 1, padding: '16px' }}>
               <div className="stat-info">
                 <span className="stat-label">کل خطاها</span>
-                <span className="stat-value" style={{ color: diagnosisStats.total > 0 ? '#f56565' : '#61f9b1' }}>
+                <span className="stat-value" style={{ color: diagnosisStats.total > 0 ? '#f56565' : '#10b981' }}>
                   {toPersianDigits(diagnosisStats.total)}
                 </span>
               </div>
@@ -1222,8 +1222,8 @@ export default function AdminPage() {
                           borderRadius: '4px',
                           fontSize: '0.75rem',
                           fontWeight: 600,
-                          background: log.level === 'ERROR' ? 'rgba(245,101,101,0.15)' : log.level === 'FATAL' ? 'rgba(229,62,62,0.2)' : log.level === 'WARN' ? 'rgba(236,201,75,0.15)' : 'rgba(97,249,177,0.1)',
-                          color: log.level === 'ERROR' ? '#f56565' : log.level === 'FATAL' ? '#e53e3e' : log.level === 'WARN' ? '#ecc94b' : '#61f9b1',
+                          background: log.level === 'ERROR' ? 'rgba(245,101,101,0.15)' : log.level === 'FATAL' ? 'rgba(229,62,62,0.2)' : log.level === 'WARN' ? 'rgba(236,201,75,0.15)' : 'rgba(16,185,129,0.1)',
+                          color: log.level === 'ERROR' ? '#f56565' : log.level === 'FATAL' ? '#e53e3e' : log.level === 'WARN' ? '#ecc94b' : '#10b981',
                         }}>
                           {log.level}
                         </span>

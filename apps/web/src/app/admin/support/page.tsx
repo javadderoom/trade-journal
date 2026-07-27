@@ -120,9 +120,9 @@ export default function AdminSupportPage() {
                     style={{
                       padding: '5px 12px',
                       borderRadius: 7,
-                      border: `1px solid ${statusFilter === opt.value ? '#61f9b1' : 'rgba(60, 74, 65, 0.3)'}`,
-                      background: statusFilter === opt.value ? 'rgba(97, 249, 177, 0.1)' : 'transparent',
-                      color: statusFilter === opt.value ? '#61f9b1' : '#94a3b8',
+                      border: `1px solid ${statusFilter === opt.value ? '#10b981' : 'rgba(60, 74, 65, 0.3)'}`,
+                      background: statusFilter === opt.value ? 'rgba(16, 185, 129, 0.1)' : 'transparent',
+                      color: statusFilter === opt.value ? '#10b981' : '#94a3b8',
                       fontSize: 12,
                       fontWeight: statusFilter === opt.value ? 600 : 400,
                       cursor: 'pointer',

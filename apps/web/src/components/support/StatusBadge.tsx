@@ -6,7 +6,7 @@ import { useTranslation } from '../../store/useAppStore';
 export function StatusBadge({ status }: { status: string }) {
   const { t } = useTranslation();
   const map: Record<string, { key: string; color: string; bg: string }> = {
-    OPEN: { key: 'support.statusOpen', color: '#3ddc97', bg: 'rgba(61, 220, 151, 0.12)' },
+    OPEN: { key: 'support.statusOpen', color: '#10b981', bg: 'rgba(16, 185, 129, 0.12)' },
     WAITING: { key: 'support.statusWaiting', color: '#f59e0b', bg: 'rgba(245, 158, 11, 0.12)' },
     RESOLVED: { key: 'support.statusResolved', color: '#60a5fa', bg: 'rgba(96, 165, 250, 0.12)' },
     CLOSED: { key: 'support.statusClosed', color: '#94a3b8', bg: 'rgba(148, 163, 184, 0.12)' },

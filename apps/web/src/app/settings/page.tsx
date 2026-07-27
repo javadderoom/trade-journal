@@ -1387,10 +1387,10 @@ export default function SettingsPage() {
                             onClick={() => setPaymentMethod('payping')}
                             style={{
                               padding: '10px',
-                              background: paymentMethod === 'payping' ? 'rgba(97, 249, 177, 0.15)' : '#0f121d',
-                              border: paymentMethod === 'payping' ? '1px solid #61f9b1' : '1px solid rgba(255,255,255,0.1)',
+                              background: paymentMethod === 'payping' ? 'rgba(16, 185, 129, 0.15)' : '#0f121d',
+                              border: paymentMethod === 'payping' ? '1px solid #10b981' : '1px solid rgba(255,255,255,0.1)',
                               borderRadius: '8px',
-                              color: paymentMethod === 'payping' ? '#61f9b1' : '#a0aec0',
+                              color: paymentMethod === 'payping' ? '#10b981' : '#a0aec0',
                               fontWeight: 'bold',
                               cursor: 'pointer',
                               fontSize: '0.82rem',
@@ -1493,7 +1493,7 @@ export default function SettingsPage() {
                               background: '#0f121d',
                               border: '1px dashed rgba(255,255,255,0.2)',
                               borderRadius: '8px',
-                              color: '#61f9b1',
+                              color: '#10b981',
                               cursor: 'pointer',
                               fontSize: '0.85rem',
                               transition: 'border-color 0.2s'
@@ -1554,7 +1554,7 @@ export default function SettingsPage() {
                             <div style={{ fontSize: '0.82rem', marginBottom: '8px', color: '#e2e8f0', display: 'flex', flexDirection: 'column', gap: '5px' }}>
                               <div>
                                 {language === 'fa' ? 'مبلغ قابل پرداخت:' : 'Amount to Pay:'}{' '}
-                                <strong style={{ color: '#61f9b1' }}>
+                                <strong style={{ color: '#10b981' }}>
                                   {cryptoCoin === 'USDT' 
                                     ? `${expectedAmount.toFixed(2)} USDT` 
                                     : `${language === 'fa' ? 'معادل ریالی/دلاری با نرخ زنده در تراکنش' : 'Live dynamic conversion equivalent of'} $${expectedAmount.toFixed(2)} USD`}
@@ -1575,7 +1575,7 @@ export default function SettingsPage() {
                                     style={{
                                       background: 'none',
                                       border: 'none',
-                                      color: '#61f9b1',
+                                      color: '#10b981',
                                       cursor: 'pointer',
                                       display: 'flex',
                                       alignItems: 'center',

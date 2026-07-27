@@ -173,7 +173,7 @@ export default function TradesPage() {
   };
 
   return (
-    <main style={{ backgroundColor: '#111319', minHeight: '100%' }}>
+    <main style={{ backgroundColor: 'transparent', minHeight: '100%' }}>
       <SubscriptionBanners
         subStatus={subStatus}
         dismissedRejectionId={dismissedRejectionId}

@@ -34,9 +34,9 @@ export default function MessageBubble({ senderId, body, attachments, timestamp, 
           borderRadius: '16px',
           fontSize: '14px',
           lineHeight: 1.5,
-          color: isOwn ? '#003822' : '#e2e2eb',
+          color: isOwn ? '#ffffff' : '#e2e2eb',
           background: isOwn
-            ? 'linear-gradient(135deg, #61f9b1, #3ddc97)'
+            ? 'linear-gradient(135deg, #10b981, #059669)'
             : '#282a30',
           borderBottomRightRadius: isOwn ? '4px' : '16px',
           borderBottomLeftRadius: isOwn ? '16px' : '4px',

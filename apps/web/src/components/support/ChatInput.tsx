@@ -52,8 +52,8 @@ export default function ChatInput({ onSend, sending, disabled, placeholder }: Ch
                 gap: 4,
                 padding: '3px 8px',
                 borderRadius: 6,
-                background: 'rgba(97, 249, 177, 0.1)',
-                color: '#61f9b1',
+                background: 'rgba(16, 185, 129, 0.1)',
+                color: '#10b981',
                 fontSize: 12,
               }}
             >
@@ -139,8 +139,8 @@ export default function ChatInput({ onSend, sending, disabled, placeholder }: Ch
             height: 40,
             borderRadius: '50%',
             border: 'none',
-            background: '#61f9b1',
-            color: '#003822',
+            background: '#10b981',
+            color: '#ffffff',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',

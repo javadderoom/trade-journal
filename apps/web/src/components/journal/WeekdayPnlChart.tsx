@@ -229,13 +229,13 @@ export default function WeekdayPnlChart({ closedTrades }: WeekdayPnlChartProps) 
           style={{
             left: hoveredBar.x + hoveredBar.width / 2 - 75 + (hoveredBar.x > width - 150 ? -40 : 0),
             top: hoveredBar.y - 65,
-            border: `1px solid ${hoveredBar.pnl >= 0 ? '#61f9b1' : '#ffb4ab'}`,
+            border: `1px solid ${hoveredBar.pnl >= 0 ? '#10b981' : '#ffb4ab'}`,
           }}
         >
           <div style={{ fontWeight: '700', fontSize: '12px', color: '#bbcabe' }}>
             روز {hoveredBar.fullName}
           </div>
-          <div style={{ display: 'flex', gap: '4px', fontSize: '13px', fontWeight: '800', color: hoveredBar.pnl >= 0 ? '#61f9b1' : '#ffb4ab' }}>
+          <div style={{ display: 'flex', gap: '4px', fontSize: '13px', fontWeight: '800', color: hoveredBar.pnl >= 0 ? '#10b981' : '#ffb4ab' }}>
             <span>{hoveredBar.pnl >= 0 ? 'سود:' : 'زیان:'}</span>
             <span>{hoveredBar.pnl >= 0 ? '+' : '-'}${toPersianDigits(Math.abs(hoveredBar.pnl).toFixed(2))}</span>
           </div>

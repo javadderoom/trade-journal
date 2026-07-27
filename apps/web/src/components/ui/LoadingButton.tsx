@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useTranslation } from '../../store/useAppStore';
 import './loading-button.scss';
 
@@ -32,62 +32,57 @@ export default function LoadingButton({
   isLoading: controlledLoading,
   isSuccess: controlledSuccess,
   isError: controlledError,
-  autoResetDelay = 1500,
+  autoResetDelay = 2200,
   ...rest
 }: LoadingButtonProps) {
   const { language } = useTranslation();
   const isEn = language === 'en';
 
   const [status, setStatus] = useState<ButtonStatus>('idle');
-  const [btnWidth, setBtnWidth] = useState<number | null>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const resetTimerRef = useRef<NodeJS.Timeout | null>(null);
-
   const prevLoadingRef = useRef<boolean | undefined>(controlledLoading);
+  const loadingStartTimeRef = useRef<number | null>(null);
 
-  const triggerReset = useCallback(() => {
-    if (resetTimerRef.current) clearTimeout(resetTimerRef.current);
-    resetTimerRef.current = setTimeout(() => {
-      setStatus('idle');
-    }, autoResetDelay);
-  }, [autoResetDelay]);
+  const defaultSuccessText = successText ?? (isEn ? 'Done!' : 'ذخیره شد');
+  const defaultErrorText = errorText ?? (isEn ? 'Failed' : 'خطا');
 
-  // Sync controlled state if passed
+  // Sync controlled state (e.g. isLoading={isSubmitting})
   useEffect(() => {
     if (controlledLoading !== undefined) {
       const wasLoading = prevLoadingRef.current;
       prevLoadingRef.current = controlledLoading;
 
       if (controlledLoading) {
+        if (resetTimerRef.current) clearTimeout(resetTimerRef.current);
+        loadingStartTimeRef.current = Date.now();
         setStatus('loading');
       } else if (wasLoading) {
-        // Controlled loading state just completed!
-        if (controlledError) {
-          setStatus('error');
-          triggerReset();
-        } else {
-          setStatus('success');
-          triggerReset();
-        }
+        const elapsed = loadingStartTimeRef.current ? Date.now() - loadingStartTimeRef.current : 500;
+        const remaining = Math.max(0, 500 - elapsed);
+
+        setTimeout(() => {
+          if (controlledError) {
+            setStatus('error');
+          } else {
+            setStatus('success');
+          }
+          if (resetTimerRef.current) clearTimeout(resetTimerRef.current);
+          resetTimerRef.current = setTimeout(() => {
+            setStatus('idle');
+          }, autoResetDelay);
+        }, remaining);
       } else if (controlledSuccess) {
         setStatus('success');
-        triggerReset();
+        if (resetTimerRef.current) clearTimeout(resetTimerRef.current);
+        resetTimerRef.current = setTimeout(() => setStatus('idle'), autoResetDelay);
       } else if (controlledError) {
         setStatus('error');
-        triggerReset();
+        if (resetTimerRef.current) clearTimeout(resetTimerRef.current);
+        resetTimerRef.current = setTimeout(() => setStatus('idle'), autoResetDelay);
       }
     }
-  }, [controlledLoading, controlledSuccess, controlledError, triggerReset]);
-
-  // Capture initial button width for smooth morphing back & forth
-  useEffect(() => {
-    if (buttonRef.current && status === 'idle') {
-      const rect = buttonRef.current.getBoundingClientRect();
-      if (rect.width > 0) {
-        setBtnWidth(rect.width);
-      }
-    }
-  }, [children, status]);
+  }, [controlledLoading, controlledSuccess, controlledError, autoResetDelay]);
 
   // Clean up auto-reset timer on unmount
   useEffect(() => {
@@ -98,27 +93,37 @@ export default function LoadingButton({
 
   const handleClick = async (e: React.MouseEvent<HTMLButtonElement>) => {
     if (disabled || status !== 'idle') return;
-
     if (!onClick) return;
 
     try {
+      loadingStartTimeRef.current = Date.now();
+      setStatus('loading');
+
       const result = onClick(e);
 
-      // Check if return value is a Promise
       if (result && typeof (result as any).then === 'function') {
-        setStatus('loading');
         await result;
-        setStatus('success');
-        triggerReset();
       }
+
+      const elapsed = loadingStartTimeRef.current ? Date.now() - loadingStartTimeRef.current : 500;
+      const remaining = Math.max(0, 500 - elapsed);
+
+      setTimeout(() => {
+        setStatus('success');
+        if (resetTimerRef.current) clearTimeout(resetTimerRef.current);
+        resetTimerRef.current = setTimeout(() => setStatus('idle'), autoResetDelay);
+      }, remaining);
     } catch (err) {
-      setStatus('error');
-      triggerReset();
+      const elapsed = loadingStartTimeRef.current ? Date.now() - loadingStartTimeRef.current : 500;
+      const remaining = Math.max(0, 500 - elapsed);
+
+      setTimeout(() => {
+        setStatus('error');
+        if (resetTimerRef.current) clearTimeout(resetTimerRef.current);
+        resetTimerRef.current = setTimeout(() => setStatus('idle'), autoResetDelay);
+      }, remaining);
     }
   };
-
-  const defaultSuccessText = successText ?? (isEn ? 'Done!' : 'ذخیره شد ✅');
-  const defaultErrorText = errorText ?? (isEn ? 'Failed' : 'خطا ❌');
 
   const statusClass = `btn-${status}-state`;
   const sizeClass = `btn-size-${size}`;
@@ -131,25 +136,24 @@ export default function LoadingButton({
       className={`loading-btn ${variantClass} ${sizeClass} ${statusClass} ${className}`}
       disabled={disabled || status === 'loading'}
       onClick={handleClick}
-      style={{
-        ...(btnWidth && status !== 'loading' ? { minWidth: `${btnWidth}px` } : {}),
-        ...style,
-      }}
+      style={style}
       {...rest}
     >
       {/* State 1: IDLE */}
-      <span className={`btn-label-idle ${status === 'idle' ? 'visible' : 'hidden'}`}>
-        {children}
-      </span>
+      {status === 'idle' && (
+        <span className="btn-label-idle">
+          {children}
+        </span>
+      )}
 
-      {/* State 2: LOADING (Mini Spinner inside Collapsed Circle) */}
+      {/* State 2: LOADING */}
       {status === 'loading' && (
         <span className="btn-spinner-wrap">
           <span className="btn-mini-spinner" />
         </span>
       )}
 
-      {/* State 3: SUCCESS (Expanded + Checkmark + Done Text) */}
+      {/* State 3: SUCCESS */}
       {status === 'success' && (
         <span className="btn-status-content btn-success-content">
           <span className="material-symbols-outlined status-icon">check</span>
@@ -157,7 +161,7 @@ export default function LoadingButton({
         </span>
       )}
 
-      {/* State 4: ERROR (Expanded + Error Icon + Alert Text) */}
+      {/* State 4: ERROR */}
       {status === 'error' && (
         <span className="btn-status-content btn-error-content">
           <span className="material-symbols-outlined status-icon">error</span>

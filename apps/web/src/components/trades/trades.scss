@@ -5,7 +5,7 @@
   display: flex;
   width: 100%;
   height: calc(100vh - 64px); // Adjust based on header if any, or full height
-  background-color: $surface;
+  background-color: transparent;
   color: $on-surface;
   font-family: $font-primary;
   overflow: hidden;
@@ -1372,19 +1372,10 @@
 
     .btn-save {
       flex: 1;
-      background-color: rgba($primary, 0.1);
-      color: $primary;
-      border: 1px solid rgba($primary, 0.3);
-      padding: 8px 16px;
-      border-radius: 8px;
+      height: 42px;
       font-size: 14px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: background-color 0.2s ease;
-
-      &:hover {
-        background-color: rgba($primary, 0.2);
-      }
+      font-weight: 600;
+      margin-inline: auto;
     }
 
     .btn-delete {
@@ -2041,12 +2032,13 @@ input[type="checkbox"] {
         }
 
         &.btn-primary {
-          background-color: rgba($primary, 0.1);
-          color: $primary;
-          border: 1px solid rgba($primary, 0.3);
+          background: linear-gradient(135deg, #10b981, #059669);
+          color: #ffffff;
+          border: 1px solid transparent;
 
           &:hover {
-            background-color: rgba($primary, 0.2);
+            background: linear-gradient(135deg, #34d399, #10b981);
+            color: #ffffff;
           }
 
           &:disabled {

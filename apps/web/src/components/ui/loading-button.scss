@@ -15,13 +15,16 @@
   user-select: none;
   white-space: nowrap;
   box-sizing: border-box;
+
   transition:
-    width 0.35s cubic-bezier(0.4, 0, 0.2, 1),
-    min-width 0.35s cubic-bezier(0.4, 0, 0.2, 1),
-    border-radius 0.35s cubic-bezier(0.4, 0, 0.2, 1),
-    background-color 0.25s ease,
-    border-color 0.25s ease,
-    box-shadow 0.25s ease,
+    width 0.45s cubic-bezier(0.4, 0, 0.2, 1),
+    min-width 0.45s cubic-bezier(0.4, 0, 0.2, 1),
+    max-width 0.45s cubic-bezier(0.4, 0, 0.2, 1),
+    border-radius 0.45s cubic-bezier(0.4, 0, 0.2, 1),
+    padding 0.45s cubic-bezier(0.4, 0, 0.2, 1),
+    background-color 0.35s ease,
+    border-color 0.35s ease,
+    box-shadow 0.35s ease,
     transform 0.15s ease;
 
   &:active {
@@ -39,11 +42,13 @@
     padding: 0 14px;
     font-size: 0.82rem;
   }
+
   &.btn-size-md {
     height: 42px;
     padding: 0 20px;
     font-size: 0.9rem;
   }
+
   &.btn-size-lg {
     height: 48px;
     padding: 0 28px;
@@ -52,14 +57,14 @@
 
   // ─── Variants ────────────────────────────────────────────────────────────────
   &.btn-var-primary {
-    background: linear-gradient(135deg, $primary, darken($primary, 8%));
+    background: linear-gradient(135deg, #10b981, #059669);
     color: #ffffff;
-    border-color: rgba($primary, 0.4);
-    box-shadow: 0 4px 14px rgba($primary, 0.25);
+    border-color: rgba(16, 185, 129, 0.4);
+    box-shadow: 0 4px 14px rgba(16, 185, 129, 0.25);
 
     &:hover:not(:disabled) {
-      background: linear-gradient(135deg, lighten($primary, 4%), $primary);
-      box-shadow: 0 6px 18px rgba($primary, 0.35);
+      background: linear-gradient(135deg, #34d399, #10b981);
+      box-shadow: 0 6px 18px rgba(16, 185, 129, 0.35);
     }
   }
 
@@ -99,41 +104,34 @@
   .btn-label-idle {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 8px;
-    transition: opacity 0.2s ease;
-
-    &.visible {
-      opacity: 1;
-    }
-    &.hidden {
-      opacity: 0;
-      pointer-events: none;
-    }
+    width: 100%;
+    text-align: center;
   }
 
-  // ─── State 2: LOADING (Collapses into 42px Circle) ───────────────────────────
+  // ─── State 2: LOADING (Circle Target) ────────────────────────────────────────
   &.btn-loading-state {
+    width: 42px !important;
+    min-width: 42px !important;
+    max-width: 42px !important;
+    height: 42px !important;
     border-radius: 50% !important;
     padding: 0 !important;
-    margin-inline: auto;
-    flex: none !important;
-    aspect-ratio: 1 / 1 !important;
     box-shadow: 0 0 16px rgba($primary, 0.3);
 
     &.btn-size-sm {
       width: 34px !important;
       min-width: 34px !important;
       max-width: 34px !important;
+      height: 34px !important;
     }
-    &.btn-size-md {
-      width: 42px !important;
-      min-width: 42px !important;
-      max-width: 42px !important;
-    }
+
     &.btn-size-lg {
       width: 48px !important;
       min-width: 48px !important;
       max-width: 48px !important;
+      height: 48px !important;
     }
 
     .btn-spinner-wrap {
@@ -156,7 +154,7 @@
     }
   }
 
-  // ─── State 3: SUCCESS (Expands + Green Highlight + Checkmark) ─────────────────
+  // ─── State 3: SUCCESS (Expanded + Green Highlight + Centered Checkmark) ───────
   &.btn-success-state {
     background: linear-gradient(135deg, #10b981, #059669) !important;
     border-color: rgba(16, 185, 129, 0.5) !important;
@@ -166,16 +164,20 @@
     .btn-success-content {
       display: inline-flex;
       align-items: center;
+      justify-content: center;
       gap: 6px;
+      width: 100%;
+      text-align: center;
       animation: btn-pop-in 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 
       .status-icon {
         font-size: 1.1rem;
+        line-height: 1;
       }
     }
   }
 
-  // ─── State 4: ERROR (Expands + Shake + Red Alert) ───────────────────────────
+  // ─── State 4: ERROR (Expands + Shake + Centered Red Alert) ─────────────────
   &.btn-error-state {
     background: linear-gradient(135deg, #ef4444, #dc2626) !important;
     border-color: rgba(239, 68, 68, 0.5) !important;
@@ -186,11 +188,15 @@
     .btn-error-content {
       display: inline-flex;
       align-items: center;
+      justify-content: center;
       gap: 6px;
+      width: 100%;
+      text-align: center;
       animation: btn-pop-in 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 
       .status-icon {
         font-size: 1.1rem;
+        line-height: 1;
       }
     }
   }
@@ -208,6 +214,7 @@
     transform: scale(0.8);
     opacity: 0;
   }
+
   100% {
     transform: scale(1);
     opacity: 1;
@@ -215,9 +222,24 @@
 }
 
 @keyframes btn-shake {
-  0%, 100% { transform: translateX(0); }
-  20% { transform: translateX(-6px); }
-  40% { transform: translateX(6px); }
-  60% { transform: translateX(-4px); }
-  80% { transform: translateX(4px); }
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  20% {
+    transform: translateX(-6px);
+  }
+
+  40% {
+    transform: translateX(6px);
+  }
+
+  60% {
+    transform: translateX(-4px);
+  }
+
+  80% {
+    transform: translateX(4px);
+  }
 }

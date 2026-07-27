@@ -136,27 +136,15 @@ export default function EaSetupHelpPage() {
                 <h3>{content.downloadTitle} (MT5)</h3>
                 <p>{content.mt5Compatibility}</p>
               </div>
-              <div style={{ display: 'flex', gap: '8px', width: '100%' }}>
-                <a 
-                  href="/downloads/TradeKav_EA.ex5" 
-                  download="TradeKav_EA.ex5"
-                  className="download-action-btn"
-                  style={{ flex: 1, justifyContent: 'center' }}
-                >
-                  <span className="material-symbols-outlined">download</span>
-                  <span>{content.mt5Btn}</span>
-                </a>
-                <a 
-                  href="/downloads/TradeKav_EA.mq5" 
-                  download="TradeKav_EA.mq5"
-                  className="download-action-btn"
-                  style={{ flex: '0 0 auto', justifyContent: 'center', padding: '0 12px' }}
-                  title="Source Code (.MQ5)"
-                >
-                  <span className="material-symbols-outlined">code</span>
-                  <span>MQ5</span>
-                </a>
-              </div>
+              <a 
+                href="/downloads/TradeKav_EA.ex5" 
+                download="TradeKav_EA.ex5"
+                className="download-action-btn"
+                style={{ width: '100%', justifyContent: 'center' }}
+              >
+                <span className="material-symbols-outlined">download</span>
+                <span>{content.mt5Btn}</span>
+              </a>
             </div>
 
             <div className="ea-download-card" style={{ flexDirection: 'column', gap: '16px', textAlign: 'center' }}>
@@ -164,27 +152,15 @@ export default function EaSetupHelpPage() {
                 <h3>{content.downloadTitle} (MT4)</h3>
                 <p>{content.mt4Compatibility}</p>
               </div>
-              <div style={{ display: 'flex', gap: '8px', width: '100%' }}>
-                <a 
-                  href="/downloads/TradeKav_EA.ex4" 
-                  download="TradeKav_EA.ex4"
-                  className="download-action-btn"
-                  style={{ flex: 1, justifyContent: 'center' }}
-                >
-                  <span className="material-symbols-outlined">download</span>
-                  <span>{content.mt4Btn}</span>
-                </a>
-                <a 
-                  href="/downloads/TradeKav_EA.mq4" 
-                  download="TradeKav_EA.mq4"
-                  className="download-action-btn"
-                  style={{ flex: '0 0 auto', justifyContent: 'center', padding: '0 12px' }}
-                  title="Source Code (.MQ4)"
-                >
-                  <span className="material-symbols-outlined">code</span>
-                  <span>MQ4</span>
-                </a>
-              </div>
+              <a 
+                href="/downloads/TradeKav_EA.ex4" 
+                download="TradeKav_EA.ex4"
+                className="download-action-btn"
+                style={{ width: '100%', justifyContent: 'center' }}
+              >
+                <span className="material-symbols-outlined">download</span>
+                <span>{content.mt4Btn}</span>
+              </a>
             </div>
           </div>
         </div>
