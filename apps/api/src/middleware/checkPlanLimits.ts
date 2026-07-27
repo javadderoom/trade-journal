@@ -175,16 +175,23 @@ export const checkSyncPermission = async (
         const diffSeconds = (now - lastSync) / 1000;
 
         if (plan === 'STANDARD' && diffSeconds < 3600) {
-          const remainMins = Math.ceil((3600 - diffSeconds) / 60);
+          const retryAfterSeconds = Math.max(1, Math.ceil(3600 - diffSeconds));
+          const remainMins = Math.ceil(retryAfterSeconds / 60);
+          res.setHeader('Retry-After', retryAfterSeconds.toString());
           return res.status(429).json({
             error: `همگام‌سازی خودکار در پلن استاندارد به هر ۱ ساعت یک‌بار محدود است. لطفاً ${remainMins} دقیقه دیگر تلاش کنید یا برای همگام‌سازی سریع‌تر (۶۰ ثانیه)، پلن خود را به حرفه‌ای ارتقا دهید.`,
+            retryAfterSeconds,
+            remainMins,
           });
         }
 
         if (plan === 'PRO' && diffSeconds < 60) {
-          const remainSecs = Math.ceil(60 - diffSeconds);
+          const retryAfterSeconds = Math.max(1, Math.ceil(60 - diffSeconds));
+          res.setHeader('Retry-After', retryAfterSeconds.toString());
           return res.status(429).json({
-            error: `همگام‌سازی خودکار به هر ۶۰ ثانیه یک‌بار محدود است. لطفاً ${remainSecs} ثانیه دیگر تلاش کنید.`,
+            error: `همگام‌سازی خودکار به هر ۶۰ ثانیه یک‌بار محدود است. لطفاً ${retryAfterSeconds} ثانیه دیگر تلاش کنید.`,
+            retryAfterSeconds,
+            remainSecs: retryAfterSeconds,
           });
         }
       }
