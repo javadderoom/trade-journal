@@ -29,58 +29,8 @@ export async function fetchHistoricalCandles(
   limit: number = 500
 ): Promise<CandleData[]> {
   const normSymbol = symbol.toUpperCase().trim();
-  const symbolInfo = SYMBOL_MAP[normSymbol] || { basePrice: 100.0 };
 
-  // 1. Try Binance Public API for Crypto
-  if (symbolInfo.binanceSymbol) {
-    try {
-      const intervalMap: Record<Timeframe, string> = {
-        '1m': '1m',
-        '5m': '5m',
-        '15m': '15m',
-        '1h': '1h',
-        '4h': '4h',
-        '1d': '1d',
-      };
-      const binanceInterval = intervalMap[timeframe] || '15m';
-      const url = `https://api.binance.com/api/v3/klines?symbol=${symbolInfo.binanceSymbol}&interval=${binanceInterval}&limit=${limit}`;
-      
-      const response = await fetch(url);
-      if (response.ok) {
-        const rawData = await response.json();
-        if (Array.isArray(rawData) && rawData.length > 0) {
-          const candles: CandleData[] = rawData.map((item: any) => ({
-            time: Math.floor(Number(item[0]) / 1000), // convert ms to unix timestamp (seconds)
-            open: parseFloat(item[1]),
-            high: parseFloat(item[2]),
-            low: parseFloat(item[3]),
-            close: parseFloat(item[4]),
-            volume: parseFloat(item[5]),
-          }));
-
-          // Sort ascending by time
-          return candles.sort((a, b) => a.time - b.time);
-        }
-      }
-    } catch (err) {
-      console.warn('[MarketData] Binance API fetch failed, trying backend proxy:', err);
-    }
-  }
-
-  // 2. Try direct Yahoo Finance or Backend Proxy for Forex & Commodities
   try {
-    const yahooSym = symbolInfo.yahooSymbol || 'XAUUSD=X';
-    let interval = '15m';
-    let range = '1mo';
-
-    if (timeframe === '1m') { interval = '1m'; range = '7d'; }
-    else if (timeframe === '5m') { interval = '5m'; range = '1mo'; }
-    else if (timeframe === '15m') { interval = '15m'; range = '1mo'; }
-    else if (timeframe === '1h') { interval = '60m'; range = '3mo'; }
-    else if (timeframe === '4h') { interval = '60m'; range = '1y'; }
-    else if (timeframe === '1d') { interval = '1d'; range = '2y'; }
-
-    // Try API Proxy first
     const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
     const proxyUrl = `${apiBase}/api/market-data/history?symbol=${encodeURIComponent(normSymbol)}&timeframe=${timeframe}&limit=${limit}`;
     
@@ -95,7 +45,6 @@ export async function fetchHistoricalCandles(
     console.warn('[MarketData] Proxy fetch failed:', err);
   }
 
-  // 3. No fallback — throw so the UI can show an error
   throw new Error(`Market data unavailable for ${normSymbol}`);
 }
 

@@ -35,6 +35,7 @@ export default function BacktestPage() {
   // Refs for reading current state inside async callbacks without adding dependencies
   const candlesRef = useRef(candles);
   const visibleCountRef = useRef(0);
+  const candleCacheRef = useRef<Map<string, CandleData[]>>(new Map());
 
   // Sync refs after render so async callbacks always see latest state
   useEffect(() => { candlesRef.current = candles; });
@@ -105,11 +106,28 @@ export default function BacktestPage() {
   const loadCandleData = useCallback(async (sym: string, tf: Timeframe) => {
     // Capture current timestamp before fetch so we can map to new timeframe
     const targetTimestamp = candlesRef.current[visibleCountRef.current - 1]?.time ?? null;
+    const cacheKey = `${sym}-${tf}`;
+
+    // Check memory cache first for instant timeframe switching
+    const cached = candleCacheRef.current.get(cacheKey);
+    if (cached) {
+      setCandles(cached);
+      if (cached.length > 0) {
+        if (targetTimestamp !== null) {
+          const matchedIndex = findClosestCandleIndex(cached, targetTimestamp);
+          replay.loadCandles(matchedIndex + 1);
+        } else {
+          replay.loadCandles(cached.length);
+        }
+      }
+      return;
+    }
 
     setIsLoadingCandles(true);
     setLoadError(false);
     try {
-      const data = await fetchHistoricalCandles(sym, tf, 600);
+      const data = await fetchHistoricalCandles(sym, tf, 10000);
+      candleCacheRef.current.set(cacheKey, data);
       setCandles(data);
       if (data.length > 0) {
         if (targetTimestamp !== null) {
@@ -179,6 +197,7 @@ export default function BacktestPage() {
     if (!confirmed) return;
 
     localStorage.removeItem(LOCAL_STORAGE_KEY);
+    candleCacheRef.current.clear(); // Clear client-side memory cache
     replay.resetReplay(candles.length);
     resetTrading();
     setDrawings([]);

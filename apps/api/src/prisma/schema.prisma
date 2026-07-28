@@ -534,3 +534,17 @@ model BacktestSession {
   @@index([user_id, created_at])
 }
 
+// ─── Candle Cache ───────────────────────────────────────────────────────────
+
+model CandleCache {
+  id         String   @id @default(uuid())
+  symbol     String
+  timeframe  String
+  candles    Json
+  count      Int
+  fetched_at DateTime @default(now())
+
+  @@unique([symbol, timeframe])
+  @@index([symbol, timeframe])
+}
+
