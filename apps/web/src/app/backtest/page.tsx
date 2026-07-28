@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import BacktestChart, { PositionState, DrawingShape } from '../../components/backtest/BacktestChart';
 import DrawingToolbar, { DrawingToolMode } from '../../components/backtest/DrawingToolbar';
 import ReplayToolbar from '../../components/backtest/ReplayToolbar';
@@ -26,10 +26,19 @@ export default function BacktestPage() {
   const [timeframe, setTimeframe] = useState<Timeframe>('15m');
   const [candles, setCandles] = useState<CandleData[]>([]);
   const [isLoadingCandles, setIsLoadingCandles] = useState<boolean>(false);
+  const [loadError, setLoadError] = useState<boolean>(false);
 
   // --- Drawing State ---
   const [activeTool, setActiveTool] = useState<DrawingToolMode>('cursor');
   const [drawings, setDrawings] = useState<DrawingShape[]>([]);
+
+  // Refs for reading current state inside async callbacks without adding dependencies
+  const candlesRef = useRef(candles);
+  const visibleCountRef = useRef(0);
+
+  // Sync refs after render so async callbacks always see latest state
+  useEffect(() => { candlesRef.current = candles; });
+  useEffect(() => { visibleCountRef.current = visibleCount; });
 
   // --- Trading (via hook) ---
   const trading = useTradingEngine({ symbol, isEn });
@@ -81,15 +90,38 @@ export default function BacktestPage() {
     }
   }, [symbol, timeframe, balance, positions, tradeHistory, drawings, visibleCount]);
 
+  // Binary search: find index of candle closest to target timestamp (O(log n))
+  const findClosestCandleIndex = useCallback((data: CandleData[], targetTime: number): number => {
+    let lo = 0, hi = data.length - 1;
+    while (lo < hi) {
+      const mid = (lo + hi) >> 1;
+      if (data[mid].time < targetTime) lo = mid + 1;
+      else hi = mid;
+    }
+    return lo;
+  }, []);
+
   // 3. Load Candles
   const loadCandleData = useCallback(async (sym: string, tf: Timeframe) => {
+    // Capture current timestamp before fetch so we can map to new timeframe
+    const targetTimestamp = candlesRef.current[visibleCountRef.current - 1]?.time ?? null;
+
     setIsLoadingCandles(true);
+    setLoadError(false);
     try {
       const data = await fetchHistoricalCandles(sym, tf, 600);
       setCandles(data);
-      if (data.length > 0) replay.loadCandles(data.length);
+      if (data.length > 0) {
+        if (targetTimestamp !== null) {
+          const matchedIndex = findClosestCandleIndex(data, targetTimestamp);
+          replay.loadCandles(matchedIndex + 1);
+        } else {
+          replay.loadCandles(data.length);
+        }
+      }
     } catch (err) {
       console.error('Failed to load candles:', err);
+      setLoadError(true);
       notify.error(isEn ? 'Failed to fetch historical market data' : 'خطا در دریافت داده‌های تاریخی بازار');
     } finally {
       setIsLoadingCandles(false);
@@ -177,6 +209,26 @@ export default function BacktestPage() {
             {isLoadingCandles ? (
               <div className="empty-history" style={{ paddingTop: '100px' }}>
                 {isEn ? 'Loading historical market candles...' : 'در حال دریافت کندل‌های بازار...'}
+              </div>
+            ) : loadError && candles.length === 0 ? (
+              <div className="load-error-card">
+                <span className="material-symbols-outlined error-icon">cloud_off</span>
+                <p className="error-title">
+                  {isEn ? 'Market data unavailable' : 'داده بازار در دسترس نیست'}
+                </p>
+                <p className="error-subtitle">
+                  {isEn
+                    ? 'Could not connect to the data source. Check your connection and try again.'
+                    : 'امکان اتصال به منبع داده وجود نداشت. اتصال خود را بررسی کرده و دوباره تلاش کنید.'}
+                </p>
+                <button
+                  type="button"
+                  className="retry-btn"
+                  onClick={() => loadCandleData(symbol, timeframe)}
+                >
+                  <span className="material-symbols-outlined">refresh</span>
+                  {isEn ? 'Retry' : 'تلاش مجدد'}
+                </button>
               </div>
             ) : (
               <BacktestChart

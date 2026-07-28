@@ -95,8 +95,8 @@ export async function fetchHistoricalCandles(
     console.warn('[MarketData] Proxy fetch failed:', err);
   }
 
-  // 3. Fallback Candle Generator (Only if offline & restricted)
-  return generateSyntheticCandles(normSymbol, timeframe, limit);
+  // 3. No fallback — throw so the UI can show an error
+  throw new Error(`Market data unavailable for ${normSymbol}`);
 }
 
 /**
