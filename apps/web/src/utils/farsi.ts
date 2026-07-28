@@ -57,7 +57,10 @@ export function normalizeNumericInput(value: string): string {
  * Formats a number with thousand separators and converts it to Persian digits
  */
 export function formatPersianNumber(val: number, decimals: number = 2): string {
-  const fixed = val.toFixed(decimals).replace(/\.?0+$/, ''); // Remove trailing zeros
+  let fixed = val.toFixed(decimals);
+  if (fixed.includes('.')) {
+    fixed = fixed.replace(/0+$/, '').replace(/\.$/, '');
+  }
   const parts = fixed.split('.');
   parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
   const formatted = parts.join('.');
