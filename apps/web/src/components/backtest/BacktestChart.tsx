@@ -182,15 +182,15 @@ export default function BacktestChart({
     }
   }, [candles, visibleCount]);
 
-  // ── 3. Render Position Lines (Entry, SL, TP) for ALL positions ───────────
-  useEffect(() => {
+  // Helper to draw or redraw all position lines
+  const redrawPositionLines = useCallback((currentPositions: PositionState[]) => {
     const series = seriesRef.current;
     if (!series) return;
 
     const linesMap = linesMapRef.current;
 
     // Remove lines for positions that no longer exist
-    const currentIds = new Set(positions.map((p) => p.id));
+    const currentIds = new Set(currentPositions.map((p) => p.id));
     for (const [id, lines] of linesMap.entries()) {
       if (!currentIds.has(id)) {
         [lines.entry, lines.sl, lines.tp].forEach((line) => {
@@ -201,8 +201,7 @@ export default function BacktestChart({
     }
 
     // Create/update lines for ALL positions — similar brightness, latest only is draggable
-    const lastPos = positions[positions.length - 1];
-    for (const pos of positions) {
+    for (const pos of currentPositions) {
       let lines = linesMap.get(pos.id);
 
       if (!lines) {
@@ -250,7 +249,12 @@ export default function BacktestChart({
         title: tpIsSet ? `TP @ ${pos.takeProfit!.toFixed(2)}` : 'TP (drag to set)',
       } as any);
     }
-  }, [positions]);
+  }, []);
+
+  // ── 3. Render Position Lines (Entry, SL, TP) for ALL positions ───────────
+  useEffect(() => {
+    redrawPositionLines(positions);
+  }, [positions, redrawPositionLines]);
 
   // ── 4. Drag-to-adjust SL/TP ───────────────────────────────────────────────
   const handleMouseDown = useCallback((e: MouseEvent) => {
@@ -312,13 +316,14 @@ export default function BacktestChart({
       if (!pos) return;
 
       const entryPrice = pos.entryPrice;
+      let targetPrice = price as any;
 
       if (dragRef.current.field === 'sl') {
         const valid = pos.type === 'BUY' ? price < entryPrice : price > entryPrice;
-        if (!valid) return;
+        if (!valid) targetPrice = entryPrice;
       } else {
         const valid = pos.type === 'BUY' ? price > entryPrice : price < entryPrice;
-        if (!valid) return;
+        if (!valid) targetPrice = entryPrice;
       }
 
       // Update the price line visually
@@ -331,12 +336,12 @@ export default function BacktestChart({
         try { series.removePriceLine(lineRef); } catch (e) {}
       }
       const newLine = series.createPriceLine({
-        price,
+        price: targetPrice,
         color,
         lineWidth: 1,
         lineStyle: 2,
         axisLabelVisible: true,
-        title: `${label} @ ${Number(price).toFixed(2)}`,
+        title: `${label} @ ${Number(targetPrice).toFixed(2)}`,
       } as any);
 
       if (lines) {
@@ -386,7 +391,18 @@ export default function BacktestChart({
         const price = series.coordinateToPrice(mouseY);
 
         if (price != null) {
-          const rounded = Number(Number(price).toFixed(pos.entryPrice > 100 ? 2 : 5));
+          const entryPrice = pos.entryPrice;
+          let targetPrice = price as any;
+
+          if (field === 'sl') {
+            const valid = pos.type === 'BUY' ? price < entryPrice : price > entryPrice;
+            if (!valid) targetPrice = entryPrice;
+          } else {
+            const valid = pos.type === 'BUY' ? price > entryPrice : price < entryPrice;
+            if (!valid) targetPrice = entryPrice;
+          }
+
+          const rounded = Number(Number(targetPrice).toFixed(pos.entryPrice > 100 ? 2 : 5));
           if (propsRef.current.onUpdateSLTP) {
             if (field === 'sl') {
               propsRef.current.onUpdateSLTP(positionId, rounded, pos.takeProfit);
@@ -401,7 +417,7 @@ export default function BacktestChart({
     isDragging.current = false;
     dragRef.current = null;
     if (chartContainerRef.current) chartContainerRef.current.style.cursor = 'crosshair';
-  }, []);
+  }, [redrawPositionLines]);
 
   // Attach drag handlers to chart container
   useEffect(() => {
