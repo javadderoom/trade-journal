@@ -1,4 +1,5 @@
 import { MetadataRoute } from "next";
+import { TOPICS_DATA } from "../constants/topicsData";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = "https://tradekav.ir";
@@ -80,7 +81,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.3,
     },
     // Programmatic Topic SEO Landing Pages
-    ...['prop-firm-journal', 'metatrader-sync', 'crypto-journal', 'forex-journal'].flatMap((topicSlug) => [
+    ...Object.keys(TOPICS_DATA).flatMap((topicSlug) => [
       {
         url: `${baseUrl}/fa/topic/${topicSlug}`,
         lastModified: new Date(),

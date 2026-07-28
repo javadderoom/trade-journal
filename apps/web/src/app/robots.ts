@@ -6,7 +6,20 @@ export default function robots(): MetadataRoute.Robots {
   return {
     rules: {
       userAgent: "*",
-      allow: ["/", "/namad", "/login", "/register", "/contact", "/help/ea-setup", "/fa", "/fa/contact", "/en", "/en/contact"],
+      allow: [
+        "/",
+        "/namad",
+        "/login",
+        "/register",
+        "/contact",
+        "/help/ea-setup",
+        "/fa",
+        "/fa/contact",
+        "/en",
+        "/en/contact",
+        "/fa/topic/",
+        "/en/topic/",
+      ],
       disallow: [
         "/dashboard/",
         "/admin/",
@@ -15,6 +28,7 @@ export default function robots(): MetadataRoute.Robots {
         "/settings/",
         "/trades/",
         "/payments/",
+        "/backtest/",
         "/api/",
       ],
     },
