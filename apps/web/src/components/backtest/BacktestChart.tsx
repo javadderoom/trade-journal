@@ -75,6 +75,9 @@ export default function BacktestChart({
   const dragRef = useRef<{ positionId: string; field: 'sl' | 'tp' } | null>(null);
   const isDragging = useRef(false);
 
+  // Track previous visibleCount to avoid resetting scroll position on single step forward/backward
+  const prevVisibleCountRef = useRef<number | null>(null);
+
   // Store latest props in a ref so chart event handlers always see fresh state
   const propsRef = useRef({
     candles,
@@ -120,6 +123,7 @@ export default function BacktestChart({
         borderColor: 'rgba(60, 74, 65, 0.3)',
         timeVisible: true,
         secondsVisible: false,
+        rightOffset: 20,
       },
     });
 
@@ -177,10 +181,63 @@ export default function BacktestChart({
     if (!seriesRef.current || candles.length === 0) return;
     const visibleSlice = candles.slice(0, Math.min(visibleCount, candles.length));
     seriesRef.current.setData(visibleSlice as any);
-    if (chartRef.current && visibleSlice.length > 0) {
-      chartRef.current.timeScale().scrollToPosition(0, false);
+
+    const prevCount = prevVisibleCountRef.current;
+    prevVisibleCountRef.current = visibleCount;
+
+    // Only auto-scroll to the end on initial load, symbol change, or manual jumps/cuts.
+    // Do not force scroll/reset position on step forward (+1) or step backward (-1).
+    const isStep = prevCount !== null && Math.abs(visibleCount - prevCount) === 1;
+
+    if (chartRef.current && visibleSlice.length > 0 && !isStep) {
+      chartRef.current.timeScale().scrollToPosition(20, false);
     }
   }, [candles, visibleCount]);
+
+  // ── 2b. Customize crosshair when cut tool is active ──────────────────────────
+  useEffect(() => {
+    const chart = chartRef.current;
+    if (!chart) return;
+
+    if (activeDrawingTool === 'cut') {
+      chart.applyOptions({
+        crosshair: {
+          mode: 1,
+          vertLine: {
+            color: '#ef4444',
+            width: 2,
+            style: 0,
+            labelBackgroundColor: '#ef4444',
+            labelVisible: true,
+          },
+          horzLine: {
+            visible: false,
+            labelVisible: false,
+          },
+        },
+      });
+    } else {
+      // Restore default crosshair options
+      chart.applyOptions({
+        crosshair: {
+          mode: 1,
+          vertLine: {
+            color: 'rgba(60, 74, 65, 0.4)',
+            width: 1,
+            style: 3,
+            labelVisible: true,
+          },
+          horzLine: {
+            visible: true,
+            labelVisible: true,
+            color: 'rgba(60, 74, 65, 0.4)',
+            width: 1,
+            style: 3,
+          },
+        },
+      });
+    }
+  }, [activeDrawingTool]);
 
   // Helper to draw or redraw all position lines
   const redrawPositionLines = useCallback((currentPositions: PositionState[]) => {

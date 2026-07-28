@@ -8,7 +8,7 @@ import { checkSLTPHit } from '../utils/pnl';
 interface ReplayEngineOptions {
   candles: CandleData[];
   positions: PositionState[];
-  onPositionHit: (positionId: string, exitPrice: number, reason: string) => void;
+  onPositionHit: (positionId: string, exitPrice: number, reason: string, candle: CandleData) => void;
 }
 
 export function useReplayEngine({ candles, positions, onPositionHit }: ReplayEngineOptions) {
@@ -39,24 +39,30 @@ export function useReplayEngine({ candles, positions, onPositionHit }: ReplayEng
           pos.takeProfit,
         );
         if (hit) {
-          onPositionHit(pos.id, hit.exitPrice, hit.reason);
+          onPositionHit(pos.id, hit.exitPrice, hit.reason, nextCandle);
         }
       }
     }
   }, [visibleCount, candles, positions, onPositionHit]);
 
+  const handleStepForwardRef = useRef(handleStepForward);
+  useEffect(() => {
+    handleStepForwardRef.current = handleStepForward;
+  }, [handleStepForward]);
+
   // Auto-play timer
   useEffect(() => {
     if (isPlaying) {
       const intervalMs = Math.max(100, Math.round(1000 / speed));
-      timerRef.current = setInterval(handleStepForward, intervalMs);
-    } else if (timerRef.current) {
-      clearInterval(timerRef.current);
+      const tick = () => {
+        handleStepForwardRef.current();
+      };
+      timerRef.current = setInterval(tick, intervalMs);
     }
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
     };
-  }, [isPlaying, speed, handleStepForward]);
+  }, [isPlaying, speed]);
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -88,8 +94,8 @@ export function useReplayEngine({ candles, positions, onPositionHit }: ReplayEng
   }, []);
 
   // Reset
-  const resetReplay = useCallback(() => {
-    setVisibleCount(0);
+  const resetReplay = useCallback((defaultCount: number = 0) => {
+    setVisibleCount(defaultCount);
     setIsPlaying(false);
   }, []);
 

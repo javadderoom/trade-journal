@@ -43,7 +43,7 @@ export default function BacktestPage() {
   const replay = useReplayEngine({
     candles,
     positions,
-    onPositionHit: (id, price, reason) => closePosition(id, price, reason, replay.currentCandle),
+    onPositionHit: (id, price, reason, candle) => closePosition(id, price, reason, candle),
   });
   const { visibleCount, isPlaying, speed } = replay;
   const currentCandle = replay.currentCandle;
@@ -147,7 +147,7 @@ export default function BacktestPage() {
     if (!confirmed) return;
 
     localStorage.removeItem(LOCAL_STORAGE_KEY);
-    replay.resetReplay();
+    replay.resetReplay(candles.length);
     resetTrading();
     setDrawings([]);
     notify.info(isEn ? 'Backtest session reset' : 'جلسه بک‌تست بازنشانی شد');
