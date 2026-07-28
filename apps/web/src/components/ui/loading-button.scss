@@ -17,11 +17,6 @@
   box-sizing: border-box;
 
   transition:
-    width 0.45s cubic-bezier(0.4, 0, 0.2, 1),
-    min-width 0.45s cubic-bezier(0.4, 0, 0.2, 1),
-    max-width 0.45s cubic-bezier(0.4, 0, 0.2, 1),
-    border-radius 0.45s cubic-bezier(0.4, 0, 0.2, 1),
-    padding 0.45s cubic-bezier(0.4, 0, 0.2, 1),
     background-color 0.35s ease,
     border-color 0.35s ease,
     box-shadow 0.35s ease,
@@ -100,104 +95,75 @@
     }
   }
 
-  // ─── State 1: IDLE ───────────────────────────────────────────────────────────
-  .btn-label-idle {
+  // ─── Content Spans (managed by AnimatePresence) ──────────────────────────────
+  .btn-label-idle,
+  .btn-spinner-wrap,
+  .btn-status-content {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
     width: 100%;
     text-align: center;
+    white-space: nowrap;
+  }
+
+  .btn-label-idle {
+    gap: 8px;
   }
 
   // ─── State 2: LOADING (Circle Target) ────────────────────────────────────────
   &.btn-loading-state {
-    width: 42px !important;
-    min-width: 42px !important;
-    max-width: 42px !important;
-    height: 42px !important;
-    border-radius: 50% !important;
-    padding: 0 !important;
+    flex: none !important;
     box-shadow: 0 0 16px rgba($primary, 0.3);
+  }
 
-    &.btn-size-sm {
-      width: 34px !important;
-      min-width: 34px !important;
-      max-width: 34px !important;
-      height: 34px !important;
-    }
+  .btn-spinner-wrap {
+    inset: 0;
+    width: 100%;
+    height: 100%;
 
-    &.btn-size-lg {
-      width: 48px !important;
-      min-width: 48px !important;
-      max-width: 48px !important;
-      height: 48px !important;
-    }
-
-    .btn-spinner-wrap {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-
-      .btn-mini-spinner {
-        width: 20px;
-        height: 20px;
-        border: 2.5px solid rgba(255, 255, 255, 0.2);
-        border-top: 2.5px solid #ffffff;
-        border-radius: 50%;
-        animation: btn-spin 0.75s linear infinite;
-      }
+    .btn-mini-spinner {
+      width: 20px;
+      height: 20px;
+      border: 2.5px solid rgba(255, 255, 255, 0.2);
+      border-top: 2.5px solid #ffffff;
+      border-radius: 50%;
+      animation: btn-spin 0.75s linear infinite;
     }
   }
 
-  // ─── State 3: SUCCESS (Expanded + Green Highlight + Centered Checkmark) ───────
+  // ─── State 3: SUCCESS ────────────────────────────────────────────────────────
   &.btn-success-state {
     background: linear-gradient(135deg, #10b981, #059669) !important;
     border-color: rgba(16, 185, 129, 0.5) !important;
     color: #ffffff !important;
     box-shadow: 0 4px 16px rgba(16, 185, 129, 0.35) !important;
+  }
 
-    .btn-success-content {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      width: 100%;
-      text-align: center;
-      animation: btn-pop-in 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  .btn-success-content {
+    gap: 6px;
 
-      .status-icon {
-        font-size: 1.1rem;
-        line-height: 1;
-      }
+    .status-icon {
+      font-size: 1.1rem;
+      line-height: 1;
     }
   }
 
-  // ─── State 4: ERROR (Expands + Shake + Centered Red Alert) ─────────────────
+  // ─── State 4: ERROR ──────────────────────────────────────────────────────────
   &.btn-error-state {
     background: linear-gradient(135deg, #ef4444, #dc2626) !important;
     border-color: rgba(239, 68, 68, 0.5) !important;
     color: #ffffff !important;
     box-shadow: 0 4px 16px rgba(239, 68, 68, 0.35) !important;
     animation: btn-shake 0.4s ease;
+  }
 
-    .btn-error-content {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      width: 100%;
-      text-align: center;
-      animation: btn-pop-in 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  .btn-error-content {
+    gap: 6px;
 
-      .status-icon {
-        font-size: 1.1rem;
-        line-height: 1;
-      }
+    .status-icon {
+      font-size: 1.1rem;
+      line-height: 1;
     }
   }
 }

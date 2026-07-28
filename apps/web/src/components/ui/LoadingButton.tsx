@@ -1,12 +1,11 @@
-'use client';
-
 import React, { useState, useRef, useEffect } from 'react';
+import { AnimatePresence, motion, HTMLMotionProps } from 'framer-motion';
 import { useTranslation } from '../../store/useAppStore';
 import './loading-button.scss';
 
 export type ButtonStatus = 'idle' | 'loading' | 'success' | 'error';
 
-export interface LoadingButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+export interface LoadingButtonProps extends Omit<HTMLMotionProps<'button'>, 'onClick'> {
   onClick?: (e: React.MouseEvent<HTMLButtonElement>) => Promise<any> | void;
   variant?: 'primary' | 'secondary' | 'danger' | 'ghost';
   size?: 'sm' | 'md' | 'lg';
@@ -43,6 +42,39 @@ export default function LoadingButton({
   const resetTimerRef = useRef<NodeJS.Timeout | null>(null);
   const prevLoadingRef = useRef<boolean | undefined>(controlledLoading);
   const loadingStartTimeRef = useRef<number | null>(null);
+
+  const [initialWidth, setInitialWidth] = useState<number | null>(null);
+
+  // Keep track of the button's auto-layout width when idle
+  useEffect(() => {
+    const button = buttonRef.current;
+    if (!button) return;
+
+    const updateWidth = () => {
+      if (status === 'idle') {
+        const originalWidthStyle = button.style.width;
+        button.style.width = '';
+        const naturalWidth = button.getBoundingClientRect().width;
+        button.style.width = originalWidthStyle;
+        setInitialWidth(naturalWidth);
+      }
+    };
+
+    updateWidth();
+    const resizeObserver = new ResizeObserver(updateWidth);
+    resizeObserver.observe(button);
+
+    return () => {
+      resizeObserver.disconnect();
+    };
+  }, [status, children]);
+
+  // Get the circle size for the current button size variant
+  const getCircleSize = () => {
+    if (size === 'sm') return 34;
+    if (size === 'lg') return 48;
+    return 42; // md
+  };
 
   const defaultSuccessText = successText ?? (isEn ? 'Done!' : 'ذخیره شد');
   const defaultErrorText = errorText ?? (isEn ? 'Failed' : 'خطا');
@@ -84,7 +116,7 @@ export default function LoadingButton({
     }
   }, [controlledLoading, controlledSuccess, controlledError, autoResetDelay]);
 
-  // Clean up auto-reset timer on unmount
+  // Clean up timers on unmount
   useEffect(() => {
     return () => {
       if (resetTimerRef.current) clearTimeout(resetTimerRef.current);
@@ -111,7 +143,9 @@ export default function LoadingButton({
       setTimeout(() => {
         setStatus('success');
         if (resetTimerRef.current) clearTimeout(resetTimerRef.current);
-        resetTimerRef.current = setTimeout(() => setStatus('idle'), autoResetDelay);
+        resetTimerRef.current = setTimeout(() => {
+          setStatus('idle');
+        }, autoResetDelay);
       }, remaining);
     } catch (err) {
       const elapsed = loadingStartTimeRef.current ? Date.now() - loadingStartTimeRef.current : 500;
@@ -120,7 +154,9 @@ export default function LoadingButton({
       setTimeout(() => {
         setStatus('error');
         if (resetTimerRef.current) clearTimeout(resetTimerRef.current);
-        resetTimerRef.current = setTimeout(() => setStatus('idle'), autoResetDelay);
+        resetTimerRef.current = setTimeout(() => {
+          setStatus('idle');
+        }, autoResetDelay);
       }, remaining);
     }
   };
@@ -130,44 +166,92 @@ export default function LoadingButton({
   const variantClass = `btn-var-${variant}`;
 
   return (
-    <button
-      ref={buttonRef}
+    <motion.button
+      ref={buttonRef as any}
       type={type}
       className={`loading-btn ${variantClass} ${sizeClass} ${statusClass} ${className}`}
       disabled={disabled || status === 'loading'}
-      onClick={handleClick}
-      style={style}
+      onClick={handleClick as any}
+      style={{
+        ...style,
+        overflow: 'hidden',
+        whiteSpace: 'nowrap',
+      }}
+      animate={{
+        width:
+          status === 'loading'
+            ? getCircleSize()
+            : status === 'idle'
+            ? (initialWidth ?? 'auto')
+            : 'auto',
+        borderRadius:
+          status === 'loading'
+            ? (size === 'sm' ? '17px' : size === 'lg' ? '24px' : '21px')
+            : '8px',
+        paddingLeft: status === 'loading' ? '0px' : (size === 'sm' ? '14px' : size === 'lg' ? '28px' : '20px'),
+        paddingRight: status === 'loading' ? '0px' : (size === 'sm' ? '14px' : size === 'lg' ? '28px' : '20px'),
+      }}
+      transition={{
+        duration: 0.3,
+        ease: [0.4, 0, 0.2, 1],
+      }}
       {...rest}
     >
-      {/* State 1: IDLE */}
-      {status === 'idle' && (
-        <span className="btn-label-idle">
-          {children}
-        </span>
-      )}
+      <AnimatePresence mode="wait" initial={false}>
+        {status === 'idle' && (
+          <motion.span
+            key="idle"
+            className="btn-label-idle"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.15 }}
+          >
+            {children}
+          </motion.span>
+        )}
 
-      {/* State 2: LOADING */}
-      {status === 'loading' && (
-        <span className="btn-spinner-wrap">
-          <span className="btn-mini-spinner" />
-        </span>
-      )}
+        {status === 'loading' && (
+          <motion.span
+            key="loading"
+            className="btn-spinner-wrap"
+            initial={{ opacity: 0, scale: 0.5 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.5 }}
+            transition={{ duration: 0.15 }}
+          >
+            <span className="btn-mini-spinner" />
+          </motion.span>
+        )}
 
-      {/* State 3: SUCCESS */}
-      {status === 'success' && (
-        <span className="btn-status-content btn-success-content">
-          <span className="material-symbols-outlined status-icon">check</span>
-          <span>{defaultSuccessText}</span>
-        </span>
-      )}
+        {status === 'success' && (
+          <motion.span
+            key="success"
+            className="btn-status-content btn-success-content"
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.8 }}
+            transition={{ duration: 0.2 }}
+          >
+            <span className="material-symbols-outlined status-icon">check</span>
+            <span>{defaultSuccessText}</span>
+          </motion.span>
+        )}
 
-      {/* State 4: ERROR */}
-      {status === 'error' && (
-        <span className="btn-status-content btn-error-content">
-          <span className="material-symbols-outlined status-icon">error</span>
-          <span>{defaultErrorText}</span>
-        </span>
-      )}
-    </button>
+        {status === 'error' && (
+          <motion.span
+            key="error"
+            className="btn-status-content btn-error-content"
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.8 }}
+            transition={{ duration: 0.2 }}
+          >
+            <span className="material-symbols-outlined status-icon">error</span>
+            <span>{defaultErrorText}</span>
+          </motion.span>
+        )}
+      </AnimatePresence>
+    </motion.button>
   );
 }
