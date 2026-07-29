@@ -55,13 +55,17 @@ export async function runDailyAIBlogPipeline() {
     console.log('[Cron] AI Discovery Phase...');
     const topic = await generateTrendingTopic();
 
-    // 3. Generate Article (with Review Loop)
+    // 3. Generate English Article (with Review Loop)
     console.log(`[Cron] AI Generation Phase for topic: ${topic}...`);
-    // Need to import generateBlogArticle inside or at top level to avoid circular dependency
-    const { generateBlogArticle } = require('./aiBlogService');
+    const { generateBlogArticle, translateBlogArticle } = require('./aiBlogService');
     const post = await generateBlogArticle(topic, authorId);
+    console.log(`[Cron] English Pipeline Success! Draft saved with ID: ${post.id}`);
 
-    console.log(`[Cron] Pipeline Success! Draft saved with ID: ${post.id}`);
+    // 4. Translate to Farsi
+    console.log(`[Cron] AI Translation Phase...`);
+    const farsiPost = await translateBlogArticle(post.id);
+    console.log(`[Cron] Farsi Pipeline Success! Draft saved with ID: ${farsiPost.id}`);
+
   } catch (error) {
     console.error('[Cron] Daily AI Blog Pipeline Failed:', error);
   }

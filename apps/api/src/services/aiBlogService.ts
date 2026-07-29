@@ -6,7 +6,9 @@ async function reviewArticle(parsedArticle: any, topic: string) {
   const prompt = `
 You are a ruthless SEO Editor and Trading Expert.
 Review this drafted article about "${topic}".
-Evaluate its HTML structure, tone, readability, accuracy, and SEO keyword density.
+1. Check SEO optimization, keyword density, and heading structure (H1, H2, H3).
+2. Check content quality, readability, and depth.
+3. TONE AND HUMANIZATION CHECK: Strictly check if the writing sounds like a generic AI. Heavily penalize the score if you see clichés like: "In today's fast-paced world", "delve into", "furthermore", "in conclusion", or robotic transitions. The tone must be direct, punchy, and sound like a seasoned human trader.
 
 Article:
 ${JSON.stringify(parsedArticle, null, 2)}
@@ -59,6 +61,13 @@ export async function generateBlogArticle(topic: string, authorId: string) {
 You are an expert trading blogger and SEO specialist for "TradeKav" (a trading journal platform).
 Write a comprehensive, highly SEO-optimized blog article about: "${topic}".
 The article must be high quality, beginner-friendly but professional, and around 1500 words.
+
+CRITICAL TONE RULES (HUMANIZE YOUR WRITING):
+- Do NOT use typical AI clichés or robotic transitions like: "In today's fast-paced world", "Delve into", "Furthermore", "In conclusion", "It's important to note", "A testament to".
+- Write like a seasoned, battle-tested trader talking to a peer. Use a conversational, punchy, and direct tone.
+- Use varied sentence lengths. Make some sentences very short for impact.
+- Start paragraphs directly with the point, without filler intro sentences.
+
 Use clean HTML for the content (<h1>, <h2>, <h3>, <ul>, <li>, <p>, <strong>). Do NOT use markdown.
 ${internalLinksContext}
 ${feedback ? `\nPREVIOUS FEEDBACK TO IMPROVE UPON: ${feedback}` : ''}
@@ -136,5 +145,94 @@ Return ONLY a raw JSON object (without any markdown formatting like \`\`\`json) 
     }
   });
 
+  return newPost;
+}
+
+// Phase 3 (Bonus): Auto-translate English to Farsi
+export async function translateBlogArticle(originalPostId: string) {
+  const original = await prisma.blogPost.findUnique({
+    where: { id: originalPostId }
+  });
+
+  if (!original || original.locale !== 'en') {
+    throw new Error('Original post not found or is not in English.');
+  }
+
+  console.log(`[AI Blog] Translating article ${original.title} to Farsi...`);
+
+  const prompt = `
+You are an expert Farsi (Persian) translator and financial market specialist.
+Your task is to translate the following English trading article into highly professional and natural-sounding Persian.
+CRITICAL RULES:
+1. Preserve all HTML tags exactly as they are (e.g., <p>, <h2>, <a>, <strong>). Do NOT alter the HTML structure.
+2. Translate the text inside the HTML tags.
+3. Keep technical trading terms (like RSI, MACD, Support, Resistance) either in English or their well-accepted Farsi equivalents (e.g. حمایت و مقاومت).
+
+English Title: ${original.title}
+English Excerpt: ${original.excerpt}
+
+English HTML Content:
+${original.content}
+
+Return ONLY a raw JSON object (without markdown wrappers like \`\`\`json) with this exact structure:
+{
+  "title": "...", // The translated Farsi H1 title
+  "slug": "...", // Provide a brief english slug representing the farsi title (for URL routing)
+  "excerpt": "...", // The translated Farsi excerpt
+  "seo_title": "...", // The translated Farsi SEO title
+  "seo_description": "...", // The translated Farsi SEO description
+  "content": "..." // The full translated HTML article
+}
+`;
+
+  const model = getGeminiModel('gemini-3.6-flash');
+  const result = await model.generateContent(prompt);
+  let text = (await result.response).text();
+  text = text.replace(/```json/g, '').replace(/```/g, '').trim();
+  
+  const farsiDraft = JSON.parse(text);
+
+  // Fallback category
+  let category = await prisma.blogCategory.findFirst({
+    where: { slug: 'trading-education-fa' } // Try to find a Farsi category
+  });
+
+  if (!category) {
+    category = await prisma.blogCategory.create({
+      data: {
+        name: 'آموزش ترید',
+        slug: 'trading-education-fa',
+        locale: 'fa'
+      }
+    });
+  }
+
+  const newPost = await prisma.blogPost.create({
+    data: {
+      title: farsiDraft.title,
+      slug: farsiDraft.slug + '-' + Date.now().toString().slice(-4),
+      content: farsiDraft.content,
+      excerpt: farsiDraft.excerpt,
+      seo_title: farsiDraft.seo_title,
+      seo_description: farsiDraft.seo_description,
+      seo_score: original.seo_score,
+      quality_score: original.quality_score,
+      reading_time: original.reading_time,
+      featured_image_prompt: original.featured_image_prompt,
+      status: 'DRAFT',
+      author_id: original.author_id,
+      category_id: category.id,
+      locale: 'fa',
+      translation_id: original.id // Link to the English post
+    }
+  });
+
+  // Link English post back to Farsi post
+  await prisma.blogPost.update({
+    where: { id: original.id },
+    data: { translation_id: newPost.id }
+  });
+
+  console.log(`[AI Blog] Translation successful! Farsi post ID: ${newPost.id}`);
   return newPost;
 }
