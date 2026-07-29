@@ -14,9 +14,9 @@ router.use(requireAdmin);
 
 router.post('/categories', async (req: AuthRequest, res: Response) => {
   try {
-    const { name, slug, description } = req.body;
+    const { name, slug, description, locale = 'fa' } = req.body;
     const category = await prisma.blogCategory.create({
-      data: { name, slug, description },
+      data: { name, slug, description, locale },
     });
     res.status(201).json(category);
   } catch (error) {
@@ -26,10 +26,10 @@ router.post('/categories', async (req: AuthRequest, res: Response) => {
 
 router.put('/categories/:id', async (req: AuthRequest, res: Response) => {
   try {
-    const { name, slug, description } = req.body;
+    const { name, slug, description, locale } = req.body;
     const category = await prisma.blogCategory.update({
       where: { id: req.params.id as string },
-      data: { name, slug, description },
+      data: { name, slug, description, locale },
     });
     res.json(category);
   } catch (error) {
@@ -52,9 +52,9 @@ router.delete('/categories/:id', async (req: AuthRequest, res: Response) => {
 
 router.post('/tags', async (req: AuthRequest, res: Response) => {
   try {
-    const { name, slug } = req.body;
+    const { name, slug, locale = 'fa' } = req.body;
     const tag = await prisma.blogTag.create({
-      data: { name, slug },
+      data: { name, slug, locale },
     });
     res.status(201).json(tag);
   } catch (error) {
@@ -77,11 +77,15 @@ router.delete('/tags/:id', async (req: AuthRequest, res: Response) => {
 
 router.get('/posts', async (req: AuthRequest, res: Response) => {
   try {
+    const { locale = 'fa' } = req.query;
     const posts = await prisma.blogPost.findMany({
+      where: { locale: locale as string },
       orderBy: { created_at: 'desc' },
       include: {
         category: true,
-        author: { select: { name: true } }
+        author: { select: { name: true } },
+        translation: { select: { id: true, locale: true } },
+        translated_from: { select: { id: true, locale: true } }
       },
     });
     res.json(posts);
@@ -97,6 +101,8 @@ router.get('/posts/:id', async (req: AuthRequest, res: Response) => {
       include: {
         category: true,
         tags: true,
+        translation: { select: { id: true, slug: true, locale: true } },
+        translated_from: { select: { id: true, slug: true, locale: true } },
       },
     });
     if (!post) return res.status(404).json({ error: 'Not found' });
@@ -110,13 +116,13 @@ router.post('/posts', async (req: AuthRequest, res: Response) => {
   try {
     const { 
       title, slug, content, excerpt, cover_image, status, 
-      seo_title, seo_description, category_id, tag_ids 
+      seo_title, seo_description, category_id, tag_ids, locale = 'fa', translation_id
     } = req.body;
 
     const post = await prisma.blogPost.create({
       data: {
-        title, slug, content, excerpt, cover_image, status,
-        seo_title, seo_description,
+        title, slug, content, excerpt, cover_image, status, locale,
+        seo_title, seo_description, translation_id,
         author_id: req.user!.userId as string,
         category_id,
         published_at: status === 'PUBLISHED' ? new Date() : null,
@@ -135,7 +141,7 @@ router.put('/posts/:id', async (req: AuthRequest, res: Response) => {
   try {
     const { 
       title, slug, content, excerpt, cover_image, status, 
-      seo_title, seo_description, category_id, tag_ids 
+      seo_title, seo_description, category_id, tag_ids, locale, translation_id
     } = req.body;
 
     const existing = await prisma.blogPost.findUnique({ where: { id: req.params.id as string }});
@@ -146,8 +152,8 @@ router.put('/posts/:id', async (req: AuthRequest, res: Response) => {
     const post = await prisma.blogPost.update({
       where: { id: req.params.id as string },
       data: {
-        title, slug, content, excerpt, cover_image, status,
-        seo_title, seo_description,
+        title, slug, content, excerpt, cover_image, status, locale,
+        seo_title, seo_description, translation_id,
         category_id,
         published_at,
         tags: tag_ids ? {
@@ -159,6 +165,39 @@ router.put('/posts/:id', async (req: AuthRequest, res: Response) => {
     res.json(post);
   } catch (error) {
     res.status(500).json({ error: 'Failed to update post' });
+  }
+});
+
+router.post('/posts/:id/translate', async (req: AuthRequest, res: Response) => {
+  try {
+    const originalPost = await prisma.blogPost.findUnique({
+      where: { id: req.params.id as string }
+    });
+    
+    if (!originalPost) return res.status(404).json({ error: 'Not found' });
+
+    const newLocale = originalPost.locale === 'fa' ? 'en' : 'fa';
+    const newSlug = `${originalPost.slug}-${newLocale}`;
+
+    const newPost = await prisma.blogPost.create({
+      data: {
+        title: `${originalPost.title} (${newLocale.toUpperCase()})`,
+        slug: newSlug,
+        content: originalPost.content,
+        excerpt: originalPost.excerpt,
+        cover_image: originalPost.cover_image,
+        status: 'DRAFT',
+        locale: newLocale,
+        author_id: originalPost.author_id,
+        category_id: originalPost.category_id,
+        translation_id: originalPost.id,
+      }
+    });
+    
+    res.status(201).json(newPost);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to translate post' });
   }
 });
 

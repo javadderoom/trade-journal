@@ -7,16 +7,21 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   let dynamicBlogPages: MetadataRoute.Sitemap = [];
   try {
-    const res = await fetch(`${apiBase}/api/blog/posts?limit=100`);
-    if (res.ok) {
-      const data = await res.json();
-      dynamicBlogPages = (data.posts || []).map((post: any) => ({
-        url: `${baseUrl}/blog/${post.slug}`,
-        lastModified: new Date(post.updated_at || post.published_at || post.created_at),
-        changeFrequency: "weekly" as const,
-        priority: 0.8,
-      }));
-    }
+    const [resFa, resEn] = await Promise.all([
+      fetch(`${apiBase}/api/blog/posts?locale=fa&limit=100`),
+      fetch(`${apiBase}/api/blog/posts?locale=en&limit=100`)
+    ]);
+    
+    let allPosts: any[] = [];
+    if (resFa.ok) allPosts = [...allPosts, ...(await resFa.json()).posts];
+    if (resEn.ok) allPosts = [...allPosts, ...(await resEn.json()).posts];
+
+    dynamicBlogPages = allPosts.map((post: any) => ({
+      url: `${baseUrl}/${post.locale || 'fa'}/blog/${post.slug}`,
+      lastModified: new Date(post.updated_at || post.published_at || post.created_at),
+      changeFrequency: "weekly" as const,
+      priority: 0.8,
+    }));
   } catch (error) {
     console.warn("Could not fetch blog posts for sitemap");
   }
@@ -98,10 +103,28 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.3,
     },
     {
-      url: `${baseUrl}/blog`,
+      url: `${baseUrl}/fa/blog`,
       lastModified: new Date(),
       changeFrequency: "daily" as const,
       priority: 0.9,
+      alternates: {
+        languages: {
+          fa: `${baseUrl}/fa/blog`,
+          en: `${baseUrl}/en/blog`,
+        },
+      },
+    },
+    {
+      url: `${baseUrl}/en/blog`,
+      lastModified: new Date(),
+      changeFrequency: "daily" as const,
+      priority: 0.9,
+      alternates: {
+        languages: {
+          fa: `${baseUrl}/fa/blog`,
+          en: `${baseUrl}/en/blog`,
+        },
+      },
     },
     // Programmatic Topic SEO Landing Pages
     ...Object.keys(TOPICS_DATA).flatMap((topicSlug) => [

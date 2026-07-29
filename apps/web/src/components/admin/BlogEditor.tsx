@@ -3,12 +3,17 @@ import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Image from '@tiptap/extension-image';
 import Link from '@tiptap/extension-link';
+import Underline from '@tiptap/extension-underline';
+import TextAlign from '@tiptap/extension-text-align';
+import { Color } from '@tiptap/extension-color';
+import { TextStyle } from '@tiptap/extension-text-style';
+import Select from '../ui/Select';
 import { api } from '../../lib/api';
 import { notify } from '../../lib/notify';
 import LoadingButton from '../ui/LoadingButton';
 import './BlogEditor.scss';
 
-export default function BlogEditor({ initialData, onSuccess, onCancel }: { initialData?: any, onSuccess: () => void, onCancel: () => void }) {
+export default function BlogEditor({ initialData, locale, onSuccess, onCancel }: { initialData?: any, locale: 'fa' | 'en', onSuccess: () => void, onCancel: () => void }) {
   const [loading, setLoading] = useState(false);
   const [title, setTitle] = useState(initialData?.title || '');
   const [slug, setSlug] = useState(initialData?.slug || '');
@@ -24,17 +29,22 @@ export default function BlogEditor({ initialData, onSuccess, onCancel }: { initi
   const [tagsList, setTagsList] = useState<any[]>([]);
 
   useEffect(() => {
-    api.get('/api/blog/categories').then(res => setCategories(res.data)).catch(() => {});
-    api.get('/api/blog/tags').then(res => setTagsList(res.data)).catch(() => {});
-  }, []);
+    api.get(`/api/blog/categories?locale=${locale}`).then(res => setCategories(res.data)).catch(() => {});
+    api.get(`/api/blog/tags?locale=${locale}`).then(res => setTagsList(res.data)).catch(() => {});
+  }, [locale]);
 
   const editor = useEditor({
     extensions: [
       StarterKit,
       Image,
       Link.configure({ openOnClick: false }),
+      Underline,
+      TextAlign.configure({ types: ['heading', 'paragraph'] }),
+      TextStyle,
+      Color,
     ],
     content: initialData?.content || '<p>محتوای مقاله...</p>',
+    immediatelyRender: false,
   });
 
   const handleSave = async () => {
@@ -50,6 +60,7 @@ export default function BlogEditor({ initialData, onSuccess, onCancel }: { initi
       content: editor?.getHTML(),
       seo_title: seoTitle,
       seo_description: seoDescription,
+      locale,
     };
 
     try {
@@ -86,15 +97,88 @@ export default function BlogEditor({ initialData, onSuccess, onCancel }: { initi
       <div className="form-group">
         <label>ویرایشگر محتوا</label>
         <div className="tiptap-toolbar">
-          <button type="button" onClick={() => editor?.chain().focus().toggleBold().run()} className={editor?.isActive('bold') ? 'is-active' : ''}>Bold</button>
-          <button type="button" onClick={() => editor?.chain().focus().toggleItalic().run()} className={editor?.isActive('italic') ? 'is-active' : ''}>Italic</button>
-          <button type="button" onClick={() => editor?.chain().focus().toggleHeading({ level: 2 }).run()} className={editor?.isActive('heading', { level: 2 }) ? 'is-active' : ''}>H2</button>
-          <button type="button" onClick={() => editor?.chain().focus().toggleHeading({ level: 3 }).run()} className={editor?.isActive('heading', { level: 3 }) ? 'is-active' : ''}>H3</button>
-          <button type="button" onClick={() => editor?.chain().focus().toggleBulletList().run()} className={editor?.isActive('bulletList') ? 'is-active' : ''}>List</button>
-          <button type="button" onClick={() => {
-            const url = window.prompt('URL');
-            if (url) editor?.chain().focus().setImage({ src: url }).run();
-          }}>Image</button>
+          <div className="toolbar-group">
+            <button type="button" onClick={() => editor?.chain().focus().toggleBold().run()} className={editor?.isActive('bold') ? 'is-active' : ''} title="Bold">
+              <span className="material-symbols-outlined">format_bold</span>
+            </button>
+            <button type="button" onClick={() => editor?.chain().focus().toggleItalic().run()} className={editor?.isActive('italic') ? 'is-active' : ''} title="Italic">
+              <span className="material-symbols-outlined">format_italic</span>
+            </button>
+            <button type="button" onClick={() => editor?.chain().focus().toggleUnderline().run()} className={editor?.isActive('underline') ? 'is-active' : ''} title="Underline">
+              <span className="material-symbols-outlined">format_underlined</span>
+            </button>
+            <button type="button" onClick={() => editor?.chain().focus().toggleStrike().run()} className={editor?.isActive('strike') ? 'is-active' : ''} title="Strike">
+              <span className="material-symbols-outlined">format_strikethrough</span>
+            </button>
+          </div>
+          
+          <div className="toolbar-group">
+            <button type="button" onClick={() => editor?.chain().focus().toggleHeading({ level: 2 }).run()} className={editor?.isActive('heading', { level: 2 }) ? 'is-active' : ''} title="Heading 2">
+              <span className="material-symbols-outlined">format_h2</span>
+            </button>
+            <button type="button" onClick={() => editor?.chain().focus().toggleHeading({ level: 3 }).run()} className={editor?.isActive('heading', { level: 3 }) ? 'is-active' : ''} title="Heading 3">
+              <span className="material-symbols-outlined">format_h3</span>
+            </button>
+            <button type="button" onClick={() => editor?.chain().focus().toggleBlockquote().run()} className={editor?.isActive('blockquote') ? 'is-active' : ''} title="Quote">
+              <span className="material-symbols-outlined">format_quote</span>
+            </button>
+            <button type="button" onClick={() => editor?.chain().focus().toggleCodeBlock().run()} className={editor?.isActive('codeBlock') ? 'is-active' : ''} title="Code Block">
+              <span className="material-symbols-outlined">code_blocks</span>
+            </button>
+          </div>
+
+          <div className="toolbar-group">
+            <button type="button" onClick={() => editor?.chain().focus().setTextAlign('right').run()} className={editor?.isActive({ textAlign: 'right' }) ? 'is-active' : ''} title="Align Right">
+              <span className="material-symbols-outlined">format_align_right</span>
+            </button>
+            <button type="button" onClick={() => editor?.chain().focus().setTextAlign('center').run()} className={editor?.isActive({ textAlign: 'center' }) ? 'is-active' : ''} title="Align Center">
+              <span className="material-symbols-outlined">format_align_center</span>
+            </button>
+            <button type="button" onClick={() => editor?.chain().focus().setTextAlign('left').run()} className={editor?.isActive({ textAlign: 'left' }) ? 'is-active' : ''} title="Align Left">
+              <span className="material-symbols-outlined">format_align_left</span>
+            </button>
+            <button type="button" onClick={() => editor?.chain().focus().setTextAlign('justify').run()} className={editor?.isActive({ textAlign: 'justify' }) ? 'is-active' : ''} title="Justify">
+              <span className="material-symbols-outlined">format_align_justify</span>
+            </button>
+          </div>
+
+          <div className="toolbar-group">
+            <button type="button" onClick={() => editor?.chain().focus().toggleBulletList().run()} className={editor?.isActive('bulletList') ? 'is-active' : ''} title="Bullet List">
+              <span className="material-symbols-outlined">format_list_bulleted</span>
+            </button>
+            <button type="button" onClick={() => editor?.chain().focus().toggleOrderedList().run()} className={editor?.isActive('orderedList') ? 'is-active' : ''} title="Numbered List">
+              <span className="material-symbols-outlined">format_list_numbered</span>
+            </button>
+          </div>
+
+          <div className="toolbar-group">
+            <button type="button" onClick={() => {
+              const url = window.prompt('URL');
+              if (url) editor?.chain().focus().setImage({ src: url }).run();
+            }} title="Insert Image">
+              <span className="material-symbols-outlined">image</span>
+            </button>
+            <button type="button" onClick={() => {
+              const url = window.prompt('URL');
+              if (url) {
+                editor?.chain().focus().extendMarkRange('link').setLink({ href: url }).run();
+              }
+            }} className={editor?.isActive('link') ? 'is-active' : ''} title="Insert Link">
+              <span className="material-symbols-outlined">link</span>
+            </button>
+            <button type="button" onClick={() => editor?.chain().focus().unsetLink().run()} disabled={!editor?.isActive('link')} title="Remove Link">
+              <span className="material-symbols-outlined">link_off</span>
+            </button>
+          </div>
+
+          <div className="toolbar-group color-picker">
+            <input
+              type="color"
+              onInput={event => editor?.chain().focus().setColor((event.target as HTMLInputElement).value).run()}
+              value={editor?.getAttributes('textStyle').color || '#e5e7eb'}
+              title="Text Color"
+            />
+          </div>
         </div>
         <div className="tiptap-editor-wrapper">
           <EditorContent editor={editor} />
@@ -109,18 +193,26 @@ export default function BlogEditor({ initialData, onSuccess, onCancel }: { initi
       <div className="form-row">
         <div className="form-group" style={{ flex: 1 }}>
           <label>دسته‌بندی</label>
-          <select className="input-field" value={categoryId} onChange={(e) => setCategoryId(e.target.value)}>
-            <option value="">-- بدون دسته --</option>
-            {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-          </select>
+          <Select
+            value={categoryId}
+            onChange={setCategoryId}
+            options={[
+              { value: '', label: '-- بدون دسته --' },
+              ...categories.map(c => ({ value: c.id, label: c.name }))
+            ]}
+          />
         </div>
         <div className="form-group" style={{ flex: 1 }}>
           <label>وضعیت</label>
-          <select className="input-field" value={status} onChange={(e) => setStatus(e.target.value)}>
-            <option value="DRAFT">پیش‌نویس</option>
-            <option value="PUBLISHED">منتشر شده</option>
-            <option value="ARCHIVED">بایگانی</option>
-          </select>
+          <Select
+            value={status}
+            onChange={setStatus}
+            options={[
+              { value: 'DRAFT', label: 'پیش‌نویس' },
+              { value: 'PUBLISHED', label: 'منتشر شده' },
+              { value: 'ARCHIVED', label: 'بایگانی' }
+            ]}
+          />
         </div>
       </div>
 

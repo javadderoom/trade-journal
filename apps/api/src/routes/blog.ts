@@ -7,7 +7,9 @@ const router = Router();
 // GET /api/blog/categories
 router.get('/categories', async (req: Request, res: Response) => {
   try {
+    const { locale = 'fa' } = req.query;
     const categories = await prisma.blogCategory.findMany({
+      where: { locale: locale as string },
       orderBy: { name: 'asc' },
     });
     res.json(categories);
@@ -19,7 +21,9 @@ router.get('/categories', async (req: Request, res: Response) => {
 // GET /api/blog/tags
 router.get('/tags', async (req: Request, res: Response) => {
   try {
+    const { locale = 'fa' } = req.query;
     const tags = await prisma.blogTag.findMany({
+      where: { locale: locale as string },
       orderBy: { name: 'asc' },
     });
     res.json(tags);
@@ -31,10 +35,10 @@ router.get('/tags', async (req: Request, res: Response) => {
 // GET /api/blog/posts
 router.get('/posts', async (req: Request, res: Response) => {
   try {
-    const { category, tag, page = '1', limit = '10' } = req.query as { category?: string, tag?: string, page?: string, limit?: string };
+    const { category, tag, page = '1', limit = '10', locale = 'fa' } = req.query as { category?: string, tag?: string, page?: string, limit?: string, locale?: string };
     const skip = (Number(page) - 1) * Number(limit);
     
-    const where: any = { status: 'PUBLISHED' };
+    const where: any = { status: 'PUBLISHED', locale: locale as string };
     
     if (category) {
       where.category = { slug: String(category) };
@@ -68,12 +72,15 @@ router.get('/posts', async (req: Request, res: Response) => {
 // GET /api/blog/posts/:slug
 router.get('/posts/:slug', async (req: Request, res: Response) => {
   try {
-    const post = await prisma.blogPost.findUnique({
-      where: { slug: req.params.slug as string },
+    const { locale = 'fa' } = req.query;
+    const post = await prisma.blogPost.findFirst({
+      where: { slug: req.params.slug as string, locale: locale as string },
       include: {
-        author: { select: { id: true, name: true, avatar_url: true } },
+        author: { select: { name: true, avatar_url: true } },
         category: true,
         tags: true,
+        translation: { select: { slug: true, locale: true } },
+        translated_from: { select: { slug: true, locale: true } },
         comments: {
           where: { is_approved: true },
           include: {

@@ -25,6 +25,7 @@ export default function BottomNavBar() {
   const isSettingsActive = pathname === '/settings';
 
   const logout = useAuthStore((state) => state.logout);
+  const user = useAuthStore((state) => state.user);
 
   const toggleLanguage = useCallback(() => {
     setLanguage(language === 'fa' ? 'en' : 'fa');
@@ -62,6 +63,13 @@ export default function BottomNavBar() {
     { label: langLabel, icon: langIcon, onClick: toggleLanguage },
     { label: t('common.logout'), icon: 'logout', onClick: handleLogout },
   ];
+
+  if (user?.role === 'ADMIN') {
+    drawerItems.splice(0, 0,
+      { href: '/admin', label: t('nav.admin'), icon: 'admin_panel_settings' },
+      { href: '/admin/blog', label: language === 'fa' ? 'مدیریت وبلاگ' : 'Blog Admin', icon: 'edit_document' }
+    );
+  }
 
   const closeMenu = useCallback(() => setMenuOpen(false), []);
 

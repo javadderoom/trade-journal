@@ -554,6 +554,7 @@ model CandleCache {
 
 model BlogCategory {
   id          String     @id @default(uuid())
+  locale      String     @default("fa")
   name        String
   slug        String     @unique
   description String?
@@ -566,6 +567,7 @@ model BlogCategory {
 
 model BlogTag {
   id         String     @id @default(uuid())
+  locale     String     @default("fa")
   name       String
   slug       String     @unique
   created_at DateTime   @default(now())
@@ -582,6 +584,7 @@ enum PostStatus {
 
 model BlogPost {
   id               String       @id @default(uuid())
+  locale           String       @default("fa")
   title            String
   slug             String       @unique
   content          String       @db.Text
@@ -604,6 +607,10 @@ model BlogPost {
   published_at     DateTime?
   created_at       DateTime     @default(now())
   updated_at       DateTime     @updatedAt
+
+  translation_id   String?      @unique
+  translation      BlogPost?    @relation("PostTranslations", fields: [translation_id], references: [id])
+  translated_from  BlogPost?    @relation("PostTranslations")
 
   @@index([slug])
   @@index([status, published_at])

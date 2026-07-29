@@ -31,11 +31,11 @@ type CompareItem = CompareRow | CompareSection;
 const DATA = {
   fa: {
     navLinks: [
-      { href: '/blog', label: 'وبلاگ' },
+      { href: '/fa/blog', label: 'وبلاگ' },
       { href: '#how', label: 'روش کار' },
       { href: '#features', label: 'امکانات' },
-      { href: '#pricing', label: 'قیمت' },
-      { href: '#faq', label: 'سوالات' },
+      { href: '#pricing', label: 'تعرفه‌ها' },
+      { href: '/fa/contact', label: 'تماس با ما' },
     ],
     stats: [
       { value: 100, suffix: '٪', label: 'ثبت خودکار متاتریدر ۴ و ۵' },
@@ -87,7 +87,7 @@ const DATA = {
     heroSubtitle: 'معاملاتت رو وارد کن، الگوها رو پیدا کن، سودت رو بیشتر کن.',
     startFree: 'شروع رایگان',
     signinLabel: 'ورود',
-    registerLabel: 'ثبت‌نام رایگان',
+    registerLabel: 'شروع رایگان',
     problemHeadline: 'اکثر تریدرا، بدون ژورنال، با چشم بسته معامله می‌کنه.',
     howTitle: '۳ قدم تا تبدیل شدن به معامله‌گر حرفه‌ای',
     featuresTitle: 'ابزارهایی که معامله‌گر حرفه‌ای نیاز داره',
@@ -112,11 +112,11 @@ const DATA = {
   },
   en: {
     navLinks: [
-      { href: '/blog', label: 'Blog' },
-      { href: '#how', label: 'How it works' },
+      { href: '/en/blog', label: 'Blog' },
+      { href: '#how', label: 'How it Works' },
       { href: '#features', label: 'Features' },
       { href: '#pricing', label: 'Pricing' },
-      { href: '#faq', label: 'FAQ' },
+      { href: '/en/contact', label: 'Contact Us' },
     ],
     stats: [
       { value: 100, suffix: '%', label: 'Automated MT4/MT5 Sync' },
@@ -293,6 +293,11 @@ export default function LandingPage({ params }: PageProps) {
 
   const handleScroll = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     e.preventDefault();
+    if (href.startsWith('/')) {
+      router.push(href);
+      setMobileMenuOpen(false);
+      return;
+    }
     if (href === '#top') {
       window.scrollTo({
         top: 0,

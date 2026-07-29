@@ -22,6 +22,7 @@ export default function AdminBlogPage() {
   }, [user, router]);
 
   const [activeTab, setActiveTab] = useState<'posts' | 'categories' | 'tags' | 'comments'>('posts');
+  const [activeLocale, setActiveLocale] = useState<'fa' | 'en'>('fa');
   
   // States
   const [posts, setPosts] = useState<any[]>([]);
@@ -35,16 +36,28 @@ export default function AdminBlogPage() {
 
   const fetchPosts = async () => {
     try {
-      const res = await api.get('/api/admin/blog/posts');
+      const res = await api.get(`/api/admin/blog/posts?locale=${activeLocale}`);
       setPosts(res.data);
-    } catch (err) {
-      notify.error('Failed to fetch posts');
+    } catch (error) {
+      notify.error('خطا در دریافت مقالات');
+    }
+  };
+
+  const handleTranslatePost = async (id: string) => {
+    try {
+      const res = await api.post(`/api/admin/blog/posts/${id}/translate`);
+      notify.success('پیش‌نویس ترجمه ایجاد شد!');
+      setEditingPost(res.data);
+      setShowEditor(true);
+      setActiveLocale(res.data.locale);
+    } catch (error) {
+      notify.error('خطا در ایجاد ترجمه');
     }
   };
 
   const fetchCategories = async () => {
     try {
-      const res = await api.get('/api/blog/categories');
+      const res = await api.get(`/api/blog/categories?locale=${activeLocale}`);
       setCategories(res.data);
     } catch (err) {
       notify.error('Failed to fetch categories');
@@ -53,7 +66,7 @@ export default function AdminBlogPage() {
 
   const fetchTags = async () => {
     try {
-      const res = await api.get('/api/blog/tags');
+      const res = await api.get(`/api/blog/tags?locale=${activeLocale}`);
       setTags(res.data);
     } catch (err) {
       notify.error('Failed to fetch tags');
@@ -76,7 +89,7 @@ export default function AdminBlogPage() {
       if (activeTab === 'tags') fetchTags();
       if (activeTab === 'comments') fetchComments();
     }
-  }, [activeTab, user]);
+  }, [activeTab, activeLocale, user]);
 
   const handleDeletePost = async (id: string) => {
     if (!await notify.confirm({ title: 'Delete Post', message: 'Are you sure?', danger: true })) return;
@@ -107,6 +120,7 @@ export default function AdminBlogPage() {
         <div className="admin-panel-card" style={{ padding: '20px' }}>
           <BlogEditor 
             initialData={editingPost} 
+            locale={activeLocale}
             onSuccess={() => { setShowEditor(false); setEditingPost(null); fetchPosts(); }} 
             onCancel={() => { setShowEditor(false); setEditingPost(null); }} 
           />
@@ -122,9 +136,6 @@ export default function AdminBlogPage() {
           <h1>مدیریت وبلاگ</h1>
           <span className="admin-sub">ایجاد مقالات، دسته‌بندی‌ها و مدیریت نظرات</span>
         </div>
-        <Link href="/admin" className="btn-secondary" style={{ textDecoration: 'none' }}>
-          بازگشت به پنل اصلی
-        </Link>
       </header>
 
       <div className="admin-tabs">
@@ -171,6 +182,16 @@ export default function AdminBlogPage() {
                     <td>{toPersianDigits(post.view_count)}</td>
                     <td>{post.author?.name}</td>
                     <td>
+                      {!(post.translation || post.translated_from) && (
+                        <button className="icon-btn text-green" onClick={() => handleTranslatePost(post.id)} title="ایجاد ترجمه">
+                          <span className="material-symbols-outlined">translate</span>
+                        </button>
+                      )}
+                      {(post.translation || post.translated_from) && (
+                        <span className="badge" style={{ fontSize: '10px', background: '#374151', padding: '2px 6px', borderRadius: '4px', marginRight: '5px' }}>
+                          دو زبانه
+                        </span>
+                      )}
                       <button className="icon-btn text-blue" onClick={() => { setEditingPost(post); setShowEditor(true); }}>
                         <span className="material-symbols-outlined">edit</span>
                       </button>
@@ -187,7 +208,32 @@ export default function AdminBlogPage() {
         </div>
       )}
 
-      {/* Categories, Tags, Comments UI to be fully implemented next */}
+      {activeTab === 'categories' && (
+        <div className="admin-panel-card">
+          <div className="card-header-actions">
+            <h3>لیست دسته‌بندی‌ها</h3>
+          </div>
+          <div style={{ padding: '40px', textAlign: 'center', color: '#9ca3af' }}>بخش مدیریت دسته‌بندی‌ها به زودی اضافه می‌شود.</div>
+        </div>
+      )}
+
+      {activeTab === 'tags' && (
+        <div className="admin-panel-card">
+          <div className="card-header-actions">
+            <h3>لیست برچسب‌ها</h3>
+          </div>
+          <div style={{ padding: '40px', textAlign: 'center', color: '#9ca3af' }}>بخش مدیریت برچسب‌ها به زودی اضافه می‌شود.</div>
+        </div>
+      )}
+
+      {activeTab === 'comments' && (
+        <div className="admin-panel-card">
+          <div className="card-header-actions">
+            <h3>لیست نظرات</h3>
+          </div>
+          <div style={{ padding: '40px', textAlign: 'center', color: '#9ca3af' }}>بخش مدیریت نظرات به زودی اضافه می‌شود.</div>
+        </div>
+      )}
     </div>
   );
 }
