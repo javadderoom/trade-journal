@@ -202,6 +202,34 @@ router.get('/history', async (req: Request, res: Response): Promise<void> => {
           });
         }
       }
+
+      // Automatically back-adjust rollover gaps for Gold Futures (GC=F)
+      // Restricted to 07:00 - 08:00 UTC to prevent false positives during US news events
+      if (yahooSymbol === 'GC=F' && candles.length > 1) {
+        for (let i = candles.length - 1; i > 0; i--) {
+          const curr = candles[i];
+          const prev = candles[i - 1];
+          const gap = Math.abs(curr.open - prev.close);
+          
+          if (gap > 30 && (curr.time - prev.time) < 7200) {
+            const date = new Date(curr.time * 1000);
+            const utcHour = date.getUTCHours();
+            
+            // Yahoo batch jobs for rollover usually happen around 07:30 UTC
+            if (utcHour === 7) {
+              const spread = curr.open - prev.close;
+              console.log(`[MarketData] Detected Gold rollover gap of ${spread} at ${date.toISOString()}. Back-adjusting...`);
+              // Adjust all previous candles backwards
+              for (let j = 0; j < i; j++) {
+                candles[j].open = parseFloat((candles[j].open + spread).toFixed(3));
+                candles[j].high = parseFloat((candles[j].high + spread).toFixed(3));
+                candles[j].low = parseFloat((candles[j].low + spread).toFixed(3));
+                candles[j].close = parseFloat((candles[j].close + spread).toFixed(3));
+              }
+            }
+          }
+        }
+      }
     }
 
     if (timeframe === '4h') {

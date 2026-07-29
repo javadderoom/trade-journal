@@ -47,3 +47,4 @@ next-env.d.ts
 
 .codex/auth.json
 .codex/config.toml
+apps/api/temp.txt
