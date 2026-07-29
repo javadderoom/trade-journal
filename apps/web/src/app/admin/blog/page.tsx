@@ -1,0 +1,193 @@
+'use client';
+
+import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+import { useAuthStore } from '../../../lib/auth';
+import { api } from '../../../lib/api';
+import { notify } from '../../../lib/notify';
+import { toPersianDigits } from '../../../utils/farsi';
+import '../admin.scss';
+
+import BlogEditor from '../../../components/admin/BlogEditor';
+
+export default function AdminBlogPage() {
+  const user = useAuthStore((state) => state.user);
+  const router = useRouter();
+
+  useEffect(() => {
+    if (user && user.role !== 'ADMIN') {
+      router.push('/dashboard');
+    }
+  }, [user, router]);
+
+  const [activeTab, setActiveTab] = useState<'posts' | 'categories' | 'tags' | 'comments'>('posts');
+  
+  // States
+  const [posts, setPosts] = useState<any[]>([]);
+  const [categories, setCategories] = useState<any[]>([]);
+  const [tags, setTags] = useState<any[]>([]);
+  const [comments, setComments] = useState<any[]>([]);
+
+  // Modals / Form states
+  const [showEditor, setShowEditor] = useState(false);
+  const [editingPost, setEditingPost] = useState<any>(null);
+
+  const fetchPosts = async () => {
+    try {
+      const res = await api.get('/api/admin/blog/posts');
+      setPosts(res.data);
+    } catch (err) {
+      notify.error('Failed to fetch posts');
+    }
+  };
+
+  const fetchCategories = async () => {
+    try {
+      const res = await api.get('/api/blog/categories');
+      setCategories(res.data);
+    } catch (err) {
+      notify.error('Failed to fetch categories');
+    }
+  };
+
+  const fetchTags = async () => {
+    try {
+      const res = await api.get('/api/blog/tags');
+      setTags(res.data);
+    } catch (err) {
+      notify.error('Failed to fetch tags');
+    }
+  };
+
+  const fetchComments = async () => {
+    try {
+      const res = await api.get('/api/admin/blog/comments');
+      setComments(res.data);
+    } catch (err) {
+      notify.error('Failed to fetch comments');
+    }
+  };
+
+  useEffect(() => {
+    if (user && user.role === 'ADMIN') {
+      if (activeTab === 'posts') fetchPosts();
+      if (activeTab === 'categories') fetchCategories();
+      if (activeTab === 'tags') fetchTags();
+      if (activeTab === 'comments') fetchComments();
+    }
+  }, [activeTab, user]);
+
+  const handleDeletePost = async (id: string) => {
+    if (!await notify.confirm({ title: 'Delete Post', message: 'Are you sure?', danger: true })) return;
+    try {
+      await api.delete(`/api/admin/blog/posts/${id}`);
+      notify.success('Post deleted');
+      fetchPosts();
+    } catch (err) {
+      notify.error('Failed to delete');
+    }
+  };
+
+  if (!user || user.role !== 'ADMIN') {
+    return <div style={{ padding: '40px', textAlign: 'center' }}>Checking access...</div>;
+  }
+
+  if (showEditor) {
+    return (
+      <div className="admin-container">
+        <header className="admin-header">
+          <div>
+            <h1>{editingPost ? 'ویرایش مقاله' : 'مقاله جدید'}</h1>
+          </div>
+          <button className="btn-secondary" onClick={() => { setShowEditor(false); setEditingPost(null); }}>
+            بازگشت به لیست
+          </button>
+        </header>
+        <div className="admin-panel-card" style={{ padding: '20px' }}>
+          <BlogEditor 
+            initialData={editingPost} 
+            onSuccess={() => { setShowEditor(false); setEditingPost(null); fetchPosts(); }} 
+            onCancel={() => { setShowEditor(false); setEditingPost(null); }} 
+          />
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="admin-container">
+      <header className="admin-header">
+        <div>
+          <h1>مدیریت وبلاگ</h1>
+          <span className="admin-sub">ایجاد مقالات، دسته‌بندی‌ها و مدیریت نظرات</span>
+        </div>
+        <Link href="/admin" className="btn-secondary" style={{ textDecoration: 'none' }}>
+          بازگشت به پنل اصلی
+        </Link>
+      </header>
+
+      <div className="admin-tabs">
+        <button className={`admin-tab-btn ${activeTab === 'posts' ? 'active' : ''}`} onClick={() => setActiveTab('posts')}>
+          <span className="material-symbols-outlined">article</span>
+          <span>مقالات</span>
+        </button>
+        <button className={`admin-tab-btn ${activeTab === 'categories' ? 'active' : ''}`} onClick={() => setActiveTab('categories')}>
+          <span className="material-symbols-outlined">category</span>
+          <span>دسته‌بندی‌ها</span>
+        </button>
+        <button className={`admin-tab-btn ${activeTab === 'tags' ? 'active' : ''}`} onClick={() => setActiveTab('tags')}>
+          <span className="material-symbols-outlined">tag</span>
+          <span>برچسب‌ها</span>
+        </button>
+        <button className={`admin-tab-btn ${activeTab === 'comments' ? 'active' : ''}`} onClick={() => setActiveTab('comments')}>
+          <span className="material-symbols-outlined">forum</span>
+          <span>نظرات</span>
+        </button>
+      </div>
+
+      {activeTab === 'posts' && (
+        <div className="admin-panel-card">
+          <div className="card-header-actions">
+            <h3>لیست مقالات</h3>
+            <button className="btn-primary" onClick={() => setShowEditor(true)}>مقاله جدید +</button>
+          </div>
+          <div className="admin-table-wrapper">
+            <table className="admin-table">
+              <thead>
+                <tr>
+                  <th>عنوان</th>
+                  <th>وضعیت</th>
+                  <th>بازدید</th>
+                  <th>نویسنده</th>
+                  <th>عملیات</th>
+                </tr>
+              </thead>
+              <tbody>
+                {posts.map(post => (
+                  <tr key={post.id}>
+                    <td>{post.title}</td>
+                    <td>{post.status}</td>
+                    <td>{toPersianDigits(post.view_count)}</td>
+                    <td>{post.author?.name}</td>
+                    <td>
+                      <button className="icon-btn text-blue" onClick={() => { setEditingPost(post); setShowEditor(true); }}>
+                        <span className="material-symbols-outlined">edit</span>
+                      </button>
+                      <button className="icon-btn text-red" onClick={() => handleDeletePost(post.id)}>
+                        <span className="material-symbols-outlined">delete</span>
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+                {posts.length === 0 && <tr><td colSpan={5} style={{ textAlign: 'center' }}>هیچ مقاله‌ای یافت نشد.</td></tr>}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {/* Categories, Tags, Comments UI to be fully implemented next */}
+    </div>
+  );
+}

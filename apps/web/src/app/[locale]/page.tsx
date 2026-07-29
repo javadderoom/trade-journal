@@ -31,6 +31,7 @@ type CompareItem = CompareRow | CompareSection;
 const DATA = {
   fa: {
     navLinks: [
+      { href: '/blog', label: 'وبلاگ' },
       { href: '#how', label: 'روش کار' },
       { href: '#features', label: 'امکانات' },
       { href: '#pricing', label: 'قیمت' },
@@ -111,6 +112,7 @@ const DATA = {
   },
   en: {
     navLinks: [
+      { href: '/blog', label: 'Blog' },
       { href: '#how', label: 'How it works' },
       { href: '#features', label: 'Features' },
       { href: '#pricing', label: 'Pricing' },

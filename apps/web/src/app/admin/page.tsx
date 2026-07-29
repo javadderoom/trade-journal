@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { useAuthStore } from '../../lib/auth';
 import { api } from '../../lib/api';
 import { toPersianDigits } from '../../utils/farsi';
@@ -506,9 +507,13 @@ export default function AdminPage() {
           className={`admin-tab-btn ${activeTab === 'pricing' ? 'active' : ''}`}
           onClick={() => setActiveTab('pricing')}
         >
-          <span className="material-symbols-outlined">settings_suggest</span>
-          <span>تنظیمات قیمت</span>
+          <span className="material-symbols-outlined">request_quote</span>
+          <span>تنظیمات پلن‌ها</span>
         </button>
+        <Link href="/admin/blog" className="admin-tab-btn">
+          <span className="material-symbols-outlined">article</span>
+          <span>مدیریت وبلاگ</span>
+        </Link>
         <button
           className={`admin-tab-btn ${activeTab === 'contact' ? 'active' : ''}`}
           onClick={() => setActiveTab('contact')}

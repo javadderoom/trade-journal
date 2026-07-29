@@ -1,0 +1,164 @@
+.single-post-page {
+  padding: 60px 20px;
+  background: #0f1115;
+  min-height: 100vh;
+  color: #e5e7eb;
+
+  .post-article {
+    max-width: 800px;
+    margin: 0 auto;
+    background: #1f2937;
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+  }
+
+  .post-header {
+    padding: 40px 40px 20px;
+    text-align: center;
+
+    .post-category {
+      display: inline-block;
+      background: rgba(16, 185, 129, 0.1);
+      color: #10b981;
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 20px;
+    }
+
+    .post-title {
+      font-size: 36px;
+      font-weight: 800;
+      color: #ffffff;
+      margin-bottom: 25px;
+      line-height: 1.4;
+    }
+
+    .post-meta {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      color: #9ca3af;
+      font-size: 14px;
+
+      span {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+
+        .material-symbols-outlined {
+          font-size: 18px;
+        }
+      }
+    }
+  }
+
+  .post-cover-image {
+    width: 100%;
+    max-height: 450px;
+    overflow: hidden;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+
+  .post-content {
+    padding: 40px;
+    font-size: 17px;
+    line-height: 1.8;
+    color: #d1d5db;
+
+    h2, h3, h4 {
+      color: #ffffff;
+      margin-top: 2em;
+      margin-bottom: 0.8em;
+    }
+
+    p {
+      margin-bottom: 1.5em;
+    }
+
+    a {
+      color: #3b82f6;
+      text-decoration: underline;
+    }
+
+    img {
+      max-width: 100%;
+      border-radius: 8px;
+      margin: 20px 0;
+    }
+
+    ul, ol {
+      margin-bottom: 1.5em;
+      padding-right: 20px; /* RTL padding */
+      
+      li {
+        margin-bottom: 0.5em;
+      }
+    }
+  }
+
+  .post-tags {
+    padding: 0 40px 40px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+
+    .tag {
+      background: #374151;
+      color: #e5e7eb;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 13px;
+    }
+  }
+
+  .comments-section {
+    max-width: 800px;
+    margin: 40px auto 0;
+    background: #1f2937;
+    border-radius: 16px;
+    padding: 40px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+
+    h3 {
+      font-size: 20px;
+      margin-bottom: 20px;
+      color: #fff;
+    }
+
+    .comment {
+      background: #111827;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 15px;
+
+      .comment-header {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+
+        strong {
+          color: #10b981;
+        }
+
+        small {
+          color: #6b7280;
+        }
+      }
+
+      p {
+        font-size: 15px;
+        line-height: 1.5;
+        color: #d1d5db;
+        margin: 0;
+      }
+    }
+  }
+}

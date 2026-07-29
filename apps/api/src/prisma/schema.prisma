@@ -40,6 +40,8 @@ model User {
    sentMessages Message[]                   @relation("MessageSender")
    activities ConversationActivity[]        @relation("ActivityActor")
    backtestSessions BacktestSession[]
+   blogPosts        BlogPost[]
+   blogComments     BlogComment[]
 }
 
 model Account {
@@ -548,3 +550,80 @@ model CandleCache {
   @@index([symbol, timeframe])
 }
 
+// ─── Blog System ────────────────────────────────────────────────────────────
+
+model BlogCategory {
+  id          String     @id @default(uuid())
+  name        String
+  slug        String     @unique
+  description String?
+  created_at  DateTime   @default(now())
+  updated_at  DateTime   @updatedAt
+  posts       BlogPost[]
+
+  @@index([slug])
+}
+
+model BlogTag {
+  id         String     @id @default(uuid())
+  name       String
+  slug       String     @unique
+  created_at DateTime   @default(now())
+  posts       BlogPost[]
+
+  @@index([slug])
+}
+
+enum PostStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+model BlogPost {
+  id               String       @id @default(uuid())
+  title            String
+  slug             String       @unique
+  content          String       @db.Text
+  excerpt          String?      @db.Text
+  cover_image      String?
+  status           PostStatus   @default(DRAFT)
+  view_count       Int          @default(0)
+  seo_title        String?
+  seo_description  String?
+  
+  author_id        String
+  author           User         @relation(fields: [author_id], references: [id])
+  
+  category_id      String?
+  category         BlogCategory? @relation(fields: [category_id], references: [id], onDelete: SetNull)
+  
+  tags             BlogTag[]
+  comments         BlogComment[]
+
+  published_at     DateTime?
+  created_at       DateTime     @default(now())
+  updated_at       DateTime     @updatedAt
+
+  @@index([slug])
+  @@index([status, published_at])
+  @@index([category_id])
+}
+
+model BlogComment {
+  id          String       @id @default(uuid())
+  content     String       @db.Text
+  is_approved Boolean      @default(false)
+  
+  post_id     String
+  post        BlogPost     @relation(fields: [post_id], references: [id], onDelete: Cascade)
+  
+  user_id     String
+  user        User         @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  
+  created_at  DateTime     @default(now())
+  updated_at  DateTime     @updatedAt
+
+  @@index([post_id, is_approved])
+  @@index([user_id])
+}

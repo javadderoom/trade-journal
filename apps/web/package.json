@@ -8,6 +8,10 @@
     "start": "next start"
   },
   "dependencies": {
+    "@tiptap/extension-image": "^3.29.2",
+    "@tiptap/extension-link": "^3.29.2",
+    "@tiptap/react": "^3.29.2",
+    "@tiptap/starter-kit": "^3.29.2",
     "axios": "^1.18.0",
     "framer-motion": "^12.42.2",
     "lightweight-charts": "^4.2.1",

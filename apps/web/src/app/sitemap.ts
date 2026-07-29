@@ -1,10 +1,27 @@
 import { MetadataRoute } from "next";
 import { TOPICS_DATA } from "../constants/topicsData";
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = "https://tradekav.ir";
+  const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
 
-  const publicPages = [
+  let dynamicBlogPages: MetadataRoute.Sitemap = [];
+  try {
+    const res = await fetch(`${apiBase}/api/blog/posts?limit=100`);
+    if (res.ok) {
+      const data = await res.json();
+      dynamicBlogPages = (data.posts || []).map((post: any) => ({
+        url: `${baseUrl}/blog/${post.slug}`,
+        lastModified: new Date(post.updated_at || post.published_at || post.created_at),
+        changeFrequency: "weekly" as const,
+        priority: 0.8,
+      }));
+    }
+  } catch (error) {
+    console.warn("Could not fetch blog posts for sitemap");
+  }
+
+  const publicPages: MetadataRoute.Sitemap = [
     // Landing pages (separate locale routes)
     {
       url: baseUrl,
@@ -80,6 +97,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly" as const,
       priority: 0.3,
     },
+    {
+      url: `${baseUrl}/blog`,
+      lastModified: new Date(),
+      changeFrequency: "daily" as const,
+      priority: 0.9,
+    },
     // Programmatic Topic SEO Landing Pages
     ...Object.keys(TOPICS_DATA).flatMap((topicSlug) => [
       {
@@ -107,6 +130,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
         },
       },
     ]),
+    ...dynamicBlogPages,
   ];
 
   return publicPages;
