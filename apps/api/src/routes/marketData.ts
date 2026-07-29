@@ -4,15 +4,13 @@ import { prisma } from '../services/tradeSync';
 
 const router = Router();
 
-const YAHOO_SYMBOL_MAP: Record<string, string> = {
-  XAUUSD: 'XAUUSD=X',
-  EURUSD: 'EURUSD=X',
-  GBPUSD: 'GBPUSD=X',
-  USDJPY: 'JPY=X',
-  BTCUSD: 'BTC-USD',
-  ETHUSD: 'ETH-USD',
-  SOLUSD: 'SOL-USD',
+const TWELVEDATA_SYMBOL_MAP: Record<string, string> = {
+  XAUUSD: 'XAU/USD',
+  EURUSD: 'EUR/USD',
+  GBPUSD: 'GBP/USD',
+  USDJPY: 'USD/JPY',
 };
+
 
 const BINANCE_SYMBOL_MAP: Record<string, string> = {
   BTCUSD: 'BTCUSDT',
@@ -97,6 +95,63 @@ async function fetchBinanceCandles(binanceSymbol: string, binanceInterval: strin
   return uniqueCandles.sort((a, b) => a.time - b.time).slice(-limit);
 }
 
+// Helper to paginate TwelveData backwards to get up to 10k candles
+async function fetchTwelveDataCandles(twelveSymbol: string, twelveInterval: string, limit: number): Promise<any[]> {
+  let allCandles: any[] = [];
+  let currentEndDate: string | null = null;
+  const maxRequests = Math.ceil(limit / 5000) + 1; // Safeguard
+
+  const apiKey = process.env.TWELVEDATA_API_KEY;
+  if (!apiKey) throw new Error("Missing TWELVEDATA_API_KEY");
+
+  for (let i = 0; i < maxRequests; i++) {
+    const fetchLimit = Math.min(5000, limit - allCandles.length);
+    if (fetchLimit <= 0) break;
+
+    let url = `https://api.twelvedata.com/time_series?symbol=${twelveSymbol}&interval=${twelveInterval}&outputsize=${fetchLimit}&timezone=UTC&apikey=${apiKey}`;
+    if (currentEndDate !== null) {
+      url += `&end_date=${encodeURIComponent(currentEndDate)}`;
+    }
+
+    try {
+      const response = await axios.get(url, { timeout: 8000 });
+      const rawData = response.data;
+      if (rawData.status !== 'ok' || !Array.isArray(rawData.values) || rawData.values.length === 0) {
+        if (rawData.status === 'error') {
+            console.error(`[TwelveData Error]:`, rawData.message);
+        }
+        break;
+      }
+
+      // TwelveData returns newest to oldest. We parse and reverse to make it oldest to newest.
+      const chunk: any[] = rawData.values.map((item: any) => ({
+        time: Math.floor(new Date(item.datetime + 'Z').getTime() / 1000),
+        open: parseFloat(item.open),
+        high: parseFloat(item.high),
+        low: parseFloat(item.low),
+        close: parseFloat(item.close),
+        volume: item.volume ? parseFloat(item.volume) : 0,
+      }));
+      chunk.reverse();
+
+      allCandles = [...chunk, ...allCandles];
+
+      const oldestTimeMs = chunk[0].time * 1000;
+      currentEndDate = new Date(oldestTimeMs - 1000).toISOString().replace('T', ' ').substring(0, 19);
+
+      if (rawData.values.length < fetchLimit) {
+        break;
+      }
+    } catch (err: any) {
+      console.error(`[TwelveData Fetch Error] Page ${i}:`, err.message);
+      break;
+    }
+  }
+
+  const uniqueCandles = Array.from(new Map(allCandles.map(c => [c.time, c])).values());
+  return uniqueCandles.sort((a, b) => a.time - b.time).slice(-limit);
+}
+
 /**
  * GET /api/market-data/history
  * Fetch historical candles with 0 API key required. Caches results in DB.
@@ -146,90 +201,21 @@ router.get('/history', async (req: Request, res: Response): Promise<void> => {
       
       candles = await fetchBinanceCandles(binanceSymbol, interval, fetchLimit);
     } else {
-      // Fetch from Yahoo (Forex & Commodities)
-      let yahooSymbol = YAHOO_SYMBOL_MAP[symbol] || symbol;
-      if (symbol === 'XAUUSD' && timeframe !== '1d') {
-        yahooSymbol = 'GC=F';
-      }
+      // Fetch from Twelve Data (Forex & Commodities)
+      const twelveSymbol = TWELVEDATA_SYMBOL_MAP[symbol] || symbol;
 
-      let interval = '15m';
-      let range = '60d';
-
-      if (timeframe === '1m') { interval = '1m'; range = '7d'; }
-      else if (timeframe === '5m') { interval = '5m'; range = '60d'; }
-      else if (timeframe === '15m') { interval = '15m'; range = '60d'; }
-      else if (timeframe === '1h') { interval = '60m'; range = '2y'; }
-      else if (timeframe === '4h') { interval = '60m'; range = '2y'; }
-      else if (timeframe === '1d') { interval = '1d'; range = '2y'; }
-
-      const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(yahooSymbol)}?interval=${interval}&range=${range}`;
+      const twelveIntervalMap: Record<string, string> = {
+        '1m': '1min',
+        '5m': '5min',
+        '15m': '15min',
+        '1h': '1h',
+        '4h': '1h', // aggregate 4h
+        '1d': '1day',
+      };
+      const twelveInterval = twelveIntervalMap[timeframe] || '15min';
+      const fetchLimit = timeframe === '4h' ? limit * 4 : limit;
       
-      const response = await axios.get(url, {
-        headers: {
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-        },
-        timeout: 8000,
-      });
-
-      const result = response.data?.chart?.result?.[0];
-      if (!result || !result.timestamp || !result.indicators?.quote?.[0]) {
-        throw new Error('Market data not found in Yahoo Finance response');
-      }
-
-      const timestamps = result.timestamp;
-      const quote = result.indicators.quote[0];
-      const opens = quote.open || [];
-      const highs = quote.high || [];
-      const lows = quote.low || [];
-      const closes = quote.close || [];
-      const volumes = quote.volume || [];
-
-      for (let i = 0; i < timestamps.length; i++) {
-        if (
-          opens[i] !== null &&
-          highs[i] !== null &&
-          lows[i] !== null &&
-          closes[i] !== null &&
-          !isNaN(opens[i])
-        ) {
-          candles.push({
-            time: timestamps[i],
-            open: parseFloat(opens[i].toFixed(symbol.includes('JPY') ? 3 : 5)),
-            high: parseFloat(highs[i].toFixed(symbol.includes('JPY') ? 3 : 5)),
-            low: parseFloat(lows[i].toFixed(symbol.includes('JPY') ? 3 : 5)),
-            close: parseFloat(closes[i].toFixed(symbol.includes('JPY') ? 3 : 5)),
-            volume: volumes[i] ? Math.round(volumes[i]) : 0,
-          });
-        }
-      }
-
-      // Automatically back-adjust rollover gaps for Gold Futures (GC=F)
-      // Restricted to 07:00 - 08:00 UTC to prevent false positives during US news events
-      if (yahooSymbol === 'GC=F' && candles.length > 1) {
-        for (let i = candles.length - 1; i > 0; i--) {
-          const curr = candles[i];
-          const prev = candles[i - 1];
-          const gap = Math.abs(curr.open - prev.close);
-          
-          if (gap > 30 && (curr.time - prev.time) < 7200) {
-            const date = new Date(curr.time * 1000);
-            const utcHour = date.getUTCHours();
-            
-            // Yahoo batch jobs for rollover usually happen around 07:30 UTC
-            if (utcHour === 7) {
-              const spread = curr.open - prev.close;
-              console.log(`[MarketData] Detected Gold rollover gap of ${spread} at ${date.toISOString()}. Back-adjusting...`);
-              // Adjust all previous candles backwards
-              for (let j = 0; j < i; j++) {
-                candles[j].open = parseFloat((candles[j].open + spread).toFixed(3));
-                candles[j].high = parseFloat((candles[j].high + spread).toFixed(3));
-                candles[j].low = parseFloat((candles[j].low + spread).toFixed(3));
-                candles[j].close = parseFloat((candles[j].close + spread).toFixed(3));
-              }
-            }
-          }
-        }
-      }
+      candles = await fetchTwelveDataCandles(twelveSymbol, twelveInterval, fetchLimit);
     }
 
     if (timeframe === '4h') {

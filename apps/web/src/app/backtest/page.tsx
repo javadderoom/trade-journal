@@ -252,6 +252,7 @@ export default function BacktestPage() {
             ) : (
               <BacktestChart
                 candles={candles}
+                symbol={symbol}
                 visibleCount={visibleCount}
                 positions={positions}
                 activeDrawingTool={activeTool}

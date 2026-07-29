@@ -25,6 +25,7 @@ export interface DrawingShape {
 
 interface BacktestChartProps {
   candles: CandleData[];
+  symbol?: string;
   visibleCount: number;
   positions: PositionState[];
   onPriceSelect?: (price: number) => void;
@@ -52,6 +53,7 @@ interface PositionLines {
 
 export default function BacktestChart({
   candles,
+  symbol,
   visibleCount,
   positions,
   onPriceSelect,
@@ -81,6 +83,7 @@ export default function BacktestChart({
   // Store latest props in a ref so chart event handlers always see fresh state
   const propsRef = useRef({
     candles,
+    symbol,
     activeDrawingTool,
     onCutBarSelect,
     onPriceSelect,
@@ -91,13 +94,14 @@ export default function BacktestChart({
   useEffect(() => {
     propsRef.current = {
       candles,
+      symbol,
       activeDrawingTool,
       onCutBarSelect,
       onPriceSelect,
       positions,
       onUpdateSLTP,
     };
-  }, [candles, activeDrawingTool, onCutBarSelect, onPriceSelect, positions, onUpdateSLTP]);
+  }, [candles, symbol, activeDrawingTool, onCutBarSelect, onPriceSelect, positions, onUpdateSLTP]);
 
   // ── 1. Initialize chart ONCE ──────────────────────────────────────────────
   useEffect(() => {
@@ -114,7 +118,10 @@ export default function BacktestChart({
         vertLines: { color: 'rgba(60, 74, 65, 0.15)' },
         horzLines: { color: 'rgba(60, 74, 65, 0.15)' },
       },
-      crosshair: { mode: 1 },
+      crosshair: {
+        vertLine: { color: 'rgba(97, 249, 177, 0.4)', labelBackgroundColor: '#1e293b' },
+        horzLine: { color: 'rgba(97, 249, 177, 0.4)', labelBackgroundColor: '#1e293b' },
+      },
       rightPriceScale: {
         borderColor: 'rgba(60, 74, 65, 0.3)',
         autoScale: true,
@@ -127,12 +134,36 @@ export default function BacktestChart({
       },
     });
 
+    let precision = 2;
+    let minMove = 0.01;
+    if (propsRef.current.symbol) {
+      const s = propsRef.current.symbol.toUpperCase();
+      if (s.includes('JPY')) {
+        precision = 3;
+        minMove = 0.001;
+      } else if (s.includes('USD') && !['XAUUSD', 'BTCUSD', 'ETHUSD', 'SOLUSD'].includes(s)) {
+        precision = 5;
+        minMove = 0.00001;
+      }
+    }
+
+    chart.applyOptions({
+      localization: {
+        priceFormatter: (p: number) => p.toFixed(precision),
+      },
+    });
+
     const candlestickSeries = chart.addCandlestickSeries({
       upColor: '#10b981',
       downColor: '#ef4444',
       borderVisible: false,
       wickUpColor: '#10b981',
       wickDownColor: '#ef4444',
+      priceFormat: {
+        type: 'price',
+        precision,
+        minMove,
+      },
     });
 
     chartRef.current = chart;
@@ -238,6 +269,36 @@ export default function BacktestChart({
       });
     }
   }, [activeDrawingTool]);
+
+  // Dynamically update precision when symbol changes
+  useEffect(() => {
+    if (!chartRef.current || !seriesRef.current || !symbol) return;
+    
+    let precision = 2;
+    let minMove = 0.01;
+    const s = symbol.toUpperCase();
+    if (s.includes('JPY')) {
+      precision = 3;
+      minMove = 0.001;
+    } else if (s.includes('USD') && !['XAUUSD', 'BTCUSD', 'ETHUSD', 'SOLUSD'].includes(s)) {
+      precision = 5;
+      minMove = 0.00001;
+    }
+
+    chartRef.current.applyOptions({
+      localization: {
+        priceFormatter: (p: number) => p.toFixed(precision),
+      },
+    });
+
+    seriesRef.current.applyOptions({
+      priceFormat: {
+        type: 'price',
+        precision,
+        minMove,
+      },
+    });
+  }, [symbol]);
 
   // Helper to draw or redraw all position lines
   const redrawPositionLines = useCallback((currentPositions: PositionState[]) => {

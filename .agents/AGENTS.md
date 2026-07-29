@@ -18,3 +18,6 @@ For every user request, analyze the required cognitive effort. At the very top o
 - This project uses **Prisma 7+**, where the `url` property inside `schema.prisma` is deprecated/unsupported and triggers Error `P1012`.
 - Connection URLs in Prisma 7 are managed via `prisma.config.ts` or passed at runtime via environment variables/adapters.
 
+## Language and Communication
+- **ALWAYS communicate and respond in ENGLISH.**
+- **NEVER** write or respond in Farsi (Persian) or any other language, even if the user prompts in that language.

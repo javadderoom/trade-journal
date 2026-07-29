@@ -13,6 +13,7 @@ interface CandlestickData {
 
 interface TradeChartProps {
   candlesticks: CandlestickData[];
+  symbol?: string;
   direction: 'BUY' | 'SELL';
   openPrice: number;
   closePrice: number | null;
@@ -24,6 +25,7 @@ interface TradeChartProps {
 
 export default function TradeChart({
   candlesticks,
+  symbol,
   direction,
   openPrice,
   closePrice,
@@ -83,6 +85,25 @@ export default function TradeChart({
       },
     });
 
+    let precision = 2;
+    let minMove = 0.01;
+    if (symbol) {
+      const s = symbol.toUpperCase();
+      if (s.includes('JPY')) {
+        precision = 3;
+        minMove = 0.001;
+      } else if (s.includes('USD') && !['XAUUSD', 'BTCUSD', 'ETHUSD', 'SOLUSD'].includes(s)) {
+        precision = 5;
+        minMove = 0.00001;
+      }
+    }
+
+    chart.applyOptions({
+      localization: {
+        priceFormatter: (p: number) => p.toFixed(precision),
+      },
+    });
+
     chartRef.current = chart;
 
     // 3. Add Candlestick Series
@@ -92,6 +113,11 @@ export default function TradeChart({
       borderVisible: false,
       wickUpColor: '#10b981',
       wickDownColor: '#ff6b6b',
+      priceFormat: {
+        type: 'price',
+        precision,
+        minMove,
+      },
     });
 
     candlestickSeries.setData(uniqueData);

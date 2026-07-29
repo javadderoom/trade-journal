@@ -325,6 +325,7 @@ export default function DetailPanel({
                 <label className="section-label">{p.chartTitle}</label>
                 <TradeChart 
                   candlesticks={activeTrade.chartData}
+                  symbol={activeTrade.symbol}
                   direction={activeTrade.direction}
                   openPrice={activeTrade.openPrice}
                   closePrice={activeTrade.closePrice}
