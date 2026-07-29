@@ -34,7 +34,7 @@ export async function syncTradesFromEA(
   // 1. Extract all ticket IDs for batch fetching
   const tickets = trades
     .map(t => t.ticket)
-    .filter((t): t is number => typeof t === 'number' && t > 0);
+    .filter((t): t is string => typeof t === 'string' && t.trim() !== '');
 
   // 2. Fetch all existing trades matching the incoming tickets in a single DB query
   const existingTrades = tickets.length > 0
@@ -49,7 +49,7 @@ export async function syncTradesFromEA(
   console.log(`[Sync] existingInDB=${existingTrades.length} tickets=${existingTrades.map(t => t.ticket).join(',')}`);
 
   // Map existing trades by ticket ID for O(1) lookup
-  const existingMap = new Map<number, typeof existingTrades[0]>();
+  const existingMap = new Map<string, typeof existingTrades[0]>();
   for (const t of existingTrades) {
     if (t.ticket !== null) {
       existingMap.set(t.ticket, t);
@@ -61,7 +61,7 @@ export async function syncTradesFromEA(
 
   for (const trade of trades) {
     // Skip trades without a valid ticket
-    if (!trade.ticket || trade.ticket <= 0) {
+    if (!trade.ticket || trade.ticket.trim() === '') {
       console.log(`[Sync] SKIP ticket=${trade.ticket} reason=invalid_ticket`);
       result.skipped++;
       continue;
@@ -287,7 +287,7 @@ export async function syncTradeAggregates(tradeId: string, prismaClient?: typeof
 export type TradeListRow = {
   id: string;
   accountId: string;
-  ticket: number | null;
+  ticket: string | null;
   symbol: string;
   direction: 'BUY' | 'SELL';
   openTime: string;

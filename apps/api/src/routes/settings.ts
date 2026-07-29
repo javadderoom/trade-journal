@@ -1,4 +1,4 @@
-import { Router, Response } from 'express';
+import { Router, Request, Response } from 'express';
 import { prisma } from '../services/tradeSync';
 import { authenticate, AuthRequest } from '../middleware/auth';
 import bcrypt from 'bcryptjs';

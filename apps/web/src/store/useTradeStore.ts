@@ -8,7 +8,7 @@ import { useAppStore } from './useAppStore';
 export const MOCK_TRADES: Trade[] = [
   {
     id: 'mock-1',
-    ticket: 12345678,
+    ticket: '12345678',
     symbol: 'XAUUSD',
     direction: 'BUY',
     openTime: '2026-06-15T10:30:00Z',
@@ -29,7 +29,7 @@ export const MOCK_TRADES: Trade[] = [
   },
   {
     id: 'mock-2',
-    ticket: 12345679,
+    ticket: '12345679',
     symbol: 'EURUSD',
     direction: 'SELL',
     openTime: '2026-06-14T14:15:00Z',
@@ -50,7 +50,7 @@ export const MOCK_TRADES: Trade[] = [
   },
   {
     id: 'mock-3',
-    ticket: 12345680,
+    ticket: '12345680',
     symbol: 'GBPUSD',
     direction: 'BUY',
     openTime: '2026-06-13T09:00:00Z',
@@ -71,7 +71,7 @@ export const MOCK_TRADES: Trade[] = [
   },
   {
     id: 'mock-4',
-    ticket: 12345681,
+    ticket: '12345681',
     symbol: 'BTCUSD',
     direction: 'SELL',
     openTime: '2026-06-15T16:45:00Z',
@@ -92,7 +92,7 @@ export const MOCK_TRADES: Trade[] = [
   },
   {
     id: 'mock-5',
-    ticket: 12345682,
+    ticket: '12345682',
     symbol: 'AUDUSD',
     direction: 'BUY',
     openTime: '2026-06-12T11:20:00Z',
@@ -113,7 +113,7 @@ export const MOCK_TRADES: Trade[] = [
   },
   {
     id: 'mock-6',
-    ticket: 12345683,
+    ticket: '12345683',
     symbol: 'USDCAD',
     direction: 'SELL',
     openTime: '2026-06-11T15:00:00Z',
@@ -134,7 +134,7 @@ export const MOCK_TRADES: Trade[] = [
   },
   {
     id: 'mock-7',
-    ticket: 12345684,
+    ticket: '12345684',
     symbol: 'XAUUSD',
     direction: 'SELL',
     openTime: '2026-06-10T08:45:00Z',
@@ -155,7 +155,7 @@ export const MOCK_TRADES: Trade[] = [
   },
   {
     id: 'mock-8',
-    ticket: 12345685,
+    ticket: '12345685',
     symbol: 'NZDUSD',
     direction: 'BUY',
     openTime: '2026-06-09T19:20:00Z',

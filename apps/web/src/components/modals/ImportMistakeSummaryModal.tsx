@@ -10,7 +10,7 @@ import './mistake-review-modal.scss';
 
 export interface ImportMistakeEntry {
   tradeId: string;
-  ticket: number | null;
+  ticket: string | null;
   symbol: string;
   suggestedMistakes: SuggestedMistake[];
 }
@@ -25,7 +25,7 @@ interface RuleGroup {
   ruleKey: string;
   label: string;
   totalCostUsd: number;
-  entries: Array<{ tradeId: string; ticket: number | null; symbol: string; costUsd: number }>;
+  entries: Array<{ tradeId: string; ticket: string | null; symbol: string; costUsd: number }>;
 }
 
 function groupByRule(summary: ImportMistakeEntry[]): RuleGroup[] {

@@ -2,13 +2,7 @@ import ccxt from 'ccxt';
 import { prisma, syncTradeAggregates } from './tradeSync';
 import { decrypt } from '../lib/encryption';
 
-function stringToHash(str: string): number {
-  let hash = 5381;
-  for (let i = 0; i < str.length; i++) {
-    hash = (hash * 33) ^ str.charCodeAt(i);
-  }
-  return Math.abs(hash) % 2147483647; // Positive signed 32-bit int
-}
+
 
 export interface SyncResult {
   created: number;
@@ -137,7 +131,7 @@ export async function syncExchangeTrades(
   }
 
   // 4. Batch query existing tickets to avoid duplicate insertion errors
-  const incomingTickets = ccxtTrades.map(t => stringToHash(t.id));
+  const incomingTickets = ccxtTrades.map(t => t.id);
   const existingTrades = await prisma.trade.findMany({
     where: {
       account_id: accountId,
@@ -150,7 +144,7 @@ export async function syncExchangeTrades(
 
   // 5. Process trades
   for (const trade of ccxtTrades) {
-    const ticket = stringToHash(trade.id);
+    const ticket = trade.id;
     if (existingTicketsSet.has(ticket)) {
       result.skipped++;
       continue;

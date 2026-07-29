@@ -79,7 +79,7 @@ function parseMT4CSV(csvData: string): ParsedTrade[] {
     if (!parsedSymbol || !direction) return [];
 
     return [{
-      ticket: parseInt(ticket?.trim() || '0', 10),
+      ticket: ticket?.trim() || '0',
       symbol: parsedSymbol,
       direction: direction as 'BUY' | 'SELL',
       openTime: time?.trim() || '',
@@ -111,7 +111,7 @@ function parseMT5CSV(csvData: string): ParsedTrade[] {
     if (!parsedSymbol || !direction) return [];
 
     return [{
-      ticket: parseInt(position?.trim() || '0', 10),
+      ticket: position?.trim() || '0',
       symbol: parsedSymbol,
       direction: direction as 'BUY' | 'SELL',
       openTime: openTime?.trim() || '',

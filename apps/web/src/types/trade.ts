@@ -1,7 +1,7 @@
 export interface Trade {
   id: string;
   accountId?: string;
-  ticket?: number | null;
+  ticket?: string | null;
   symbol: string;
   direction: 'BUY' | 'SELL';
   openTime: string;

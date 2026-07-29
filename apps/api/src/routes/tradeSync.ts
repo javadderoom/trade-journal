@@ -1299,8 +1299,8 @@ router.post('/import-mt4', authenticate, checkImportPermission, uploadMemory.sin
             const ticketIdx = mapping['ticket'];
             if (ticketIdx === undefined || ticketIdx >= cellTexts.length) continue;
             const ticketStr = cellTexts[ticketIdx];
-            const ticket = parseInt(ticketStr, 10);
-            if (isNaN(ticket)) continue; // Must be numeric ticket
+            const ticket = ticketStr.trim();
+            if (!ticket) continue; // Must have ticket
 
             const typeIdx = mapping['type'];
             if (typeIdx === undefined || typeIdx >= cellTexts.length) continue;
@@ -1433,7 +1433,7 @@ router.post('/import-mt4', authenticate, checkImportPermission, uploadMemory.sin
     const fileSource = htmlContent.toLowerCase().includes('metatrader 5') ? 'MT5_CSV' : 'MT4_HTM';
 
     // Batch dedup: fetch all existing tickets for this account in one query
-    const incomingTickets = parsedTrades.map(t => t.ticket).filter((t): t is number => t !== null);
+    const incomingTickets = parsedTrades.map(t => t.ticket).filter((t): t is string => t !== null);
     const existingTrades = await prisma.trade.findMany({
       where: {
         account_id: accountId,
@@ -1448,6 +1448,9 @@ router.post('/import-mt4', authenticate, checkImportPermission, uploadMemory.sin
       if (t.ticket !== null && existingTicketSet.has(t.ticket)) {
         skipped++;
         return false;
+      }
+      if (t.ticket !== null) {
+        existingTicketSet.add(t.ticket);
       }
       return true;
     });
@@ -1539,7 +1542,7 @@ router.post('/import-mt4', authenticate, checkImportPermission, uploadMemory.sin
     }
 
     // Run mistake detection on newly imported losing trades (batch)
-    const mistakeSummary: Array<{ tradeId: string; ticket: number | null; symbol: string; suggestedMistakes: any[] }> = [];
+    const mistakeSummary: Array<{ tradeId: string; ticket: string | null; symbol: string; suggestedMistakes: any[] }> = [];
     for (const lossTrade of newLosingTrades) {
       try {
         const suggestions = await detectMistakes(lossTrade as any, prisma);

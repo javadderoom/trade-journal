@@ -10,7 +10,7 @@ export type TradeDirection = 'BUY' | 'SELL';
 
 /** Core trade data — used by parsers, EA sync, and API routes */
 export interface TradeData {
-  ticket?: number;
+  ticket?: string;
   symbol: string;
   direction: TradeDirection;
   openTime: string;

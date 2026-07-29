@@ -109,7 +109,7 @@ model Trade {
   tags          String[]
   emotion       String?
   notes         String?
-  ticket        Int?         // MT4/MT5 deal ticket for deduplication
+  ticket        String?      // MT4/MT5 deal ticket for deduplication
   import_source ImportSource @default(MANUAL)
   screenshots   String[]     @default([])
   chart_data         Json?
