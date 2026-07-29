@@ -415,10 +415,9 @@ export default function TradesTable({
     return { count, winRate, totalProfit };
   }, [filteredTrades, ignoredTagsSet]);
 
-  // Paginated trades
+  // Paginated trades (Load More logic)
   const paginatedTrades = useMemo(() => {
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    return filteredTrades.slice(startIndex, startIndex + itemsPerPage);
+    return filteredTrades.slice(0, currentPage * itemsPerPage);
   }, [filteredTrades, currentPage]);
 
   const totalPages = Math.max(Math.ceil(filteredTrades.length / itemsPerPage), 1);
@@ -856,36 +855,22 @@ export default function TradesTable({
           allTags={allTags}
         />
 
-        {/* 6. Pagination */}
-        <div className="pagination-container">
-          <div>
+        {/* 6. Pagination / Load More */}
+        <div className="pagination-container" style={{ marginTop: '20px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '15px' }}>
+          <div style={{ color: '#9ca3af', fontSize: '14px' }}>
             {isEn
-              ? `Showing ${(currentPage - 1) * itemsPerPage + 1} to ${Math.min(currentPage * itemsPerPage, filteredTrades.length)} of ${filteredTrades.length} trades`
-              : `نمایش ${toPersianDigits((currentPage - 1) * itemsPerPage + 1)} تا ${toPersianDigits(Math.min(currentPage * itemsPerPage, filteredTrades.length))} از ${toPersianDigits(filteredTrades.length)} معامله`}
+              ? `Showing ${Math.min(currentPage * itemsPerPage, filteredTrades.length)} of ${filteredTrades.length} trades`
+              : `نمایش ${toPersianDigits(Math.min(currentPage * itemsPerPage, filteredTrades.length))} از ${toPersianDigits(filteredTrades.length)} معامله`}
           </div>
-          <div className="pagination-actions">
+          {currentPage * itemsPerPage < filteredTrades.length && (
             <button
-              className="nav-btn"
-              onClick={() => handlePageChange(currentPage - 1)}
-              disabled={currentPage === 1}
+              className="btn btn-outline"
+              onClick={() => setCurrentPage(p => p + 1)}
+              style={{ padding: '8px 24px', borderRadius: '20px', minWidth: '150px' }}
             >
-              <span className="material-symbols-outlined btn-icon">arrow_forward</span>
-              {isEn ? 'Previous' : 'قبلی'}
+              {isEn ? 'Load More' : 'بیشتر'}
             </button>
-            <span className="page-indicator">
-              {isEn
-                ? `Page ${currentPage} of ${totalPages}`
-                : `صفحه ${toPersianDigits(currentPage)} از ${toPersianDigits(totalPages)}`}
-            </span>
-            <button
-              className="nav-btn"
-              onClick={() => handlePageChange(currentPage + 1)}
-              disabled={currentPage === totalPages}
-            >
-              {isEn ? 'Next' : 'بعدی'}
-              <span className="material-symbols-outlined btn-icon">arrow_back</span>
-            </button>
-          </div>
+          )}
         </div>
       </div>
 
