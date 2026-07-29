@@ -95,7 +95,7 @@ $maxw: 1200px;
 
 // ─── Navigation ────────────────────────────────────────────────────────────────
 .landing-nav {
-  position: fixed;
+  position: sticky;
   top: 0;
   inset-inline: 0;
   z-index: 100;

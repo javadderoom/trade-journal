@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
+import { api } from '../../lib/api';
 import './AnnouncementBanner.scss';
 
 interface BannerConfig {
@@ -22,9 +23,9 @@ export default function AnnouncementBanner() {
     // Check if dismissed
     const dismissedStr = localStorage.getItem('announcement_banner_dismissed');
     
-    fetch('/api/settings/announcement-banner')
-      .then(res => res.json())
-      .then(data => {
+    api.get('/api/settings/announcement-banner')
+      .then(res => {
+        const data = res.data;
         setConfig(data);
         // If data changes or isn't dismissed, we show it
         const bannerKey = data.textFa || data.textEn;

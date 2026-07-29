@@ -20,14 +20,22 @@
   font-weight: 500;
   z-index: 1000;
   
-  &.ltr {
-    direction: ltr;
-    font-family: inherit;
-  }
-  
   &.rtl {
     direction: rtl;
     font-family: inherit;
+    
+    .banner-close {
+      left: 12px;
+    }
+  }
+
+  &.ltr {
+    direction: ltr;
+    font-family: inherit;
+    
+    .banner-close {
+      right: 12px;
+    }
   }
 
   .banner-content {
@@ -55,22 +63,15 @@
     justify-content: center;
     border-radius: 4px;
     transition: all 0.2s ease;
-    
-    .rtl & {
-      left: 12px;
-    }
-    
-    .ltr & {
-      right: 12px;
-    }
 
     &:hover {
       color: #ffffff;
       background: rgba(255, 255, 255, 0.1);
     }
 
-    span {
-      font-size: 16px;
+    svg {
+      width: 18px;
+      height: 18px;
     }
   }
 }
