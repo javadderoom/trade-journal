@@ -595,6 +595,12 @@ model BlogPost {
   seo_title        String?
   seo_description  String?
   
+  // AI Automation Fields
+  featured_image_prompt String?      @db.Text
+  reading_time          Int?
+  seo_score             Int?
+  quality_score         Int?
+  
   author_id        String
   author           User         @relation(fields: [author_id], references: [id])
   

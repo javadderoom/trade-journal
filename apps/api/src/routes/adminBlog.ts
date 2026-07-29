@@ -1,6 +1,28 @@
 import { Router, Response } from 'express';
 import { prisma } from '../services/tradeSync';
 import { authenticate, requireAdmin, AuthRequest } from '../middleware/auth';
+import multer from 'multer';
+import path from 'path';
+import fs from 'fs';
+
+// ─── Cover Image Upload Setup ─────────────────────────────────────────────
+const coverDir = path.join(__dirname, '../../uploads/blogs');
+if (!fs.existsSync(coverDir)) {
+  fs.mkdirSync(coverDir, { recursive: true });
+}
+
+const coverUpload = multer({
+  storage: multer.diskStorage({
+    destination: (req, file, cb) => {
+      cb(null, coverDir);
+    },
+    filename: (req, file, cb) => {
+      const ext = path.extname(file.originalname);
+      cb(null, `cover_${Date.now()}${ext}`);
+    },
+  }),
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
+});
 
 const router = Router();
 
@@ -112,17 +134,28 @@ router.get('/posts/:id', async (req: AuthRequest, res: Response) => {
   }
 });
 
+router.post('/upload-image', coverUpload.single('image'), async (req: AuthRequest, res: Response) => {
+  try {
+    if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
+    const imageUrl = `/uploads/blogs/${req.file.filename}`;
+    res.json({ url: imageUrl });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to upload image' });
+  }
+});
+
 router.post('/posts', async (req: AuthRequest, res: Response) => {
   try {
     const { 
       title, slug, content, excerpt, cover_image, status, 
-      seo_title, seo_description, category_id, tag_ids, locale = 'fa', translation_id
+      seo_title, seo_description, category_id, tag_ids, locale = 'fa', translation_id,
+      featured_image_prompt
     } = req.body;
 
     const post = await prisma.blogPost.create({
       data: {
         title, slug, content, excerpt, cover_image, status, locale,
-        seo_title, seo_description, translation_id,
+        seo_title, seo_description, translation_id, featured_image_prompt,
         author_id: req.user!.userId as string,
         category_id,
         published_at: status === 'PUBLISHED' ? new Date() : null,
@@ -141,7 +174,8 @@ router.put('/posts/:id', async (req: AuthRequest, res: Response) => {
   try {
     const { 
       title, slug, content, excerpt, cover_image, status, 
-      seo_title, seo_description, category_id, tag_ids, locale, translation_id
+      seo_title, seo_description, category_id, tag_ids, locale, translation_id,
+      featured_image_prompt
     } = req.body;
 
     const existing = await prisma.blogPost.findUnique({ where: { id: req.params.id as string }});
@@ -153,7 +187,7 @@ router.put('/posts/:id', async (req: AuthRequest, res: Response) => {
       where: { id: req.params.id as string },
       data: {
         title, slug, content, excerpt, cover_image, status, locale,
-        seo_title, seo_description, translation_id,
+        seo_title, seo_description, translation_id, featured_image_prompt,
         category_id,
         published_at,
         tags: tag_ids ? {

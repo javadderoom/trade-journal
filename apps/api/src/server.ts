@@ -31,7 +31,9 @@ import adminSupportRouter from './routes/adminSupport';
 import adminDiagnosisRouter from './routes/adminDiagnosis';
 import marketDataRouter from './routes/marketData';
 import backtestRouter from './routes/backtest';
+import aiAutomationRouter from './routes/aiAutomation';
 import { syncExchangeTrades } from './services/ccxtSync';
+import { runDailyAIBlogPipeline } from './services/aiDiscoveryService';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -98,6 +100,7 @@ app.use('/api/support', supportRouter);
 app.use('/api/crypto', cryptoSyncRouter);
 app.use('/api/market-data', marketDataRouter);
 app.use('/api/backtest', backtestRouter);
+app.use('/api/internal/ai', aiAutomationRouter);
 
 // Health check
 app.get('/api/health', (_req, res) => {
@@ -130,6 +133,11 @@ cron.schedule('0 3 * * *', async () => {
   } catch (err) {
     console.error('[Cron] Cleanup job failed:', err);
   }
+});
+
+// Cron job: Daily AI Blog Automation Pipeline at 09:00 AM server time
+cron.schedule('0 9 * * *', () => {
+  runDailyAIBlogPipeline();
 });
 
 // Cron job: Sync exchange connections based on subscription plan rates

@@ -24,6 +24,7 @@ export default function BlogEditor({ initialData, locale, onSuccess, onCancel }:
   const [tagIds, setTagIds] = useState<string[]>(initialData?.tags?.map((t:any) => t.id) || []);
   const [seoTitle, setSeoTitle] = useState(initialData?.seo_title || '');
   const [seoDescription, setSeoDescription] = useState(initialData?.seo_description || '');
+  const [featuredImagePrompt, setFeaturedImagePrompt] = useState(initialData?.featured_image_prompt || '');
 
   const [categories, setCategories] = useState<any[]>([]);
   const [tagsList, setTagsList] = useState<any[]>([]);
@@ -60,6 +61,7 @@ export default function BlogEditor({ initialData, locale, onSuccess, onCancel }:
       content: editor?.getHTML(),
       seo_title: seoTitle,
       seo_description: seoDescription,
+      featured_image_prompt: featuredImagePrompt,
       locale,
     };
 
@@ -81,6 +83,27 @@ export default function BlogEditor({ initialData, locale, onSuccess, onCancel }:
 
   const handleTagToggle = (id: string) => {
     setTagIds(prev => prev.includes(id) ? prev.filter(t => t !== id) : [...prev, id]);
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append('image', file);
+    
+    setLoading(true);
+    try {
+      const res = await api.post('/api/admin/blog/upload-image', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      setCoverImage(res.data.url);
+      notify.success('تصویر با موفقیت آپلود شد');
+    } catch (err) {
+      notify.error('خطا در آپلود تصویر');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -230,8 +253,31 @@ export default function BlogEditor({ initialData, locale, onSuccess, onCancel }:
 
       <div className="form-group">
         <label>لینک تصویر کاور (Cover Image)</label>
-        <input type="text" className="input-field" value={coverImage} onChange={(e) => setCoverImage(e.target.value)} style={{ direction: 'ltr', textAlign: 'left' }} />
+        <div style={{ display: 'flex', gap: '10px' }}>
+          <input type="text" className="input-field" value={coverImage} onChange={(e) => setCoverImage(e.target.value)} style={{ direction: 'ltr', textAlign: 'left', flex: 1 }} />
+          <label className="btn-secondary" style={{ display: 'flex', alignItems: 'center', cursor: 'pointer', padding: '0 20px', whiteSpace: 'nowrap' }}>
+            <span className="material-symbols-outlined" style={{ marginRight: '5px' }}>upload</span>
+            آپلود
+            <input type="file" accept="image/*" style={{ display: 'none' }} onChange={handleImageUpload} disabled={loading} />
+          </label>
+        </div>
       </div>
+
+      {featuredImagePrompt && (
+        <div className="form-group" style={{ background: 'rgba(59, 130, 246, 0.1)', padding: '15px', borderRadius: '8px', border: '1px solid rgba(59, 130, 246, 0.3)' }}>
+          <label style={{ color: '#60a5fa', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>smart_toy</span>
+            پیشنهاد هوش مصنوعی برای تولید تصویر کاور (کپی کنید)
+          </label>
+          <textarea 
+            className="input-field" 
+            rows={3} 
+            value={featuredImagePrompt} 
+            onChange={(e) => setFeaturedImagePrompt(e.target.value)} 
+            style={{ direction: 'ltr', textAlign: 'left', background: 'rgba(0,0,0,0.2)', border: '1px solid #333', fontSize: '14px', marginTop: '10px' }} 
+          />
+        </div>
+      )}
 
       <hr style={{ margin: '30px 0', borderColor: '#333' }} />
       
