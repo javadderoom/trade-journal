@@ -19,6 +19,7 @@ export default function robots(): MetadataRoute.Robots {
         "/en/contact",
         "/fa/topic/",
         "/en/topic/",
+        "/blog/",
       ],
       disallow: [
         "/dashboard/",
