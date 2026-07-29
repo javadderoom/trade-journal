@@ -466,4 +466,30 @@ router.put('/settings/crypto-details', async (req: AuthRequest, res: Response) =
   }
 });
 
+/**
+ * PUT /api/admin/settings/announcement-banner
+ * Update the global announcement banner configuration
+ */
+router.put('/settings/announcement-banner', async (req: AuthRequest, res: Response) => {
+  try {
+    const { isActive, textFa, textEn, link } = req.body;
+
+    await prisma.systemSetting.upsert({
+      where: { key: 'ANNOUNCEMENT_BANNER' },
+      create: {
+        key: 'ANNOUNCEMENT_BANNER',
+        value: { isActive, textFa, textEn, link },
+      },
+      update: {
+        value: { isActive, textFa, textEn, link },
+      },
+    });
+
+    return res.status(200).json({ message: 'تنظیمات بنر اطلاع‌رسانی با موفقیت بروزرسانی شد' });
+  } catch (err: any) {
+    console.error('Admin update banner error:', err);
+    return res.status(500).json({ error: 'خطا در ذخیره‌سازی تنظیمات بنر' });
+  }
+});
+
 export default router;

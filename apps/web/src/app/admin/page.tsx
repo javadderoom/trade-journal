@@ -10,7 +10,8 @@ import { notify } from '../../lib/notify';
 import LoadingButton from '../../components/ui/LoadingButton';
 import './admin.scss';
 
-type AdminTab = 'stats' | 'users' | 'receipts' | 'coupons' | 'pricing' | 'contact' | 'crypto' | 'diagnosis';
+type AdminTab = 'stats' | 'users' | 'receipts' | 'coupons' | 'pricing' | 'contact' | 'crypto' | 'diagnosis' | 'banner';
+
 
 interface AdminStats {
   totalUsers: number;
@@ -111,6 +112,14 @@ export default function AdminPage() {
   });
 
   const [updatingCrypto, setUpdatingCrypto] = useState(false);
+
+  // Banner state
+  const [bannerConfig, setBannerConfig] = useState({
+    isActive: false,
+    textFa: '',
+    textEn: '',
+    link: ''
+  });
 
   // Diagnosis state
   const [diagnosisLogs, setDiagnosisLogs] = useState<any[]>([]);
@@ -233,6 +242,22 @@ export default function AdminPage() {
     }
   }, []);
 
+  const fetchBannerSetting = useCallback(async () => {
+    try {
+      const res = await api.get('/api/settings/announcement-banner');
+      if (res.data) {
+        setBannerConfig({
+          isActive: res.data.isActive || false,
+          textFa: res.data.textFa || '',
+          textEn: res.data.textEn || '',
+          link: res.data.link || ''
+        });
+      }
+    } catch (err) {
+      console.error('Failed to fetch banner config:', err);
+    }
+  }, []);
+
   // Diagnosis fetch
   const fetchDiagnosisLogs = useCallback(async () => {
     try {
@@ -295,11 +320,14 @@ export default function AdminPage() {
     if (activeTab === 'crypto') {
       fetchCryptoSetting();
     }
+    if (activeTab === 'banner') {
+      fetchBannerSetting();
+    }
     if (activeTab === 'diagnosis') {
       fetchDiagnosisLogs();
       fetchDiagnosisStats();
     }
-  }, [activeTab, user, fetchStats, fetchUsers, fetchReceipts, fetchCoupons, fetchPricesSetting, fetchExchangeRateSetting, fetchContactSetting, fetchCardSetting, fetchCryptoSetting, fetchDiagnosisLogs, fetchDiagnosisStats]);
+  }, [activeTab, user, fetchStats, fetchUsers, fetchReceipts, fetchCoupons, fetchPricesSetting, fetchExchangeRateSetting, fetchContactSetting, fetchCardSetting, fetchCryptoSetting, fetchBannerSetting, fetchDiagnosisLogs, fetchDiagnosisStats]);
 
   // Auto-refresh for diagnosis
   useEffect(() => {
@@ -436,6 +464,15 @@ export default function AdminPage() {
     }
   };
 
+  const handleUpdateBanner = async () => {
+    try {
+      await api.put('/api/admin/settings/announcement-banner', bannerConfig);
+      notify.success('تنظیمات بنر اطلاع‌رسانی با موفقیت بروزرسانی شد');
+    } catch (err: any) {
+      notify.error(err.response?.data?.error || 'خطا در ذخیره‌سازی تنظیمات بنر');
+    }
+  };
+
   const handleManualPlanOverride = async () => {
     if (!selectedUserForPlan) return;
     const ok = await notify.confirm({
@@ -520,6 +557,13 @@ export default function AdminPage() {
         >
           <span className="material-symbols-outlined">contact_support</span>
           <span>اطلاعات تماس</span>
+        </button>
+        <button
+          className={`admin-tab-btn ${activeTab === 'banner' ? 'active' : ''}`}
+          onClick={() => setActiveTab('banner')}
+        >
+          <span className="material-symbols-outlined">campaign</span>
+          <span>بنر اطلاع‌رسانی</span>
         </button>
         <button
           className={`admin-tab-btn ${activeTab === 'crypto' ? 'active' : ''}`}
@@ -1244,6 +1288,65 @@ export default function AdminPage() {
               </table>
             </div>
           )}
+        </div>
+      )}
+
+      {/* Banner Tab */}
+      {activeTab === 'banner' && (
+        <div className="admin-panel-card">
+          <div className="card-header-actions">
+            <h3>بنر اطلاع‌رسانی سراسری (لندینگ)</h3>
+            <LoadingButton className="admin-btn" onClick={handleUpdateBanner} isLoading={loading}>
+              ذخیره تنظیمات
+            </LoadingButton>
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', marginTop: '10px' }}>
+            <label style={{ display: 'flex', alignItems: 'center', gap: '10px', color: '#e2e2eb', cursor: 'pointer' }}>
+              <input
+                type="checkbox"
+                checked={bannerConfig.isActive}
+                onChange={(e) => setBannerConfig({ ...bannerConfig, isActive: e.target.checked })}
+              />
+              فعال‌سازی بنر اطلاع‌رسانی
+            </label>
+
+            <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+              <label style={{ fontSize: '0.8rem', color: '#a0aec0' }}>متن فارسی (نمایش در نسخه فارسی سایت)</label>
+              <input
+                type="text"
+                value={bannerConfig.textFa}
+                onChange={(e) => setBannerConfig({ ...bannerConfig, textFa: e.target.value })}
+                placeholder="مثال: کد تخفیف ویژه: BETA50"
+                style={{ background: '#0b0d19', border: '1px solid rgba(255,255,255,0.1)', padding: '10px', color: '#fff', borderRadius: '6px' }}
+                dir="rtl"
+              />
+            </div>
+
+            <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+              <label style={{ fontSize: '0.8rem', color: '#a0aec0' }}>متن انگلیسی (نمایش در نسخه انگلیسی سایت)</label>
+              <input
+                type="text"
+                value={bannerConfig.textEn}
+                onChange={(e) => setBannerConfig({ ...bannerConfig, textEn: e.target.value })}
+                placeholder="e.g. Special Discount Code: BETA50"
+                style={{ background: '#0b0d19', border: '1px solid rgba(255,255,255,0.1)', padding: '10px', color: '#fff', borderRadius: '6px' }}
+                dir="ltr"
+              />
+            </div>
+
+            <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+              <label style={{ fontSize: '0.8rem', color: '#a0aec0' }}>لینک (اختیاری - در صورت کلیک روی بنر)</label>
+              <input
+                type="text"
+                value={bannerConfig.link}
+                onChange={(e) => setBannerConfig({ ...bannerConfig, link: e.target.value })}
+                placeholder="https://example.com/pricing یا /pricing"
+                style={{ background: '#0b0d19', border: '1px solid rgba(255,255,255,0.1)', padding: '10px', color: '#fff', borderRadius: '6px' }}
+                dir="ltr"
+              />
+            </div>
+          </div>
         </div>
       )}
 

@@ -68,6 +68,22 @@ const DEFAULT_CRYPTO_DETAILS = {
 };
 
 /**
+ * GET /api/settings/announcement-banner
+ * Public route to fetch the announcement banner config
+ */
+router.get('/announcement-banner', async (req: Request, res: Response) => {
+  try {
+    const setting = await prisma.systemSetting.findUnique({
+      where: { key: 'ANNOUNCEMENT_BANNER' }
+    });
+    return res.json(setting ? setting.value : { isActive: false });
+  } catch (err) {
+    console.error('Error fetching announcement banner config:', err);
+    return res.status(500).json({ error: 'Failed to fetch config' });
+  }
+});
+
+/**
  * GET /api/settings/all
  * Returns profile, accounts, subscription, prices, card-details, crypto-details, and sessions
  * in a single round-trip using parallel queries.

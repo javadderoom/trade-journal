@@ -11,6 +11,7 @@ import { useTranslation } from '../../store/useAppStore';
 import Toaster from '../ui/Toaster';
 import PageLoader from '../ui/PageLoader';
 import { Agentation } from 'agentation';
+import AnnouncementBanner from '../ui/AnnouncementBanner';
 
 const swrConfigValue = {
   fetcher,
@@ -206,6 +207,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     return (
       <SWRConfig value={swrConfigValue}>
         <div className={fontClass}>
+          <AnnouncementBanner />
           <Toaster />
           {children}
           {process.env.NODE_ENV === 'development' && <Agentation />}
