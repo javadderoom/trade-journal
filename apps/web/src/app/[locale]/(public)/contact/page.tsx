@@ -2,9 +2,9 @@
 
 import React, { useEffect, useState, use } from 'react';
 import Link from 'next/link';
-import { api } from '../../../lib/api';
-import { toPersianDigits } from '../../../utils/farsi';
-import '../../contact/contact.scss';
+import { api } from '../../../../lib/api';
+import { toPersianDigits } from '../../../../utils/farsi';
+import '../../../contact/contact.scss';
 
 interface ContactInfo {
   email?: string;
@@ -50,10 +50,6 @@ export default function ContactPage({ params }: PageProps) {
       <div className="bg-glow bg-glow-2"></div>
 
       <header className="contact-header">
-        <Link href={isEn ? '/en' : '/fa'} className="back-link">
-          <span className="material-symbols-outlined">{isEn ? 'arrow_back' : 'arrow_forward'}</span>
-          <span>{isEn ? 'Back to Home' : 'بازگشت به خانه'}</span>
-        </Link>
         <h1>{isEn ? 'Contact Us' : 'ارتباط با ما'}</h1>
         <p>
           {isEn
@@ -146,12 +142,6 @@ export default function ContactPage({ params }: PageProps) {
         )}
       </main>
 
-      <footer className="contact-footer">
-        <p>
-          © {isEn ? new Date().getFullYear() : toPersianDigits(new Date().getFullYear())}{' '}
-          {isEn ? 'TradeKav. All rights reserved.' : 'معامله‌یار. تمامی حقوق محفوظ است.'}
-        </p>
-      </footer>
     </div>
   );
 }

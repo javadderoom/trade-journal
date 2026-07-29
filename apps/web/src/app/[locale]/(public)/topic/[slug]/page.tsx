@@ -2,7 +2,7 @@ import React from 'react';
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { TOPICS_DATA } from '../../../../constants/topicsData';
+import { TOPICS_DATA } from '../../../../../constants/topicsData';
 import './topic.scss';
 
 interface TopicPageProps {

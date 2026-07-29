@@ -3,11 +3,11 @@
 import { useEffect, useState, useMemo, use } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { useAuthStore } from '../../lib/auth';
-import { toPersianDigits } from '../../utils/farsi';
-import { usePrices } from '../../hooks/usePrices';
-import { useCryptoDetails } from '../../hooks/useCryptoDetails';
-import '../landing.scss';
+import { useAuthStore } from '../../../lib/auth';
+import { toPersianDigits } from '../../../utils/farsi';
+import { usePrices } from '../../../hooks/usePrices';
+import { useCryptoDetails } from '../../../hooks/useCryptoDetails';
+import '../../landing.scss';
 
 type CellType = 'check' | 'cross' | 'partial' | string;
 
@@ -327,42 +327,7 @@ export default function LandingPage({ params }: PageProps) {
 
   return (
     <div className={`landing ${isEn ? 'ltr' : 'rtl'}`} dir={isEn ? 'ltr' : 'rtl'}>
-      {/* ─── Nav ─── */}
-      <nav className={`landing-nav ${navScrolled ? 'scrolled' : ''}`}>
-        <a className="landing-logo" href="#top" aria-label="TradeKav" onClick={(e) => handleScroll(e, '#top')}>
-          <img src="/logo.png" alt="TradeKav" className="logo-img-landing" style={{ height: '34px', width: 'auto', objectFit: 'contain' }} />
-          <span className="logo-text">{isEn ? 'TradeKav' : 'تریدکاو'}</span>
-        </a>
-        <div className="landing-nav-links">
-          {copy.navLinks.map((l) => (
-            <a key={l.href} href={l.href} onClick={(e) => handleScroll(e, l.href)}>{l.label}</a>
-          ))}
-        </div>
-        <div className="landing-nav-cta">
-          <button className="lang-switcher" onClick={() => router.push(isEn ? '/fa' : '/en')} style={{ marginInlineEnd: '16px', background: 'transparent', border: '1px solid #1e2535', color: '#f0f2f5', padding: '6px 12px', borderRadius: '8px', cursor: 'pointer', fontSize: '0.85rem' }}>
-            {isEn ? 'فارسی' : 'English'}
-          </button>
-          <button className="btn-ghost" onClick={goLogin}>{copy.signinLabel}</button>
-          <button className="btn-primary" onClick={goRegister}>{copy.registerLabel}</button>
-        </div>
-        <button
-          className={`landing-nav-burger ${mobileMenuOpen ? 'open' : ''}`}
-          onClick={() => setMobileMenuOpen((v) => !v)}
-          aria-label={copy.mobMenu}
-        >
-          <span className="material-symbols-outlined">{mobileMenuOpen ? 'close' : 'menu'}</span>
-        </button>
-        {mobileMenuOpen && (
-          <div className="landing-mobile-menu">
-            {copy.navLinks.map((l) => (
-              <a key={l.href} href={l.href} onClick={(e) => handleScroll(e, l.href)}>{l.label}</a>
-            ))}
-            <button className="btn-primary full" onClick={() => { setMobileMenuOpen(false); goRegister(); }}>
-              {copy.registerLabel}
-            </button>
-          </div>
-        )}
-      </nav>
+
 
       {/* ─── Hero ─── */}
       <header className="landing-hero" id="top">
@@ -565,69 +530,6 @@ export default function LandingPage({ params }: PageProps) {
         </div>
       </section>
 
-      {/* ─── Final CTA ─── */}
-      <section className="landing-final-cta">
-        <div className="final-glow" aria-hidden="true" />
-        <h2>{copy.finalCtaTitle}</h2>
-        <p>{copy.finalCtaSub}</p>
-        <button className="btn-primary lg glow" onClick={goRegister}>
-          {copy.finalCtaBtn}
-          <span className="material-symbols-outlined">{isEn ? 'arrow_forward' : 'arrow_back'}</span>
-        </button>
-      </section>
-
-      {/* ─── Footer ─── */}
-      <footer className="landing-footer">
-        <div className="footer-inner">
-          <div className="footer-brand-col">
-            <div className="footer-brand">
-              <img src="/logo.png" alt="TradeKav" className="logo-img-landing" style={{ height: '34px', width: 'auto', objectFit: 'contain' }} />
-              <span className="logo-text">{isEn ? 'TradeKav' : 'تریدکاو'}</span>
-            </div>
-            <p className="footer-tag">{copy.footerDesc}</p>
-            {/* e-namad logo shown only in Persian */}
-            {!isEn && (
-              <div className="footer-namad" style={{ marginTop: '16px' }}>
-                <Link href="/namad">
-                  <img
-                    referrerPolicy="origin"
-                    src="https://trustseal.enamad.ir/logo.aspx?id=750622&Code=ijlypx97VzY8LxxCpiKO81gBE1Ju0VRE"
-                    alt="نماد اعتماد الکترونیکی تریدکاو"
-                    style={{ cursor: 'pointer', width: '60px', height: '60px', backgroundColor: '#ffffff', padding: '6px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.08)' }}
-                  />
-                </Link>
-              </div>
-            )}
-          </div>
-          <div className="footer-links">
-            <div>
-              <h4>{copy.footerProduct}</h4>
-              <a href="#features" onClick={(e) => handleScroll(e, '#features')}>{isEn ? 'Features' : 'امکانات'}</a>
-              <a href="#pricing" onClick={(e) => handleScroll(e, '#pricing')}>{isEn ? 'Pricing' : 'قیمت'}</a>
-              <a href="#how" onClick={(e) => handleScroll(e, '#how')}>{isEn ? 'How it works' : 'روش کار'}</a>
-            </div>
-            <div>
-              <h4>{copy.footerAccount}</h4>
-              <a href="/register">{isEn ? 'Sign Up' : 'ثبت‌نام'}</a>
-              <a href="/login">{isEn ? 'Sign In' : 'ورود'}</a>
-            </div>
-            <div>
-              <h4>{copy.footerSupport}</h4>
-              <Link href={isEn ? '/en/contact' : '/fa/contact'}>{isEn ? 'Contact Support' : 'ارتباط با ما'}</Link>
-              <Link href="/help/ea-setup">{isEn ? 'Expert Advisor Guide' : 'راهنمای اکسپرت'}</Link>
-            </div>
-          </div>
-        </div>
-        <div className="footer-bottom">
-          <span>© {isEn ? new Date().getFullYear() : toPersianDigits(1405)} {copy.footerCopyright}</span>
-        </div>
-      </footer>
-
-      {/* ─── Floating mobile CTA ─── */}
-      <button className="landing-fab" onClick={goRegister} aria-label={copy.startFree}>
-        <span className="material-symbols-outlined">rocket_launch</span>
-        {copy.startFree}
-      </button>
     </div>
   );
 }
