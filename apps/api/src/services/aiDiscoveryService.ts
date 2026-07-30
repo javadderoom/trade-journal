@@ -1,5 +1,6 @@
 import { getGeminiModel } from '../lib/gemini';
 import { prisma } from './tradeSync';
+import { aiLogger } from './aiLogger';
 
 export async function generateTrendingTopic(): Promise<string> {
   // Fetch recent posts to avoid duplication
@@ -28,19 +29,27 @@ Return ONLY a raw JSON object (without markdown wrappers like \`\`\`json) with t
 }
 `;
 
-  const model = getGeminiModel('gemini-3.6-flash');
+  const model = getGeminiModel('gemini-3.5-flash');
   const result = await model.generateContent(prompt);
   let text = (await result.response).text();
   text = text.replace(/```json/g, '').replace(/```/g, '').trim();
   
   const parsed = JSON.parse(text);
-  console.log(`[AI Discovery] Selected Topic: ${parsed.topic} (Reason: ${parsed.reason})`);
+  aiLogger.log(`[AI Discovery] Selected Topic: ${parsed.topic} (Reason: ${parsed.reason})`);
   
   return parsed.topic;
 }
 
 export async function runDailyAIBlogPipeline() {
-  console.log('[Cron] Starting Daily AI Blog Pipeline...');
+  if (aiLogger.isRunning) {
+    aiLogger.log('[Cron] AI Pipeline is already running, skipped.');
+    return;
+  }
+  
+  aiLogger.clear();
+  aiLogger.isRunning = true;
+  aiLogger.log('[Cron] Starting Daily AI Blog Pipeline...');
+  
   try {
     // 1. Get an author ID (admin user)
     const admin = await prisma.user.findFirst({
@@ -52,21 +61,24 @@ export async function runDailyAIBlogPipeline() {
     if (!authorId) throw new Error('No users found in database to act as author.');
 
     // 2. Discover Topic
-    console.log('[Cron] AI Discovery Phase...');
+    aiLogger.log('[Cron] AI Discovery Phase...');
     const topic = await generateTrendingTopic();
 
     // 3. Generate English Article (with Review Loop)
-    console.log(`[Cron] AI Generation Phase for topic: ${topic}...`);
+    aiLogger.log(`[Cron] AI Generation Phase for topic: ${topic}...`);
     const { generateBlogArticle, translateBlogArticle } = require('./aiBlogService');
     const post = await generateBlogArticle(topic, authorId);
-    console.log(`[Cron] English Pipeline Success! Draft saved with ID: ${post.id}`);
+    aiLogger.log(`[Cron] English Pipeline Success! Draft saved with ID: ${post.id}`);
 
     // 4. Translate to Farsi
-    console.log(`[Cron] AI Translation Phase...`);
+    aiLogger.log(`[Cron] AI Translation Phase...`);
     const farsiPost = await translateBlogArticle(post.id);
-    console.log(`[Cron] Farsi Pipeline Success! Draft saved with ID: ${farsiPost.id}`);
+    aiLogger.log(`[Cron] Farsi Pipeline Success! Draft saved with ID: ${farsiPost.id}`);
 
   } catch (error) {
-    console.error('[Cron] Daily AI Blog Pipeline Failed:', error);
+    aiLogger.log(`[Cron] Daily AI Blog Pipeline Failed: ${error}`);
+  } finally {
+    aiLogger.log('[Cron] Pipeline Finished.');
+    aiLogger.isRunning = false;
   }
 }

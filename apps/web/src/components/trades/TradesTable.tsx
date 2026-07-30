@@ -856,22 +856,26 @@ export default function TradesTable({
         />
 
         {/* 6. Pagination / Load More */}
-        <div className="pagination-container" style={{ marginTop: '20px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '15px' }}>
+        <div className="pagination-container" style={{ display: 'none' }}>
           <div style={{ color: '#9ca3af', fontSize: '14px' }}>
             {isEn
               ? `Showing ${Math.min(currentPage * itemsPerPage, filteredTrades.length)} of ${filteredTrades.length} trades`
               : `نمایش ${toPersianDigits(Math.min(currentPage * itemsPerPage, filteredTrades.length))} از ${toPersianDigits(filteredTrades.length)} معامله`}
           </div>
-          {currentPage * itemsPerPage < filteredTrades.length && (
+        </div>
+
+        {/* Load More Button for Desktop */}
+        {currentPage * itemsPerPage < filteredTrades.length && (
+          <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px', marginBottom: '20px' }}>
             <button
               className="btn btn-outline"
               onClick={() => setCurrentPage(p => p + 1)}
-              style={{ padding: '8px 24px', borderRadius: '20px', minWidth: '150px' }}
+              style={{ padding: '8px 32px', borderRadius: '24px', minWidth: '180px', fontWeight: 'bold' }}
             >
-              {isEn ? 'Load More' : 'بیشتر'}
+              {isEn ? 'Load More' : 'نمایش بیشتر'}
             </button>
-          )}
-        </div>
+          </div>
+        )}
       </div>
 
       {/* 7. Slide-out Detail Panel Drawer */}

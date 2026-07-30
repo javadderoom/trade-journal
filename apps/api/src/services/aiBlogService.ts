@@ -1,5 +1,6 @@
 import { getGeminiModel } from '../lib/gemini';
 import { prisma } from './tradeSync'; // reusing prisma instance
+import { aiLogger } from './aiLogger';
 
 // Phase 2: SEO Review Agent
 async function reviewArticle(parsedArticle: any, topic: string) {
@@ -55,7 +56,7 @@ export async function generateBlogArticle(topic: string, authorId: string) {
 
   while (attempts < MAX_ATTEMPTS) {
     attempts++;
-    console.log(`[AI Blog] Generation attempt ${attempts}/${MAX_ATTEMPTS} for topic: ${topic}`);
+    aiLogger.log(`[AI Blog] Generation attempt ${attempts}/${MAX_ATTEMPTS} for topic: ${topic}`);
 
     const prompt = `
 You are an expert trading blogger and SEO specialist for "TradeKav" (a trading journal platform).
@@ -90,23 +91,23 @@ Return ONLY a raw JSON object (without any markdown formatting like \`\`\`json) 
       currentDraft = JSON.parse(text);
 
       // Phase 2: Critic Review
-      console.log(`[AI Blog] Reviewing draft...`);
+      aiLogger.log(`[AI Blog] Reviewing draft...`);
       const review = await reviewArticle(currentDraft, topic);
       
-      console.log(`[AI Blog] Review Results - SEO: ${review.seo_score}, Quality: ${review.quality_score}`);
+      aiLogger.log(`[AI Blog] Review Results - SEO: ${review.seo_score}, Quality: ${review.quality_score}`);
       
       if (review.approved || attempts >= MAX_ATTEMPTS) {
         // Add the final scores to the draft
         currentDraft.seo_score = review.seo_score;
         currentDraft.quality_score = review.quality_score;
-        console.log(`[AI Blog] Draft approved!`);
+        aiLogger.log(`[AI Blog] Draft approved!`);
         break; // Exit the loop
       } else {
         feedback = review.feedback;
-        console.log(`[AI Blog] Draft rejected. Feedback: ${feedback}`);
+        aiLogger.log(`[AI Blog] Draft rejected. Feedback: ${feedback}`);
       }
     } catch (error) {
-      console.error(`[AI Blog] Attempt ${attempts} failed:`, error);
+      aiLogger.log(`[AI Blog] Attempt ${attempts} failed: ${error}`);
       if (attempts >= MAX_ATTEMPTS) throw new Error('AI Generation failed after max attempts');
     }
   }
@@ -158,7 +159,7 @@ export async function translateBlogArticle(originalPostId: string) {
     throw new Error('Original post not found or is not in English.');
   }
 
-  console.log(`[AI Blog] Translating article ${original.title} to Farsi...`);
+  aiLogger.log(`[AI Blog] Translating article ${original.title} to Farsi...`);
 
   const prompt = `
 You are an expert Farsi (Persian) translator and financial market specialist.
@@ -175,6 +176,7 @@ English HTML Content:
 ${original.content}
 
 Return ONLY a raw JSON object (without markdown wrappers like \`\`\`json) with this exact structure:
+Return ONLY a raw JSON object (without markdown wrappers like ```json) with this exact structure:
 {
   "title": "...", // The translated Farsi H1 title
   "slug": "...", // Provide a brief english slug representing the farsi title (for URL routing)
@@ -185,7 +187,7 @@ Return ONLY a raw JSON object (without markdown wrappers like \`\`\`json) with t
 }
 `;
 
-  const model = getGeminiModel('gemini-3.6-flash');
+  const model = getGeminiModel('gemini-3.5-flash');
   const result = await model.generateContent(prompt);
   let text = (await result.response).text();
   text = text.replace(/```json/g, '').replace(/```/g, '').trim();

@@ -2,6 +2,7 @@ import { Router, Response } from 'express';
 import { prisma } from '../services/tradeSync';
 import { authenticate, requireAdmin, AuthRequest } from '../middleware/auth';
 import { runDailyAIBlogPipeline } from '../services/aiDiscoveryService';
+import { aiLogger } from '../services/aiLogger';
 import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
@@ -154,6 +155,13 @@ router.post('/posts/generate-ai', async (req: AuthRequest, res: Response) => {
   } catch (error) {
     res.status(500).json({ error: 'Failed to start AI generation' });
   }
+});
+
+router.get('/posts/generate-ai-status', (req: AuthRequest, res: Response) => {
+  res.json({
+    isRunning: aiLogger.isRunning,
+    logs: aiLogger.logs,
+  });
 });
 
 router.post('/posts', async (req: AuthRequest, res: Response) => {

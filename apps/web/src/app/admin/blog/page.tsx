@@ -10,6 +10,7 @@ import { toPersianDigits } from '../../../utils/farsi';
 import '../admin.scss';
 
 import BlogEditor from '../../../components/admin/BlogEditor';
+import AILogModal from '../../../components/admin/AILogModal';
 
 export default function AdminBlogPage() {
   const user = useAuthStore((state) => state.user);
@@ -33,6 +34,7 @@ export default function AdminBlogPage() {
   // Modals / Form states
   const [showEditor, setShowEditor] = useState(false);
   const [editingPost, setEditingPost] = useState<any>(null);
+  const [showAILogModal, setShowAILogModal] = useState(false);
 
   const fetchPosts = async () => {
     try {
@@ -106,7 +108,8 @@ export default function AdminBlogPage() {
     if (!await notify.confirm({ title: 'تولید مقاله با هوش مصنوعی', message: 'آیا مطمئن هستید که می‌خواهید پروسه تولید مقاله با هوش مصنوعی را به صورت دستی آغاز کنید؟ این کار ممکن است چند دقیقه طول بکشد.' })) return;
     try {
       await api.post('/api/admin/blog/posts/generate-ai');
-      notify.success('پروسه تولید مقاله در پس‌زمینه آغاز شد. چند دقیقه دیگر لیست را رفرش کنید.');
+      notify.success('پروسه تولید مقاله در پس‌زمینه آغاز شد.');
+      setShowAILogModal(true);
     } catch (err) {
       notify.error('خطا در شروع پروسه هوش مصنوعی');
     }
@@ -141,6 +144,7 @@ export default function AdminBlogPage() {
 
   return (
     <div className="admin-container">
+      {showAILogModal && <AILogModal onClose={() => { setShowAILogModal(false); fetchPosts(); }} />}
       <header className="admin-header">
         <div>
           <h1>مدیریت وبلاگ</h1>
