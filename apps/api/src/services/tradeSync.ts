@@ -33,7 +33,7 @@ export async function syncTradesFromEA(
 
   // 1. Extract all ticket IDs for batch fetching
   const tickets = trades
-    .map(t => t.ticket)
+    .map(t => t.ticket ? String(t.ticket) : null)
     .filter((t): t is string => typeof t === 'string' && t.trim() !== '');
 
   // 2. Fetch all existing trades matching the incoming tickets in a single DB query
@@ -60,14 +60,15 @@ export async function syncTradesFromEA(
   const operations: (() => Promise<void>)[] = [];
 
   for (const trade of trades) {
+    const ticketStr = trade.ticket ? String(trade.ticket) : '';
     // Skip trades without a valid ticket
-    if (!trade.ticket || trade.ticket.trim() === '') {
+    if (!ticketStr || ticketStr.trim() === '') {
       console.log(`[Sync] SKIP ticket=${trade.ticket} reason=invalid_ticket`);
       result.skipped++;
       continue;
     }
 
-    const existing = existingMap.get(trade.ticket);
+    const existing = existingMap.get(ticketStr);
 
     if (!existing) {
       // Prepare CREATE operation
@@ -92,7 +93,7 @@ export async function syncTradesFromEA(
               swap: trade.swap,
               pips: trade.pips ?? 0,
               r_multiple: trade.rMultiple,
-              ticket: trade.ticket,
+              ticket: ticketStr,
               import_source: 'MT5_EA',
               chart_data: trade.chartData ? trade.chartData : undefined,
             },
