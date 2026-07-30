@@ -868,9 +868,9 @@ export default function TradesTable({
         {currentPage * itemsPerPage < filteredTrades.length && (
           <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px', marginBottom: '20px' }}>
             <button
-              className="btn btn-outline"
+              className="btn btn-secondary"
               onClick={() => setCurrentPage(p => p + 1)}
-              style={{ padding: '8px 32px', borderRadius: '24px', minWidth: '180px', fontWeight: 'bold' }}
+              style={{ width: '100%', maxWidth: '300px' }}
             >
               {isEn ? 'Load More' : 'نمایش بیشتر'}
             </button>

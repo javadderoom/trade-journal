@@ -13,6 +13,16 @@ import { notify } from '../../lib/notify';
 import LoadingButton from '../ui/LoadingButton';
 import './BlogEditor.scss';
 
+const TIPTAP_EXTENSIONS = [
+  StarterKit,
+  Image,
+  Link.configure({ openOnClick: false }),
+  Underline,
+  TextAlign.configure({ types: ['heading', 'paragraph'] }),
+  TextStyle,
+  Color,
+];
+
 export default function BlogEditor({ initialData, locale, onSuccess, onCancel }: { initialData?: any, locale: 'fa' | 'en', onSuccess: () => void, onCancel: () => void }) {
   const [loading, setLoading] = useState(false);
   const [title, setTitle] = useState(initialData?.title || '');
@@ -35,17 +45,10 @@ export default function BlogEditor({ initialData, locale, onSuccess, onCancel }:
   }, [locale]);
 
   const editor = useEditor({
-    extensions: [
-      StarterKit,
-      Image,
-      Link.configure({ openOnClick: false }),
-      Underline,
-      TextAlign.configure({ types: ['heading', 'paragraph'] }),
-      TextStyle,
-      Color,
-    ],
+    extensions: TIPTAP_EXTENSIONS,
     content: initialData?.content || '<p>محتوای مقاله...</p>',
     immediatelyRender: false,
+
   });
 
   const handleSave = async () => {

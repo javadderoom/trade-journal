@@ -6,6 +6,7 @@ import { aiLogger } from '../services/aiLogger';
 import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
+import sharp from 'sharp';
 
 // ─── Cover Image Upload Setup ─────────────────────────────────────────────
 const coverDir = path.join(__dirname, '../../uploads/blogs');
@@ -14,16 +15,8 @@ if (!fs.existsSync(coverDir)) {
 }
 
 const coverUpload = multer({
-  storage: multer.diskStorage({
-    destination: (req, file, cb) => {
-      cb(null, coverDir);
-    },
-    filename: (req, file, cb) => {
-      const ext = path.extname(file.originalname);
-      cb(null, `cover_${Date.now()}${ext}`);
-    },
-  }),
-  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB
 });
 
 const router = Router();
@@ -139,10 +132,20 @@ router.get('/posts/:id', async (req: AuthRequest, res: Response) => {
 router.post('/upload-image', coverUpload.single('image'), async (req: AuthRequest, res: Response) => {
   try {
     if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
-    const imageUrl = `/uploads/blogs/${req.file.filename}`;
+
+    const webpFilename = `cover_${Date.now()}.webp`;
+    const outputPath = path.join(coverDir, webpFilename);
+
+    await sharp(req.file.buffer)
+      .resize({ width: 1200, withoutEnlargement: true })
+      .webp({ quality: 80 })
+      .toFile(outputPath);
+
+    const imageUrl = `/uploads/blogs/${webpFilename}`;
     res.json({ url: imageUrl });
   } catch (error) {
-    res.status(500).json({ error: 'Failed to upload image' });
+    console.error('Image processing error:', error);
+    res.status(500).json({ error: 'Failed to upload and process image' });
   }
 });
 

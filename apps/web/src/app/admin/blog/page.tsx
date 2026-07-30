@@ -175,7 +175,24 @@ export default function AdminBlogPage() {
         <div className="admin-panel-card">
           <div className="card-header-actions">
             <h3>لیست مقالات</h3>
-            <div style={{ display: 'flex', gap: '10px' }}>
+            <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+              <select
+                value={activeLocale}
+                onChange={(e) => setActiveLocale(e.target.value as 'fa' | 'en')}
+                style={{ 
+                  padding: '8px 12px', 
+                  borderRadius: '8px', 
+                  background: 'var(--surface-container-high)', 
+                  color: 'var(--on-surface)', 
+                  border: '1px solid var(--outline-variant)',
+                  outline: 'none',
+                  fontFamily: 'inherit',
+                  cursor: 'pointer'
+                }}
+              >
+                <option value="fa">فارسی (FA)</option>
+                <option value="en">انگلیسی (EN)</option>
+              </select>
               <button className="btn btn-secondary" onClick={handleGenerateAIPost} style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
                 <span className="material-symbols-outlined">smart_toy</span>
                 تولید خودکار

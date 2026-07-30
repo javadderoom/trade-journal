@@ -47,3 +47,47 @@
     }
   }
 }
+
+.icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  color: $on-surface-variant;
+  border: 1px solid $outline-variant;
+  border-radius: 8px;
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    color: $on-surface;
+    background-color: rgba($surface-variant, 0.3);
+    border-color: $outline;
+  }
+
+  &.text-green {
+    color: #10b981;
+    &:hover {
+      background-color: rgba(16, 185, 129, 0.1);
+      border-color: rgba(16, 185, 129, 0.3);
+    }
+  }
+
+  &.text-blue {
+    color: #3b82f6;
+    &:hover {
+      background-color: rgba(59, 130, 246, 0.1);
+      border-color: rgba(59, 130, 246, 0.3);
+    }
+  }
+
+  &.text-red {
+    color: $error;
+    &:hover {
+      background-color: rgba($error, 0.1);
+      border-color: rgba($error, 0.3);
+    }
+  }
+}
