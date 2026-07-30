@@ -16,6 +16,10 @@ ENV NODE_OPTIONS="--max-old-space-size=2048"
 
 RUN npm run build --workspace=web
 
+# Optimize image size before copying to runner
+RUN rm -rf apps/web/.next/cache
+RUN npm prune --omit=dev
+
 # Stage 2: Runner
 FROM docker.arvancloud.ir/library/node:22.13-alpine AS runner
 WORKDIR /app

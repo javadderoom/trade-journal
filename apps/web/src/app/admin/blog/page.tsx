@@ -126,7 +126,7 @@ export default function AdminBlogPage() {
           <div>
             <h1>{editingPost ? 'ویرایش مقاله' : 'مقاله جدید'}</h1>
           </div>
-          <button className="btn-secondary" onClick={() => { setShowEditor(false); setEditingPost(null); }}>
+          <button className="btn btn-secondary" onClick={() => { setShowEditor(false); setEditingPost(null); }}>
             بازگشت به لیست
           </button>
         </header>
@@ -176,11 +176,11 @@ export default function AdminBlogPage() {
           <div className="card-header-actions">
             <h3>لیست مقالات</h3>
             <div style={{ display: 'flex', gap: '10px' }}>
-              <button className="btn-secondary" onClick={handleGenerateAIPost} style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+              <button className="btn btn-secondary" onClick={handleGenerateAIPost} style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
                 <span className="material-symbols-outlined">smart_toy</span>
                 تولید خودکار
               </button>
-              <button className="btn-primary" onClick={() => setShowEditor(true)}>مقاله جدید +</button>
+              <button className="btn btn-primary" onClick={() => setShowEditor(true)}>مقاله جدید +</button>
             </div>
           </div>
           <div className="admin-table-wrapper">
