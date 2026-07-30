@@ -1,6 +1,6 @@
 'use client';
 import React, { useEffect, useState, useRef } from 'react';
-import { api } from '../../../lib/api';
+import { api } from '../../lib/api';
 
 interface AILogModalProps {
   onClose: () => void;

@@ -176,7 +176,6 @@ English HTML Content:
 ${original.content}
 
 Return ONLY a raw JSON object (without markdown wrappers like \`\`\`json) with this exact structure:
-Return ONLY a raw JSON object (without markdown wrappers like ```json) with this exact structure:
 {
   "title": "...", // The translated Farsi H1 title
   "slug": "...", // Provide a brief english slug representing the farsi title (for URL routing)
