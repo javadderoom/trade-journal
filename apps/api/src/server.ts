@@ -43,6 +43,7 @@ app.use(compression());
 app.use(express.json({ limit: '2mb' }));
 app.use(cookieParser());
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
+app.use('/api/uploads', express.static(path.join(__dirname, '../uploads')));
 
 // CORS — allow only trusted origins
 const ALLOWED_ORIGINS: (string | RegExp)[] = [

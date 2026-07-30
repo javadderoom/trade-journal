@@ -141,7 +141,7 @@ router.post('/upload-image', coverUpload.single('image'), async (req: AuthReques
       .webp({ quality: 80 })
       .toFile(outputPath);
 
-    const imageUrl = `/uploads/blogs/${webpFilename}`;
+    const imageUrl = `/api/uploads/blogs/${webpFilename}`;
     res.json({ url: imageUrl });
   } catch (error) {
     console.error('Image processing error:', error);
