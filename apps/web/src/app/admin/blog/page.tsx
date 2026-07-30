@@ -102,6 +102,16 @@ export default function AdminBlogPage() {
     }
   };
 
+  const handleGenerateAIPost = async () => {
+    if (!await notify.confirm({ title: 'تولید مقاله با هوش مصنوعی', message: 'آیا مطمئن هستید که می‌خواهید پروسه تولید مقاله با هوش مصنوعی را به صورت دستی آغاز کنید؟ این کار ممکن است چند دقیقه طول بکشد.' })) return;
+    try {
+      await api.post('/api/admin/blog/posts/generate-ai');
+      notify.success('پروسه تولید مقاله در پس‌زمینه آغاز شد. چند دقیقه دیگر لیست را رفرش کنید.');
+    } catch (err) {
+      notify.error('خطا در شروع پروسه هوش مصنوعی');
+    }
+  };
+
   if (!user || user.role !== 'ADMIN') {
     return <div style={{ padding: '40px', textAlign: 'center' }}>Checking access...</div>;
   }
@@ -161,7 +171,13 @@ export default function AdminBlogPage() {
         <div className="admin-panel-card">
           <div className="card-header-actions">
             <h3>لیست مقالات</h3>
-            <button className="btn-primary" onClick={() => setShowEditor(true)}>مقاله جدید +</button>
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <button className="btn-secondary" onClick={handleGenerateAIPost} style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                <span className="material-symbols-outlined">smart_toy</span>
+                تولید خودکار
+              </button>
+              <button className="btn-primary" onClick={() => setShowEditor(true)}>مقاله جدید +</button>
+            </div>
           </div>
           <div className="admin-table-wrapper">
             <table className="admin-table">

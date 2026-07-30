@@ -1,6 +1,7 @@
 import { Router, Response } from 'express';
 import { prisma } from '../services/tradeSync';
 import { authenticate, requireAdmin, AuthRequest } from '../middleware/auth';
+import { runDailyAIBlogPipeline } from '../services/aiDiscoveryService';
 import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
@@ -141,6 +142,17 @@ router.post('/upload-image', coverUpload.single('image'), async (req: AuthReques
     res.json({ url: imageUrl });
   } catch (error) {
     res.status(500).json({ error: 'Failed to upload image' });
+  }
+});
+
+router.post('/posts/generate-ai', async (req: AuthRequest, res: Response) => {
+  try {
+    // Run asynchronously to not block the request, or we can await it.
+    // Since it takes time, let's run it async and return immediately.
+    runDailyAIBlogPipeline().catch(console.error);
+    res.json({ message: 'AI Blog generation started in the background.' });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to start AI generation' });
   }
 });
 
