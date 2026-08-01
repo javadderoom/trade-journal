@@ -162,3 +162,32 @@
     }
   }
 }
+
+@media (max-width: 768px) {
+  .single-post-page {
+    padding: 30px 10px;
+
+    .post-header {
+      padding: 30px 20px 15px;
+
+      .post-title {
+        font-size: 26px;
+      }
+    }
+
+    .post-content {
+      padding: 24px 20px;
+      font-size: 16px;
+      line-height: 1.7;
+    }
+
+    .post-tags {
+      padding: 0 20px 24px;
+    }
+
+    .comments-section {
+      padding: 24px 20px;
+      margin-top: 30px;
+    }
+  }
+}

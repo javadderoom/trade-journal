@@ -377,3 +377,39 @@
     }
   }
 }
+
+@media (max-width: 768px) {
+  .blog-index-page {
+    padding-bottom: 40px;
+  }
+  .blog-hero {
+    padding: 60px 15px 40px;
+    h1 {
+      font-size: 32px;
+    }
+    p {
+      font-size: 16px;
+    }
+  }
+  .blog-container {
+    padding: 30px 15px;
+  }
+  .featured-card {
+    height: 180px;
+    padding: 20px;
+    .post-title {
+      font-size: 18px;
+    }
+  }
+  .post-card {
+    .post-cover {
+      height: 180px;
+    }
+    .post-content {
+      padding: 20px;
+      .post-title {
+        font-size: 18px;
+      }
+    }
+  }
+}
