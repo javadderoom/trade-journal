@@ -95,15 +95,33 @@ router.get('/posts/:slug', async (req: Request, res: Response) => {
       return res.status(404).json({ error: 'Post not found' });
     }
 
-    // Increment view count asynchronously
-    prisma.blogPost.update({
-      where: { id: post.id },
-      data: { view_count: { increment: 1 } },
-    }).catch(() => {});
-
     res.json(post);
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch post' });
+  }
+});
+
+// POST /api/blog/posts/:slug/view
+router.post('/posts/:slug/view', async (req: Request, res: Response) => {
+  try {
+    const { locale = 'fa' } = req.query;
+    const post = await prisma.blogPost.findFirst({
+      where: { slug: req.params.slug as string, locale: locale as string },
+      select: { id: true }
+    });
+
+    if (!post) {
+      return res.status(404).json({ error: 'Post not found' });
+    }
+
+    await prisma.blogPost.update({
+      where: { id: post.id },
+      data: { view_count: { increment: 1 } },
+    });
+
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to record view' });
   }
 });
 

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
+import { ViewTracker } from '@/components/blog/ViewTracker';
 import './single-post.scss';
 
 async function getPost(slug: string, locale: string) {
@@ -71,6 +72,7 @@ export default async function SinglePostPage({ params }: { params: Promise<{ slu
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
+      <ViewTracker slug={post.slug || slug} />
       
       <article className="post-article">
         <header className="post-header">
