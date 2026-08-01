@@ -60,6 +60,7 @@ export async function generateBlogArticle(topic: string, authorId: string) {
 
   const categoryTagContext = `
 You must also categorize this article and provide 3-5 tags.
+A category can be a main topic (e.g. "Trading Education") or a specific sub-category under a parent (e.g. parent: "Trading Education", sub: "Price Action").
 You can either choose from the existing lists below or create entirely new ones if none are a perfect fit.
 Existing Categories:
 ${existingCategories.length > 0 ? existingCategories.map(c => `- ${c.name} (slug: ${c.slug})`).join('\n') : 'None'}
@@ -101,7 +102,8 @@ Return ONLY a raw JSON object (without any markdown formatting like \`\`\`json) 
   "excerpt": "...", // A 2 sentence meta description
   "reading_time": 10, // Estimated reading time in minutes
   "featured_image_prompt": "...", // A prompt for an AI image generator to create the cover
-  "category": { "name": "...", "slug": "..." }, // The category you chose or created
+  "category": { "name": "...", "slug": "..." }, // The main category you chose or created
+  "sub_category": { "name": "...", "slug": "..." }, // Optional: A sub-category under the main category. Leave null if not needed.
   "tags": [ { "name": "...", "slug": "..." }, ... ] // 3 to 5 tags you chose or created
 }
 `;
@@ -138,18 +140,41 @@ Return ONLY a raw JSON object (without any markdown formatting like \`\`\`json) 
   let categorySlug = currentDraft.category?.slug || 'trading-education';
   let categoryName = currentDraft.category?.name || 'Trading Education';
   
-  let category = await prisma.blogCategory.findFirst({
+  let parentCategory = await prisma.blogCategory.findFirst({
     where: { slug: categorySlug }
   });
 
-  if (!category) {
-    category = await prisma.blogCategory.create({
+  if (!parentCategory) {
+    parentCategory = await prisma.blogCategory.create({
       data: {
         name: categoryName,
         slug: categorySlug,
         locale: 'en'
       }
     });
+  }
+
+  let targetCategoryId = parentCategory.id;
+
+  // Handle Sub-category
+  if (currentDraft.sub_category?.name && currentDraft.sub_category?.slug) {
+    let subCategory = await prisma.blogCategory.findFirst({
+      where: { slug: currentDraft.sub_category.slug }
+    });
+
+    if (!subCategory) {
+      subCategory = await prisma.blogCategory.create({
+        data: {
+          name: currentDraft.sub_category.name,
+          slug: currentDraft.sub_category.slug,
+          locale: 'en',
+          parent_id: parentCategory.id
+        }
+      });
+    }
+    // If it exists but doesn't have the correct parent, we can optionally update it,
+    // but for now just assign the post to the sub-category
+    targetCategoryId = subCategory.id;
   }
 
   // Handle Tags
@@ -189,7 +214,7 @@ Return ONLY a raw JSON object (without any markdown formatting like \`\`\`json) 
       featured_image_prompt: currentDraft.featured_image_prompt,
       status: 'DRAFT',
       author_id: authorId,
-      category_id: category.id,
+      category_id: targetCategoryId,
       locale: 'en',
       tags: tagIds.length > 0 ? {
         connect: tagIds.map(id => ({ id }))
@@ -238,6 +263,7 @@ ${original.content}
 
 You must also categorize this Farsi article and provide 3-5 tags.
 You can either choose from the existing Farsi lists below or translate the English ones.
+If it has a sub-category, provide both the main and sub-category.
 If you create new slugs for Farsi categories/tags, you MUST append "-fa" to the end of the slug to ensure uniqueness in the database (e.g. "psychology-fa").
 Existing Farsi Categories:
 ${existingCategories.length > 0 ? existingCategories.map(c => `- ${c.name} (slug: ${c.slug})`).join('\n') : 'None'}
@@ -252,7 +278,8 @@ Return ONLY a raw JSON object (without markdown wrappers like \`\`\`json) with t
   "seo_title": "...", // The translated Farsi SEO title
   "seo_description": "...", // The translated Farsi SEO description
   "content": "...", // The full translated HTML article
-  "category": { "name": "...", "slug": "..." }, // The Farsi category you chose or created
+  "category": { "name": "...", "slug": "..." }, // The main Farsi category you chose or created
+  "sub_category": { "name": "...", "slug": "..." }, // Optional: The Farsi sub-category you chose or created. Null if not needed.
   "tags": [ { "name": "...", "slug": "..." }, ... ] // 3 to 5 Farsi tags you chose or created
 }
 `;
@@ -268,18 +295,39 @@ Return ONLY a raw JSON object (without markdown wrappers like \`\`\`json) with t
   let categorySlug = farsiDraft.category?.slug || 'trading-education-fa';
   let categoryName = farsiDraft.category?.name || 'آموزش ترید';
   
-  let category = await prisma.blogCategory.findFirst({
+  let parentCategory = await prisma.blogCategory.findFirst({
     where: { slug: categorySlug }
   });
 
-  if (!category) {
-    category = await prisma.blogCategory.create({
+  if (!parentCategory) {
+    parentCategory = await prisma.blogCategory.create({
       data: {
         name: categoryName,
         slug: categorySlug,
         locale: 'fa'
       }
     });
+  }
+
+  let targetCategoryId = parentCategory.id;
+
+  // Handle Sub-category
+  if (farsiDraft.sub_category?.name && farsiDraft.sub_category?.slug) {
+    let subCategory = await prisma.blogCategory.findFirst({
+      where: { slug: farsiDraft.sub_category.slug }
+    });
+
+    if (!subCategory) {
+      subCategory = await prisma.blogCategory.create({
+        data: {
+          name: farsiDraft.sub_category.name,
+          slug: farsiDraft.sub_category.slug,
+          locale: 'fa',
+          parent_id: parentCategory.id
+        }
+      });
+    }
+    targetCategoryId = subCategory.id;
   }
 
   // Handle Tags
@@ -319,7 +367,7 @@ Return ONLY a raw JSON object (without markdown wrappers like \`\`\`json) with t
       featured_image_prompt: original.featured_image_prompt,
       status: 'DRAFT',
       author_id: original.author_id,
-      category_id: category.id,
+      category_id: targetCategoryId,
       locale: 'fa',
       translation_id: original.id, // Link to the English post
       tags: tagIds.length > 0 ? {

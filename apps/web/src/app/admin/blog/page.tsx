@@ -39,7 +39,7 @@ export default function AdminBlogPage() {
 
   const [showCategoryModal, setShowCategoryModal] = useState(false);
   const [editingCategory, setEditingCategory] = useState<any>(null);
-  const [categoryForm, setCategoryForm] = useState({ name: '', slug: '', description: '' });
+  const [categoryForm, setCategoryForm] = useState({ name: '', slug: '', description: '', parent_id: '' });
 
   const [showTagModal, setShowTagModal] = useState(false);
   const [editingTag, setEditingTag] = useState<any>(null);
@@ -362,7 +362,7 @@ export default function AdminBlogPage() {
               />
               <button className="btn btn-primary" onClick={() => {
                 setEditingCategory(null);
-                setCategoryForm({ name: '', slug: '', description: '' });
+                setCategoryForm({ name: '', slug: '', description: '', parent_id: '' });
                 setShowCategoryModal(true);
               }}>دسته‌بندی جدید +</button>
             </div>
@@ -374,6 +374,7 @@ export default function AdminBlogPage() {
                   <th>نام</th>
                   <th>آدرس (Slug)</th>
                   <th>توضیحات</th>
+                  <th>زیرمجموعه (والد)</th>
                   <th>عملیات</th>
                 </tr>
               </thead>
@@ -383,10 +384,11 @@ export default function AdminBlogPage() {
                     <td>{cat.name}</td>
                     <td style={{ direction: 'ltr', textAlign: 'left' }}>{cat.slug}</td>
                     <td>{cat.description || '-'}</td>
+                    <td>{cat.parent ? cat.parent.name : '-'}</td>
                     <td style={{ display: 'flex', gap: '8px' }}>
                       <button className="icon-btn text-blue" onClick={() => { 
                         setEditingCategory(cat); 
-                        setCategoryForm({ name: cat.name, slug: cat.slug, description: cat.description || '' });
+                        setCategoryForm({ name: cat.name, slug: cat.slug, description: cat.description || '', parent_id: cat.parent_id || '' });
                         setShowCategoryModal(true); 
                       }}>
                         <span className="material-symbols-outlined">edit</span>
@@ -397,7 +399,7 @@ export default function AdminBlogPage() {
                     </td>
                   </tr>
                 ))}
-                {categories.length === 0 && <tr><td colSpan={4} style={{ textAlign: 'center' }}>هیچ دسته‌بندی یافت نشد.</td></tr>}
+                {categories.length === 0 && <tr><td colSpan={5} style={{ textAlign: 'center' }}>هیچ دسته‌بندی یافت نشد.</td></tr>}
               </tbody>
             </table>
           </div>
@@ -483,6 +485,19 @@ export default function AdminBlogPage() {
               <div className="form-group">
                 <label>توضیحات (اختیاری)</label>
                 <textarea rows={3} value={categoryForm.description} onChange={e => setCategoryForm({...categoryForm, description: e.target.value})} />
+              </div>
+              <div className="form-group">
+                <label>دسته‌بندی والد (اختیاری)</label>
+                <Select
+                  value={categoryForm.parent_id}
+                  onChange={(val) => setCategoryForm({...categoryForm, parent_id: val})}
+                  options={[
+                    { value: '', label: 'بدون والد (اصلی)' },
+                    ...categories
+                      .filter(c => c.id !== editingCategory?.id && !c.parent_id) // Only allow top-level categories as parents (1 level deep)
+                      .map(c => ({ value: c.id, label: c.name }))
+                  ]}
+                />
               </div>
             </div>
             <div className="receipt-modal-actions">

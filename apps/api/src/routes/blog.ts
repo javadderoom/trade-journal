@@ -10,6 +10,10 @@ router.get('/categories', async (req: Request, res: Response) => {
     const { locale = 'fa' } = req.query;
     const categories = await prisma.blogCategory.findMany({
       where: { locale: locale as string },
+      include: {
+        children: true,
+        parent: true
+      },
       orderBy: { name: 'asc' },
     });
     res.json(categories);

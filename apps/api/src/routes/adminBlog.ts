@@ -31,9 +31,9 @@ router.use(requireAdmin);
 
 router.post('/categories', async (req: AuthRequest, res: Response) => {
   try {
-    const { name, slug, description, locale = 'fa' } = req.body;
+    const { name, slug, description, locale = 'fa', parent_id } = req.body;
     const category = await prisma.blogCategory.create({
-      data: { name, slug, description, locale },
+      data: { name, slug, description, locale, parent_id: parent_id || null },
     });
     res.status(201).json(category);
   } catch (error) {
@@ -43,10 +43,10 @@ router.post('/categories', async (req: AuthRequest, res: Response) => {
 
 router.put('/categories/:id', async (req: AuthRequest, res: Response) => {
   try {
-    const { name, slug, description, locale } = req.body;
+    const { name, slug, description, locale, parent_id } = req.body;
     const category = await prisma.blogCategory.update({
       where: { id: req.params.id as string },
-      data: { name, slug, description, locale },
+      data: { name, slug, description, locale, parent_id: parent_id || null },
     });
     res.json(category);
   } catch (error) {

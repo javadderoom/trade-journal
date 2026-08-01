@@ -559,7 +559,12 @@ model BlogCategory {
   slug        String     @unique
   description String?
   created_at  DateTime   @default(now())
-  updated_at  DateTime   @updatedAt
+  updated_at  DateTime       @updatedAt
+  
+  parent_id   String?
+  parent      BlogCategory?  @relation("CategoryHierarchy", fields: [parent_id], references: [id])
+  children    BlogCategory[] @relation("CategoryHierarchy")
+
   posts       BlogPost[]
 
   @@index([slug])
