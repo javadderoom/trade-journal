@@ -79,6 +79,19 @@ router.post('/tags', async (req: AuthRequest, res: Response) => {
   }
 });
 
+router.put('/tags/:id', async (req: AuthRequest, res: Response) => {
+  try {
+    const { name, slug, locale } = req.body;
+    const tag = await prisma.blogTag.update({
+      where: { id: req.params.id as string },
+      data: { name, slug, locale },
+    });
+    res.json(tag);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to update tag' });
+  }
+});
+
 router.delete('/tags/:id', async (req: AuthRequest, res: Response) => {
   try {
     await prisma.blogTag.delete({ where: { id: req.params.id as string } });

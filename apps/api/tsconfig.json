@@ -4,9 +4,8 @@
     "outDir": "dist",
     "rootDir": "src",
     "types": ["node", "@prisma/client"],
-    "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": ["./src/*"]
     }
   },
   "include": ["src/**/*.ts"]

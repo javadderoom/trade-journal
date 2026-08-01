@@ -3,14 +3,15 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { useAuthStore } from '../../../lib/auth';
-import { api } from '../../../lib/api';
-import { notify } from '../../../lib/notify';
-import { toPersianDigits } from '../../../utils/farsi';
+import { useAuthStore } from '@/lib/auth';
+import { api } from '@/lib/api';
+import { notify } from '@/lib/notify';
+import { toPersianDigits } from '@/utils/farsi';
 import '../admin.scss';
 
-import BlogEditor from '../../../components/admin/BlogEditor';
-import AILogModal from '../../../components/admin/AILogModal';
+import BlogEditor from '@/components/admin/BlogEditor';
+import AILogModal from '@/components/admin/AILogModal';
+import Select from '@/components/ui/Select';
 
 export default function AdminBlogPage() {
   const user = useAuthStore((state) => state.user);
@@ -35,6 +36,14 @@ export default function AdminBlogPage() {
   const [showEditor, setShowEditor] = useState(false);
   const [editingPost, setEditingPost] = useState<any>(null);
   const [showAILogModal, setShowAILogModal] = useState(false);
+
+  const [showCategoryModal, setShowCategoryModal] = useState(false);
+  const [editingCategory, setEditingCategory] = useState<any>(null);
+  const [categoryForm, setCategoryForm] = useState({ name: '', slug: '', description: '' });
+
+  const [showTagModal, setShowTagModal] = useState(false);
+  const [editingTag, setEditingTag] = useState<any>(null);
+  const [tagForm, setTagForm] = useState({ name: '', slug: '' });
 
   const fetchPosts = async () => {
     try {
@@ -104,6 +113,68 @@ export default function AdminBlogPage() {
     }
   };
 
+  const handleSaveCategory = async () => {
+    if (!categoryForm.name || !categoryForm.slug) {
+      notify.error('نام و آدرس (Slug) اجباری است');
+      return;
+    }
+    try {
+      if (editingCategory) {
+        await api.put(`/api/admin/blog/categories/${editingCategory.id}`, { ...categoryForm, locale: activeLocale });
+        notify.success('دسته‌بندی ویرایش شد');
+      } else {
+        await api.post('/api/admin/blog/categories', { ...categoryForm, locale: activeLocale });
+        notify.success('دسته‌بندی ایجاد شد');
+      }
+      handleCloseModal();
+      fetchCategories();
+    } catch (err) {
+      notify.error('خطا در ذخیره دسته‌بندی');
+    }
+  };
+
+  const handleDeleteCategory = async (id: string) => {
+    if (!await notify.confirm({ title: 'حذف دسته‌بندی', message: 'آیا از حذف دسته‌بندی مطمئن هستید؟', danger: true })) return;
+    try {
+      await api.delete(`/api/admin/blog/categories/${id}`);
+      notify.success('دسته‌بندی حذف شد');
+      fetchCategories();
+    } catch (err) {
+      notify.error('خطا در حذف دسته‌بندی');
+    }
+  };
+
+  const handleSaveTag = async () => {
+    if (!tagForm.name || !tagForm.slug) {
+      notify.error('نام و آدرس (Slug) اجباری است');
+      return;
+    }
+    try {
+      if (editingTag) {
+        await api.put(`/api/admin/blog/tags/${editingTag.id}`, { ...tagForm, locale: activeLocale });
+        notify.success('برچسب ویرایش شد');
+      } else {
+        await api.post('/api/admin/blog/tags', { ...tagForm, locale: activeLocale });
+        notify.success('برچسب ایجاد شد');
+      }
+      handleCloseModal();
+      fetchTags();
+    } catch (err) {
+      notify.error('خطا در ذخیره برچسب');
+    }
+  };
+
+  const handleDeleteTag = async (id: string) => {
+    if (!await notify.confirm({ title: 'حذف برچسب', message: 'آیا از حذف برچسب مطمئن هستید؟', danger: true })) return;
+    try {
+      await api.delete(`/api/admin/blog/tags/${id}`);
+      notify.success('برچسب حذف شد');
+      fetchTags();
+    } catch (err) {
+      notify.error('خطا در حذف برچسب');
+    }
+  };
+
   const handleGenerateAIPost = async () => {
     if (!await notify.confirm({ title: 'تولید مقاله با هوش مصنوعی', message: 'آیا مطمئن هستید که می‌خواهید پروسه تولید مقاله با هوش مصنوعی را به صورت دستی آغاز کنید؟ این کار ممکن است چند دقیقه طول بکشد.' })) return;
     try {
@@ -112,6 +183,36 @@ export default function AdminBlogPage() {
       setShowAILogModal(true);
     } catch (err) {
       notify.error('خطا در شروع پروسه هوش مصنوعی');
+    }
+  };
+
+  useEffect(() => {
+    const isModalOpen = showEditor || showCategoryModal || showTagModal;
+    if (isModalOpen) {
+      window.history.pushState({ modalOpen: true }, '', '');
+    }
+
+    const handlePopState = (e: PopStateEvent) => {
+      if (showEditor) {
+        setShowEditor(false);
+        setEditingPost(null);
+      }
+      if (showCategoryModal) setShowCategoryModal(false);
+      if (showTagModal) setShowTagModal(false);
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, [showEditor, showCategoryModal, showTagModal]);
+
+  const handleCloseModal = () => {
+    if (window.history.state?.modalOpen) {
+      window.history.back();
+    } else {
+      setShowEditor(false);
+      setEditingPost(null);
+      setShowCategoryModal(false);
+      setShowTagModal(false);
     }
   };
 
@@ -126,16 +227,16 @@ export default function AdminBlogPage() {
           <div>
             <h1>{editingPost ? 'ویرایش مقاله' : 'مقاله جدید'}</h1>
           </div>
-          <button className="btn btn-secondary" onClick={() => { setShowEditor(false); setEditingPost(null); }}>
+          <button className="btn btn-secondary" onClick={handleCloseModal}>
             بازگشت به لیست
           </button>
         </header>
         <div className="admin-panel-card" style={{ padding: '20px' }}>
           <BlogEditor 
             initialData={editingPost} 
-            locale={activeLocale}
-            onSuccess={() => { setShowEditor(false); setEditingPost(null); fetchPosts(); }} 
-            onCancel={() => { setShowEditor(false); setEditingPost(null); }} 
+            locale={activeLocale} 
+            onSuccess={() => { fetchPosts(); }} 
+            onCancel={handleCloseModal} 
           />
         </div>
       </div>
@@ -176,23 +277,14 @@ export default function AdminBlogPage() {
           <div className="card-header-actions">
             <h3>لیست مقالات</h3>
             <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-              <select
+              <Select
                 value={activeLocale}
-                onChange={(e) => setActiveLocale(e.target.value as 'fa' | 'en')}
-                style={{ 
-                  padding: '8px 12px', 
-                  borderRadius: '8px', 
-                  background: 'var(--surface-container-high)', 
-                  color: 'var(--on-surface)', 
-                  border: '1px solid var(--outline-variant)',
-                  outline: 'none',
-                  fontFamily: 'inherit',
-                  cursor: 'pointer'
-                }}
-              >
-                <option value="fa">فارسی (FA)</option>
-                <option value="en">انگلیسی (EN)</option>
-              </select>
+                onChange={(val) => setActiveLocale(val as 'fa' | 'en')}
+                options={[
+                  { value: 'fa', label: 'فارسی (FA)' },
+                  { value: 'en', label: 'انگلیسی (EN)' }
+                ]}
+              />
               <button className="btn btn-secondary" onClick={handleGenerateAIPost} style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
                 <span className="material-symbols-outlined">smart_toy</span>
                 تولید خودکار
@@ -218,14 +310,24 @@ export default function AdminBlogPage() {
                     <td>{post.status}</td>
                     <td>{toPersianDigits(post.view_count)}</td>
                     <td>{post.author?.name}</td>
-                    <td>
+                    <td style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                       {!(post.translation || post.translated_from) && (
                         <button className="icon-btn text-green" onClick={() => handleTranslatePost(post.id)} title="ایجاد ترجمه">
                           <span className="material-symbols-outlined">translate</span>
                         </button>
                       )}
                       {(post.translation || post.translated_from) && (
-                        <span className="badge" style={{ fontSize: '10px', background: '#374151', padding: '2px 6px', borderRadius: '4px', marginRight: '5px' }}>
+                        <span style={{ 
+                          display: 'inline-flex', 
+                          alignItems: 'center', 
+                          fontSize: '11px', 
+                          background: 'rgba(59, 130, 246, 0.1)', 
+                          color: '#60a5fa', 
+                          padding: '4px 8px', 
+                          borderRadius: '12px', 
+                          fontWeight: 500,
+                          border: '1px solid rgba(59, 130, 246, 0.2)'
+                        }}>
                           دو زبانه
                         </span>
                       )}
@@ -249,8 +351,56 @@ export default function AdminBlogPage() {
         <div className="admin-panel-card">
           <div className="card-header-actions">
             <h3>لیست دسته‌بندی‌ها</h3>
+            <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+              <Select
+                value={activeLocale}
+                onChange={(val) => setActiveLocale(val as 'fa' | 'en')}
+                options={[
+                  { value: 'fa', label: 'فارسی (FA)' },
+                  { value: 'en', label: 'انگلیسی (EN)' }
+                ]}
+              />
+              <button className="btn btn-primary" onClick={() => {
+                setEditingCategory(null);
+                setCategoryForm({ name: '', slug: '', description: '' });
+                setShowCategoryModal(true);
+              }}>دسته‌بندی جدید +</button>
+            </div>
           </div>
-          <div style={{ padding: '40px', textAlign: 'center', color: '#9ca3af' }}>بخش مدیریت دسته‌بندی‌ها به زودی اضافه می‌شود.</div>
+          <div className="admin-table-wrapper">
+            <table className="admin-table">
+              <thead>
+                <tr>
+                  <th>نام</th>
+                  <th>آدرس (Slug)</th>
+                  <th>توضیحات</th>
+                  <th>عملیات</th>
+                </tr>
+              </thead>
+              <tbody>
+                {categories.map(cat => (
+                  <tr key={cat.id}>
+                    <td>{cat.name}</td>
+                    <td style={{ direction: 'ltr', textAlign: 'left' }}>{cat.slug}</td>
+                    <td>{cat.description || '-'}</td>
+                    <td style={{ display: 'flex', gap: '8px' }}>
+                      <button className="icon-btn text-blue" onClick={() => { 
+                        setEditingCategory(cat); 
+                        setCategoryForm({ name: cat.name, slug: cat.slug, description: cat.description || '' });
+                        setShowCategoryModal(true); 
+                      }}>
+                        <span className="material-symbols-outlined">edit</span>
+                      </button>
+                      <button className="icon-btn text-red" onClick={() => handleDeleteCategory(cat.id)}>
+                        <span className="material-symbols-outlined">delete</span>
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+                {categories.length === 0 && <tr><td colSpan={4} style={{ textAlign: 'center' }}>هیچ دسته‌بندی یافت نشد.</td></tr>}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
 
@@ -258,8 +408,52 @@ export default function AdminBlogPage() {
         <div className="admin-panel-card">
           <div className="card-header-actions">
             <h3>لیست برچسب‌ها</h3>
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <Select
+                value={activeLocale}
+                onChange={(val) => setActiveLocale(val as 'fa' | 'en')}
+                options={[
+                  { value: 'fa', label: 'فارسی (FA)' },
+                  { value: 'en', label: 'انگلیسی (EN)' }
+                ]}
+              />
+              <button className="btn" onClick={() => { setEditingTag(null); setTagForm({ name: '', slug: '' }); setShowTagModal(true); }}>
+                + برچسب جدید
+              </button>
+            </div>
           </div>
-          <div style={{ padding: '40px', textAlign: 'center', color: '#9ca3af' }}>بخش مدیریت برچسب‌ها به زودی اضافه می‌شود.</div>
+          <div className="admin-table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>نام</th>
+                  <th>آدرس (Slug)</th>
+                  <th>عملیات</th>
+                </tr>
+              </thead>
+              <tbody>
+                {tags.map((t: any) => (
+                  <tr key={t.id}>
+                    <td>{t.name}</td>
+                    <td dir="ltr" style={{ textAlign: 'left' }}>{t.slug}</td>
+                    <td style={{ display: 'flex', gap: '8px' }}>
+                      <button className="icon-btn" onClick={() => { 
+                        setEditingTag(t); 
+                        setTagForm({ name: t.name, slug: t.slug }); 
+                        setShowTagModal(true); 
+                      }}>
+                        <span className="material-symbols-outlined">edit</span>
+                      </button>
+                      <button className="icon-btn text-red" onClick={() => handleDeleteTag(t.id)}>
+                        <span className="material-symbols-outlined">delete</span>
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+                {tags.length === 0 && <tr><td colSpan={3} style={{ textAlign: 'center' }}>هیچ برچسبی یافت نشد.</td></tr>}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
 
@@ -269,6 +463,56 @@ export default function AdminBlogPage() {
             <h3>لیست نظرات</h3>
           </div>
           <div style={{ padding: '40px', textAlign: 'center', color: '#9ca3af' }}>بخش مدیریت نظرات به زودی اضافه می‌شود.</div>
+        </div>
+      )}
+
+      {/* Category Modal */}
+      {showCategoryModal && (
+        <div className="admin-overlay">
+          <div className="admin-modal-card">
+            <h4>{editingCategory ? 'ویرایش دسته‌بندی' : 'دسته‌بندی جدید'}</h4>
+            <div className="admin-form-grid" style={{ display: 'flex', flexDirection: 'column', padding: 0, border: 'none', background: 'transparent', gap: '15px' }}>
+              <div className="form-group">
+                <label>نام دسته‌بندی</label>
+                <input type="text" value={categoryForm.name} onChange={e => setCategoryForm({...categoryForm, name: e.target.value})} />
+              </div>
+              <div className="form-group">
+                <label>آدرس (Slug)</label>
+                <input type="text" style={{ direction: 'ltr', textAlign: 'left' }} value={categoryForm.slug} onChange={e => setCategoryForm({...categoryForm, slug: e.target.value})} />
+              </div>
+              <div className="form-group">
+                <label>توضیحات (اختیاری)</label>
+                <textarea rows={3} value={categoryForm.description} onChange={e => setCategoryForm({...categoryForm, description: e.target.value})} />
+              </div>
+            </div>
+            <div className="receipt-modal-actions">
+              <button className="admin-btn btn-secondary" onClick={handleCloseModal}>انصراف</button>
+              <button className="admin-btn" onClick={handleSaveCategory}>ذخیره</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Tag Modal */}
+      {showTagModal && (
+        <div className="admin-overlay">
+          <div className="admin-modal-card">
+            <h4>{editingTag ? 'ویرایش برچسب' : 'برچسب جدید'}</h4>
+            <div className="admin-form-grid" style={{ display: 'flex', flexDirection: 'column', padding: 0, border: 'none', background: 'transparent', gap: '15px' }}>
+              <div className="form-group">
+                <label>نام برچسب</label>
+                <input type="text" value={tagForm.name} onChange={e => setTagForm({...tagForm, name: e.target.value})} />
+              </div>
+              <div className="form-group">
+                <label>آدرس (Slug)</label>
+                <input type="text" style={{ direction: 'ltr', textAlign: 'left' }} value={tagForm.slug} onChange={e => setTagForm({...tagForm, slug: e.target.value})} />
+              </div>
+            </div>
+            <div className="receipt-modal-actions">
+              <button className="admin-btn btn-secondary" onClick={handleCloseModal}>انصراف</button>
+              <button className="admin-btn" onClick={handleSaveTag}>ذخیره</button>
+            </div>
+          </div>
         </div>
       )}
     </div>

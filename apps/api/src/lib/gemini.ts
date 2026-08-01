@@ -9,7 +9,7 @@ export const gemini = new GoogleGenerativeAI(apiKey);
  * Returns a configured Gemini model instance.
  * Automatically injects the Cloudflare proxy URL if it exists in the environment.
  */
-export const getGeminiModel = (modelName: string = 'gemini-3.6-flash') => {
+export const getGeminiModel = (modelName: string = 'gemini-3.5-flash') => {
   const requestOptions: any = {};
   
   if (proxyUrl) {

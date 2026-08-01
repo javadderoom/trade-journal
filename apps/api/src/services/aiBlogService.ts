@@ -23,7 +23,7 @@ Return ONLY a raw JSON object (without markdown wrappers like \`\`\`json) with t
 }
 `;
 
-  const model = getGeminiModel('gemini-3.6-flash');
+  const model = getGeminiModel('gemini-3.5-flash');
   const result = await model.generateContent(prompt);
   let text = (await result.response).text();
   text = text.replace(/```json/g, '').replace(/```/g, '').trim();
@@ -41,6 +41,16 @@ export async function generateBlogArticle(topic: string, authorId: string) {
     orderBy: { published_at: 'desc' }
   });
   
+  const existingCategories = await prisma.blogCategory.findMany({
+    where: { locale: 'en' },
+    select: { name: true, slug: true }
+  });
+
+  const existingTags = await prisma.blogTag.findMany({
+    where: { locale: 'en' },
+    select: { name: true, slug: true }
+  });
+
   const internalLinksContext = existingPosts.length > 0 
     ? `\nYou must naturally include internal links to some of these existing articles using HTML <a> tags. 
        Use this URL format: href="/en/blog/[slug]"
@@ -48,7 +58,16 @@ export async function generateBlogArticle(topic: string, authorId: string) {
        ${existingPosts.map(p => `- Title: "${p.title}" (slug: ${p.slug})`).join('\n')}`
     : '';
 
-  const model = getGeminiModel('gemini-3.6-flash');
+  const categoryTagContext = `
+You must also categorize this article and provide 3-5 tags.
+You can either choose from the existing lists below or create entirely new ones if none are a perfect fit.
+Existing Categories:
+${existingCategories.length > 0 ? existingCategories.map(c => `- ${c.name} (slug: ${c.slug})`).join('\n') : 'None'}
+Existing Tags:
+${existingTags.length > 0 ? existingTags.map(t => `- ${t.name} (slug: ${t.slug})`).join('\n') : 'None'}
+`;
+
+  const model = getGeminiModel('gemini-3.5-flash');
   let currentDraft: any = null;
   let attempts = 0;
   const MAX_ATTEMPTS = 3;
@@ -71,6 +90,7 @@ CRITICAL TONE RULES (HUMANIZE YOUR WRITING):
 
 Use clean HTML for the content (<h1>, <h2>, <h3>, <ul>, <li>, <p>, <strong>). Do NOT use markdown.
 ${internalLinksContext}
+${categoryTagContext}
 ${feedback ? `\nPREVIOUS FEEDBACK TO IMPROVE UPON: ${feedback}` : ''}
 
 Return ONLY a raw JSON object (without any markdown formatting like \`\`\`json) with this exact structure:
@@ -80,7 +100,9 @@ Return ONLY a raw JSON object (without any markdown formatting like \`\`\`json) 
   "content": "...", // The full HTML article
   "excerpt": "...", // A 2 sentence meta description
   "reading_time": 10, // Estimated reading time in minutes
-  "featured_image_prompt": "..." // A prompt for an AI image generator to create the cover
+  "featured_image_prompt": "...", // A prompt for an AI image generator to create the cover
+  "category": { "name": "...", "slug": "..." }, // The category you chose or created
+  "tags": [ { "name": "...", "slug": "..." }, ... ] // 3 to 5 tags you chose or created
 }
 `;
 
@@ -112,19 +134,45 @@ Return ONLY a raw JSON object (without any markdown formatting like \`\`\`json) 
     }
   }
 
-  // Fallback category
+  // Handle Category
+  let categorySlug = currentDraft.category?.slug || 'trading-education';
+  let categoryName = currentDraft.category?.name || 'Trading Education';
+  
   let category = await prisma.blogCategory.findFirst({
-    where: { slug: 'trading-education' }
+    where: { slug: categorySlug }
   });
 
   if (!category) {
     category = await prisma.blogCategory.create({
       data: {
-        name: 'Trading Education',
-        slug: 'trading-education',
+        name: categoryName,
+        slug: categorySlug,
         locale: 'en'
       }
     });
+  }
+
+  // Handle Tags
+  const tagIds: string[] = [];
+  if (currentDraft.tags && Array.isArray(currentDraft.tags)) {
+    for (const tagData of currentDraft.tags) {
+      if (!tagData.slug || !tagData.name) continue;
+      
+      let tag = await prisma.blogTag.findFirst({
+        where: { slug: tagData.slug }
+      });
+
+      if (!tag) {
+        tag = await prisma.blogTag.create({
+          data: {
+            name: tagData.name,
+            slug: tagData.slug,
+            locale: 'en'
+          }
+        });
+      }
+      tagIds.push(tag.id);
+    }
   }
 
   const newPost = await prisma.blogPost.create({
@@ -142,7 +190,10 @@ Return ONLY a raw JSON object (without any markdown formatting like \`\`\`json) 
       status: 'DRAFT',
       author_id: authorId,
       category_id: category.id,
-      locale: 'en'
+      locale: 'en',
+      tags: tagIds.length > 0 ? {
+        connect: tagIds.map(id => ({ id }))
+      } : undefined
     }
   });
 
@@ -161,6 +212,16 @@ export async function translateBlogArticle(originalPostId: string) {
 
   aiLogger.log(`[AI Blog] Translating article ${original.title} to Farsi...`);
 
+  const existingCategories = await prisma.blogCategory.findMany({
+    where: { locale: 'fa' },
+    select: { name: true, slug: true }
+  });
+
+  const existingTags = await prisma.blogTag.findMany({
+    where: { locale: 'fa' },
+    select: { name: true, slug: true }
+  });
+
   const prompt = `
 You are an expert Farsi (Persian) translator and financial market specialist.
 Your task is to translate the following English trading article into highly professional and natural-sounding Persian.
@@ -175,6 +236,14 @@ English Excerpt: ${original.excerpt}
 English HTML Content:
 ${original.content}
 
+You must also categorize this Farsi article and provide 3-5 tags.
+You can either choose from the existing Farsi lists below or translate the English ones.
+If you create new slugs for Farsi categories/tags, you MUST append "-fa" to the end of the slug to ensure uniqueness in the database (e.g. "psychology-fa").
+Existing Farsi Categories:
+${existingCategories.length > 0 ? existingCategories.map(c => `- ${c.name} (slug: ${c.slug})`).join('\n') : 'None'}
+Existing Farsi Tags:
+${existingTags.length > 0 ? existingTags.map(t => `- ${t.name} (slug: ${t.slug})`).join('\n') : 'None'}
+
 Return ONLY a raw JSON object (without markdown wrappers like \`\`\`json) with this exact structure:
 {
   "title": "...", // The translated Farsi H1 title
@@ -182,7 +251,9 @@ Return ONLY a raw JSON object (without markdown wrappers like \`\`\`json) with t
   "excerpt": "...", // The translated Farsi excerpt
   "seo_title": "...", // The translated Farsi SEO title
   "seo_description": "...", // The translated Farsi SEO description
-  "content": "..." // The full translated HTML article
+  "content": "...", // The full translated HTML article
+  "category": { "name": "...", "slug": "..." }, // The Farsi category you chose or created
+  "tags": [ { "name": "...", "slug": "..." }, ... ] // 3 to 5 Farsi tags you chose or created
 }
 `;
 
@@ -193,19 +264,45 @@ Return ONLY a raw JSON object (without markdown wrappers like \`\`\`json) with t
   
   const farsiDraft = JSON.parse(text);
 
-  // Fallback category
+  // Handle Category
+  let categorySlug = farsiDraft.category?.slug || 'trading-education-fa';
+  let categoryName = farsiDraft.category?.name || 'آموزش ترید';
+  
   let category = await prisma.blogCategory.findFirst({
-    where: { slug: 'trading-education-fa' } // Try to find a Farsi category
+    where: { slug: categorySlug }
   });
 
   if (!category) {
     category = await prisma.blogCategory.create({
       data: {
-        name: 'آموزش ترید',
-        slug: 'trading-education-fa',
+        name: categoryName,
+        slug: categorySlug,
         locale: 'fa'
       }
     });
+  }
+
+  // Handle Tags
+  const tagIds: string[] = [];
+  if (farsiDraft.tags && Array.isArray(farsiDraft.tags)) {
+    for (const tagData of farsiDraft.tags) {
+      if (!tagData.slug || !tagData.name) continue;
+      
+      let tag = await prisma.blogTag.findFirst({
+        where: { slug: tagData.slug }
+      });
+
+      if (!tag) {
+        tag = await prisma.blogTag.create({
+          data: {
+            name: tagData.name,
+            slug: tagData.slug,
+            locale: 'fa'
+          }
+        });
+      }
+      tagIds.push(tag.id);
+    }
   }
 
   const newPost = await prisma.blogPost.create({
@@ -224,7 +321,10 @@ Return ONLY a raw JSON object (without markdown wrappers like \`\`\`json) with t
       author_id: original.author_id,
       category_id: category.id,
       locale: 'fa',
-      translation_id: original.id // Link to the English post
+      translation_id: original.id, // Link to the English post
+      tags: tagIds.length > 0 ? {
+        connect: tagIds.map(id => ({ id }))
+      } : undefined
     }
   });
 

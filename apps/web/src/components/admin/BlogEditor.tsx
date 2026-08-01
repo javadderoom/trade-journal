@@ -25,6 +25,7 @@ const TIPTAP_EXTENSIONS = [
 
 export default function BlogEditor({ initialData, locale, onSuccess, onCancel }: { initialData?: any, locale: 'fa' | 'en', onSuccess: () => void, onCancel: () => void }) {
   const [loading, setLoading] = useState(false);
+  const [postId, setPostId] = useState(initialData?.id || null);
   const [title, setTitle] = useState(initialData?.title || '');
   const [slug, setSlug] = useState(initialData?.slug || '');
   const [excerpt, setExcerpt] = useState(initialData?.excerpt || '');
@@ -69,11 +70,12 @@ export default function BlogEditor({ initialData, locale, onSuccess, onCancel }:
     };
 
     try {
-      if (initialData?.id) {
-        await api.put(`/api/admin/blog/posts/${initialData.id}`, payload);
+      if (postId) {
+        await api.put(`/api/admin/blog/posts/${postId}`, payload);
         notify.success('Post updated');
       } else {
-        await api.post('/api/admin/blog/posts', payload);
+        const res = await api.post('/api/admin/blog/posts', payload);
+        setPostId(res.data.id);
         notify.success('Post created');
       }
       onSuccess();
@@ -258,7 +260,7 @@ export default function BlogEditor({ initialData, locale, onSuccess, onCancel }:
         <label>لینک تصویر کاور (Cover Image)</label>
         <div style={{ display: 'flex', gap: '10px' }}>
           <input type="text" className="input-field" value={coverImage} onChange={(e) => setCoverImage(e.target.value)} style={{ direction: 'ltr', textAlign: 'left', flex: 1 }} />
-          <label className="btn-secondary" style={{ display: 'flex', alignItems: 'center', cursor: 'pointer', padding: '0 20px', whiteSpace: 'nowrap' }}>
+          <label className="btn btn-secondary" style={{ display: 'flex', alignItems: 'center', cursor: 'pointer', padding: '0 20px', whiteSpace: 'nowrap' }}>
             <span className="material-symbols-outlined" style={{ marginRight: '5px' }}>upload</span>
             آپلود
             <input type="file" accept="image/*" style={{ display: 'none' }} onChange={handleImageUpload} disabled={loading} />
@@ -295,7 +297,7 @@ export default function BlogEditor({ initialData, locale, onSuccess, onCancel }:
 
       <div style={{ display: 'flex', gap: '10px', marginTop: '30px' }}>
         <LoadingButton isLoading={loading} onClick={handleSave} className="btn-primary">ذخیره مقاله</LoadingButton>
-        <button type="button" className="btn-secondary" onClick={onCancel} disabled={loading}>انصراف</button>
+        <button type="button" className="btn btn-secondary" onClick={onCancel} disabled={loading}>انصراف</button>
       </div>
     </div>
   );
