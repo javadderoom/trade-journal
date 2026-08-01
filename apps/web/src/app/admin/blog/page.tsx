@@ -419,8 +419,8 @@ export default function AdminBlogPage() {
                   { value: 'en', label: 'انگلیسی (EN)' }
                 ]}
               />
-              <button className="btn" onClick={() => { setEditingTag(null); setTagForm({ name: '', slug: '' }); setShowTagModal(true); }}>
-                + برچسب جدید
+              <button className="btn btn-primary" onClick={() => { setEditingTag(null); setTagForm({ name: '', slug: '' }); setShowTagModal(true); }}>
+                برچسب جدید +
               </button>
             </div>
           </div>

@@ -113,6 +113,7 @@ router.get('/posts', async (req: AuthRequest, res: Response) => {
       orderBy: { created_at: 'desc' },
       include: {
         category: true,
+        tags: true,
         author: { select: { name: true } },
         translation: { select: { id: true, locale: true } },
         translated_from: { select: { id: true, locale: true } }
@@ -227,8 +228,7 @@ router.put('/posts/:id', async (req: AuthRequest, res: Response) => {
         category_id,
         published_at,
         tags: tag_ids ? {
-          set: [], // clear existing tags
-          connect: tag_ids.map((id: string) => ({ id }))
+          set: tag_ids.map((id: string) => ({ id }))
         } : undefined
       },
     });
