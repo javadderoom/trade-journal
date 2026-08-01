@@ -642,6 +642,11 @@ model BlogComment {
   created_at  DateTime     @default(now())
   updated_at  DateTime     @updatedAt
 
+  parent_id   String?
+  parent      BlogComment?  @relation("CommentReplies", fields: [parent_id], references: [id])
+  replies     BlogComment[] @relation("CommentReplies")
+
   @@index([post_id, is_approved])
   @@index([user_id])
+  @@index([parent_id])
 }

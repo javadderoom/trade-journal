@@ -287,10 +287,15 @@ router.delete('/posts/:id', async (req: AuthRequest, res: Response) => {
 router.get('/comments', async (req: AuthRequest, res: Response) => {
   try {
     const comments = await prisma.blogComment.findMany({
+      where: { parent_id: null },
       orderBy: { created_at: 'desc' },
       include: {
-        post: { select: { title: true } },
-        user: { select: { name: true, email: true } }
+        post: { select: { title: true, slug: true } },
+        user: { select: { name: true, email: true } },
+        replies: {
+          orderBy: { created_at: 'asc' },
+          include: { user: { select: { name: true } } }
+        }
       },
     });
     res.json(comments);
@@ -317,6 +322,41 @@ router.delete('/comments/:id', async (req: AuthRequest, res: Response) => {
     res.json({ success: true });
   } catch (error) {
     res.status(500).json({ error: 'Failed to delete comment' });
+  }
+});
+
+router.post('/comments/:id/reply', async (req: AuthRequest, res: Response) => {
+  try {
+    const { content } = req.body;
+    const parentId = req.params.id as string;
+    const userId = req.user?.userId;
+
+    if (!content || !userId) {
+      return res.status(400).json({ error: 'Invalid data' });
+    }
+
+    // Find parent comment to get post_id
+    const parentComment = await prisma.blogComment.findUnique({
+      where: { id: parentId }
+    });
+
+    if (!parentComment) {
+      return res.status(404).json({ error: 'Parent comment not found' });
+    }
+
+    const reply = await prisma.blogComment.create({
+      data: {
+        content,
+        post_id: parentComment.post_id,
+        user_id: userId,
+        parent_id: parentId,
+        is_approved: true, // Admin replies are automatically approved
+      },
+    });
+
+    res.status(201).json(reply);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to post reply' });
   }
 });
 

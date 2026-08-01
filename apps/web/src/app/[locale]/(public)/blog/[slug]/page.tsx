@@ -2,6 +2,7 @@ import React from 'react';
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { ViewTracker } from '@/components/blog/ViewTracker';
+import CommentSection from '@/components/blog/CommentSection';
 import './single-post.scss';
 
 async function getPost(slug: string, locale: string) {
@@ -119,20 +120,7 @@ export default async function SinglePostPage({ params }: { params: Promise<{ slu
         )}
       </article>
       
-      {/* Comments section UI would go here */}
-      <div className="comments-section">
-        <h3>نظرات ({post.comments?.length || 0})</h3>
-        {/* Simple comment list for now */}
-        {post.comments?.map((comment: any) => (
-          <div key={comment.id} className="comment">
-            <div className="comment-header">
-              <strong>{comment.user?.name || 'کاربر'}</strong>
-              <small>{new Date(comment.created_at).toLocaleDateString('fa-IR')}</small>
-            </div>
-            <p>{comment.content}</p>
-          </div>
-        ))}
-      </div>
+      <CommentSection postId={post.id} initialComments={post.comments || []} locale={locale} />
     </div>
   );
 }

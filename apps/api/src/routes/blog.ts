@@ -86,9 +86,14 @@ router.get('/posts/:slug', async (req: Request, res: Response) => {
         translation: { select: { slug: true, locale: true } },
         translated_from: { select: { slug: true, locale: true } },
         comments: {
-          where: { is_approved: true },
+          where: { is_approved: true, parent_id: null },
           include: {
             user: { select: { name: true, avatar_url: true } },
+            replies: {
+              where: { is_approved: true },
+              include: { user: { select: { name: true, avatar_url: true } } },
+              orderBy: { created_at: 'asc' },
+            },
           },
           orderBy: { created_at: 'desc' },
         },
@@ -132,7 +137,7 @@ router.post('/posts/:slug/view', async (req: Request, res: Response) => {
 // POST /api/blog/posts/:id/comments
 router.post('/posts/:id/comments', authenticate, async (req: AuthRequest, res: Response) => {
   try {
-    const { content } = req.body;
+    const { content, parent_id } = req.body;
     const postId = req.params.id as string;
     const userId = req.user?.userId;
 
@@ -150,6 +155,7 @@ router.post('/posts/:id/comments', authenticate, async (req: AuthRequest, res: R
         content,
         post_id: postId,
         user_id: userId,
+        parent_id: parent_id || null,
         is_approved: false, // Needs admin approval
       },
     });
