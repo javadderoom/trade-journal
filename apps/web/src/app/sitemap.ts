@@ -1,6 +1,8 @@
 import { MetadataRoute } from "next";
 import { TOPICS_DATA } from "../constants/topicsData";
 
+export const revalidate = 3600; // Revalidate sitemap every hour
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = "https://tradekav.ir";
   const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
@@ -8,8 +10,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   let dynamicBlogPages: MetadataRoute.Sitemap = [];
   try {
     const [resFa, resEn] = await Promise.all([
-      fetch(`${apiBase}/api/blog/posts?locale=fa&limit=100`),
-      fetch(`${apiBase}/api/blog/posts?locale=en&limit=100`)
+      fetch(`${apiBase}/api/blog/posts?locale=fa&limit=1000`, { next: { revalidate: 3600 } }),
+      fetch(`${apiBase}/api/blog/posts?locale=en&limit=1000`, { next: { revalidate: 3600 } })
     ]);
     
     let allPosts: any[] = [];
