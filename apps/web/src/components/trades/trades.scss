@@ -10,24 +10,6 @@
   font-family: $font-primary;
   overflow: hidden;
 
-  // Custom scrollbar
-  ::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
-  }
-
-  ::-webkit-scrollbar-track {
-    background: $surface;
-  }
-
-  ::-webkit-scrollbar-thumb {
-    background: $outline-variant;
-    border-radius: 4px;
-
-    &:hover {
-      background: $outline;
-    }
-  }
 }
 
 .trades-main-content {

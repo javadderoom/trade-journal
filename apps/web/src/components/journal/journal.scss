@@ -10,24 +10,6 @@
   color: $on-surface;
   font-family: $font-primary;
 
-  // Custom scrollbar
-  ::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
-  }
-
-  ::-webkit-scrollbar-track {
-    background: $background;
-  }
-
-  ::-webkit-scrollbar-thumb {
-    background: $outline-variant;
-    border-radius: 4px;
-
-    &:hover {
-      background: $outline;
-    }
-  }
 }
 
 .journal-header {

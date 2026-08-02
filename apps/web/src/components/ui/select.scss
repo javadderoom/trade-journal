@@ -135,19 +135,6 @@
     transform: translateY(0) scale(1);
     pointer-events: auto;
   }
-
-  // Scrollbar
-  &::-webkit-scrollbar {
-    width: 4px;
-  }
-  &::-webkit-scrollbar-track {
-    background: transparent;
-  }
-  &::-webkit-scrollbar-thumb {
-    background: $outline-variant;
-    border-radius: 4px;
-    &:hover { background: $outline; }
-  }
 }
 
 // ─── Option items ──────────────────────────────────────────────────────────
