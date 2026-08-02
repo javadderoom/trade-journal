@@ -228,7 +228,11 @@ Return ONLY a raw JSON object (without any markdown formatting like \`\`\`json) 
 // Phase 3 (Bonus): Auto-translate English to Farsi
 export async function translateBlogArticle(originalPostId: string) {
   const original = await prisma.blogPost.findUnique({
-    where: { id: originalPostId }
+    where: { id: originalPostId },
+    include: {
+      category: { include: { parent: true } },
+      tags: true
+    }
   });
 
   if (!original || original.locale !== 'en') {
@@ -237,15 +241,20 @@ export async function translateBlogArticle(originalPostId: string) {
 
   aiLogger.log(`[AI Blog] Translating article ${original.title} to Farsi...`);
 
-  const existingCategories = await prisma.blogCategory.findMany({
-    where: { locale: 'fa' },
-    select: { name: true, slug: true }
-  });
+  let categoryContext = '';
+  if (original.category) {
+    if (original.category.parent) {
+      categoryContext = `English Main Category: "${original.category.parent.name}" (slug: ${original.category.parent.slug})\nEnglish Sub-Category: "${original.category.name}" (slug: ${original.category.slug})`;
+    } else {
+      categoryContext = `English Main Category: "${original.category.name}" (slug: ${original.category.slug})\nEnglish Sub-Category: None`;
+    }
+  } else {
+    categoryContext = 'English Main Category: None\nEnglish Sub-Category: None';
+  }
 
-  const existingTags = await prisma.blogTag.findMany({
-    where: { locale: 'fa' },
-    select: { name: true, slug: true }
-  });
+  const tagsContext = original.tags.length > 0
+    ? `English Tags:\n${original.tags.map(t => `- "${t.name}" (slug: ${t.slug})`).join('\n')}`
+    : `English Tags: None`;
 
   const prompt = `
 You are an expert Farsi (Persian) translator and financial market specialist.
@@ -261,14 +270,11 @@ English Excerpt: ${original.excerpt}
 English HTML Content:
 ${original.content}
 
-You must also categorize this Farsi article and provide 3-5 tags.
-You can either choose from the existing Farsi lists below or translate the English ones.
-If it has a sub-category, provide both the main and sub-category.
-If you create new slugs for Farsi categories/tags, you MUST append "-fa" to the end of the slug to ensure uniqueness in the database (e.g. "psychology-fa").
-Existing Farsi Categories:
-${existingCategories.length > 0 ? existingCategories.map(c => `- ${c.name} (slug: ${c.slug})`).join('\n') : 'None'}
-Existing Farsi Tags:
-${existingTags.length > 0 ? existingTags.map(t => `- ${t.name} (slug: ${t.slug})`).join('\n') : 'None'}
+CATEGORY AND TAGS TRANSLATION:
+You must translate the EXACT categories and tags used in the English article. Do not invent new ones or leave any out.
+${categoryContext}
+${tagsContext}
+For the Farsi slugs, you MUST use the exact English slug but appended with "-fa". For example, if the English slug is "crypto", the Farsi slug MUST be "crypto-fa".
 
 Return ONLY a raw JSON object (without markdown wrappers like \`\`\`json) with this exact structure:
 {
@@ -278,9 +284,9 @@ Return ONLY a raw JSON object (without markdown wrappers like \`\`\`json) with t
   "seo_title": "...", // The translated Farsi SEO title
   "seo_description": "...", // The translated Farsi SEO description
   "content": "...", // The full translated HTML article
-  "category": { "name": "...", "slug": "..." }, // The main Farsi category you chose or created
-  "sub_category": { "name": "...", "slug": "..." }, // Optional: The Farsi sub-category you chose or created. Null if not needed.
-  "tags": [ { "name": "...", "slug": "..." }, ... ] // 3 to 5 Farsi tags you chose or created
+  "category": { "name": "...", "slug": "...-fa" }, // The exact translated main category. Null if none.
+  "sub_category": { "name": "...", "slug": "...-fa" }, // The exact translated sub-category. Null if none.
+  "tags": [ { "name": "...", "slug": "...-fa" } ] // The exact translated tags matching the English ones
 }
 `;
 
