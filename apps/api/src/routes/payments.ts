@@ -1,4 +1,5 @@
 import { Router, Response } from 'express';
+import axios from 'axios';
 import { prisma } from '../services/tradeSync';
 import { authenticate, AuthRequest } from '../middleware/auth';
 import { requestPayment, verifyPayment } from '../services/zarinpal';
@@ -90,6 +91,55 @@ export async function getPlanPrices() {
 router.get('/prices', async (req, res) => {
   const prices = await getPlanPrices();
   return res.status(200).json(prices);
+});
+
+/**
+ * GET /api/payments/crypto/rate
+ * Fetches the live exchange rate for a given coin (e.g., TRX) against USD.
+ */
+router.get('/crypto/rate', async (req, res) => {
+  const { coin } = req.query;
+  if (!coin || typeof coin !== 'string') {
+    return res.status(400).json({ error: 'Coin parameter is required' });
+  }
+
+  const symbolBinance = `${coin.toUpperCase()}USDT`;
+  const symbolKucoin = `${coin.toUpperCase()}-USDT`;
+  const symbolNobitex = `${coin.toLowerCase()}-usdt`;
+  
+  try {
+    // Attempt 1: KuCoin (Rarely blocked)
+    try {
+      const kucoin = await axios.get(`https://api.kucoin.com/api/v1/market/orderbook/level1?symbol=${symbolKucoin}`, { timeout: 3000 });
+      if (kucoin.data && kucoin.data.data && kucoin.data.data.price) {
+        return res.status(200).json({ rate: parseFloat(kucoin.data.data.price) });
+      }
+    } catch (e) { /* fallback */ }
+
+    // Attempt 2: Nobitex (Iranian Exchange, never blocked in Iran)
+    try {
+      const nobitex = await axios.get(`https://api.nobitex.ir/market/stats?srcCurrency=${coin.toLowerCase()}&dstCurrency=usdt`, { timeout: 3000 });
+      if (nobitex.data && nobitex.data.status === 'ok' && nobitex.data.stats[symbolNobitex]) {
+        return res.status(200).json({ rate: parseFloat(nobitex.data.stats[symbolNobitex].latest) });
+      }
+    } catch (e) { /* fallback */ }
+
+    // Attempt 3: Binance
+    try {
+      const binance = await axios.get(`https://api.binance.com/api/v3/ticker/price?symbol=${symbolBinance}`, { timeout: 3000 });
+      if (binance.data && binance.data.price) {
+        return res.status(200).json({ rate: parseFloat(binance.data.price) });
+      }
+    } catch (e) { /* throw */ }
+
+    throw new Error('All crypto rate providers failed');
+  } catch (error: any) {
+    console.warn(`[Crypto Rate] Failed to fetch live rate for ${coin}:`, error.message);
+    return res.status(200).json({ 
+      rate: null,
+      fallback: true
+    });
+  }
 });
 
 /**

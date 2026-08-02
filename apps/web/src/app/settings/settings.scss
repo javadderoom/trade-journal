@@ -659,6 +659,7 @@ $set-gold: #f5c542;
   display: flex;
   flex-direction: column;
   animation: modalScaleIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  max-height: 90vh;
 }
 
 @keyframes modalScaleIn {
@@ -703,6 +704,7 @@ $set-gold: #f5c542;
   display: flex;
   flex-direction: column;
   gap: 20px;
+  overflow-y: auto;
 }
 
 .price-details-section {

@@ -137,6 +137,27 @@ export default function SettingsPage() {
     : proUsdDiscountPercent;
   const [cryptoCoin, setCryptoCoin] = useState<'USDT' | 'TRX'>('USDT');
   const [cryptoTxHash, setCryptoTxHash] = useState('');
+  const [liveCryptoRates, setLiveCryptoRates] = useState<Record<string, number | null>>({});
+  const [fetchingRate, setFetchingRate] = useState(false);
+
+  useEffect(() => {
+    if (cryptoCoin !== 'USDT' && checkoutTarget) {
+      const fetchRate = async () => {
+        try {
+          setFetchingRate(true);
+          const res = await api.get(`/api/payments/crypto/rate?coin=${cryptoCoin}`);
+          if (res.data.rate) {
+            setLiveCryptoRates(prev => ({ ...prev, [cryptoCoin]: res.data.rate }));
+          }
+        } catch (err) {
+          console.error('Failed to fetch crypto rate', err);
+        } finally {
+          setFetchingRate(false);
+        }
+      };
+      fetchRate();
+    }
+  }, [cryptoCoin, checkoutTarget]);
 
   const handleValidateDiscount = async (codeStr: string, plan: string, period: string) => {
     if (!codeStr) {
@@ -1401,15 +1422,15 @@ export default function SettingsPage() {
                           </button>
                           <button
                             type="button"
-                            onClick={() => setPaymentMethod('zarinpal')}
+                            disabled={true}
                             style={{
                               padding: '10px',
-                              background: paymentMethod === 'zarinpal' ? 'rgba(255, 204, 0, 0.15)' : '#0f121d',
-                              border: paymentMethod === 'zarinpal' ? '1px solid #ffcc00' : '1px solid rgba(255,255,255,0.1)',
+                              background: '#0f121d',
+                              border: '1px solid rgba(255,255,255,0.1)',
                               borderRadius: '8px',
-                              color: paymentMethod === 'zarinpal' ? '#ffcc00' : '#a0aec0',
+                              color: 'rgba(160, 174, 192, 0.5)',
                               fontWeight: 'bold',
-                              cursor: 'pointer',
+                              cursor: 'not-allowed',
                               fontSize: '0.82rem',
                               transition: 'all 0.2s',
                             }}
@@ -1557,7 +1578,16 @@ export default function SettingsPage() {
                                 <strong style={{ color: '#10b981' }}>
                                   {cryptoCoin === 'USDT' 
                                     ? `${expectedAmount.toFixed(2)} USDT` 
-                                    : `${language === 'fa' ? 'معادل ریالی/دلاری با نرخ زنده در تراکنش' : 'Live dynamic conversion equivalent of'} $${expectedAmount.toFixed(2)} USD`}
+                                    : (
+                                      liveCryptoRates[cryptoCoin]
+                                        ? `${(expectedAmount / liveCryptoRates[cryptoCoin]!).toFixed(2)} ${cryptoCoin} ` + 
+                                          `(Rate: $${liveCryptoRates[cryptoCoin]})`
+                                        : (fetchingRate 
+                                            ? (language === 'fa' ? 'در حال دریافت نرخ زنده...' : 'Fetching live rate...') 
+                                            : `${language === 'fa' ? 'معادل ریالی/دلاری با نرخ زنده در تراکنش' : 'Live dynamic conversion equivalent of'} $${expectedAmount.toFixed(2)} USD`
+                                          )
+                                    )
+                                  }
                                 </strong>
                               </div>
                               <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginTop: '5px' }}>
