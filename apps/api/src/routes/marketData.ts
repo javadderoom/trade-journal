@@ -84,7 +84,7 @@ function aggregate4HourCandles(rawCandles: Array<{ time: number; open: number; h
 
 
 // Helper to paginate TwelveData backwards to get up to 10k candles
-async function fetchTwelveDataCandles(twelveSymbol: string, twelveInterval: string, limit: number): Promise<any[]> {
+async function fetchTwelveDataCandles(twelveSymbol: string, twelveInterval: string, limit: number, isCrypto: boolean = false): Promise<any[]> {
   let allCandles: any[] = [];
   let currentEndDate: string | null = null;
   const maxRequests = Math.ceil(limit / 5000) + 1; // Safeguard
@@ -123,23 +123,29 @@ async function fetchTwelveDataCandles(twelveSymbol: string, twelveInterval: stri
         volume: item.volume ? parseFloat(item.volume) : 0,
       }));
 
-      // Filter out weekend garbage data for Forex/Commodities
-      chunk = chunk.filter((c: any) => {
-        const d = new Date(c.time * 1000);
-        const day = d.getUTCDay();
-        const hrs = d.getUTCHours();
-        if (day === 6) return false; // Saturday
-        if (day === 5 && hrs >= 22) return false; // Friday after 22:00 UTC
-        if (day === 0 && hrs < 21) return false; // Sunday before 21:00 UTC
-        return true;
-      });
+      // Grab the oldest time before filtering (TwelveData returns newest to oldest)
+      const oldestTimeMs = chunk[chunk.length - 1].time * 1000;
+      currentEndDate = new Date(oldestTimeMs - 1000).toISOString().replace('T', ' ').substring(0, 19);
+
+      console.log(`[MarketData Filter] Processing chunk of ${chunk.length} candles for ${twelveSymbol}. isCrypto: ${isCrypto}`);
+      if (!isCrypto) {
+        // Filter out weekend garbage data for Forex/Commodities
+        chunk = chunk.filter((c: any) => {
+          const d = new Date(c.time * 1000);
+          const day = d.getUTCDay();
+          const hrs = d.getUTCHours();
+          const isWeekend = day === 6 || (day === 5 && hrs >= 22) || (day === 0 && hrs < 21);
+          if (isWeekend) {
+             console.log(`[MarketData Filter] Dropping weekend candle: ${d.toUTCString()}`);
+             return false;
+          }
+          return true;
+        });
+        console.log(`[MarketData Filter] After filter: ${chunk.length} candles left.`);
+      }
 
       chunk.reverse();
-
       allCandles = [...chunk, ...allCandles];
-
-      const oldestTimeMs = chunk[0].time * 1000;
-      currentEndDate = new Date(oldestTimeMs - 1000).toISOString().replace('T', ' ').substring(0, 19);
 
       if (rawData.values.length < fetchLimit) {
         break;
@@ -159,6 +165,7 @@ async function fetchTwelveDataCandles(twelveSymbol: string, twelveInterval: stri
  * Fetch historical candles with 0 API key required. Caches results in DB.
  */
 router.get('/history', rateLimit(60 * 1000, 30), async (req: Request, res: Response): Promise<void> => {
+  res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
   const symbol = (req.query.symbol as string || 'XAUUSD').toUpperCase();
   const timeframe = (req.query.timeframe as string || '15m').toLowerCase();
   const parsedLimit = parseInt(req.query.limit as string || '10000', 10);
@@ -217,8 +224,9 @@ router.get('/history', rateLimit(60 * 1000, 30), async (req: Request, res: Respo
       const twelveInterval = twelveIntervalMap[timeframe] || '15min';
       const fetchCount = isDeltaFetch ? 50 : limit;
       const fetchLimit = timeframe === '4h' ? fetchCount * 4 : fetchCount;
+      const isCrypto = symbol.includes('BTC') || symbol.includes('ETH') || symbol.includes('SOL');
       
-      candles = await fetchTwelveDataCandles(twelveSymbol, twelveInterval, fetchLimit);
+      candles = await fetchTwelveDataCandles(twelveSymbol, twelveInterval, fetchLimit, isCrypto);
 
       if (timeframe === '4h') {
         candles = aggregate4HourCandles(candles);
