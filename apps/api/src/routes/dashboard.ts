@@ -209,25 +209,25 @@ function generateEdgeInsight(recentTrades: any[], locale = 'fa'): EdgeInsight {
     const net = t.profit_usd + (t.commission ?? 0) + (t.swap ?? 0);
     const openDate = new Date(t.open_time);
     
-    // Analysis Timeframe
-    if (t.analysis_timeframe) {
-      if (!analysisTfs[t.analysis_timeframe]) {
-        analysisTfs[t.analysis_timeframe] = { label: t.analysis_timeframe, wins: 0, total: 0, pnl: 0 };
-      }
-      analysisTfs[t.analysis_timeframe].total++;
-      analysisTfs[t.analysis_timeframe].pnl += net;
-      if (isWin) analysisTfs[t.analysis_timeframe].wins++;
-    }
+// Analysis Timeframe
+     if (t.annotation?.analysis_timeframe) {
+       if (!analysisTfs[t.annotation.analysis_timeframe]) {
+         analysisTfs[t.annotation.analysis_timeframe] = { label: t.annotation.analysis_timeframe, wins: 0, total: 0, pnl: 0 };
+       }
+       analysisTfs[t.annotation.analysis_timeframe].total++;
+       analysisTfs[t.annotation.analysis_timeframe].pnl += net;
+       if (isWin) analysisTfs[t.annotation.analysis_timeframe].wins++;
+     }
 
-    // Entry Timeframe
-    if (t.entry_timeframe) {
-      if (!entryTfs[t.entry_timeframe]) {
-        entryTfs[t.entry_timeframe] = { label: t.entry_timeframe, wins: 0, total: 0, pnl: 0 };
-      }
-      entryTfs[t.entry_timeframe].total++;
-      entryTfs[t.entry_timeframe].pnl += net;
-      if (isWin) entryTfs[t.entry_timeframe].wins++;
-    }
+     // Entry Timeframe
+     if (t.annotation?.entry_timeframe) {
+       if (!entryTfs[t.annotation.entry_timeframe]) {
+         entryTfs[t.annotation.entry_timeframe] = { label: t.annotation.entry_timeframe, wins: 0, total: 0, pnl: 0 };
+       }
+       entryTfs[t.annotation.entry_timeframe].total++;
+       entryTfs[t.annotation.entry_timeframe].pnl += net;
+       if (isWin) entryTfs[t.annotation.entry_timeframe].wins++;
+     }
 
     // Session
     const session = getTradingSession(openDate);
@@ -237,7 +237,7 @@ function generateEdgeInsight(recentTrades: any[], locale = 'fa'): EdgeInsight {
     if (isWin) sessions[session].wins++;
 
     // Strategy tags
-    const tags = Array.isArray(t.tags) ? t.tags : [];
+    const tags = Array.isArray(t.annotation?.tags) ? t.annotation.tags : [];
     for (const tag of tags) {
       if (!strategies[tag]) strategies[tag] = { label: tag, wins: 0, total: 0, pnl: 0 };
       strategies[tag].total++;
@@ -254,7 +254,7 @@ function generateEdgeInsight(recentTrades: any[], locale = 'fa'): EdgeInsight {
     if (isWin) weekdays[dayName].wins++;
 
     // Emotion
-    const emo = t.emotion || 'UNKNOWN';
+    const emo = t.annotation?.emotion || 'UNKNOWN';
     if (!emotions[emo]) emotions[emo] = { label: emo, wins: 0, total: 0, pnl: 0 };
     emotions[emo].total++;
     emotions[emo].pnl += net;
@@ -400,39 +400,43 @@ router.get('/summary', authenticate, async (req: AuthRequest, res: Response) => 
     const monthStr = getTehranMonthStr(now);
 
     // ─── Fetch user trades and total count in parallel ────
-    const [allTrades, totalTrades] = await Promise.all([
-      prisma.trade.findMany({
-        where: accountWhere,
-        orderBy: { open_time: 'desc' },
-        take: 2000,
-        select: {
-          id: true,
-          account_id: true,
-          ticket: true,
-          symbol: true,
-          direction: true,
-          open_time: true,
-          close_time: true,
-          open_price: true,
-          close_price: true,
-          lot_size: true,
-          stop_loss: true,
-          take_profit: true,
-          profit_usd: true,
-          commission: true,
-          swap: true,
-          pips: true,
-          r_multiple: true,
-          tags: true,
-          emotion: true,
-          notes: true,
-          import_source: true,
-          analysis_timeframe: true,
-          entry_timeframe: true,
-        },
-      }),
-      prisma.trade.count({ where: accountWhere }),
-    ]);
+const [allTrades, totalTrades] = await Promise.all([
+       prisma.trade.findMany({
+         where: accountWhere,
+         orderBy: { open_time: 'desc' },
+         take: 2000,
+         select: {
+           id: true,
+           account_id: true,
+           ticket: true,
+           symbol: true,
+           direction: true,
+           open_time: true,
+           close_time: true,
+           open_price: true,
+           close_price: true,
+           lot_size: true,
+           stop_loss: true,
+           take_profit: true,
+           profit_usd: true,
+           commission: true,
+           swap: true,
+           pips: true,
+           r_multiple: true,
+           import_source: true,
+           annotation: {
+             select: {
+               tags: true,
+               emotion: true,
+               notes: true,
+               analysis_timeframe: true,
+               entry_timeframe: true,
+             },
+           },
+         },
+       }),
+       prisma.trade.count({ where: accountWhere }),
+     ]);
 
     // ─── SECTION 1: TODAY ──────────────────────────────────────────────────────
     const todayTrades = allTrades.filter((t) => {
@@ -598,8 +602,8 @@ router.get('/summary', authenticate, async (req: AuthRequest, res: Response) => 
         swap: t.swap,
         pips: t.pips,
         rMultiple: t.r_multiple,
-        tags: t.tags,
-        emotion: t.emotion,
+tags: t.annotation?.tags ?? [],
+         emotion: t.annotation?.emotion ?? null,
         direction_is_buy: t.direction === 'BUY',
       }));
 

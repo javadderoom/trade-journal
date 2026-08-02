@@ -21,7 +21,9 @@ type PrismaTrade = {
   stop_loss: number | null;
   take_profit: number | null;
   profit_usd: number;
-  tags: string[];
+  annotation?: {
+    tags: string[];
+  } | null;
 };
 
 /**
@@ -171,14 +173,15 @@ async function checkWeakStrategy(
   prisma: PrismaClient,
   costUsd: number
 ): Promise<SuggestedMistake | null> {
-  if (!trade.tags || trade.tags.length === 0) return null;
+  const tags = trade.annotation?.tags;
+  if (!tags || tags.length === 0) return null;
 
-  for (const tag of trade.tags) {
+  for (const tag of tags) {
     const tagTrades = await prisma.trade.findMany({
       where: {
         user_id: trade.user_id,
         id: { not: trade.id },
-        tags: { has: tag },
+        annotation: { tags: { has: tag } },
         close_time: { not: null },
       },
       orderBy: { close_time: 'desc' },

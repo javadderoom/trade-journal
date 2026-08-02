@@ -243,7 +243,7 @@ export default function TradesTable({
       if (deletedNames.length > 0) {
         setTrades(prev => prev.map(t => ({
           ...t,
-          tags: t.tags ? t.tags.filter(tag => !deletedNames.includes(tag)) : []
+          tags: t.annotation?.tags ? t.annotation?.tags.filter(tag => !deletedNames.includes(tag)) : []
         })));
       }
 
@@ -268,7 +268,7 @@ export default function TradesTable({
       if (deletedValues.length > 0) {
         setTrades(prev => prev.map(t => ({
           ...t,
-          emotion: t.emotion && deletedValues.includes(t.emotion) ? null : t.emotion
+          emotion: t.annotation?.emotion && deletedValues.includes(t.annotation?.emotion) ? null : t.annotation?.emotion
         })));
       }
 
@@ -286,8 +286,8 @@ export default function TradesTable({
       const map = new Map<string, TagObject>();
       prev.forEach(t => map.set(t.name, t));
       trades.forEach(t => {
-        if (t.tags && Array.isArray(t.tags)) {
-          t.tags.forEach(tag => {
+        if (t.annotation?.tags && Array.isArray(t.annotation?.tags)) {
+          t.annotation?.tags.forEach(tag => {
             if (tag && !map.has(tag)) {
               map.set(tag, { name: tag, is_ignored: false, show_first: false });
             }
@@ -305,9 +305,9 @@ export default function TradesTable({
       const existingValues = new Set(prev.map(e => e.value));
       const updated = [...prev];
       trades.forEach(t => {
-        if (t.emotion && !existingValues.has(t.emotion)) {
-          existingValues.add(t.emotion);
-          updated.push({ value: t.emotion, label: t.emotion, emoji: '💭' });
+        if (t.annotation?.emotion && !existingValues.has(t.annotation?.emotion)) {
+          existingValues.add(t.annotation?.emotion);
+          updated.push({ value: t.annotation?.emotion, label: t.annotation?.emotion, emoji: '💭' });
         }
       });
       return updated;
@@ -351,21 +351,21 @@ export default function TradesTable({
         if (trade.direction !== dir) return false;
       }
       if (selectedTimeframe !== 'ALL') {
-        const matchAnalysis = trade.analysisTimeframe === selectedTimeframe;
-        const matchEntry = trade.entryTimeframe === selectedTimeframe;
+        const matchAnalysis = trade.annotation?.analysisTimeframe === selectedTimeframe;
+        const matchEntry = trade.annotation?.entryTimeframe === selectedTimeframe;
         if (!matchAnalysis && !matchEntry) return false;
       }
       if (searchQuery) {
         const query = searchQuery.toLowerCase().trim();
         const symbolMatch = trade.symbol.toLowerCase().includes(query);
         const ticketMatch = trade.ticket ? String(trade.ticket).includes(query) : false;
-        const notesMatch = trade.notes ? trade.notes.toLowerCase().includes(query) : false;
+        const notesMatch = trade.annotation?.notes ? trade.annotation?.notes.toLowerCase().includes(query) : false;
         const dateMatch = trade.openTime.includes(query);
         if (!symbolMatch && !ticketMatch && !notesMatch && !dateMatch) {
           return false;
         }
       }
-      const isMissed = trade.tags?.some(tag => ignoredTagsSet.has(tag));
+      const isMissed = trade.annotation?.tags?.some(tag => ignoredTagsSet.has(tag));
       if (selectedStatus === 'OPEN' && (isMissed || trade.closeTime !== null)) return false;
       if (selectedStatus === 'CLOSED' && (isMissed || trade.closeTime === null)) return false;
       if (selectedStatus === 'MISSED' && !isMissed) return false;
@@ -406,7 +406,7 @@ export default function TradesTable({
   // Summary Metrics
   const summary = useMemo(() => {
     const activeTrades = filteredTrades.filter(
-      t => !t.tags?.some(tag => ignoredTagsSet.has(tag))
+      t => !t.annotation?.tags?.some(tag => ignoredTagsSet.has(tag))
     );
     const count = activeTrades.length;
     const wins = activeTrades.filter(t => getNetPnl(t) > 0).length;
@@ -579,11 +579,18 @@ export default function TradesTable({
     }
   };
 
-  const updateActiveTradeField = (key: keyof Trade, value: any) => {
+  const ANNOTATION_FIELDS = new Set(['tags', 'emotion', 'notes', 'screenshots', 'analysisTimeframe', 'entryTimeframe']);
+
+  const updateActiveTradeField = (key: keyof Trade | 'tags' | 'emotion' | 'notes' | 'screenshots' | 'analysisTimeframe' | 'entryTimeframe', value: any) => {
     if (!activeTradeId) return;
     setTrades(prev =>
       prev.map(t => {
         if (t.id !== activeTradeId) return t;
+
+        if (ANNOTATION_FIELDS.has(key)) {
+          const updated = { ...t, annotation: { ...(t.annotation ?? {}), [key]: value } as NonNullable<Trade['annotation']> };
+          return updated;
+        }
 
         const updated = { ...t, [key]: value };
 

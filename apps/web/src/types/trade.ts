@@ -16,13 +16,15 @@ export interface Trade {
   swap: number;
   pips: number;
   rMultiple: number;
-  tags: string[];
-  emotion: string | null;
-  notes: string | null;
-  screenshots?: string[];
+  annotation?: {
+    tags: string[];
+    emotion: string | null;
+    notes: string | null;
+    screenshots: string[];
+    analysisTimeframe: string | null;
+    entryTimeframe: string | null;
+  } | null;
   chartData?: any;
-  analysisTimeframe?: string | null;
-  entryTimeframe?: string | null;
   importSource?: string;
   accountType?: string;
 }

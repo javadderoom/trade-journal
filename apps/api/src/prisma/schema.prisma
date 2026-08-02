@@ -106,18 +106,14 @@ model Trade {
   swap          Float        // Aggregated: sum of all execution swaps
   pips          Float        // Aggregated: pips from last exit
   r_multiple    Float        // Aggregated: R-multiple from last exit
-  tags          String[]
-  emotion       String?
-  notes         String?
   ticket        String?      // MT4/MT5 deal ticket for deduplication
   import_source ImportSource @default(MANUAL)
-  screenshots   String[]     @default([])
   chart_data         Json?
-  analysis_timeframe String?
-  entry_timeframe    String?
   created_at         DateTime     @default(now())
 
   executions    Execution[]
+
+  annotation    TradeAnnotation?
 
   @@unique([account_id, ticket])
   @@index([user_id])
@@ -127,6 +123,20 @@ model Trade {
   @@index([user_id, account_id, open_time])
   @@index([user_id, close_time])
   mistakeIncidents MistakeIncident[]
+}
+
+model TradeAnnotation {
+  id                String   @id @default(uuid())
+  trade_id          String   @unique
+  trade             Trade    @relation(fields: [trade_id], references: [id], onDelete: Cascade)
+  tags              String[] @default([])
+  emotion           String?
+  notes             String?
+  screenshots       String[] @default([])
+  analysis_timeframe String?
+  entry_timeframe   String?
+  created_at        DateTime @default(now())
+  updated_at        DateTime @updatedAt
 }
 
 model Execution {

@@ -331,7 +331,7 @@ export default function DashboardPage() {
                 const net = t.profitUsd + (t.commission ?? 0) + (t.swap ?? 0);
                 const isOpen = !t.closeTime;
                 const r = t.rMultiple ?? 0;
-                const primaryTag = Array.isArray(t.tags) && t.tags.length > 0 ? t.tags[0] : null;
+                const primaryTag = Array.isArray(t.annotation?.tags) && t.annotation.tags.length > 0 ? t.annotation.tags[0] : null;
                 return (
                   <div key={t.id} className="dash-recent-trade-row">
                     <div className={`trade-dir-badge ${t.direction_is_buy ? 'buy' : 'sell'}`}>

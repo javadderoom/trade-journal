@@ -140,10 +140,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
           rel="stylesheet"
         />
-        {/* Kavenegar Webpush SDK */}
-        {process.env.NODE_ENV !== 'development' && (
-          <script src="https://cdn.kavenegar.com/sdk/page.js?appId=245422b2-eab2-4608-93ab-80526bd21f85" defer charSet="utf-8"></script>
-        )}
         {/* Google Analytics 4 (GA4) */}
         <Script
           src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_ID || 'G-T2148XPMH9'}`}

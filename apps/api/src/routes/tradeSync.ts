@@ -155,6 +155,7 @@ router.post('/', authenticate, checkTradeLimit, async (req: AuthRequest, res: Re
       stopLoss, takeProfit, closePrice, closeTime,
       profitUsd, commission, swap, accountId,
       analysisTimeframe, entryTimeframe,
+      tags, emotion, notes,
     } = parsed.data;
 
     const userId = req.user!.userId;
@@ -238,14 +239,24 @@ router.post('/', authenticate, checkTradeLimit, async (req: AuthRequest, res: Re
           profit_usd: profitUsdNum,
           commission: commissionNum,
           swap: swapNum,
-          pips: pips,
-          r_multiple: rMultiple,
-          import_source: 'MANUAL',
-          ticket: null,
-          analysis_timeframe: analysisTimeframe || null,
-          entry_timeframe: entryTimeframe || null,
-        },
-      });
+pips: pips,
+           r_multiple: rMultiple,
+           import_source: 'MANUAL',
+           ticket: null,
+         },
+       });
+
+       // Create user-generated annotation fields separately
+       await tx.tradeAnnotation.create({
+         data: {
+           trade_id: trade.id,
+           tags: tags ?? [],
+           emotion: emotion ?? null,
+           notes: notes ?? null,
+           analysis_timeframe: analysisTimeframe || null,
+           entry_timeframe: entryTimeframe || null,
+         },
+       });
 
       // Create ENTRY execution
       await tx.execution.create({
@@ -410,32 +421,43 @@ router.put('/:id', authenticate, async (req: AuthRequest, res: Response) => {
       }
     }
 
-    const updated = await prisma.$transaction(async (tx) => {
-      const trade = await tx.trade.update({
-        where: { id },
-        data: {
-          account_id: accountId !== undefined ? accountId : undefined,
-          notes: notes !== undefined ? notes : undefined,
-          emotion: emotion !== undefined ? emotion : undefined,
-          stop_loss: stopLoss !== undefined ? stopLoss : undefined,
-          take_profit: takeProfit !== undefined ? takeProfit : undefined,
-          tags: tags !== undefined ? (tags ?? []) : undefined,
-          r_multiple: rMultipleUpdate !== undefined ? rMultipleUpdate : undefined,
-          analysis_timeframe: analysisTimeframe !== undefined ? analysisTimeframe : undefined,
-          entry_timeframe: entryTimeframe !== undefined ? entryTimeframe : undefined,
-          symbol: symbol !== undefined ? symbol : undefined,
-          direction: direction !== undefined ? direction : undefined,
-          lot_size: lotSize !== undefined ? lotSize : undefined,
-          open_price: openPrice !== undefined ? openPrice : undefined,
-          open_time: openTime !== undefined ? new Date(openTime) : undefined,
-          close_time: closeTime !== undefined ? (closeTime === null ? null : new Date(closeTime)) : undefined,
-          close_price: closePrice !== undefined ? closePrice : undefined,
-          profit_usd: profitUsdUpdate !== undefined ? profitUsdUpdate : (profitUsd !== undefined ? profitUsd : undefined),
-          commission: commission !== undefined ? commission : undefined,
-          swap: swap !== undefined ? swap : undefined,
-          pips: pipsUpdate !== undefined ? pipsUpdate : undefined,
-        },
-      });
+const updated = await prisma.$transaction(async (tx) => {
+       const trade = await tx.trade.update({
+         where: { id },
+         data: {
+           account_id: accountId !== undefined ? accountId : undefined,
+           stop_loss: stopLoss !== undefined ? stopLoss : undefined,
+           take_profit: takeProfit !== undefined ? takeProfit : undefined,
+           r_multiple: rMultipleUpdate !== undefined ? rMultipleUpdate : undefined,
+           symbol: symbol !== undefined ? symbol : undefined,
+           direction: direction !== undefined ? direction : undefined,
+           lot_size: lotSize !== undefined ? lotSize : undefined,
+           open_price: openPrice !== undefined ? openPrice : undefined,
+           open_time: openTime !== undefined ? new Date(openTime) : undefined,
+           close_time: closeTime !== undefined ? (closeTime === null ? null : new Date(closeTime)) : undefined,
+           close_price: closePrice !== undefined ? closePrice : undefined,
+           profit_usd: profitUsdUpdate !== undefined ? profitUsdUpdate : (profitUsd !== undefined ? profitUsd : undefined),
+           commission: commission !== undefined ? commission : undefined,
+           swap: swap !== undefined ? swap : undefined,
+           pips: pipsUpdate !== undefined ? pipsUpdate : undefined,
+         },
+       });
+
+       // Update user-generated annotation fields separately
+       const annotationData: any = {};
+       if (notes !== undefined) annotationData.notes = notes;
+       if (emotion !== undefined) annotationData.emotion = emotion;
+       if (tags !== undefined) annotationData.tags = tags ?? [];
+       if (analysisTimeframe !== undefined) annotationData.analysis_timeframe = analysisTimeframe;
+       if (entryTimeframe !== undefined) annotationData.entry_timeframe = entryTimeframe;
+
+       if (Object.keys(annotationData).length > 0) {
+         await tx.tradeAnnotation.upsert({
+           where: { trade_id: id },
+           create: { trade_id: id, ...annotationData },
+           update: annotationData,
+         });
+       }
 
       // Handle EXIT execution creation on close
       const isBeingClosed = closeTime !== undefined && closeTime !== null && closePrice !== undefined && closePrice !== null;
@@ -651,10 +673,10 @@ router.post('/tags/bulk', authenticate, async (req: AuthRequest, res: Response) 
         },
       });
 
-      // Remove from Trade tags arrays — single query per tag using array_remove
-      for (const tagName of deletes) {
-        await prisma.$executeRaw`UPDATE "Trade" SET tags = array_remove(tags, ${tagName}) WHERE user_id = ${userId} AND ${tagName} = ANY(tags)`;
-      }
+// Remove from TradeAnnotation tags arrays — single query per tag using array_remove
+       for (const tagName of deletes) {
+         await prisma.$executeRaw`UPDATE "TradeAnnotation" SET tags = array_remove(tags, ${tagName}) WHERE EXISTS (SELECT 1 FROM "Trade" WHERE "TradeAnnotation".trade_id = "Trade".id AND "Trade".user_id = ${userId}) AND ${tagName} = ANY(tags)`;
+       }
     }
 
     // 2. Handle updates/upserts — batch with createMany + updateMany
@@ -746,7 +768,7 @@ router.delete('/tags/:name', authenticate, async (req: AuthRequest, res: Respons
     });
 
     // 2. Remove tag from all trades — single query
-    await prisma.$executeRaw`UPDATE "Trade" SET tags = array_remove(tags, ${name}) WHERE user_id = ${userId} AND ${name} = ANY(tags)`;
+    await prisma.$executeRaw`UPDATE "TradeAnnotation" SET tags = array_remove(tags, ${name}) WHERE EXISTS (SELECT 1 FROM "Trade" WHERE "TradeAnnotation".trade_id = "Trade".id AND "Trade".user_id = ${userId}) AND ${name} = ANY(tags)`;
 
     res.status(200).json({ success: true });
   } catch (err: any) {
@@ -820,16 +842,16 @@ router.post('/emotions/bulk', authenticate, async (req: AuthRequest, res: Respon
         },
       });
 
-      // Clear emotion on all matching trades
-      await prisma.trade.updateMany({
-        where: {
-          user_id: userId,
-          emotion: { in: deletes },
-        },
-        data: {
-          emotion: null,
-        },
-      });
+// Clear emotion on all matching trade annotations
+       await prisma.tradeAnnotation.updateMany({
+         where: {
+           trade: { user_id: userId },
+           emotion: { in: deletes },
+         },
+         data: {
+           emotion: null,
+         },
+       });
     }
 
     // 2. Handle updates/upserts
@@ -1034,35 +1056,35 @@ router.post('/:id/screenshots', authenticate, upload.single('screenshot'), async
       return;
     }
 
-    const trade = await prisma.trade.findFirst({
-      where: { id, user_id: userId },
-    });
+const trade = await prisma.trade.findFirst({
+       where: { id, user_id: userId },
+       include: { annotation: true },
+     });
 
-    if (!trade) {
-      // Remove uploaded file if trade is not found
-      if (fs.existsSync(req.file.path)) {
-        fs.unlinkSync(req.file.path);
-      }
-      res.status(404).json({ error: 'Trade not found' });
-      return;
-    }
+     if (!trade) {
+       // Remove uploaded file if trade is not found
+       if (fs.existsSync(req.file.path)) {
+         fs.unlinkSync(req.file.path);
+       }
+       res.status(404).json({ error: 'Trade not found' });
+       return;
+     }
 
-    const relativeUrl = `/uploads/screenshots/${req.file.filename}`;
-    const updatedScreenshots = [...trade.screenshots, relativeUrl];
+     const relativeUrl = `/uploads/screenshots/${req.file.filename}`;
+     const updatedScreenshots = [...(trade.annotation?.screenshots ?? []), relativeUrl];
 
-    await prisma.trade.update({
-      where: { id },
-      data: {
-        screenshots: updatedScreenshots,
-      },
-    });
+     await prisma.tradeAnnotation.upsert({
+       where: { trade_id: id },
+       create: { trade_id: id, screenshots: updatedScreenshots },
+       update: { screenshots: updatedScreenshots },
+     });
 
-    res.status(200).json({ screenshots: updatedScreenshots });
-  } catch (err: any) {
-    console.error('Screenshot upload error:', err);
-    res.status(500).json({ error: 'خطای داخلی سرور' });
-  }
-});
+     res.status(200).json({ screenshots: updatedScreenshots });
+   } catch (err: any) {
+     console.error('Screenshot upload error:', err);
+     res.status(500).json({ error: 'خطای داخلی سرور' });
+   }
+ });
 
 /**
  * DELETE /api/trades/:id/screenshots
@@ -1078,44 +1100,44 @@ router.delete('/:id/screenshots', authenticate, async (req: AuthRequest, res: Re
       return;
     }
 
-    const trade = await prisma.trade.findFirst({
-      where: { id, user_id: userId },
-    });
+const trade = await prisma.trade.findFirst({
+       where: { id, user_id: userId },
+       include: { annotation: true },
+     });
 
-    if (!trade) {
-      res.status(404).json({ error: 'Trade not found' });
-      return;
-    }
+     if (!trade) {
+       res.status(404).json({ error: 'Trade not found' });
+       return;
+     }
 
-    // Filter out the URL from the screenshots list
-    const updatedScreenshots = trade.screenshots.filter(s => s !== url);
+     // Filter out the URL from the screenshots list
+     const updatedScreenshots = (trade.annotation?.screenshots ?? []).filter(s => s !== url);
 
-    // Delete the file from the filesystem if it belongs to this trade's uploads
-    if (url.startsWith('/uploads/screenshots/')) {
-      const filename = url.replace('/uploads/screenshots/', '');
-      const filepath = path.join(__dirname, '../../uploads/screenshots', filename);
-      if (fs.existsSync(filepath)) {
-        try {
-          fs.unlinkSync(filepath);
-        } catch (e) {
-          console.error(`Failed to delete file from disk: ${filepath}`, e);
-        }
-      }
-    }
+     // Delete the file from the filesystem if it belongs to this trade's uploads
+     if (url.startsWith('/uploads/screenshots/')) {
+       const filename = url.replace('/uploads/screenshots/', '');
+       const filepath = path.join(__dirname, '../../uploads/screenshots', filename);
+       if (fs.existsSync(filepath)) {
+         try {
+           fs.unlinkSync(filepath);
+         } catch (e) {
+           console.error(`Failed to delete file from disk: ${filepath}`, e);
+         }
+       }
+     }
 
-    await prisma.trade.update({
-      where: { id },
-      data: {
-        screenshots: updatedScreenshots,
-      },
-    });
+     await prisma.tradeAnnotation.upsert({
+       where: { trade_id: id },
+       create: { trade_id: id, screenshots: updatedScreenshots },
+       update: { screenshots: updatedScreenshots },
+     });
 
-    res.status(200).json({ screenshots: updatedScreenshots });
-  } catch (err: any) {
-    console.error('Screenshot deletion error:', err);
-    res.status(500).json({ error: 'خطای داخلی سرور' });
-  }
-});
+     res.status(200).json({ screenshots: updatedScreenshots });
+   } catch (err: any) {
+     console.error('Screenshot deletion error:', err);
+     res.status(500).json({ error: 'خطای داخلی سرور' });
+   }
+ });
 
 const uploadMemory = multer({ storage: multer.memoryStorage() });
 

@@ -303,13 +303,15 @@ export type TradeListRow = {
   swap: number;
   pips: number;
   rMultiple: number;
-  tags: string[];
-  emotion: string | null;
-  notes: string | null;
-  screenshots: string[];
+  annotation: {
+    tags: string[];
+    emotion: string | null;
+    notes: string | null;
+    screenshots: string[];
+    analysisTimeframe: string | null;
+    entryTimeframe: string | null;
+  } | null;
   chartData?: any;
-  analysisTimeframe: string | null;
-  entryTimeframe: string | null;
 };
 
 export async function getTradesForAccount(params: {
@@ -384,15 +386,19 @@ export async function getTradesForAccount(params: {
       swap: true,
       pips: true,
       r_multiple: true,
-      tags: true,
-      emotion: true,
-      notes: true,
-      screenshots: true,
       chart_data: true,
-      analysis_timeframe: true,
-      entry_timeframe: true,
       import_source: true,
       account: { select: { account_type: true } },
+      annotation: {
+        select: {
+          tags: true,
+          emotion: true,
+          notes: true,
+          screenshots: true,
+          analysis_timeframe: true,
+          entry_timeframe: true,
+        },
+      },
     },
   });
 
@@ -414,13 +420,15 @@ export async function getTradesForAccount(params: {
     swap: t.swap,
     pips: t.pips,
     rMultiple: t.r_multiple,
-    tags: t.tags,
-    emotion: t.emotion,
-    notes: t.notes,
-    screenshots: t.screenshots,
+    annotation: t.annotation ? {
+      tags: t.annotation.tags,
+      emotion: t.annotation.emotion,
+      notes: t.annotation.notes,
+      screenshots: t.annotation.screenshots,
+      analysisTimeframe: t.annotation.analysis_timeframe,
+      entryTimeframe: t.annotation.entry_timeframe,
+    } : null,
     chartData: t.chart_data,
-    analysisTimeframe: t.analysis_timeframe,
-    entryTimeframe: t.entry_timeframe,
     importSource: t.import_source,
     accountType: t.account.account_type,
   }));

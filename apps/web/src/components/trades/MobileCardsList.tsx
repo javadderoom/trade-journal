@@ -122,7 +122,7 @@ export default function MobileCardsList({
           const isBuy = trade.direction === 'BUY';
           const isClosed = trade.closeTime !== null;
           const isActive = trade.id === activeTradeId;
-          const isMissed = trade.tags?.some(tag => ignoredTags.has(tag));
+          const isMissed = trade.annotation?.tags?.some(tag => ignoredTags.has(tag));
           const netPnl = getNetPnl(trade);
 
           let profitClass = 'profit-zero';
@@ -224,7 +224,7 @@ export default function MobileCardsList({
                 const importantTagNames = new Set(
                   (allTags || []).filter(t => t.show_first).map(t => t.name)
                 );
-                const sortedTags = [...(trade.tags || [])].sort((a, b) => {
+                const sortedTags = [...(trade.annotation?.tags || [])].sort((a, b) => {
                   const aImp = importantTagNames.has(a);
                   const bImp = importantTagNames.has(b);
                   if (aImp && !bImp) return -1;
@@ -232,11 +232,11 @@ export default function MobileCardsList({
                   return 0;
                 });
 
-                return (trade.emotion || (sortedTags.length > 0)) && (
+                return (trade.annotation?.emotion || (sortedTags.length > 0)) && (
                   <div className="card-tags-row">
-                    {trade.emotion && (
-                      <span className={`emotion-mini-badge emotion-${trade.emotion.toLowerCase()}`} title={`${t('trades.emotion')}: ${getEmotionLabel(trade.emotion, allEmotions)}`}>
-                        {getEmotionEmoji(trade.emotion, allEmotions)} {getEmotionLabel(trade.emotion, allEmotions)}
+                    {trade.annotation?.emotion && (
+                      <span className={`emotion-mini-badge emotion-${trade.annotation?.emotion.toLowerCase()}`} title={`${t('trades.emotion')}: ${getEmotionLabel(trade.annotation?.emotion, allEmotions)}`}>
+                        {getEmotionEmoji(trade.annotation?.emotion, allEmotions)} {getEmotionLabel(trade.annotation?.emotion, allEmotions)}
                       </span>
                     )}
                     {sortedTags.map(tag => {
@@ -250,16 +250,16 @@ export default function MobileCardsList({
                   </div>
                 );
               })()}
-              {(trade.analysisTimeframe || trade.entryTimeframe) && (
+              {(trade.annotation?.analysisTimeframe || trade.annotation?.entryTimeframe) && (
                 <div className="card-tags-row">
-                  {trade.analysisTimeframe && (
+                  {trade.annotation?.analysisTimeframe && (
                     <span className="timeframe-badge analysis" title={t('trades.analysisTimeframe')}>
-                      📊 {trade.analysisTimeframe}
+                      📊 {trade.annotation?.analysisTimeframe}
                     </span>
                   )}
-                  {trade.entryTimeframe && (
+                  {trade.annotation?.entryTimeframe && (
                     <span className="timeframe-badge entry" title={t('trades.entryTimeframe')}>
-                      🎯 {trade.entryTimeframe}
+                      🎯 {trade.annotation?.entryTimeframe}
                     </span>
                   )}
                 </div>

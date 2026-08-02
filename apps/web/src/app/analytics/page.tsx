@@ -76,7 +76,7 @@ export default function JournalPage() {
 
   // Compute Statistics (Tier 1 & Tier 2)
   const stats = useMemo(() => {
-    const closedTrades = trades.filter((t) => t.closeTime !== null && t.closePrice !== null && !t.tags?.some(tag => ignoredTags.has(tag)));
+    const closedTrades = trades.filter((t) => t.closeTime !== null && t.closePrice !== null && !t.annotation?.tags?.some(tag => ignoredTags.has(tag)));
     const totalCount = closedTrades.length;
 
     if (totalCount === 0) {
@@ -247,7 +247,7 @@ export default function JournalPage() {
       if (isWin) symbolsGroup[mainPair].wins += 1;
 
       // C. Strategy / Tags
-      const tags = Array.isArray(t.tags) ? t.tags : [];
+      const tags = Array.isArray(t.annotation?.tags) ? t.annotation.tags : [];
       tags.forEach((tag) => {
         if (!strategiesGroup[tag]) {
           strategiesGroup[tag] = { pnl: 0, wins: 0, total: 0 };
@@ -282,7 +282,7 @@ export default function JournalPage() {
       hoursPnl[hour].count += 1;
 
       // F. Emotion
-      const emo = t.emotion || 'UNKNOWN';
+      const emo = t.annotation?.emotion || 'UNKNOWN';
       if (!emotionsGroup[emo]) {
         emotionsGroup[emo] = { pnl: 0, wins: 0, total: 0 };
       }
@@ -291,8 +291,8 @@ export default function JournalPage() {
       if (isWin) emotionsGroup[emo].wins += 1;
 
       // G. Timeframes
-      const aTf = t.analysisTimeframe;
-      const eTf = t.entryTimeframe;
+const aTf = t.annotation?.analysisTimeframe;
+       const eTf = t.annotation?.entryTimeframe;
       if (aTf && eTf && timeframeMatrix[aTf] && timeframeMatrix[aTf][eTf]) {
         timeframeMatrix[aTf][eTf].total += 1;
         timeframeMatrix[aTf][eTf].pnl += net;
@@ -400,7 +400,7 @@ export default function JournalPage() {
 
   const sortedClosedTrades = useMemo(() => {
     return [...trades]
-      .filter((t) => t.closeTime !== null && t.closePrice !== null && !t.tags?.some(tag => ignoredTags.has(tag)))
+      .filter((t) => t.closeTime !== null && t.closePrice !== null && !t.annotation?.tags?.some(tag => ignoredTags.has(tag)))
       .sort((a, b) => new Date(a.closeTime!).getTime() - new Date(b.closeTime!).getTime());
   }, [trades, ignoredTags]);
 

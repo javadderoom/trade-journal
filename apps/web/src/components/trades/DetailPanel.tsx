@@ -25,7 +25,7 @@ interface DetailPanelProps {
   setAllEmotions: React.Dispatch<React.SetStateAction<{ value: string; label: string; emoji?: string }[]>>;
   isUploading: boolean;
   setLightboxUrl: (url: string | null) => void;
-  updateActiveTradeField: (key: keyof Trade, value: any) => void;
+  updateActiveTradeField: (key: keyof Trade | 'tags' | 'emotion' | 'notes' | 'screenshots' | 'analysisTimeframe' | 'entryTimeframe', value: any) => void;
   handleSaveDetails: (e: React.FormEvent) => void;
   handleDeleteClick: () => void;
   handleScreenshotUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
@@ -233,8 +233,8 @@ export default function DetailPanel({
   const handleDeleteEmotion = (value: string) => {
     setDeletedEmotionDrafts(prev => [...prev, value]);
     setAllEmotions(prev => prev.filter(e => e.value !== value));
-    if (activeTrade.emotion === value) {
-      updateActiveTradeField('emotion', null);
+if (activeTrade.annotation?.emotion === value) {
+       updateActiveTradeField('emotion', null);
     }
   };
 
@@ -580,7 +580,7 @@ export default function DetailPanel({
                 <span className="grid-value">
                   <select
                     className="grid-input"
-                    value={activeTrade.analysisTimeframe || ''}
+                    value={activeTrade.annotation?.analysisTimeframe || ''}
                     onChange={e => updateActiveTradeField('analysisTimeframe', e.target.value || null)}
                     style={inputStyle}
                   >
@@ -601,7 +601,7 @@ export default function DetailPanel({
                 <span className="grid-value">
                   <select
                     className="grid-input"
-                    value={activeTrade.entryTimeframe || ''}
+                    value={activeTrade.annotation?.entryTimeframe || ''}
                     onChange={e => updateActiveTradeField('entryTimeframe', e.target.value || null)}
                     style={inputStyle}
                   >
@@ -710,8 +710,8 @@ export default function DetailPanel({
                           onClick={() => {
                             setDeletedTagDrafts(prev => [...prev, tag.name]);
                             setAllTags(prev => prev.filter(t => t.name !== tag.name));
-                            if (activeTrade.tags?.includes(tag.name)) {
-                              updateActiveTradeField('tags', activeTrade.tags.filter(t => t !== tag.name));
+if (activeTrade.annotation?.tags?.includes(tag.name)) {
+                               updateActiveTradeField('tags', activeTrade.annotation.tags.filter(t => t !== tag.name));
                             }
                           }}
                           style={{
@@ -738,13 +738,13 @@ export default function DetailPanel({
                     .sort((a, b) => {
                       if (a.show_first && !b.show_first) return -1;
                       if (!a.show_first && b.show_first) return 1;
-                      const aSelected = activeTrade.tags?.includes(a.name) ? 1 : 0;
-                      const bSelected = activeTrade.tags?.includes(b.name) ? 1 : 0;
+const aSelected = activeTrade.annotation?.tags?.includes(a.name) ? 1 : 0;
+                       const bSelected = activeTrade.annotation?.tags?.includes(b.name) ? 1 : 0;
                       if (aSelected !== bSelected) return bSelected - aSelected;
                       return a.name.localeCompare(b.name, 'fa');
                     })
                     .map(tag => {
-                      const isSelected = activeTrade.tags && activeTrade.tags.includes(tag.name);
+                      const isSelected = activeTrade.annotation?.tags && activeTrade.annotation.tags.includes(tag.name);
                       return (
                         <span
                           key={tag.name}
@@ -755,13 +755,13 @@ export default function DetailPanel({
                             alignItems: 'center',
                             gap: '4px'
                           }}
-                          onClick={() => {
-                            const currentTags = activeTrade.tags || [];
-                            const newTags = isSelected
-                              ? currentTags.filter(t => t !== tag.name)
-                              : [...currentTags, tag.name];
-                            updateActiveTradeField('tags', newTags);
-                          }}
+onClick={() => {
+                             const currentTags = activeTrade.annotation?.tags || [];
+                             const newTags = isSelected
+                               ? currentTags.filter(t => t !== tag.name)
+                               : [...currentTags, tag.name];
+                             updateActiveTradeField('tags', newTags);
+                           }}
                         >
                           {tag.show_first && (
                             <span className="material-symbols-outlined" style={{ fontSize: '10px', color: '#10b981' }}>star</span>
@@ -780,16 +780,16 @@ export default function DetailPanel({
                       placeholder={p.tagPlaceholder}
                       onBlur={() => setIsAddingTag(false)}
                       onKeyDown={e => {
-                        if (e.key === 'Enter') {
-                          e.preventDefault();
-                          const val = e.currentTarget.value.trim();
-                          if (val) {
-                            const currentTags = activeTrade.tags || [];
-                            if (!currentTags.includes(val)) {
-                              updateActiveTradeField('tags', [...currentTags, val]);
-                            }
-                            onAddCustomTag?.(val);
-                          }
+if (e.key === 'Enter') {
+                           e.preventDefault();
+                           const val = e.currentTarget.value.trim();
+                           if (val) {
+                             const currentTags = activeTrade.annotation?.tags || [];
+                             if (!currentTags.includes(val)) {
+                               updateActiveTradeField('tags', [...currentTags, val]);
+                             }
+                             onAddCustomTag?.(val);
+                           }
                           setIsAddingTag(false);
                         } else if (e.key === 'Escape') {
                           setIsAddingTag(false);
@@ -921,12 +921,12 @@ export default function DetailPanel({
                 <div className="tags-container">
                   {[...allEmotions]
                     .sort((a, b) => {
-                      const aSelected = activeTrade.emotion === a.value ? 1 : 0;
-                      const bSelected = activeTrade.emotion === b.value ? 1 : 0;
+const aSelected = activeTrade.annotation?.emotion === a.value ? 1 : 0;
+                       const bSelected = activeTrade.annotation?.emotion === b.value ? 1 : 0;
                       return bSelected - aSelected;
                     })
                     .map(({ value, label, emoji }) => {
-                      const isSelected = activeTrade.emotion === value;
+                      const isSelected = activeTrade.annotation?.emotion === value;
                       const displayEmoji = emoji || getEmotionEmoji(value, allEmotions);
                       return (
                         <span
@@ -1009,7 +1009,7 @@ export default function DetailPanel({
               <label>{p.journalNotes}</label>
               <textarea
                 placeholder={p.notesPlaceholder}
-                value={activeTrade.notes || ''}
+                value={activeTrade.annotation?.notes || ''}
                 onChange={e => updateActiveTradeField('notes', e.target.value)}
               />
             </div>
@@ -1019,7 +1019,7 @@ export default function DetailPanel({
               <label>{p.screenshots}</label>
               
               <div className="screenshots-grid">
-                {activeTrade.screenshots && activeTrade.screenshots.map((url, idx) => {
+                {activeTrade.annotation?.screenshots && activeTrade.annotation.screenshots.map((url, idx) => {
                   const fullUrl = url.startsWith('http') ? url : `${process.env.NEXT_PUBLIC_API_BASE_URL || process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:3000'}${url}`;
                   return (
                     <div key={idx} className="screenshot-card">

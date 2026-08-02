@@ -152,17 +152,18 @@ router.get('/export', authenticate, async (req: AuthRequest, res: Response) => {
     }
 
     // Retrieve matched trades (hard-capped to avoid loading the entire table into memory)
-    const MAX_EXPORT_ROWS = 50_000;
-    const trades = await prisma.trade.findMany({
-      where: whereClause,
-      orderBy: { open_time: 'desc' },
-      take: MAX_EXPORT_ROWS,
-      include: {
-        account: {
-          select: { broker_name: true, account_number: true },
-        },
-      },
-    });
+const MAX_EXPORT_ROWS = 50_000;
+     const trades = await prisma.trade.findMany({
+       where: whereClause,
+       orderBy: { open_time: 'desc' },
+       take: MAX_EXPORT_ROWS,
+       include: {
+         account: {
+           select: { broker_name: true, account_number: true },
+         },
+         annotation: true,
+       },
+     });
 
     const stamp = new Date().toISOString().substring(0, 10);
     const filename = `tradekav-export-${stamp}`;
@@ -197,9 +198,9 @@ router.get('/export', authenticate, async (req: AuthRequest, res: Response) => {
           t.pips,
           t.r_multiple,
           t.profit_usd,
-          sanitizeCsvCell(t.emotion || ''),
-          `"${(t.tags || []).map(sanitizeCsvCell).join(' | ')}"`,
-          `"${(t.notes || '').replace(/"/g, '""').replace(/\n/g, ' ')}"`,
+sanitizeCsvCell(t.annotation?.emotion || ''),
+           `"${(t.annotation?.tags || []).map(sanitizeCsvCell).join(' | ')}"`,
+           `"${(t.annotation?.notes || '').replace(/"/g, '""').replace(/\n/g, ' ')}"`,
         ].join(',');
         res.write(rowData + '\n');
       }
@@ -249,9 +250,9 @@ router.get('/export', authenticate, async (req: AuthRequest, res: Response) => {
           pips: t.pips,
           rMultiple: t.r_multiple,
           profitUsd: t.profit_usd,
-          emotion: t.emotion || '',
-          tags: (t.tags || []).join(', '),
-          notes: t.notes || '',
+emotion: t.annotation?.emotion || '',
+           tags: (t.annotation?.tags || []).join(', '),
+           notes: t.annotation?.notes || '',
         });
 
         // Align details
