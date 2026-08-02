@@ -11,6 +11,8 @@ import { useTradingEngine } from '../../components/backtest/hooks/useTradingEngi
 import { calcSessionStats } from '../../components/backtest/utils/pnl';
 import { fetchHistoricalCandles, CandleData, Timeframe } from '../../services/marketData';
 import { useTranslation } from '../../store/useAppStore';
+import { useAuthStore } from '../../lib/auth';
+import { useRouter } from 'next/navigation';
 import { notify } from '../../lib/notify';
 import { api } from '../../lib/api';
 import '../../components/backtest/backtest.scss';
@@ -20,6 +22,8 @@ const LOCAL_STORAGE_KEY = 'tradekav_backtest_session_v1';
 export default function BacktestPage() {
   const { language } = useTranslation();
   const isEn = language === 'en';
+  const user = useAuthStore((state) => state.user);
+  const router = useRouter();
 
   // --- Data State ---
   const [symbol, setSymbol] = useState<string>('XAUUSD');
@@ -126,7 +130,8 @@ export default function BacktestPage() {
     setIsLoadingCandles(true);
     setLoadError(false);
     try {
-      const data = await fetchHistoricalCandles(sym, tf, 10000);
+      // Reduced from 10000 to 5000 to prevent hitting TwelveData free tier rate limits as quickly
+      const data = await fetchHistoricalCandles(sym, tf, 5000);
       candleCacheRef.current.set(cacheKey, data);
       setCandles(data);
       if (data.length > 0) {
@@ -203,6 +208,30 @@ export default function BacktestPage() {
     setDrawings([]);
     notify.info(isEn ? 'Backtest session reset' : 'جلسه بک‌تست بازنشانی شد');
   };
+
+  if (!user || (user.plan !== 'PRO' && user.role !== 'ADMIN')) {
+    return (
+      <div className="backtest-page-container" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', padding: '40px', background: 'var(--bg-card)' }}>
+        <span className="material-symbols-outlined" style={{ fontSize: '64px', color: 'var(--primary)', marginBottom: '20px' }}>workspace_premium</span>
+        <h2 style={{ fontSize: '24px', marginBottom: '10px', color: 'var(--text-main)' }}>
+          {isEn ? 'Pro Feature' : 'ویژگی ویژه'}
+        </h2>
+        <p style={{ color: 'var(--text-muted)', marginBottom: '30px', textAlign: 'center', maxWidth: '400px', lineHeight: '1.6' }}>
+          {isEn 
+            ? 'The backtesting engine is only available for Pro users. Upgrade your plan to unlock this feature and supercharge your trading strategy.' 
+            : 'موتور بک‌تست تنها برای کاربران حرفه‌ای (Pro) در دسترس است. برای استفاده از این ویژگی و ارتقای استراتژی خود، پلن خود را ارتقا دهید.'}
+        </p>
+        <button 
+          className="primary-btn" 
+          onClick={() => router.push('/settings?tab=subscription')}
+          style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '12px 24px', fontSize: '16px' }}
+        >
+          <span className="material-symbols-outlined">upgrade</span>
+          {isEn ? 'Upgrade to Pro' : 'ارتقا به پرو'}
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="backtest-page-container">

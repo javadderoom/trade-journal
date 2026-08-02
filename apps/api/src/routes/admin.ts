@@ -20,12 +20,12 @@ router.get('/stats', async (req: AuthRequest, res: Response) => {
     const standardUsers = await prisma.user.count({ where: { plan: 'STANDARD' } });
     const proUsers = await prisma.user.count({ where: { plan: 'PRO' } });
 
-    // Aggregate approved payments revenue
-    const approvedReceipts = await prisma.manualReceipt.findMany({
+    // Aggregate approved payments revenue in the database
+    const revenueAgg = await prisma.manualReceipt.aggregate({
+      _sum: { amount: true },
       where: { status: 'APPROVED' },
-      select: { amount: true },
     });
-    const totalRevenue = approvedReceipts.reduce((acc, curr) => acc + curr.amount, 0);
+    const totalRevenue = revenueAgg._sum.amount ?? 0;
 
     const pendingReceiptsCount = await prisma.manualReceipt.count({
       where: { status: 'PENDING' },
@@ -51,22 +51,42 @@ router.get('/stats', async (req: AuthRequest, res: Response) => {
  */
 router.get('/users', async (req: AuthRequest, res: Response) => {
   try {
-    const users = await prisma.user.findMany({
-      select: {
-        id: true,
-        email: true,
-        name: true,
-        phone: true,
-        plan: true,
-        role: true,
-        created_at: true,
-        subscriptions: {
-          where: { status: 'ACTIVE' },
-          select: { end_date: true },
+    const page = Math.max(1, parseInt((req.query.page as string) || '1', 10) || 1);
+    const pageSize = Math.min(100, Math.max(1, parseInt((req.query.pageSize as string) || '50', 10) || 50));
+    const search = ((req.query.search as string) || '').trim();
+
+    const where: any = search
+      ? {
+          OR: [
+            { email: { contains: search, mode: 'insensitive' } },
+            { name: { contains: search, mode: 'insensitive' } },
+            { phone: { contains: search } },
+          ],
+        }
+      : {};
+
+    const [total, users] = await Promise.all([
+      prisma.user.count({ where }),
+      prisma.user.findMany({
+        where,
+        select: {
+          id: true,
+          email: true,
+          name: true,
+          phone: true,
+          plan: true,
+          role: true,
+          created_at: true,
+          subscriptions: {
+            where: { status: 'ACTIVE' },
+            select: { end_date: true },
+          },
         },
-      },
-      orderBy: { created_at: 'desc' },
-    });
+        orderBy: { created_at: 'desc' },
+        skip: (page - 1) * pageSize,
+        take: pageSize,
+      }),
+    ]);
 
     const formatted = users.map((u) => {
       const activeSub = u.subscriptions[0];
@@ -82,7 +102,15 @@ router.get('/users', async (req: AuthRequest, res: Response) => {
       };
     });
 
-    return res.status(200).json(formatted);
+    return res.status(200).json({
+      data: formatted,
+      pagination: {
+        page,
+        pageSize,
+        total,
+        totalPages: Math.ceil(total / pageSize),
+      },
+    });
   } catch (err: any) {
     console.error('Admin list users error:', err);
     return res.status(500).json({ error: 'خطا در دریافت لیست کاربران' });

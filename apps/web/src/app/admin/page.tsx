@@ -76,6 +76,11 @@ export default function AdminPage() {
   const [activeTab, setActiveTab] = useState<AdminTab>('stats');
   const [stats, setStats] = useState<AdminStats | null>(null);
   const [usersList, setUsersList] = useState<AdminUser[]>([]);
+  const [usersPage, setUsersPage] = useState(1);
+  const [usersTotalPages, setUsersTotalPages] = useState(1);
+  const [usersTotal, setUsersTotal] = useState(0);
+  const [usersSearch, setUsersSearch] = useState('');
+  const [usersSearchInput, setUsersSearchInput] = useState('');
   const [receiptsList, setReceiptsList] = useState<AdminReceipt[]>([]);
   const [couponsList, setCouponsList] = useState<CouponCode[]>([]);
   const [loading, setLoading] = useState(false);
@@ -151,10 +156,23 @@ export default function AdminPage() {
     }
   }, []);
 
-  const fetchUsers = useCallback(async () => {
+  const fetchUsers = useCallback(async (page = 1, search = '') => {
     try {
-      const res = await api.get('/api/admin/users');
-      setUsersList(res.data);
+      const res = await api.get('/api/admin/users', {
+        params: { page, pageSize: 20, search: search || undefined },
+      });
+      // New paginated shape: { data, pagination }
+      if (res.data && Array.isArray(res.data.data)) {
+        setUsersList(res.data.data);
+        setUsersPage(res.data.pagination.page);
+        setUsersTotalPages(res.data.pagination.totalPages);
+        setUsersTotal(res.data.pagination.total);
+      } else if (Array.isArray(res.data)) {
+        // Fallback for legacy bare-array shape
+        setUsersList(res.data);
+        setUsersTotalPages(1);
+        setUsersTotal(res.data.length);
+      }
     } catch (err) {
       console.error('Failed to fetch users:', err);
     }
@@ -487,7 +505,7 @@ export default function AdminPage() {
         durationDays: customPlanOverride.durationDays,
       });
       setSelectedUserForPlan(null);
-      fetchUsers();
+      fetchUsers(usersPage, usersSearch);
       notify.success('پلن کاربر با موفقیت تغییر یافت');
     } catch (err: any) {
       notify.error(err.response?.data?.error || 'خطا در تغییر پلن');
@@ -641,8 +659,42 @@ export default function AdminPage() {
       {activeTab === 'users' && (
         <div className="admin-panel-card">
           <div className="card-header-actions">
-            <h3>کاربران ثبت‌نام شده</h3>
+            <h3>کاربران ثبت‌نام شده ({toPersianDigits(usersTotal)})</h3>
           </div>
+
+          {/* Search */}
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              setUsersSearch(usersSearchInput.trim());
+              fetchUsers(1, usersSearchInput.trim());
+            }}
+            style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}
+          >
+            <input
+              type="text"
+              placeholder="جستجو بر اساس نام، ایمیل یا تلفن..."
+              value={usersSearchInput}
+              onChange={(e) => setUsersSearchInput(e.target.value)}
+              style={{ background: '#0b0d19', border: '1px solid rgba(255,255,255,0.1)', padding: '8px 12px', color: '#fff', borderRadius: '6px', fontSize: '0.85rem', flex: 1, maxWidth: '360px' }}
+            />
+            <button type="submit" className="admin-btn" style={{ padding: '8px 16px' }}>جستجو</button>
+            {usersSearch && (
+              <button
+                type="button"
+                className="admin-btn btn-secondary"
+                style={{ padding: '8px 16px' }}
+                onClick={() => {
+                  setUsersSearchInput('');
+                  setUsersSearch('');
+                  fetchUsers(1, '');
+                }}
+              >
+                حذف فیلتر
+              </button>
+            )}
+          </form>
+
           <div className="admin-table-wrapper">
             <table className="admin-table">
               <thead>
@@ -687,6 +739,31 @@ export default function AdminPage() {
               </tbody>
             </table>
           </div>
+
+          {/* Pagination */}
+          {usersTotalPages > 1 && (
+            <div style={{ display: 'flex', gap: '8px', alignItems: 'center', justifyContent: 'center', marginTop: '16px' }}>
+              <button
+                className="admin-btn btn-secondary"
+                style={{ padding: '6px 14px' }}
+                disabled={usersPage <= 1}
+                onClick={() => fetchUsers(usersPage - 1, usersSearch)}
+              >
+                قبلی
+              </button>
+              <span style={{ color: '#a0aec0', fontSize: '0.85rem' }}>
+                صفحه {toPersianDigits(usersPage)} از {toPersianDigits(usersTotalPages)}
+              </span>
+              <button
+                className="admin-btn btn-secondary"
+                style={{ padding: '6px 14px' }}
+                disabled={usersPage >= usersTotalPages}
+                onClick={() => fetchUsers(usersPage + 1, usersSearch)}
+              >
+                بعدی
+              </button>
+            </div>
+          )}
         </div>
       )}
 

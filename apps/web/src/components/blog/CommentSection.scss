@@ -92,7 +92,7 @@
         padding-right: 20px;
       }
       
-      :global(.ltr) & .comment-replies {
+      .ltr & .comment-replies {
         margin-right: 0;
         margin-left: 40px; /* LTR indentation */
         border-right: none;

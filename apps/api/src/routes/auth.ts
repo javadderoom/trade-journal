@@ -18,6 +18,10 @@ const router = Router();
 const loginLimiter = rateLimit(15 * 60 * 1000, 10);
 // Rate limit: 5 registration attempts per hour per IP
 const registerLimiter = rateLimit(60 * 60 * 1000, 5);
+// Rate limit: 10 OTP SMS sends per hour per IP (per-phone limit also applies in handler)
+const otpSendLimiter = rateLimit(60 * 60 * 1000, 10);
+// Rate limit: 5 OTP registrations per hour per IP
+const otpRegisterLimiter = rateLimit(60 * 60 * 1000, 5);
 
 const REFRESH_TOKEN_EXPIRES_DAYS = 30;
 
@@ -237,7 +241,7 @@ router.post('/logout', async (req: Request, res: Response) => {
 });
 
 // ─── POST /api/auth/otp/send ──────────────────────────────────────────────────
-router.post('/otp/send', async (req: Request, res: Response) => {
+router.post('/otp/send', otpSendLimiter, async (req: Request, res: Response) => {
   try {
     const { phone } = req.body;
     if (!phone || typeof phone !== 'string') {
@@ -270,6 +274,11 @@ router.post('/otp/send', async (req: Request, res: Response) => {
     if (recentOtp) {
       return res.status(429).json({ error: 'کد تایید قبلاً ارسال شده است. لطفاً ۲ دقیقه دیگر دوباره تلاش کنید.' });
     }
+
+    // Clean up any existing OTPs for this phone number
+    await prisma.otp.deleteMany({
+      where: { phone: formattedPhone },
+    });
 
     // Generate a 5-digit verification code
     const code = Math.floor(10000 + Math.random() * 90000).toString();
@@ -324,10 +333,9 @@ router.post('/otp/verify', rateLimit(2 * 60 * 1000, 5), async (req: Request, res
       return res.status(400).json({ error: 'کد تایید نامعتبر یا منقضی شده است' });
     }
 
-    // Mark code as used
-    await prisma.otp.update({
-      where: { id: record.id },
-      data: { used: true },
+    // Delete code after successful verification to keep table clean
+    await prisma.otp.delete({
+      where: { id: record.id }
     });
 
     // Check if user exists
@@ -392,7 +400,7 @@ const otpRegisterSchema = z.object({
     .regex(/[0-9]/, 'رمز عبور باید حداقل یک عدد داشته باشد'),
 });
 
-router.post('/otp/register', async (req: Request, res: Response) => {
+router.post('/otp/register', otpRegisterLimiter, async (req: Request, res: Response) => {
   try {
     const parsed = otpRegisterSchema.safeParse(req.body);
     if (!parsed.success) {

@@ -142,7 +142,10 @@ export async function syncExchangeTrades(
 
   const existingTicketsSet = new Set(existingTrades.map(t => t.ticket));
 
-  // 5. Process trades
+  // 5. Build the list of new trades to insert (skip duplicates)
+  const newTradesData: any[] = [];
+  const newTradeMeta: Array<{ ticket: string; amount: number; price: number; timestamp: number; profitUsd: number; commission: number }> = [];
+
   for (const trade of ccxtTrades) {
     const ticket = trade.id;
     if (existingTicketsSet.has(ticket)) {
@@ -150,78 +153,93 @@ export async function syncExchangeTrades(
       continue;
     }
 
+    let profitUsd = 0;
+    if (trade.info) {
+      const info = trade.info;
+      const pnl = info.realizedPnl || info.realizedPnL || info.pnl || info.pL || info.profit || info.closedPnl;
+      if (pnl !== undefined) {
+        profitUsd = parseFloat(pnl);
+      }
+    }
+
+    let commission = 0;
+    if (trade.fee && typeof trade.fee.cost === 'number') {
+      commission = trade.fee.cost;
+    }
+
+    newTradesData.push({
+      account_id: accountId,
+      user_id: userId,
+      symbol: trade.symbol,
+      direction: trade.side.toUpperCase() as 'BUY' | 'SELL',
+      open_time: new Date(trade.timestamp),
+      close_time: new Date(trade.timestamp),
+      open_price: trade.price,
+      close_price: trade.price,
+      lot_size: trade.amount,
+      profit_usd: profitUsd,
+      commission: commission,
+      swap: 0,
+      pips: 0,
+      r_multiple: 0,
+      ticket: ticket,
+      import_source: 'CRYPTO_API' as any,
+    });
+    newTradeMeta.push({ ticket, amount: trade.amount, price: trade.price, timestamp: trade.timestamp, profitUsd, commission });
+  }
+
+  // 6. Batch-insert trades, then resolve their IDs and batch-insert executions
+  if (newTradesData.length > 0) {
     try {
-      let profitUsd = 0;
-      if (trade.info) {
-        const info = trade.info;
-        const pnl = info.realizedPnl || info.realizedPnL || info.pnl || info.pL || info.profit || info.closedPnl;
-        if (pnl !== undefined) {
-          profitUsd = parseFloat(pnl);
-        }
+      await prisma.trade.createMany({ data: newTradesData, skipDuplicates: true });
+
+      const inserted = await prisma.trade.findMany({
+        where: { account_id: accountId, ticket: { in: newTradeMeta.map((m) => m.ticket) } },
+        select: { id: true, ticket: true },
+      });
+      const idByTicket = new Map(inserted.map((t) => [t.ticket, t.id]));
+
+      const executionsData: any[] = [];
+      for (const meta of newTradeMeta) {
+        const tradeId = idByTicket.get(meta.ticket);
+        if (!tradeId) continue;
+        const ts = new Date(meta.timestamp);
+        executionsData.push(
+          {
+            trade_id: tradeId,
+            type: 'ENTRY',
+            lot_size: meta.amount,
+            price: meta.price,
+            profit_usd: 0,
+            commission: meta.commission,
+            swap: 0,
+            pips: 0,
+            r_multiple: 0,
+            executed_at: ts,
+          },
+          {
+            trade_id: tradeId,
+            type: 'EXIT',
+            lot_size: meta.amount,
+            price: meta.price,
+            profit_usd: meta.profitUsd,
+            commission: 0,
+            swap: 0,
+            pips: 0,
+            r_multiple: 0,
+            close_time: ts,
+            executed_at: ts,
+          }
+        );
       }
 
-      let commission = 0;
-      if (trade.fee && typeof trade.fee.cost === 'number') {
-        commission = trade.fee.cost;
+      if (executionsData.length > 0) {
+        await prisma.execution.createMany({ data: executionsData, skipDuplicates: true });
       }
 
-      const newTrade = await prisma.trade.create({
-        data: {
-          account_id: accountId,
-          user_id: userId,
-          symbol: trade.symbol,
-          direction: trade.side.toUpperCase() as 'BUY' | 'SELL',
-          open_time: new Date(trade.timestamp),
-          close_time: new Date(trade.timestamp),
-          open_price: trade.price,
-          close_price: trade.price,
-          lot_size: trade.amount,
-          profit_usd: profitUsd,
-          commission: commission,
-          swap: 0,
-          pips: 0,
-          r_multiple: 0,
-          ticket: ticket,
-          import_source: 'CRYPTO_API' as any,
-        },
-      });
-
-      // Create ENTRY execution (fill)
-      await prisma.execution.create({
-        data: {
-          trade_id: newTrade.id,
-          type: 'ENTRY',
-          lot_size: trade.amount,
-          price: trade.price,
-          profit_usd: 0,
-          commission: commission,
-          swap: 0,
-          pips: 0,
-          r_multiple: 0,
-          executed_at: new Date(trade.timestamp),
-        },
-      });
-
-      // Create EXIT execution (crypto trades from fetchMyTrades are closed fills)
-      await prisma.execution.create({
-        data: {
-          trade_id: newTrade.id,
-          type: 'EXIT',
-          lot_size: trade.amount,
-          price: trade.price,
-          profit_usd: profitUsd,
-          commission: 0,
-          swap: 0,
-          pips: 0,
-          r_multiple: 0,
-          close_time: new Date(trade.timestamp),
-          executed_at: new Date(trade.timestamp),
-        },
-      });
-
-      result.created++;
+      result.created += inserted.length;
     } catch (err: any) {
-      result.errors.push(`Trade ${trade.id} failed: ${err.message}`);
+      result.errors.push(`Batch insert failed: ${err.message}`);
     }
   }
 

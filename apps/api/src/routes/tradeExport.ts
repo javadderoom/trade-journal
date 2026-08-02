@@ -151,10 +151,12 @@ router.get('/export', authenticate, async (req: AuthRequest, res: Response) => {
       }
     }
 
-    // Retrieve ALL matched trades
+    // Retrieve matched trades (hard-capped to avoid loading the entire table into memory)
+    const MAX_EXPORT_ROWS = 50_000;
     const trades = await prisma.trade.findMany({
       where: whereClause,
       orderBy: { open_time: 'desc' },
+      take: MAX_EXPORT_ROWS,
       include: {
         account: {
           select: { broker_name: true, account_number: true },

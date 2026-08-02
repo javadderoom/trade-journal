@@ -1,22 +1,56 @@
-import { Router, Request, Response } from 'express';
+import { Router, Request, Response, NextFunction } from 'express';
+import { z } from 'zod';
 import axios from 'axios';
 import { prisma } from '../services/tradeSync';
+import { rateLimit } from '../middleware/rateLimit';
+import { authenticate, AuthRequest } from '../middleware/auth';
+import { RequestThrottler } from '../utils/rateLimiter';
 
 const router = Router();
+
+// Global sliding window queue limit for TwelveData (8 requests per 60 seconds)
+const twelveDataLimiter = new RequestThrottler(8, 60000);
+
+// Map to track in-flight requests to prevent Cache Stampedes (Thundering Herd)
+const inFlightFetches = new Map<string, Promise<any>>();
+
+// Middleware to restrict access to Pro users and Admins
+const requireProOrAdmin = (req: AuthRequest, res: Response, next: NextFunction) => {
+  if (!req.user || (req.user.plan !== 'PRO' && req.user.role !== 'ADMIN')) {
+    return res.status(403).json({ error: 'This feature is only available for Pro users.' });
+  }
+  next();
+};
+
+const historyQuerySchema = z.object({
+  symbol: z.string().min(1).max(50),
+  timeframe: z.enum(['1m', '5m', '15m', '1h', '4h', '1d']),
+  limit: z.coerce.number().min(1).max(10000).default(500),
+});
+
+const MAX_CANDLE_LIMIT = 10000;
 
 const TWELVEDATA_SYMBOL_MAP: Record<string, string> = {
   XAUUSD: 'XAU/USD',
   EURUSD: 'EUR/USD',
   GBPUSD: 'GBP/USD',
   USDJPY: 'USD/JPY',
+  BTCUSD: 'BTC/USD',
+  ETHUSD: 'ETH/USD',
+  SOLUSD: 'SOL/USD',
 };
 
-
-const BINANCE_SYMBOL_MAP: Record<string, string> = {
-  BTCUSD: 'BTCUSDT',
-  ETHUSD: 'ETHUSDT',
-  SOLUSD: 'SOLUSDT',
-};
+function getTimeframeExpiryMs(timeframe: string): number {
+  const map: Record<string, number> = {
+    '1m': 60 * 1000,
+    '5m': 5 * 60 * 1000,
+    '15m': 15 * 60 * 1000,
+    '1h': 60 * 60 * 1000,
+    '4h': 4 * 60 * 60 * 1000,
+    '1d': 24 * 60 * 60 * 1000,
+  };
+  return map[timeframe] || 15 * 60 * 1000;
+}
 
 function aggregate4HourCandles(rawCandles: Array<{ time: number; open: number; high: number; low: number; close: number; volume: number }>) {
   const aggregated = [];
@@ -48,52 +82,6 @@ function aggregate4HourCandles(rawCandles: Array<{ time: number; open: number; h
   return aggregated;
 }
 
-// Helper to paginate Binance backwards to get up to 10k candles
-async function fetchBinanceCandles(binanceSymbol: string, binanceInterval: string, limit: number): Promise<any[]> {
-  let allCandles: any[] = [];
-  let currentEndTime: number | null = null;
-  const maxRequests = Math.ceil(limit / 1000) + 2; // Safeguard
-
-  for (let i = 0; i < maxRequests; i++) {
-    const fetchLimit = Math.min(1000, limit - allCandles.length);
-    if (fetchLimit <= 0) break;
-
-    let url = `https://api.binance.com/api/v3/klines?symbol=${binanceSymbol}&interval=${binanceInterval}&limit=${fetchLimit}`;
-    if (currentEndTime !== null) {
-      url += `&endTime=${currentEndTime}`;
-    }
-
-    try {
-      const response = await axios.get(url, { timeout: 6000 });
-      const rawData = response.data;
-      if (!Array.isArray(rawData) || rawData.length === 0) {
-        break;
-      }
-
-      const chunk: any[] = rawData.map((item: any) => ({
-        time: Math.floor(Number(item[0]) / 1000),
-        open: parseFloat(item[1]),
-        high: parseFloat(item[2]),
-        low: parseFloat(item[3]),
-        close: parseFloat(item[4]),
-        volume: parseFloat(item[5]) || 0,
-      }));
-
-      allCandles = [...chunk, ...allCandles];
-      currentEndTime = Number(rawData[0][0]) - 1;
-
-      if (rawData.length < fetchLimit) {
-        break;
-      }
-    } catch (err: any) {
-      console.error(`[Binance Fetch Error] Page ${i}:`, err.message);
-      break;
-    }
-  }
-
-  const uniqueCandles = Array.from(new Map(allCandles.map(c => [c.time, c])).values());
-  return uniqueCandles.sort((a, b) => a.time - b.time).slice(-limit);
-}
 
 // Helper to paginate TwelveData backwards to get up to 10k candles
 async function fetchTwelveDataCandles(twelveSymbol: string, twelveInterval: string, limit: number): Promise<any[]> {
@@ -114,6 +102,8 @@ async function fetchTwelveDataCandles(twelveSymbol: string, twelveInterval: stri
     }
 
     try {
+      // Wait for a rate limit slot before making the upstream request to avoid 429 errors
+      await twelveDataLimiter.waitForSlot();
       const response = await axios.get(url, { timeout: 8000 });
       const rawData = response.data;
       if (rawData.status !== 'ok' || !Array.isArray(rawData.values) || rawData.values.length === 0) {
@@ -124,7 +114,7 @@ async function fetchTwelveDataCandles(twelveSymbol: string, twelveInterval: stri
       }
 
       // TwelveData returns newest to oldest. We parse and reverse to make it oldest to newest.
-      const chunk: any[] = rawData.values.map((item: any) => ({
+      let chunk: any[] = rawData.values.map((item: any) => ({
         time: Math.floor(new Date(item.datetime + 'Z').getTime() / 1000),
         open: parseFloat(item.open),
         high: parseFloat(item.high),
@@ -132,6 +122,18 @@ async function fetchTwelveDataCandles(twelveSymbol: string, twelveInterval: stri
         close: parseFloat(item.close),
         volume: item.volume ? parseFloat(item.volume) : 0,
       }));
+
+      // Filter out weekend garbage data for Forex/Commodities
+      chunk = chunk.filter((c: any) => {
+        const d = new Date(c.time * 1000);
+        const day = d.getUTCDay();
+        const hrs = d.getUTCHours();
+        if (day === 6) return false; // Saturday
+        if (day === 5 && hrs >= 22) return false; // Friday after 22:00 UTC
+        if (day === 0 && hrs < 21) return false; // Sunday before 21:00 UTC
+        return true;
+      });
+
       chunk.reverse();
 
       allCandles = [...chunk, ...allCandles];
@@ -156,12 +158,18 @@ async function fetchTwelveDataCandles(twelveSymbol: string, twelveInterval: stri
  * GET /api/market-data/history
  * Fetch historical candles with 0 API key required. Caches results in DB.
  */
-router.get('/history', async (req: Request, res: Response): Promise<void> => {
+router.get('/history', rateLimit(60 * 1000, 30), async (req: Request, res: Response): Promise<void> => {
   const symbol = (req.query.symbol as string || 'XAUUSD').toUpperCase();
   const timeframe = (req.query.timeframe as string || '15m').toLowerCase();
-  const limit = parseInt(req.query.limit as string || '10000', 10);
+  const parsedLimit = parseInt(req.query.limit as string || '10000', 10);
+  const limit = Math.min(
+    Number.isFinite(parsedLimit) && parsedLimit > 0 ? parsedLimit : MAX_CANDLE_LIMIT,
+    MAX_CANDLE_LIMIT
+  );
 
   let cached;
+  let isDeltaFetch = false;
+
   try {
     // 1. Check Cache
     cached = await prisma.candleCache.findUnique({
@@ -170,38 +178,32 @@ router.get('/history', async (req: Request, res: Response): Promise<void> => {
       }
     });
 
-    const isStale = cached ? (Date.now() - new Date(cached.fetched_at).getTime() > 6 * 60 * 60 * 1000) : true;
+    const expiryMs = getTimeframeExpiryMs(timeframe);
+    const isStale = cached ? (Date.now() - new Date(cached.fetched_at).getTime() > expiryMs) : true;
 
-    if (cached && !isStale && cached.count >= limit) {
-      const allCandles = cached.candles as any[];
-      res.json({ symbol, timeframe, candles: allCandles.slice(-limit) });
-      return;
+    if (cached && cached.count >= limit) {
+      if (!isStale) {
+        // Cache is perfectly fresh and has enough data
+        const allCandles = cached.candles as any[];
+        res.json({ symbol, timeframe, candles: allCandles.slice(-limit) });
+        return;
+      } else {
+        // Cache is stale, but we have enough historical data. We only need to fetch the latest candles (delta).
+        isDeltaFetch = true;
+      }
     }
   } catch (dbErr: any) {
     console.warn('[DB Cache Query Warning]:', dbErr.message);
   }
 
   // 2. Cache miss or stale: Fetch from upstream
-  try {
-    let candles: any[] = [];
-    const binanceSymbol = BINANCE_SYMBOL_MAP[symbol];
+  const cacheKey = `${symbol}-${timeframe}-${limit}`;
 
-    if (binanceSymbol) {
-      // Fetch from Binance (Crypto)
-      const intervalMap: Record<string, string> = {
-        '1m': '1m',
-        '5m': '5m',
-        '15m': '15m',
-        '1h': '1h',
-        '4h': '1h', // will be aggregated below
-        '1d': '1d',
-      };
-      const interval = intervalMap[timeframe] || '15m';
-      const fetchLimit = timeframe === '4h' ? limit * 4 : limit;
+  if (!inFlightFetches.has(cacheKey)) {
+    const fetchPromise = (async () => {
+      let candles: any[] = [];
       
-      candles = await fetchBinanceCandles(binanceSymbol, interval, fetchLimit);
-    } else {
-      // Fetch from Twelve Data (Forex & Commodities)
+      // Fetch from Twelve Data (Crypto, Forex & Commodities)
       const twelveSymbol = TWELVEDATA_SYMBOL_MAP[symbol] || symbol;
 
       const twelveIntervalMap: Record<string, string> = {
@@ -213,18 +215,33 @@ router.get('/history', async (req: Request, res: Response): Promise<void> => {
         '1d': '1day',
       };
       const twelveInterval = twelveIntervalMap[timeframe] || '15min';
-      const fetchLimit = timeframe === '4h' ? limit * 4 : limit;
+      const fetchCount = isDeltaFetch ? 50 : limit;
+      const fetchLimit = timeframe === '4h' ? fetchCount * 4 : fetchCount;
       
       candles = await fetchTwelveDataCandles(twelveSymbol, twelveInterval, fetchLimit);
-    }
 
-    if (timeframe === '4h') {
-      candles = aggregate4HourCandles(candles);
-    }
+      if (timeframe === '4h') {
+        candles = aggregate4HourCandles(candles);
+      }
 
-    const finalCandles = candles.slice(-limit);
+      // If this was a delta fetch, merge the newly fetched candles with the historical cached ones
+      let finalCandles = candles;
+      if (isDeltaFetch && cached) {
+        const cachedCandles = cached.candles as any[];
+        const mergedMap = new Map();
+        
+        for (const c of cachedCandles) mergedMap.set(c.time, c);
+        for (const c of candles) mergedMap.set(c.time, c);
 
-    if (finalCandles.length > 0) {
+        finalCandles = Array.from(mergedMap.values()).sort((a, b) => a.time - b.time);
+      }
+
+      finalCandles = finalCandles.slice(-limit);
+
+      if (finalCandles.length === 0) {
+        throw new Error(`Upstream API returned no data for ${symbol} (rate limited or network error)`);
+      }
+
       try {
         // Upsert cache in DB
         await prisma.candleCache.upsert({
@@ -247,8 +264,19 @@ router.get('/history', async (req: Request, res: Response): Promise<void> => {
       } catch (dbSaveErr: any) {
         console.error('[DB Cache Save Warning]:', dbSaveErr.message);
       }
-    }
 
+      return finalCandles;
+    })();
+
+    inFlightFetches.set(cacheKey, fetchPromise);
+
+    fetchPromise.finally(() => {
+      inFlightFetches.delete(cacheKey);
+    });
+  }
+
+  try {
+    const finalCandles = await inFlightFetches.get(cacheKey);
     res.json({ symbol, timeframe, candles: finalCandles });
   } catch (err: any) {
     console.error('Market data proxy error:', err.message);

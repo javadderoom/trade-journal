@@ -9,6 +9,8 @@ export interface CandleData {
 
 export type Timeframe = '1m' | '5m' | '15m' | '1h' | '4h' | '1d';
 
+import { api } from '../lib/api';
+
 const SYMBOL_MAP: Record<string, { binanceSymbol?: string; yahooSymbol?: string; basePrice: number }> = {
   XAUUSD: { yahooSymbol: 'XAUUSD=X', basePrice: 2700.0 },
   EURUSD: { yahooSymbol: 'EURUSD=X', basePrice: 1.0850 },
@@ -31,21 +33,23 @@ export async function fetchHistoricalCandles(
   const normSymbol = symbol.toUpperCase().trim();
 
   try {
-    const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
-    const proxyUrl = `${apiBase}/api/market-data/history?symbol=${encodeURIComponent(normSymbol)}&timeframe=${timeframe}&limit=${limit}`;
-    
-    const res = await fetch(proxyUrl);
-    if (res.ok) {
-      const data = await res.json();
-      if (Array.isArray(data.candles) && data.candles.length > 0) {
-        return data.candles;
+    const res = await api.get('/api/market-data/history', {
+      params: {
+        symbol: normSymbol,
+        timeframe,
+        limit
       }
+    });
+    
+    if (res.data && Array.isArray(res.data.candles) && res.data.candles.length > 0) {
+      return res.data.candles;
     }
-  } catch (err) {
-    console.warn('[MarketData] Proxy fetch failed:', err);
+  } catch (err: any) {
+    console.warn('[MarketData] Proxy fetch failed:', err.message || err);
+    throw err;
   }
 
-  throw new Error(`Market data unavailable for ${normSymbol}`);
+  throw new Error(`Market data unavailable for ${normSymbol} (check rate limits or connectivity)`);
 }
 
 /**

@@ -8,25 +8,33 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
 
   let dynamicBlogPages: MetadataRoute.Sitemap = [];
-  try {
-    const [resFa, resEn] = await Promise.all([
-      fetch(`${apiBase}/api/blog/posts?locale=fa&limit=1000`, { next: { revalidate: 3600 } }),
-      fetch(`${apiBase}/api/blog/posts?locale=en&limit=1000`, { next: { revalidate: 3600 } })
-    ]);
-    
-    let allPosts: any[] = [];
-    if (resFa.ok) allPosts = [...allPosts, ...(await resFa.json()).posts];
-    if (resEn.ok) allPosts = [...allPosts, ...(await resEn.json()).posts];
 
-    dynamicBlogPages = allPosts.map((post: any) => ({
-      url: `${baseUrl}/${post.locale || 'fa'}/blog/${post.slug}`,
-      lastModified: new Date(post.updated_at || post.published_at || post.created_at),
-      changeFrequency: "weekly" as const,
-      priority: 0.8,
-    }));
-  } catch (error) {
-    console.warn("Could not fetch blog posts for sitemap");
-  }
+  const fetchPosts = async (locale: string) => {
+    try {
+      const res = await fetch(`${apiBase}/api/blog/posts?locale=${locale}&limit=1000`, { next: { revalidate: 3600 } });
+      if (!res.ok) return [];
+      const data = await res.json();
+      return data.posts || [];
+    } catch (error: any) {
+      console.warn(`[sitemap] Could not fetch ${locale} blog posts:`, error.message);
+      return [];
+    }
+  };
+
+  const [postsFa, postsEn] = await Promise.all([
+    fetchPosts('fa'),
+    fetchPosts('en')
+  ]);
+
+  const allPosts = [...postsFa, ...postsEn];
+
+  dynamicBlogPages = allPosts.map((post: any) => ({
+    url: `${baseUrl}/${post.locale || 'fa'}/blog/${post.slug}`,
+    lastModified: new Date(post.updated_at || post.published_at || post.created_at),
+    changeFrequency: "weekly" as const,
+    priority: 0.8,
+  }));
+
 
   const publicPages: MetadataRoute.Sitemap = [
     // Landing pages (separate locale routes)

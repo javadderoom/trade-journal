@@ -4,6 +4,49 @@ interface VerificationResult {
   error?: string;
 }
 
+let cachedTrxPrice: number | null = null;
+let lastTrxPriceFetchTime = 0;
+let inflightTrxPriceFetch: Promise<number> | null = null;
+
+async function getTrxPrice(): Promise<number> {
+  const now = Date.now();
+  // 1-minute cache (60,000 ms)
+  if (cachedTrxPrice !== null && now - lastTrxPriceFetchTime < 60000) {
+    return cachedTrxPrice;
+  }
+  
+  if (inflightTrxPriceFetch) {
+    return inflightTrxPriceFetch;
+  }
+
+  inflightTrxPriceFetch = (async () => {
+    let price = 0.12; // fallback
+    try {
+      const priceController = new AbortController();
+      const priceTimeoutId = setTimeout(() => priceController.abort(), 5000);
+      const priceRes = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=tron&vs_currencies=usd', {
+        signal: priceController.signal,
+      });
+      clearTimeout(priceTimeoutId);
+      if (priceRes.ok) {
+        const priceData = await priceRes.json() as any;
+        if (priceData?.tron?.usd) {
+          price = priceData.tron.usd;
+          cachedTrxPrice = price;
+          lastTrxPriceFetchTime = Date.now();
+        }
+      }
+    } catch (priceErr) {
+      console.error('Failed to fetch dynamic TRX price from CoinGecko, using fallback:', priceErr);
+    }
+    return price;
+  })();
+
+  const finalPrice = await inflightTrxPriceFetch;
+  inflightTrxPriceFetch = null;
+  return finalPrice;
+}
+
 export async function verifyTronTransaction(
   txHash: string,
   coin: 'USDT' | 'TRX',
@@ -71,24 +114,8 @@ export async function verifyTronTransaction(
       // TRX has 6 decimal places
       const actualTrx = transferInfo.amount / 1000000;
 
-      // Fetch TRX price dynamically from CoinGecko with a timeout
-      let trxPriceUsd = 0.12; // Fallback price
-      try {
-        const priceController = new AbortController();
-        const priceTimeoutId = setTimeout(() => priceController.abort(), 5000);
-        const priceRes = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=tron&vs_currencies=usd', {
-          signal: priceController.signal,
-        });
-        clearTimeout(priceTimeoutId);
-        if (priceRes.ok) {
-          const priceData = await priceRes.json() as any;
-          if (priceData?.tron?.usd) {
-            trxPriceUsd = priceData.tron.usd;
-          }
-        }
-      } catch (priceErr) {
-        console.error('Failed to fetch dynamic TRX price from CoinGecko, using fallback:', priceErr);
-      }
+      // Fetch TRX price dynamically from CoinGecko with a 1-minute cache
+      const trxPriceUsd = await getTrxPrice();
 
       const actualAmount = actualTrx * trxPriceUsd;
       if (actualAmount < expectedAmount) {
