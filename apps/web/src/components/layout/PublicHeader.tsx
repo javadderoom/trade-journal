@@ -40,6 +40,7 @@ export default function PublicHeader() {
         { href: '#how', label: 'How it Works' },
         { href: '#features', label: 'Features' },
         { href: '#pricing', label: 'Pricing' },
+        { href: '/en/tools', label: 'Tools' },
         { href: '/en/blog', label: 'Blog' },
         { href: '/en/contact', label: 'Contact Us' },
       ]
@@ -47,6 +48,7 @@ export default function PublicHeader() {
         { href: '#how', label: 'روش کار' },
         { href: '#features', label: 'امکانات' },
         { href: '#pricing', label: 'تعرفه‌ها' },
+        { href: '/fa/tools', label: 'ابزارها' },
         { href: '/fa/blog', label: 'وبلاگ' },
         { href: '/fa/contact', label: 'تماس با ما' },
       ];

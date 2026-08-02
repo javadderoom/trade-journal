@@ -91,6 +91,7 @@ export default function PublicFooter() {
               <a href="#features" onClick={(e) => handleScroll(e, '#features')}>{isEn ? 'Features' : 'امکانات'}</a>
               <a href="#pricing" onClick={(e) => handleScroll(e, '#pricing')}>{isEn ? 'Pricing' : 'قیمت'}</a>
               <a href="#how" onClick={(e) => handleScroll(e, '#how')}>{isEn ? 'How it works' : 'روش کار'}</a>
+              <Link href={isEn ? '/en/tools' : '/fa/tools'}>{isEn ? 'Tools' : 'ابزارها'}</Link>
             </div>
             <div>
               <h4>{copy.footerAccount}</h4>
