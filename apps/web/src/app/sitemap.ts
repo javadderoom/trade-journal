@@ -87,6 +87,31 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         },
       },
     },
+    // Tools (separate locale routes)
+    {
+      url: `${baseUrl}/fa/tools`,
+      lastModified: new Date(),
+      changeFrequency: "weekly" as const,
+      priority: 0.8,
+      alternates: {
+        languages: {
+          fa: `${baseUrl}/fa/tools`,
+          en: `${baseUrl}/en/tools`,
+        },
+      },
+    },
+    {
+      url: `${baseUrl}/en/tools`,
+      lastModified: new Date(),
+      changeFrequency: "weekly" as const,
+      priority: 0.8,
+      alternates: {
+        languages: {
+          fa: `${baseUrl}/fa/tools`,
+          en: `${baseUrl}/en/tools`,
+        },
+      },
+    },
     // Shared pages (no separate locale routes, language switches client-side)
     {
       url: `${baseUrl}/login`,
