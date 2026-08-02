@@ -51,7 +51,7 @@ export default function LoadingButton({
     if (!button) return;
 
     const updateWidth = () => {
-      if (status === 'idle') {
+      if (status === 'idle' && button.querySelector('.btn-label-idle')) {
         const originalWidthStyle = button.style.width;
         button.style.width = '';
         const naturalWidth = button.getBoundingClientRect().width;
@@ -177,20 +177,31 @@ export default function LoadingButton({
         overflow: 'hidden',
         whiteSpace: 'nowrap',
       }}
-      animate={{
-        width:
-          status === 'loading'
-            ? getCircleSize()
-            : status === 'idle'
-            ? (initialWidth ?? 'auto')
-            : 'auto',
-        borderRadius:
-          status === 'loading'
-            ? (size === 'sm' ? '17px' : size === 'lg' ? '24px' : '21px')
-            : '8px',
-        paddingLeft: status === 'loading' ? '0px' : (size === 'sm' ? '14px' : size === 'lg' ? '28px' : '20px'),
-        paddingRight: status === 'loading' ? '0px' : (size === 'sm' ? '14px' : size === 'lg' ? '28px' : '20px'),
-      }}
+      animate={
+        status === 'loading'
+          ? {
+              width: getCircleSize(),
+              borderRadius: size === 'sm' ? '17px' : size === 'lg' ? '24px' : '21px',
+              paddingLeft: '0px',
+              paddingRight: '0px',
+            }
+          : status === 'idle'
+          ? {
+              width: initialWidth !== null ? initialWidth : '',
+              borderRadius: '8px',
+              paddingLeft: size === 'sm' ? '14px' : size === 'lg' ? '28px' : '20px',
+              paddingRight: size === 'sm' ? '14px' : size === 'lg' ? '28px' : '20px',
+              transitionEnd: {
+                width: '',
+              },
+            }
+          : {
+              width: 'auto',
+              borderRadius: '8px',
+              paddingLeft: size === 'sm' ? '14px' : size === 'lg' ? '28px' : '20px',
+              paddingRight: size === 'sm' ? '14px' : size === 'lg' ? '28px' : '20px',
+            }
+      }
       transition={{
         duration: 0.3,
         ease: [0.4, 0, 0.2, 1],

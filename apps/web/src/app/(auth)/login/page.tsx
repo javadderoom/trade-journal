@@ -238,7 +238,7 @@ export default function LoginPage() {
               </div>
             </div>
 
-            <LoadingButton type="submit" className="submit-btn" disabled={loading} isLoading={loading}>
+            <LoadingButton type="submit" className="submit-btn" disabled={loading} isLoading={loading} isError={!!error}>
               {t('auth.submitLogin')}
             </LoadingButton>
           </form>
@@ -265,7 +265,7 @@ export default function LoginPage() {
                   </div>
                 </div>
 
-                <LoadingButton type="submit" className="submit-btn" disabled={loading} isLoading={loading}>
+                <LoadingButton type="submit" className="submit-btn" disabled={loading} isLoading={loading} isError={!!error}>
                   {t('auth.otpSendBtn')}
                 </LoadingButton>
               </form>
@@ -290,7 +290,7 @@ export default function LoginPage() {
                   </div>
                 </div>
 
-                <LoadingButton type="submit" className="submit-btn" disabled={loading} isLoading={loading}>
+                <LoadingButton type="submit" className="submit-btn" disabled={loading} isLoading={loading} isError={!!error}>
                   {t('auth.submitLogin')}
                 </LoadingButton>
 

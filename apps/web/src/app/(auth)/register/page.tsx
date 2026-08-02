@@ -245,7 +245,7 @@ function RegisterForm() {
                 </div>
               </div>
 
-              <LoadingButton type="submit" className="submit-btn" disabled={loading} isLoading={loading}>
+              <LoadingButton type="submit" className="submit-btn" disabled={loading} isLoading={loading} isError={!!error}>
                 {t('auth.otpSendBtn')}
               </LoadingButton>
             </form>
@@ -298,7 +298,7 @@ function RegisterForm() {
               </div>
             </div>
 
-            <LoadingButton type="submit" className="submit-btn" disabled={loading} isLoading={loading}>
+            <LoadingButton type="submit" className="submit-btn" disabled={loading} isLoading={loading} isError={!!error}>
               {t('auth.otpVerifyBtn')}
             </LoadingButton>
 
@@ -446,7 +446,7 @@ function RegisterForm() {
               </div>
             </div>
 
-            <LoadingButton type="submit" className="submit-btn" disabled={loading} isLoading={loading}>
+            <LoadingButton type="submit" className="submit-btn" disabled={loading} isLoading={loading} isError={!!error}>
               {t('auth.submitRegister')}
             </LoadingButton>
           </form>

@@ -297,6 +297,7 @@ export default function SettingsPage() {
       fetchAccounts(); // refresh counts
     } catch (err: any) {
       notify.error(err.response?.data?.error || (language === 'fa' ? 'خطا در همگام‌سازی صرافی' : 'Failed to sync exchange'));
+      throw err;
     } finally {
       setSyncingAccountId(null);
     }
@@ -335,6 +336,7 @@ export default function SettingsPage() {
       fetchProfile();
     } catch (err: any) {
       notify.error(err.response?.data?.error || t('settings.profileSaveError'));
+      throw err;
     }
   };
 
@@ -365,6 +367,7 @@ export default function SettingsPage() {
       notify.success(t('settings.accountCreateSuccess'));
     } catch (err: any) {
       notify.error(err.response?.data?.error || t('settings.accountCreateError'));
+      throw err;
     }
   };
 
@@ -376,6 +379,7 @@ export default function SettingsPage() {
       notify.success(t('settings.accountUpdateSuccess'));
     } catch (err: any) {
       notify.error(err.response?.data?.error || t('settings.accountUpdateError'));
+      throw err;
     }
   };
 
@@ -425,6 +429,7 @@ export default function SettingsPage() {
       notify.success(t('settings.apiKeyCreateSuccess'));
     } catch (err: any) {
       notify.error(err.response?.data?.error || t('settings.apiKeyCreateError'));
+      throw err;
     }
   };
 
@@ -488,6 +493,7 @@ export default function SettingsPage() {
     } catch (err: any) {
       console.error('Submit receipt error:', err);
       notify.error(err.response?.data?.error || t('settings.receiptSubmitError'));
+      throw err;
     } finally {
       setCheckoutLoading(false);
     }
@@ -512,6 +518,7 @@ export default function SettingsPage() {
     } catch (err: any) {
       console.error('Online checkout error:', err);
       notify.error(err.response?.data?.error || t('settings.checkoutGatewayError'));
+      throw err;
     } finally {
       setCheckoutLoading(false);
     }
@@ -542,6 +549,7 @@ export default function SettingsPage() {
     } catch (err: any) {
       console.error('Crypto checkout error:', err);
       notify.error(err.response?.data?.error || (language === 'fa' ? 'خطا در تایید تراکنش رمزارز' : 'Error verifying crypto transaction'));
+      throw err;
     } finally {
       setCheckoutLoading(false);
     }
@@ -562,6 +570,7 @@ export default function SettingsPage() {
       fetchSessions();
     } catch (err: any) {
       notify.error(err.response?.data?.error || t('settings.passwordChangeError'));
+      throw err;
     }
   };
 
