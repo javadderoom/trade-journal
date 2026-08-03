@@ -7,6 +7,7 @@ import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
 import sharp from 'sharp';
+import { triggerBlogWebhook } from '../services/makeWebhook';
 
 // ─── Cover Image Upload Setup ─────────────────────────────────────────────
 const coverDir = path.join(__dirname, '../../uploads/blogs');
@@ -189,18 +190,27 @@ router.post('/posts', async (req: AuthRequest, res: Response) => {
       featured_image_prompt
     } = req.body;
 
+    const isPublishing = status === 'PUBLISHED';
+
     const post = await prisma.blogPost.create({
       data: {
         title, slug, content, excerpt, cover_image, status, locale,
         seo_title, seo_description, translation_id, featured_image_prompt,
         author_id: req.user!.userId as string,
         category_id,
-        published_at: status === 'PUBLISHED' ? new Date() : null,
+        published_at: isPublishing ? new Date() : null,
+        social_posted: isPublishing,
         tags: tag_ids ? {
           connect: tag_ids.map((id: string) => ({ id }))
         } : undefined
       },
     });
+
+    // Fire Make.com webhook in the background (non-blocking)
+    if (isPublishing) {
+      triggerBlogWebhook({ id: post.id, title, slug, excerpt, content, cover_image, locale }).catch(() => {});
+    }
+
     res.status(201).json(post);
   } catch (error) {
     res.status(500).json({ error: 'Failed to create post' });
@@ -216,6 +226,7 @@ router.put('/posts/:id', async (req: AuthRequest, res: Response) => {
     } = req.body;
 
     const existing = await prisma.blogPost.findUnique({ where: { id: req.params.id as string }});
+    const isFirstPublish = status === 'PUBLISHED' && existing?.status !== 'PUBLISHED' && !existing?.social_posted;
     const published_at = (status === 'PUBLISHED' && existing?.status !== 'PUBLISHED') 
       ? new Date() 
       : existing?.published_at;
@@ -227,11 +238,18 @@ router.put('/posts/:id', async (req: AuthRequest, res: Response) => {
         seo_title, seo_description, translation_id, featured_image_prompt,
         category_id,
         published_at,
+        ...(isFirstPublish ? { social_posted: true } : {}),
         tags: tag_ids ? {
           set: tag_ids.map((id: string) => ({ id }))
         } : undefined
       },
     });
+
+    // Fire Make.com webhook in the background (non-blocking)
+    if (isFirstPublish) {
+      triggerBlogWebhook({ id: post.id, title: post.title, slug: post.slug, excerpt: post.excerpt, content: post.content, cover_image: post.cover_image, locale: post.locale }).catch(() => {});
+    }
+
     res.json(post);
   } catch (error) {
     res.status(500).json({ error: 'Failed to update post' });

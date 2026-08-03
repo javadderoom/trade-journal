@@ -1,0 +1,96 @@
+/**
+ * Make.com Webhook Service
+ * 
+ * Sends a blog post snippet + cover image URL to a Cloudflare Worker proxy,
+ * which forwards it to Make.com (bypassing geo-restrictions).
+ * 
+ * Required env vars:
+ *   MAKE_PROXY_URL    — Your Cloudflare Worker URL (e.g. https://make-proxy.your-domain.workers.dev)
+ *   MAKE_PROXY_SECRET — Shared secret matching the Worker's PROXY_SECRET
+ */
+
+const FRONTEND_URL = 'https://tradekav.ir';
+
+interface BlogPostPayload {
+  id: string;
+  title: string;
+  slug: string;
+  excerpt?: string | null;
+  content: string;
+  cover_image?: string | null;
+  locale: string;
+}
+
+/**
+ * Constructs and sends a webhook payload via the Cloudflare proxy when a blog is published.
+ * The payload contains a short snippet, the cover image URL, and a link back
+ * to the original post. Social platforms will receive this via Make.com scenarios.
+ */
+export async function triggerBlogWebhook(post: BlogPostPayload): Promise<void> {
+  const proxyUrl = process.env.MAKE_PROXY_URL;
+  const proxySecret = process.env.MAKE_PROXY_SECRET;
+
+  if (!proxyUrl) {
+    console.warn('[Make Webhook] MAKE_PROXY_URL is not set. Skipping social media posting.');
+    return;
+  }
+
+  try {
+    // Build the blog URL based on locale
+    const blogPath = post.locale === 'fa' ? 'blog' : 'en/blog';
+    const postUrl = `${FRONTEND_URL}/${blogPath}/${post.slug}`;
+
+    // Build the cover image URL (absolute)
+    let coverImageUrl: string | null = null;
+    if (post.cover_image) {
+      if (post.cover_image.startsWith('http')) {
+        coverImageUrl = post.cover_image;
+      } else {
+        coverImageUrl = `${FRONTEND_URL}${post.cover_image}`;
+      }
+    }
+
+    // Generate a short snippet: prefer excerpt, otherwise strip HTML and take first 200 chars
+    let snippet = '';
+    if (post.excerpt && post.excerpt.trim().length > 0) {
+      snippet = post.excerpt.trim();
+    } else {
+      const plainText = post.content
+        .replace(/<[^>]*>/g, '')
+        .replace(/&nbsp;/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+      snippet = plainText.length > 200 ? plainText.slice(0, 200) + '…' : plainText;
+    }
+
+    const payload = {
+      title: post.title,
+      snippet,
+      url: postUrl,
+      image_url: coverImageUrl,
+      locale: post.locale,
+    };
+
+    console.log(`[Make Webhook] Sending blog "${post.title}" via Cloudflare proxy...`);
+
+    const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+    if (proxySecret) {
+      headers['X-Proxy-Secret'] = proxySecret;
+    }
+
+    const response = await fetch(proxyUrl, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) {
+      console.error(`[Make Webhook] Proxy returned ${response.status}: ${await response.text()}`);
+    } else {
+      console.log(`[Make Webhook] Successfully sent blog "${post.title}" via proxy.`);
+    }
+  } catch (error) {
+    // Don't throw — webhook failure should never block the publish action
+    console.error('[Make Webhook] Error sending webhook:', error);
+  }
+}
