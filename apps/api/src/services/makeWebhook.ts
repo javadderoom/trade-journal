@@ -50,17 +50,22 @@ export async function triggerBlogWebhook(post: BlogPostPayload): Promise<void> {
       }
     }
 
-    // Generate a short snippet: prefer excerpt, otherwise strip HTML and take first 200 chars
+    // Generate a short snippet: prefer excerpt, otherwise strip HTML
     let snippet = '';
     if (post.excerpt && post.excerpt.trim().length > 0) {
       snippet = post.excerpt.trim();
     } else {
-      const plainText = post.content
+      snippet = post.content
         .replace(/<[^>]*>/g, '')
         .replace(/&nbsp;/g, ' ')
         .replace(/\s+/g, ' ')
         .trim();
-      snippet = plainText.length > 200 ? plainText.slice(0, 200) + '…' : plainText;
+    }
+
+    // Twitter limit is 280 chars. Title + URL usually take ~100 chars.
+    // So strictly truncate snippet to max 120 chars to be safe.
+    if (snippet.length > 120) {
+      snippet = snippet.slice(0, 117) + '...';
     }
 
     const payload = {
