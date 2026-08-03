@@ -86,6 +86,20 @@ export default function BlogEditor({ initialData, locale, onSuccess, onCancel }:
     }
   };
 
+  const [isSharing, setIsSharing] = useState(false);
+  const handleShare = async () => {
+    if (!postId) return;
+    setIsSharing(true);
+    try {
+      await api.post(`/api/admin/blog/posts/${postId}/share`);
+      notify.success('Successfully sent to Make.com / Social Media');
+    } catch (err) {
+      notify.error('Failed to share post to social media');
+    } finally {
+      setIsSharing(false);
+    }
+  };
+
   const handleTagToggle = (id: string) => {
     setTagIds(prev => prev.includes(id) ? prev.filter(t => t !== id) : [...prev, id]);
   };
@@ -297,7 +311,18 @@ export default function BlogEditor({ initialData, locale, onSuccess, onCancel }:
 
       <div style={{ display: 'flex', gap: '10px', marginTop: '30px' }}>
         <LoadingButton isLoading={loading} onClick={handleSave} className="btn-primary">ذخیره مقاله</LoadingButton>
-        <button type="button" className="btn btn-secondary" onClick={onCancel} disabled={loading}>انصراف</button>
+        <button type="button" className="btn btn-secondary" onClick={onCancel} disabled={loading || isSharing}>انصراف</button>
+        {postId && status === 'PUBLISHED' && (
+          <LoadingButton 
+            isLoading={isSharing} 
+            onClick={handleShare} 
+            className="btn-primary" 
+            style={{ marginLeft: 'auto', background: '#3b82f6', display: 'flex', alignItems: 'center', gap: '5px' }}
+          >
+            <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>share</span>
+            اشتراک در شبکه‌های اجتماعی
+          </LoadingButton>
+        )}
       </div>
     </div>
   );

@@ -199,17 +199,11 @@ router.post('/posts', async (req: AuthRequest, res: Response) => {
         author_id: req.user!.userId as string,
         category_id,
         published_at: isPublishing ? new Date() : null,
-        social_posted: isPublishing,
         tags: tag_ids ? {
           connect: tag_ids.map((id: string) => ({ id }))
         } : undefined
       },
     });
-
-    // Fire Make.com webhook in the background (non-blocking)
-    if (isPublishing) {
-      triggerBlogWebhook({ id: post.id, title, slug, excerpt, content, cover_image, locale }).catch(() => {});
-    }
 
     res.status(201).json(post);
   } catch (error) {
@@ -226,7 +220,6 @@ router.put('/posts/:id', async (req: AuthRequest, res: Response) => {
     } = req.body;
 
     const existing = await prisma.blogPost.findUnique({ where: { id: req.params.id as string }});
-    const isFirstPublish = status === 'PUBLISHED' && existing?.status !== 'PUBLISHED' && !existing?.social_posted;
     const published_at = (status === 'PUBLISHED' && existing?.status !== 'PUBLISHED') 
       ? new Date() 
       : existing?.published_at;
@@ -238,21 +231,46 @@ router.put('/posts/:id', async (req: AuthRequest, res: Response) => {
         seo_title, seo_description, translation_id, featured_image_prompt,
         category_id,
         published_at,
-        ...(isFirstPublish ? { social_posted: true } : {}),
         tags: tag_ids ? {
           set: tag_ids.map((id: string) => ({ id }))
         } : undefined
       },
     });
 
-    // Fire Make.com webhook in the background (non-blocking)
-    if (isFirstPublish) {
-      triggerBlogWebhook({ id: post.id, title: post.title, slug: post.slug, excerpt: post.excerpt, content: post.content, cover_image: post.cover_image, locale: post.locale }).catch(() => {});
-    }
-
     res.json(post);
   } catch (error) {
     res.status(500).json({ error: 'Failed to update post' });
+  }
+});
+
+router.post('/posts/:id/share', async (req: AuthRequest, res: Response) => {
+  try {
+    const post = await prisma.blogPost.findUnique({ where: { id: req.params.id as string } });
+    if (!post) {
+      return res.status(404).json({ error: 'Post not found' });
+    }
+    
+    // Trigger the webhook non-blocking
+    triggerBlogWebhook({
+      id: post.id,
+      title: post.title,
+      slug: post.slug,
+      excerpt: post.excerpt,
+      content: post.content,
+      cover_image: post.cover_image,
+      locale: post.locale,
+    }).catch(() => {});
+
+    // Update the flag to true (for tracking)
+    await prisma.blogPost.update({
+      where: { id: post.id },
+      data: { social_posted: true }
+    });
+
+    res.json({ success: true, message: 'Shared to social media successfully' });
+  } catch (error) {
+    console.error('Share to social error:', error);
+    res.status(500).json({ error: 'Failed to share to social media' });
   }
 });
 
