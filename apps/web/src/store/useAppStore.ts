@@ -7,6 +7,8 @@ export interface TradingAccount {
   broker?: string;
   accountNumber?: string;
   balance?: number;
+  initial_balance?: number;
+  current_balance?: number;
   currency?: string;
 }
 
