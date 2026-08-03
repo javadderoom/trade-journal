@@ -505,6 +505,11 @@ const [allTrades, totalTrades] = await Promise.all([
       hasTradedToday: todayTrades.length > 0,
     };
 
+    // ─── ALL-TIME PNL ──────────────────────────────────────────────────────────
+    const allTimePnl = allTrades
+      .filter((t) => t.close_time !== null)
+      .reduce((sum, t) => sum + t.profit_usd + (t.commission ?? 0) + (t.swap ?? 0), 0);
+
     // ─── SECTION 2: THIS MONTH ─────────────────────────────────────────────────
     const monthTrades = allTrades.filter((t) => {
       const closeDay = dateToTehranDay(t.close_time);
@@ -628,6 +633,7 @@ tags: t.annotation?.tags ?? [],
     return res.status(200).json({
       today,
       month,
+      allTimePnl,
       edge,
       recent,
       totalTrades,

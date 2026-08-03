@@ -38,6 +38,7 @@ interface DashboardData {
     monthName: string;
     hasTrades: boolean;
   };
+  allTimePnl: number;
   edge: {
     type: 'session' | 'strategy' | 'weekday' | 'emotion' | 'fallback';
     insight: string;
@@ -182,6 +183,33 @@ export default function DashboardPage() {
           ) : (
             <div className="dash-card-value muted">{t('dashboard.noTradesToday')}</div>
           )}
+        </div>
+
+        {/* Card 1.5: All-Time P&L */}
+        <div className="dash-card">
+          <div className="dash-card-label">{language === 'fa' ? 'سود/زیان کل' : 'All-Time P&L'}</div>
+          {(() => {
+            const initialBalance = selectedAccountId === 'all'
+              ? accounts.reduce((sum, acc) => sum + (acc.initial_balance || 0), 0)
+              : accounts.find(a => a.id === selectedAccountId)?.initial_balance || 0;
+            const pnlPercent = initialBalance > 0 ? (data.allTimePnl / initialBalance) * 100 : null;
+            return (
+              <>
+                <div className={`dash-card-value ${data.allTimePnl >= 0 ? 'positive' : 'negative'}`}>
+                  {data.allTimePnl >= 0 ? '+' : ''}
+                  {formatPersianCurrency(data.allTimePnl)}
+                  {pnlPercent !== null && (
+                    <span style={{ fontSize: '14px', opacity: 0.8, marginLeft: '8px', verticalAlign: 'middle' }}>
+                      ({pnlPercent >= 0 ? '+' : ''}{toPersianDigits(pnlPercent.toFixed(2))}%)
+                    </span>
+                  )}
+                </div>
+                {language === 'fa' && (
+                  <div className="dash-card-sub">{formatToman(data.allTimePnl, usdToToman)}</div>
+                )}
+              </>
+            );
+          })()}
         </div>
 
         {/* Card 2: Today's Trades */}

@@ -37,46 +37,62 @@ export async function GET() {
       console.warn('[exchange-rate] Database override check failed:', dbErr.message);
     }
 
-    // 2. Fallback to Navasan API
+    // 2. Try Navasan API if key exists
     const apiKey = process.env.NAVASAN_API_KEY;
 
-    if (!apiKey) {
-      return NextResponse.json(
-        { usdToToman: FALLBACK_RATE, source: 'fallback', reason: 'no_api_key' },
-        { status: 200 }
-      );
+    if (apiKey) {
+      try {
+        const res = await fetch(
+          `https://api.navasan.tech/latest/?api_key=${apiKey}&item=usd_buy`,
+          { next: { revalidate: 21600 } }
+        );
+        if (res.ok) {
+          const data = await res.json();
+          const tomanValue = parseInt(data?.usd_buy?.value ?? '0', 10);
+          if (tomanValue > 0) {
+            return NextResponse.json({
+              usdToToman: tomanValue,
+              source: 'navasan',
+              cachedAt: new Date().toISOString(),
+            });
+          }
+        }
+      } catch (err: any) {
+        console.warn('[exchange-rate] Navasan fetch failed:', err.message);
+      }
     }
 
-    const res = await fetch(
-      `https://api.navasan.tech/latest/?api_key=${apiKey}&item=usd_buy`,
-      { next: { revalidate: 21600 } }
-    );
-
-    if (!res.ok) {
-      throw new Error(`Navasan returned ${res.status}`);
+    // 3. Fallback to Nobitex (USDT to Rials) which doesn't require an API key
+    try {
+      const res = await fetch('https://api.nobitex.ir/market/stats?srcCurrency=usdt&dstCurrency=rls', {
+        next: { revalidate: 3600 } // Cache Nobitex for 1 hour
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data && data.status === 'ok' && data.stats['usdt-rls']) {
+          const rlsValue = parseFloat(data.stats['usdt-rls'].latest);
+          if (rlsValue > 0) {
+            return NextResponse.json({
+              usdToToman: Math.floor(rlsValue / 10), // Convert Rials to Tomans
+              source: 'nobitex_fallback',
+              cachedAt: new Date().toISOString(),
+            });
+          }
+        }
+      }
+    } catch (err: any) {
+      console.warn('[exchange-rate] Nobitex fallback failed:', err.message);
     }
 
-    const data = await res.json();
-
-    // Navasan returns Rial value as a string, e.g. { "usd_buy": { "value": "900000", ... } }
-    // Currection, navasan return toman value 
-    const tomanValue = parseInt(data?.usd_buy?.value ?? '0', 10);
-    if (!tomanValue || tomanValue <= 0) {
-      throw new Error('Invalid value from Navasan');
-    }
-
-    // 1 Toman = 10 Rials
-    const usdToToman = tomanValue;
-
-    return NextResponse.json({
-      usdToToman,
-      source: 'navasan',
-      cachedAt: new Date().toISOString(),
-    });
-  } catch (err: any) {
-    console.warn('[exchange-rate] Navasan fetch failed, using fallback:', err.message);
+    // 4. Ultimate Fallback
     return NextResponse.json(
-      { usdToToman: FALLBACK_RATE, source: 'fallback', reason: err.message },
+      { usdToToman: FALLBACK_RATE, source: 'fallback', reason: 'all_apis_failed' },
+      { status: 200 }
+    );
+  } catch (err: any) {
+    console.error('[exchange-rate] Unexpected error:', err);
+    return NextResponse.json(
+      { usdToToman: FALLBACK_RATE, source: 'error_fallback', reason: err.message },
       { status: 200 }
     );
   }

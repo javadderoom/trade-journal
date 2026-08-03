@@ -2,6 +2,9 @@ import { Router, Response } from 'express';
 import { prisma } from '../services/tradeSync';
 import { authenticate, requireAdmin, AuthRequest } from '../middleware/auth';
 import { Plan, ReceiptStatus } from '@prisma/client';
+import multer from 'multer';
+import path from 'node:path';
+import fs from 'node:fs';
 
 const router = Router();
 
@@ -517,6 +520,88 @@ router.put('/settings/announcement-banner', async (req: AuthRequest, res: Respon
   } catch (err: any) {
     console.error('Admin update banner error:', err);
     return res.status(500).json({ error: 'خطا در ذخیره‌سازی تنظیمات بنر' });
+  }
+});
+
+// --- EA Management ---
+
+const eaStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    // Save to apps/web/public/downloads
+    const destDir = path.join(process.cwd(), '../../web/public/downloads');
+    if (!fs.existsSync(destDir)) {
+      fs.mkdirSync(destDir, { recursive: true });
+    }
+    cb(null, destDir);
+  },
+  filename: (req, file, cb) => {
+    // Keep original name (e.g. TradeKav_EA.mq4)
+    cb(null, file.originalname);
+  }
+});
+
+const eaUpload = multer({ 
+  storage: eaStorage,
+  limits: { fileSize: 5 * 1024 * 1024 } // 5MB limit
+});
+
+/**
+ * POST /api/admin/ea/upload
+ * Upload new EA files (.mq4, .mq5, .ex4, .ex5)
+ */
+router.post('/ea/upload', eaUpload.single('file'), (req: AuthRequest, res: Response) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: 'No file uploaded' });
+    }
+    res.status(200).json({ message: 'File uploaded successfully', filename: req.file.filename });
+  } catch (err) {
+    console.error('EA upload error:', err);
+    res.status(500).json({ error: 'Failed to upload EA' });
+  }
+});
+
+/**
+ * GET /api/admin/ea/logs
+ * Retrieve EA activity logs, optionally filtered by user ID
+ */
+router.get('/ea/logs', async (req: AuthRequest, res: Response) => {
+  try {
+    const page = Math.max(1, parseInt((req.query.page as string) || '1', 10) || 1);
+    const pageSize = Math.min(100, Math.max(1, parseInt((req.query.pageSize as string) || '50', 10) || 50));
+    const userId = req.query.userId as string | undefined;
+
+    const where: any = {};
+    if (userId) {
+      where.user_id = userId;
+    }
+
+    const [total, logs] = await Promise.all([
+      prisma.eALog.count({ where }),
+      prisma.eALog.findMany({
+        where,
+        orderBy: { created_at: 'desc' },
+        skip: (page - 1) * pageSize,
+        take: pageSize,
+        include: {
+          user: { select: { email: true, name: true } },
+          account: { select: { broker_name: true, account_number: true } }
+        }
+      })
+    ]);
+
+    res.status(200).json({
+      data: logs,
+      pagination: {
+        page,
+        pageSize,
+        total,
+        totalPages: Math.ceil(total / pageSize)
+      }
+    });
+  } catch (err) {
+    console.error('EA logs error:', err);
+    res.status(500).json({ error: 'Failed to fetch EA logs' });
   }
 });
 

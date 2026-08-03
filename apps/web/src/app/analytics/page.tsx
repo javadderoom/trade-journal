@@ -407,6 +407,38 @@ const aTf = t.annotation?.analysisTimeframe;
 
 
 
+  const periodicGains = useMemo(() => {
+    const now = new Date();
+    const todayStr = now.toDateString();
+    
+    const startOfWeek = new Date(now);
+    startOfWeek.setDate(now.getDate() - now.getDay());
+    startOfWeek.setHours(0,0,0,0);
+    
+    const currentMonth = now.getMonth();
+    const currentYear = now.getFullYear();
+    const currentQuarter = Math.floor(currentMonth / 3);
+
+    let todayPnl = 0;
+    let weekPnl = 0;
+    let monthPnl = 0;
+    let seasonPnl = 0;
+    let yearPnl = 0;
+
+    sortedClosedTrades.forEach(t => {
+      if (!t.closeTime) return;
+      const d = new Date(t.closeTime);
+      const net = t.profitUsd + (t.commission ?? 0) + (t.swap ?? 0);
+
+      if (d.toDateString() === todayStr) todayPnl += net;
+      if (d >= startOfWeek) weekPnl += net;
+      if (d.getMonth() === currentMonth && d.getFullYear() === currentYear) monthPnl += net;
+      if (Math.floor(d.getMonth() / 3) === currentQuarter && d.getFullYear() === currentYear) seasonPnl += net;
+      if (d.getFullYear() === currentYear) yearPnl += net;
+    });
+
+    return { todayPnl, weekPnl, monthPnl, seasonPnl, yearPnl };
+  }, [sortedClosedTrades]);
 
   const rDistribution = useMemo(() => {
     const bins = language === 'fa' ? [
@@ -565,6 +597,47 @@ const aTf = t.annotation?.analysisTimeframe;
                   {formatCurrency(stats.commissions + stats.swaps, 2)}
                 </span>
               </div>
+            </div>
+          </div>
+
+          {/* 1.5. Periodic Gains Card */}
+          <div className="journal-card">
+            <div className="card-header">
+              <span className="card-title">{language === 'fa' ? 'رشد دوره‌ای' : 'Periodic Gains'}</span>
+              <span className="material-symbols-outlined card-icon">trending_up</span>
+            </div>
+            <div className="periodic-gains-container" style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '12px' }}>
+              {(() => {
+                const initialBalance = selectedAccountId === 'all'
+                  ? accounts.reduce((sum, acc) => sum + (acc.initial_balance || 0), 0)
+                  : accounts.find(a => a.id === selectedAccountId)?.initial_balance || 0;
+                
+                const renderGain = (labelEn: string, labelFa: string, pnl: number) => {
+                  const percent = initialBalance > 0 ? (pnl / initialBalance) * 100 : null;
+                  const isPositive = pnl >= 0;
+                  return (
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span style={{ fontSize: '14px', color: '#9ca3af' }}>{language === 'fa' ? labelFa : labelEn}</span>
+                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+                        <span style={{ color: isPositive ? '#10b981' : '#ffb4ab', fontWeight: 600, direction: 'ltr' }}>
+                          {isPositive ? '+' : ''}{formatCurrency(pnl, 2)}
+                          {percent !== null && <span style={{ fontSize: '12px', opacity: 0.8, marginLeft: '4px' }}>({isPositive ? '+' : ''}{percent.toFixed(2)}%)</span>}
+                        </span>
+                      </div>
+                    </div>
+                  );
+                };
+
+                return (
+                  <>
+                    {renderGain('Today', 'امروز', periodicGains.todayPnl)}
+                    {renderGain('This Week', 'این هفته', periodicGains.weekPnl)}
+                    {renderGain('This Month', 'این ماه', periodicGains.monthPnl)}
+                    {renderGain('This Season', 'این فصل', periodicGains.seasonPnl)}
+                    {renderGain('This Year', 'امسال', periodicGains.yearPnl)}
+                  </>
+                );
+              })()}
             </div>
           </div>
 

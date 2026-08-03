@@ -123,7 +123,38 @@ router.post('/sync', authenticateAccountToken, checkSyncPermission, async (req: 
     const targetUserId = req.account!.user_id;
     const targetAccountId = req.account!.id;
 
+    if (body && typeof body.balance === 'number') {
+      const currentAccount = await prisma.account.findUnique({ where: { id: targetAccountId } });
+      if (currentAccount && currentAccount.initial_balance === null) {
+        await prisma.account.update({
+          where: { id: targetAccountId },
+          data: { initial_balance: body.balance, current_balance: body.balance }
+        });
+      } else if (currentAccount) {
+        await prisma.account.update({
+          where: { id: targetAccountId },
+          data: { current_balance: body.balance }
+        });
+      }
+    }
+
     const result = await syncTradesFromEA(targetUserId, targetAccountId, trades);
+
+    try {
+      const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+      const ipStr = Array.isArray(ip) ? ip[0] : ip;
+      await prisma.eALog.create({
+        data: {
+          user_id: targetUserId,
+          account_id: targetAccountId,
+          action: 'SYNC',
+          message: `Synced ${result.created} new trades`,
+          ip_address: typeof ipStr === 'string' ? ipStr : undefined,
+        }
+      });
+    } catch (logErr) {
+      console.error('Failed to write EALog:', logErr);
+    }
 
     res.status(201).json({
       message: `Synced ${result.created} new trades`,
@@ -131,6 +162,24 @@ router.post('/sync', authenticateAccountToken, checkSyncPermission, async (req: 
     });
   } catch (err: any) {
     console.error('Trade sync error:', err);
+    try {
+      const targetUserId = req.account?.user_id;
+      const targetAccountId = req.account?.id;
+      if (targetUserId) {
+        const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+        const ipStr = Array.isArray(ip) ? ip[0] : ip;
+        await prisma.eALog.create({
+          data: {
+            user_id: targetUserId,
+            account_id: targetAccountId,
+            level: 'ERROR',
+            action: 'SYNC_ERROR',
+            message: err.message || 'Unknown sync error',
+            ip_address: typeof ipStr === 'string' ? ipStr : undefined,
+          }
+        });
+      }
+    } catch (logErr) {}
     res.status(500).json({ error: 'خطای داخلی سرور' });
   }
 });

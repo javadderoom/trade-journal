@@ -53,7 +53,7 @@ int OnInit()
    if(GlobalVariableCheck(gvNextSync))
       nextAllowed = (datetime)GlobalVariableGet(gvNextSync);
 
-   datetime now = TimeCurrent();
+   datetime now = TimeLocal();
    if(now < nextAllowed)
    {
       int remain = (int)(nextAllowed - now);
@@ -110,7 +110,7 @@ void SyncAll()
    if(GlobalVariableCheck(gvNextSync))
    {
       datetime nextAllowed = (datetime)GlobalVariableGet(gvNextSync);
-      datetime now = TimeCurrent();
+      datetime now = TimeLocal();
       if(now < nextAllowed)
       {
          int remain = (int)(nextAllowed - now);
@@ -128,15 +128,15 @@ void SyncAll()
 
    if(!hasOpen && !hasClosed) return;
 
-   // Combine into single array: merge contents of both []
-   string combined = "[";
+   // Combine into single payload containing balance and trades
+   string combined = "{\"balance\":" + DoubleToString(AccountInfoDouble(ACCOUNT_BALANCE), 2) + ",\"trades\":[";
    if(hasOpen)
       combined += StringSubstr(openJson, 1, StringLen(openJson) - 2);
    if(hasOpen && hasClosed)
       combined += ",";
    if(hasClosed)
       combined += StringSubstr(closedJson, 1, StringLen(closedJson) - 2);
-   combined += "]";
+   combined += "]}";
 
    if(SendToApi(combined))
    {
@@ -388,7 +388,7 @@ int ParseRetryAfterSeconds(string headers, string body)
       string sub = StringSubstr(headers, pos + 12);
       int endPos = StringFind(sub, "\r\n");
       if(endPos > 0) sub = StringSubstr(sub, 0, endPos);
-      sub = StringTrimLeft(StringTrimRight(sub));
+      StringTrimRight(sub); StringTrimLeft(sub);
       int sec = (int)StringToInteger(sub);
       if(sec > 0) return sec;
    }
@@ -400,7 +400,7 @@ int ParseRetryAfterSeconds(string headers, string body)
       int endPos = StringFind(sub, ",");
       if(endPos < 0) endPos = StringFind(sub, "}");
       if(endPos > 0) sub = StringSubstr(sub, 0, endPos);
-      sub = StringTrimLeft(StringTrimRight(sub));
+      StringTrimRight(sub); StringTrimLeft(sub);
       int sec = (int)StringToInteger(sub);
       if(sec > 0) return sec;
    }
@@ -434,7 +434,7 @@ bool SendToApi(string jsonPayload)
       int interval = GetEffectiveInterval();
       if(interval <= 0) interval = 60;
 
-      datetime nextSync = TimeCurrent() + interval;
+      datetime nextSync = TimeLocal() + interval;
       GlobalVariableSet(gvNextSync, (double)nextSync);
       EventSetTimer(interval);
       return true;
@@ -445,7 +445,7 @@ bool SendToApi(string jsonPayload)
       int retrySecs = ParseRetryAfterSeconds(resultHeaders, responseBody);
       if(retrySecs < 10) retrySecs = 60;
 
-      datetime lockoutUntil = TimeCurrent() + retrySecs;
+      datetime lockoutUntil = TimeLocal() + retrySecs;
       GlobalVariableSet(gvNextSync, (double)lockoutUntil);
 
       Print("Rate limit reached (429). Setting sync interval to ", retrySecs, "s (until ", TimeToString(lockoutUntil, TIME_DATE|TIME_SECONDS), ").");

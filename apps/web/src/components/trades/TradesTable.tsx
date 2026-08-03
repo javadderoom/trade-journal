@@ -860,6 +860,7 @@ export default function TradesTable({
           itemsPerPage={itemsPerPage}
           ignoredTags={ignoredTagsSet}
           allTags={allTags}
+          accounts={accounts}
         />
 
         {/* 6. Pagination / Load More */}

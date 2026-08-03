@@ -28,6 +28,7 @@ interface MobileCardsListProps {
   itemsPerPage: number;
   ignoredTags: Set<string>;
   allTags: TagObject[];
+  accounts?: any[];
 }
 
 export default function MobileCardsList({
@@ -45,6 +46,7 @@ export default function MobileCardsList({
   itemsPerPage,
   ignoredTags,
   allTags,
+  accounts = [],
 }: MobileCardsListProps) {
   const { t, language } = useTranslation();
 
@@ -131,6 +133,10 @@ export default function MobileCardsList({
           if (!isClosed) profitClass = 'profit-open';
           if (isMissed) profitClass = 'profit-missed';
 
+          const account = accounts?.find(a => a.id === trade.accountId);
+          const initialBalance = account?.initial_balance || 0;
+          const pnlPercent = initialBalance > 0 ? (netPnl / initialBalance) * 100 : null;
+
           return (
             <div
               key={`card-${trade.id}`}
@@ -188,7 +194,14 @@ export default function MobileCardsList({
                   </span>
                 </div>
                 <div className={`col-profit ${profitClass}`}>
-                  <span className="profit-usd">{formatCurrency(netPnl)}</span>
+                  <span className="profit-usd">
+                    {formatCurrency(netPnl)}
+                    {pnlPercent !== null && (
+                      <span style={{ fontSize: '11px', opacity: 0.8, marginLeft: '4px' }}>
+                        ({pnlPercent > 0 ? '+' : ''}{toPersianDigits(pnlPercent.toFixed(2))}%)
+                      </span>
+                    )}
+                  </span>
                   {language === 'fa' && (
                     <span className="profit-toman">{formatToman(netPnl, usdToToman)}</span>
                   )}

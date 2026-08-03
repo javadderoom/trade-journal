@@ -42,6 +42,7 @@ model User {
    backtestSessions BacktestSession[]
    blogPosts        BlogPost[]
    blogComments     BlogComment[]
+   eaLogs           EALog[]
 }
 
 model Account {
@@ -57,7 +58,10 @@ model Account {
   importJobs         ImportJob[]
   account_tokens     AccountToken[]
   last_sync_at       DateTime?
+  initial_balance    Float?
+  current_balance    Float?
   exchangeConnection ExchangeConnection?
+  eaLogs             EALog[]
 
   @@index([user_id])
 }
@@ -520,6 +524,25 @@ model SystemLog {
 
   @@index([level])
   @@index([source])
+  @@index([created_at])
+}
+
+// ─── EA Logs ──────────────────────────────────────────────────────────────────
+
+model EALog {
+  id         String   @id @default(uuid())
+  user_id    String
+  user       User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  account_id String?
+  account    Account? @relation(fields: [account_id], references: [id], onDelete: Cascade)
+  level      LogLevel @default(INFO)
+  action     String   // e.g. "SYNC", "ERROR"
+  message    String
+  ip_address String?
+  created_at DateTime @default(now())
+
+  @@index([user_id])
+  @@index([account_id])
   @@index([created_at])
 }
 

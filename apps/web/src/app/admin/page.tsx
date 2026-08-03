@@ -569,6 +569,10 @@ export default function AdminPage() {
           <span className="material-symbols-outlined">article</span>
           <span>مدیریت وبلاگ</span>
         </Link>
+        <Link href="/admin/experts" className="admin-tab-btn">
+          <span className="material-symbols-outlined">upload_file</span>
+          <span>مدیریت اکسپرت</span>
+        </Link>
         <button
           className={`admin-tab-btn ${activeTab === 'contact' ? 'active' : ''}`}
           onClick={() => setActiveTab('contact')}

@@ -29,6 +29,7 @@ interface BrokerAccount {
   account_number: string | null;
   currency: string;
   account_type: string;
+  initial_balance: number | null;
   created_at: string;
   trade_count: number;
   last_import: string | null;
@@ -191,8 +192,9 @@ export default function SettingsPage() {
     account_number: '',
     currency: 'USD',
     account_type: 'LIVE',
+    initial_balance: '',
   });
-  const [editAccount, setEditAccount] = useState({ broker_name: '', account_number: '', currency: 'USD', account_type: 'LIVE' });
+  const [editAccount, setEditAccount] = useState({ broker_name: '', account_number: '', currency: 'USD', account_type: 'LIVE', initial_balance: '' });
 
   // ─── Subscription state ──────────────────────────────────────────────────
   const [subscription, setSubscription] = useState<any>(null);
@@ -362,7 +364,7 @@ export default function SettingsPage() {
     try {
       await api.post('/api/settings/accounts', newAccount);
       setShowAddAccount(false);
-      setNewAccount({ broker_name: '', account_number: '', currency: 'USD', account_type: 'LIVE' });
+      setNewAccount({ broker_name: '', account_number: '', currency: 'USD', account_type: 'LIVE', initial_balance: '' });
       fetchAccounts();
       notify.success(t('settings.accountCreateSuccess'));
     } catch (err: any) {
@@ -798,6 +800,16 @@ export default function SettingsPage() {
                           ))}
                         </div>
                       </div>
+                      <div className="form-field">
+                        <label>{language === 'fa' ? 'موجودی اولیه (دلار)' : 'Initial Balance ($)'}</label>
+                        <input
+                          type="number"
+                          value={editAccount.initial_balance}
+                          onChange={(e) => setEditAccount({ ...editAccount, initial_balance: e.target.value })}
+                          placeholder="e.g. 10000"
+                          style={{ direction: 'ltr', textAlign: language === 'fa' ? 'right' : 'left' }}
+                        />
+                      </div>
                     </div>
                     <div className="broker-edit-actions">
                       <LoadingButton className="settings-save-btn" onClick={() => handleUpdateAccount(acc.id)}>{t('settings.save')}</LoadingButton>
@@ -857,6 +869,7 @@ export default function SettingsPage() {
                               account_number: acc.account_number || '',
                               currency: acc.currency,
                               account_type: acc.account_type || 'LIVE',
+                              initial_balance: acc.initial_balance !== null ? String(acc.initial_balance) : '',
                             });
                           }}>{t('settings.edit')}</button>
                           <button 
@@ -969,6 +982,16 @@ export default function SettingsPage() {
                         >{t(`trades.accountType.${t2}`)}</button>
                       ))}
                     </div>
+                  </div>
+                  <div className="form-field">
+                    <label>{language === 'fa' ? 'موجودی اولیه (دلار)' : 'Initial Balance ($)'}</label>
+                    <input
+                      type="number"
+                      value={newAccount.initial_balance}
+                      onChange={(e) => setNewAccount({ ...newAccount, initial_balance: e.target.value })}
+                      placeholder="e.g. 10000"
+                      style={{ direction: 'ltr', textAlign: language === 'fa' ? 'right' : 'left' }}
+                    />
                   </div>
                 </div>
                 <div className="broker-edit-actions">

@@ -109,6 +109,10 @@ export default function DesktopTable({
               if (!isClosed) profitClass = 'profit-open';
               if (isMissed) profitClass = 'profit-missed';
 
+              const account = accounts.find(a => a.id === trade.accountId);
+              const initialBalance = account?.initial_balance || 0;
+              const pnlPercent = initialBalance > 0 ? (netPnl / initialBalance) * 100 : null;
+
               // Sort tags to show show_first (important) ones first
               const importantTagNames = new Set(
                 (allTags || []).filter(t => t.show_first).map(t => t.name)
@@ -222,7 +226,14 @@ export default function DesktopTable({
                     {toPersianDigits(trade.rMultiple.toFixed(1))}R
                   </td>
                   <td className={`col-profit ${profitClass}`}>
-                    <span className="profit-usd">{formatCurrency(netPnl)}</span>
+                    <span className="profit-usd">
+                      {formatCurrency(netPnl)}
+                      {pnlPercent !== null && (
+                        <span style={{ fontSize: '11px', opacity: 0.8, marginLeft: '4px' }}>
+                          ({pnlPercent > 0 ? '+' : ''}{toPersianDigits(pnlPercent.toFixed(2))}%)
+                        </span>
+                      )}
+                    </span>
                     {language === 'fa' && (
                       <span className="profit-toman">{formatToman(netPnl, usdToToman)}</span>
                     )}
