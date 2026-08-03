@@ -36,9 +36,8 @@ export async function triggerBlogWebhook(post: BlogPostPayload): Promise<void> {
   }
 
   try {
-    // Build the blog URL based on locale
-    const blogPath = post.locale === 'fa' ? 'blog' : 'en/blog';
-    const postUrl = `${FRONTEND_URL}/${blogPath}/${post.slug}`;
+    // Build the blog URL based on locale (strictly prefix the locale)
+    const postUrl = `${FRONTEND_URL}/${post.locale}/blog/${post.slug}`;
 
     // Build the cover image URL (absolute)
     let coverImageUrl: string | null = null;
