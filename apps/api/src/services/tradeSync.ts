@@ -304,14 +304,31 @@ export type TradeListRow = {
   pips: number;
   rMultiple: number;
   annotation: {
-    tags: string[];
+    htfBias: 'BUY' | 'SELL' | null;
+    session: 'ASIA' | 'LONDON' | 'NEW_YORK' | 'OVERLAP' | null;
+    thesis: string | null;
+    expectation: string | null;
+    lesson: string | null;
+    conviction: number | null;
     emotion: string | null;
     notes: string | null;
     screenshots: string[];
-    analysisTimeframe: string | null;
-    entryTimeframe: string | null;
+  } | null;
+  setups?: { concept: { id: string; name: string; color: string | null; icon: string | null } }[];
+  triggers?: { concept: { id: string; name: string; color: string | null; icon: string | null } }[];
+  confluences?: { concept: { id: string; name: string; color: string | null; icon: string | null } }[];
+  plan?: {
+    maxRisk: number | null;
+    expectedRr: number | null;
+    entryCondition: string | null;
+    invalidation: string | null;
+    targetZone: string | null;
+    expectedHoldTime: string | null;
+    planFollowed: boolean | null;
   } | null;
   chartData?: any;
+  importSource?: string;
+  accountType?: string;
 };
 
 export async function getTradesForAccount(params: {
@@ -391,14 +408,31 @@ export async function getTradesForAccount(params: {
       account: { select: { account_type: true } },
       annotation: {
         select: {
-          tags: true,
+          htf_bias: true,
+          session: true,
+          thesis: true,
+          expectation: true,
+          lesson: true,
+          conviction: true,
           emotion: true,
           notes: true,
           screenshots: true,
-          analysis_timeframe: true,
-          entry_timeframe: true,
         },
       },
+      setups: { select: { concept: { select: { id: true, name: true, color: true, icon: true } } } },
+      triggers: { select: { concept: { select: { id: true, name: true, color: true, icon: true } } } },
+      confluences: { select: { concept: { select: { id: true, name: true, color: true, icon: true } } } },
+      plan: {
+        select: {
+          max_risk: true,
+          expected_rr: true,
+          entry_condition: true,
+          invalidation: true,
+          target_zone: true,
+          expected_hold_time: true,
+          plan_followed: true,
+        }
+      }
     },
   });
 
@@ -421,12 +455,27 @@ export async function getTradesForAccount(params: {
     pips: t.pips,
     rMultiple: t.r_multiple,
     annotation: t.annotation ? {
-      tags: t.annotation.tags,
+      htfBias: t.annotation.htf_bias,
+      session: t.annotation.session,
+      thesis: t.annotation.thesis,
+      expectation: t.annotation.expectation,
+      lesson: t.annotation.lesson,
+      conviction: t.annotation.conviction,
       emotion: t.annotation.emotion,
       notes: t.annotation.notes,
       screenshots: t.annotation.screenshots,
-      analysisTimeframe: t.annotation.analysis_timeframe,
-      entryTimeframe: t.annotation.entry_timeframe,
+    } : null,
+    setups: t.setups,
+    triggers: t.triggers,
+    confluences: t.confluences,
+    plan: t.plan ? {
+      maxRisk: t.plan.max_risk,
+      expectedRr: t.plan.expected_rr,
+      entryCondition: t.plan.entry_condition,
+      invalidation: t.plan.invalidation,
+      targetZone: t.plan.target_zone,
+      expectedHoldTime: t.plan.expected_hold_time,
+      planFollowed: t.plan.plan_followed,
     } : null,
     chartData: t.chart_data,
     importSource: t.import_source,

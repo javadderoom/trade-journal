@@ -8,8 +8,8 @@ import { useTranslation } from '../../store/useAppStore';
 interface FilterBarProps {
   searchQuery: string;
   setSearchQuery: (val: string) => void;
-  selectedStatus: 'ALL' | 'OPEN' | 'CLOSED' | 'MISSED';
-  setSelectedStatus: (status: 'ALL' | 'OPEN' | 'CLOSED' | 'MISSED') => void;
+  selectedStatus: 'ALL' | 'OPEN' | 'CLOSED';
+  setSelectedStatus: (status: 'ALL' | 'OPEN' | 'CLOSED') => void;
   setCurrentPage: (page: number) => void;
   isAdvancedFiltersOpen: boolean;
   setIsAdvancedFiltersOpen: (open: boolean) => void;
@@ -19,8 +19,6 @@ interface FilterBarProps {
   symbolOptions: string[];
   selectedDirection: string;
   setSelectedDirection: (val: string) => void;
-  selectedTimeframe: string;
-  setSelectedTimeframe: (val: string) => void;
   selectedTimezone: string;
   setSelectedTimezone: (val: string) => void;
   usdToToman: number;
@@ -44,8 +42,6 @@ export default function FilterBar({
   symbolOptions,
   selectedDirection,
   setSelectedDirection,
-  selectedTimeframe,
-  setSelectedTimeframe,
   selectedTimezone,
   setSelectedTimezone,
   usdToToman,
@@ -101,16 +97,6 @@ export default function FilterBar({
             }}
           >
             {t('filters.statusClosed')}
-          </button>
-          <button
-            type="button"
-            className={selectedStatus === 'MISSED' ? 'active' : ''}
-            onClick={() => {
-              setSelectedStatus('MISSED');
-              setCurrentPage(1);
-            }}
-          >
-            {t('filters.statusMissed')}
           </button>
         </div>
 
@@ -186,29 +172,6 @@ export default function FilterBar({
             </div>
 
             <div className="advanced-field">
-              <label>{t('filters.timeframe')}</label>
-              <Select
-                value={selectedTimeframe}
-                onChange={(val) => {
-                  setSelectedTimeframe(val);
-                  setCurrentPage(1);
-                }}
-                options={[
-                  { value: 'ALL', label: t('filters.allTimeframes') },
-                  { value: 'M1',  label: 'M1' },
-                  { value: 'M5',  label: 'M5' },
-                  { value: 'M15', label: 'M15' },
-                  { value: 'M30', label: 'M30' },
-                  { value: 'H1',  label: 'H1' },
-                  { value: 'H4',  label: 'H4' },
-                  { value: 'D1',  label: 'D1' },
-                  { value: 'W1',  label: 'W1' },
-                  { value: 'MN',  label: 'MN' },
-                ]}
-              />
-            </div>
-
-            <div className="advanced-field">
               <label>{t('filters.timezone')}</label>
               <Select
                 value={selectedTimezone}
@@ -252,7 +215,6 @@ export default function FilterBar({
                 setSearchQuery('');
                 setSelectedSymbol(t('filters.allSymbols'));
                 setSelectedDirection(t('filters.allDirections'));
-                setSelectedTimeframe('ALL');
                 setSelectedStatus('ALL');
                 setCurrentPage(1);
               }}

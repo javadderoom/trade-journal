@@ -202,9 +202,7 @@ router.post('/', authenticate, checkTradeLimit, async (req: AuthRequest, res: Re
     const {
       symbol, direction, lotSize, openPrice, openTime,
       stopLoss, takeProfit, closePrice, closeTime,
-      profitUsd, commission, swap, accountId,
-      analysisTimeframe, entryTimeframe,
-      tags, emotion, notes,
+      profitUsd, commission, swap, accountId, emotion, notes,
     } = parsed.data;
 
     const userId = req.user!.userId;
@@ -295,17 +293,14 @@ pips: pips,
          },
        });
 
-       // Create user-generated annotation fields separately
-       await tx.tradeAnnotation.create({
-         data: {
-           trade_id: trade.id,
-           tags: tags ?? [],
-           emotion: emotion ?? null,
-           notes: notes ?? null,
-           analysis_timeframe: analysisTimeframe || null,
-           entry_timeframe: entryTimeframe || null,
-         },
-       });
+        // Create user-generated annotation fields separately
+        await tx.tradeAnnotation.create({
+          data: {
+            trade_id: trade.id,
+            emotion: emotion ?? null,
+            notes: notes ?? null,
+          },
+        });
 
       // Create ENTRY execution
       await tx.execution.create({
@@ -374,10 +369,11 @@ router.put('/:id', authenticate, async (req: AuthRequest, res: Response) => {
       return;
     }
     const {
-      notes, emotion, stopLoss, takeProfit, tags, accountId,
+      notes, emotion, stopLoss, takeProfit, accountId,
       closeTime, closePrice, profitUsd, commission, swap,
       symbol, direction, lotSize, openPrice, openTime,
-      analysisTimeframe, entryTimeframe,
+      htfBias, session, thesis, expectation, lesson, conviction,
+      setupIds, triggerIds, confluenceIds, plan
     } = parsed.data;
 
     const existing = await prisma.trade.findFirst({
@@ -496,9 +492,12 @@ const updated = await prisma.$transaction(async (tx) => {
        const annotationData: any = {};
        if (notes !== undefined) annotationData.notes = notes;
        if (emotion !== undefined) annotationData.emotion = emotion;
-       if (tags !== undefined) annotationData.tags = tags ?? [];
-       if (analysisTimeframe !== undefined) annotationData.analysis_timeframe = analysisTimeframe;
-       if (entryTimeframe !== undefined) annotationData.entry_timeframe = entryTimeframe;
+       if (htfBias !== undefined) annotationData.htf_bias = htfBias;
+       if (session !== undefined) annotationData.session = session;
+       if (thesis !== undefined) annotationData.thesis = thesis;
+       if (expectation !== undefined) annotationData.expectation = expectation;
+       if (lesson !== undefined) annotationData.lesson = lesson;
+       if (conviction !== undefined) annotationData.conviction = conviction;
 
        if (Object.keys(annotationData).length > 0) {
          await tx.tradeAnnotation.upsert({
@@ -506,6 +505,62 @@ const updated = await prisma.$transaction(async (tx) => {
            create: { trade_id: id, ...annotationData },
            update: annotationData,
          });
+       }
+
+       if (setupIds !== undefined) {
+         await tx.tradeSetup.deleteMany({ where: { trade_id: id } });
+         if (setupIds && setupIds.length > 0) {
+           await tx.tradeSetup.createMany({
+             data: setupIds.map(concept_id => ({ trade_id: id, concept_id }))
+           });
+         }
+       }
+
+       if (triggerIds !== undefined) {
+         await tx.tradeTrigger.deleteMany({ where: { trade_id: id } });
+         if (triggerIds && triggerIds.length > 0) {
+           await tx.tradeTrigger.createMany({
+             data: triggerIds.map(concept_id => ({ trade_id: id, concept_id }))
+           });
+         }
+       }
+
+       if (confluenceIds !== undefined) {
+         await tx.tradeConfluence.deleteMany({ where: { trade_id: id } });
+         if (confluenceIds && confluenceIds.length > 0) {
+           await tx.tradeConfluence.createMany({
+             data: confluenceIds.map(concept_id => ({ trade_id: id, concept_id }))
+           });
+         }
+       }
+
+       if (plan !== undefined) {
+         if (plan === null) {
+           await tx.tradePlan.deleteMany({ where: { trade_id: id } });
+         } else {
+           await tx.tradePlan.upsert({
+             where: { trade_id: id },
+             create: {
+               trade_id: id,
+               max_risk: plan.maxRisk ?? null,
+               expected_rr: plan.expectedRr ?? null,
+               entry_condition: plan.entryCondition ?? null,
+               invalidation: plan.invalidation ?? null,
+               target_zone: plan.targetZone ?? null,
+               expected_hold_time: plan.expectedHoldTime ?? null,
+               plan_followed: plan.planFollowed ?? null,
+             },
+             update: {
+               max_risk: plan.maxRisk !== undefined ? plan.maxRisk : undefined,
+               expected_rr: plan.expectedRr !== undefined ? plan.expectedRr : undefined,
+               entry_condition: plan.entryCondition !== undefined ? plan.entryCondition : undefined,
+               invalidation: plan.invalidation !== undefined ? plan.invalidation : undefined,
+               target_zone: plan.targetZone !== undefined ? plan.targetZone : undefined,
+               expected_hold_time: plan.expectedHoldTime !== undefined ? plan.expectedHoldTime : undefined,
+               plan_followed: plan.planFollowed !== undefined ? plan.planFollowed : undefined,
+             },
+           });
+         }
        }
 
       // Handle EXIT execution creation on close
@@ -616,215 +671,6 @@ router.post('/bulk-delete', authenticate, async (req: AuthRequest, res: Response
   }
 });
 
-/**
- * GET /api/trades/tags
- * Fetches all persistent user-specific tags from database.
- */
-router.get('/tags', authenticate, async (req: AuthRequest, res: Response) => {
-  try {
-    const userId = req.user!.userId;
-    
-    let tags = await prisma.tag.findMany({
-      where: { user_id: userId },
-      orderBy: { name: 'asc' },
-    });
-
-    // Auto-seed default tags in the database for the user if none exist
-    if (tags.length === 0) {
-      const defaultSystemTags = [
-        { name: 'فرصت از دست رفته', is_ignored: true, show_first: false },
-        { name: 'Missed', is_ignored: true, show_first: false },
-        { name: 'ignore', is_ignored: true, show_first: false },
-        { name: 'Ignore', is_ignored: true, show_first: false },
-        { name: 'نادیده گرفتن', is_ignored: true, show_first: false },
-      ];
-
-      await prisma.tag.createMany({
-        data: defaultSystemTags.map(t => ({
-          user_id: userId,
-          name: t.name,
-          is_ignored: t.is_ignored,
-          show_first: t.show_first,
-        })),
-      });
-
-      tags = await prisma.tag.findMany({
-        where: { user_id: userId },
-        orderBy: { name: 'asc' },
-      });
-    }
-
-    res.status(200).json(tags);
-  } catch (err: any) {
-    console.error('Fetch tags error:', err);
-    res.status(500).json({ error: 'خطای داخلی سرور' });
-  }
-});
-
-/**
- * POST /api/trades/tags
- * Creates/persists a custom tag in the user's library.
- */
-router.post('/tags', authenticate, async (req: AuthRequest, res: Response) => {
-  try {
-    const { name, is_ignored, show_first } = req.body;
-    const userId = req.user!.userId;
-
-    if (!name || typeof name !== 'string' || !name.trim()) {
-      res.status(400).json({ error: 'Tag name is required' });
-      return;
-    }
-
-    const cleanName = name.trim();
-
-    const tag = await prisma.tag.upsert({
-      where: {
-        user_id_name: {
-          user_id: userId,
-          name: cleanName,
-        },
-      },
-      create: {
-        user_id: userId,
-        name: cleanName,
-        is_ignored: is_ignored !== undefined ? Boolean(is_ignored) : false,
-        show_first: show_first !== undefined ? Boolean(show_first) : false,
-      },
-      update: {
-        is_ignored: is_ignored !== undefined ? Boolean(is_ignored) : undefined,
-        show_first: show_first !== undefined ? Boolean(show_first) : undefined,
-      },
-    });
-
-    res.status(201).json(tag);
-  } catch (err: any) {
-    console.error('Create tag error:', err);
-    res.status(500).json({ error: 'خطای داخلی سرور' });
-  }
-});
-
-/**
- * POST /api/trades/tags/bulk
- * Bulk updates tag configurations and handles deletions.
- */
-router.post('/tags/bulk', authenticate, async (req: AuthRequest, res: Response) => {
-  try {
-    const { tags, deletes } = req.body;
-    const userId = req.user!.userId;
-
-    // 1. Handle deletes
-    if (Array.isArray(deletes) && deletes.length > 0) {
-      // Delete from Tag library
-      await prisma.tag.deleteMany({
-        where: {
-          user_id: userId,
-          name: { in: deletes },
-        },
-      });
-
-// Remove from TradeAnnotation tags arrays — single query per tag using array_remove
-       for (const tagName of deletes) {
-         await prisma.$executeRaw`UPDATE "TradeAnnotation" SET tags = array_remove(tags, ${tagName}) WHERE EXISTS (SELECT 1 FROM "Trade" WHERE "TradeAnnotation".trade_id = "Trade".id AND "Trade".user_id = ${userId}) AND ${tagName} = ANY(tags)`;
-       }
-    }
-
-    // 2. Handle updates/upserts — batch with createMany + updateMany
-    if (Array.isArray(tags) && tags.length > 0) {
-      // Batch create new tags (skip duplicates)
-      await prisma.tag.createMany({
-        data: tags.map(t => ({
-          user_id: userId,
-          name: t.name,
-          is_ignored: Boolean(t.is_ignored),
-          show_first: Boolean(t.show_first),
-        })),
-        skipDuplicates: true,
-      });
-
-      // Batch update existing tags
-      for (const t of tags) {
-        await prisma.tag.updateMany({
-          where: {
-            user_id: userId,
-            name: t.name,
-          },
-          data: {
-            is_ignored: Boolean(t.is_ignored),
-            show_first: Boolean(t.show_first),
-          },
-        });
-      }
-    }
-
-    res.status(200).json({ success: true });
-  } catch (err: any) {
-    console.error('Bulk tag update error:', err);
-    res.status(500).json({ error: 'خطای داخلی سرور' });
-  }
-});
-
-/**
- * PUT /api/trades/tags/:name
- * Updates options (is_ignored, show_first) for a specific tag.
- */
-router.put('/tags/:name', authenticate, async (req: AuthRequest, res: Response) => {
-  try {
-    const name = req.params.name as string;
-    const { is_ignored, show_first } = req.body;
-    const userId = req.user!.userId;
-
-    const updated = await prisma.tag.upsert({
-      where: {
-        user_id_name: {
-          user_id: userId,
-          name: name,
-        },
-      },
-      create: {
-        user_id: userId,
-        name: name,
-        is_ignored: is_ignored !== undefined ? Boolean(is_ignored) : false,
-        show_first: show_first !== undefined ? Boolean(show_first) : false,
-      },
-      update: {
-        is_ignored: is_ignored !== undefined ? Boolean(is_ignored) : undefined,
-        show_first: show_first !== undefined ? Boolean(show_first) : undefined,
-      },
-    });
-
-    res.status(200).json(updated);
-  } catch (err: any) {
-    console.error('Update tag error:', err);
-    res.status(500).json({ error: 'خطای داخلی سرور' });
-  }
-});
-
-/**
- * DELETE /api/trades/tags/:name
- * Deletes a tag from the user's persistent library.
- */
-router.delete('/tags/:name', authenticate, async (req: AuthRequest, res: Response) => {
-  try {
-    const name = req.params.name as string;
-    const userId = req.user!.userId;
-
-    // 1. Delete tag from persistent library
-    await prisma.tag.deleteMany({
-      where: {
-        user_id: userId,
-        name: name,
-      },
-    });
-
-    // 2. Remove tag from all trades — single query
-    await prisma.$executeRaw`UPDATE "TradeAnnotation" SET tags = array_remove(tags, ${name}) WHERE EXISTS (SELECT 1 FROM "Trade" WHERE "TradeAnnotation".trade_id = "Trade".id AND "Trade".user_id = ${userId}) AND ${name} = ANY(tags)`;
-
-    res.status(200).json({ success: true });
-  } catch (err: any) {
-    console.error('Delete tag error:', err);
-    res.status(500).json({ error: 'خطای داخلی سرور' });
-  }
-});
 
 /**
  * GET /api/trades/emotions

@@ -43,6 +43,7 @@ model User {
    blogPosts        BlogPost[]
    blogComments     BlogComment[]
    eaLogs           EALog[]
+   trading_concepts TradingConcept[]
 }
 
 model Account {
@@ -118,6 +119,10 @@ model Trade {
   executions    Execution[]
 
   annotation    TradeAnnotation?
+  setups        TradeSetup[]
+  triggers      TradeTrigger[]
+  confluences   TradeConfluence[]
+  plan          TradePlan?
 
   @@unique([account_id, ticket])
   @@index([user_id])
@@ -133,14 +138,28 @@ model TradeAnnotation {
   id                String   @id @default(uuid())
   trade_id          String   @unique
   trade             Trade    @relation(fields: [trade_id], references: [id], onDelete: Cascade)
-  tags              String[] @default([])
-  emotion           String?
+  
+  htf_bias          Direction?
+  session           TradingSession?
+  
+  thesis            String?
+  expectation       String?
+  lesson            String?
+  
   notes             String?
+  conviction        Int?
+  emotion           String?
   screenshots       String[] @default([])
-  analysis_timeframe String?
-  entry_timeframe   String?
+
   created_at        DateTime @default(now())
   updated_at        DateTime @updatedAt
+}
+
+enum TradingSession {
+  ASIA
+  LONDON
+  NEW_YORK
+  OVERLAP
 }
 
 model Execution {
@@ -685,4 +704,68 @@ model BlogComment {
   @@index([post_id, is_approved])
   @@index([user_id])
   @@index([parent_id])
+}
+
+// ─── Structured Rationale ───────────────────────────────────────────────────
+
+model TradingConcept {
+  id            String        @id @default(uuid())
+  user_id       String
+  user          User          @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  name          String
+  allowed_roles ConceptRole[]
+  color         String?
+  icon          String?
+
+  setups      TradeSetup[]
+  triggers    TradeTrigger[]
+  confluences TradeConfluence[]
+
+  @@unique([user_id, name])
+}
+
+enum ConceptRole {
+  SETUP
+  TRIGGER
+  CONFLUENCE
+}
+
+model TradeSetup {
+  trade_id   String @unique
+  trade      Trade  @relation(fields: [trade_id], references: [id], onDelete: Cascade)
+  concept_id String
+  concept    TradingConcept @relation(fields: [concept_id], references: [id])
+}
+
+model TradeTrigger {
+  id         String  @id @default(uuid())
+  trade_id   String
+  trade      Trade   @relation(fields: [trade_id], references: [id], onDelete: Cascade)
+  concept_id String
+  concept    TradingConcept @relation(fields: [concept_id], references: [id])
+  is_primary Boolean @default(false)
+
+  @@unique([trade_id, concept_id])
+}
+
+model TradeConfluence {
+  trade_id   String
+  trade      Trade   @relation(fields: [trade_id], references: [id], onDelete: Cascade)
+  concept_id String
+  concept    TradingConcept @relation(fields: [concept_id], references: [id])
+
+  @@id([trade_id, concept_id])
+}
+
+model TradePlan {
+  id                 String   @id @default(uuid())
+  trade_id           String   @unique
+  trade              Trade    @relation(fields: [trade_id], references: [id], onDelete: Cascade)
+  max_risk           Float?
+  expected_rr        Float?
+  entry_condition    String?
+  invalidation       String?
+  target_zone        String?
+  expected_hold_time String?
+  plan_followed      Boolean?
 }

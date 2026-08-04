@@ -7,7 +7,7 @@ import Select from '../../components/ui/Select';
 import { toPersianDigits, formatToman, formatNum } from '../../utils/farsi';
 import { formatCurrency, getTradingSession, getMainPair, getEmotionEmoji, getEmotionLabel } from '../../utils/tradeHelpers';
 import { WEEKDAY_NAMES_FA, WEEKDAY_NAMES_EN } from '../../constants/dates';
-import { useTradesTags } from '../../hooks/useTradesTags';
+
 import { useTradesEmotions } from '../../hooks/useTradesEmotions';
 import '../../components/journal/journal.scss';
 import EquityChart from '../../components/journal/EquityChart';
@@ -48,7 +48,6 @@ export default function JournalPage() {
     fetchTrades,
   } = useTradeStore();
 
-  const [ignoredTags, setIgnoredTags] = useState<Set<string>>(new Set<string>());
   const [customEmotions, setCustomEmotions] = useState<{ value: string; label: string; emoji?: string }[]>([]);
 
   // Load trades and accounts if empty
@@ -56,16 +55,7 @@ export default function JournalPage() {
     fetchTrades(false, selectedAccountId);
   }, [selectedAccountId]);
 
-  const { tags: fetchedTags } = useTradesTags();
-  useEffect(() => {
-    if (Array.isArray(fetchedTags)) {
-      const ignored = new Set<string>();
-      fetchedTags.forEach((tag: any) => {
-        if (tag.is_ignored) ignored.add(tag.name);
-      });
-      setIgnoredTags(ignored);
-    }
-  }, [fetchedTags]);
+
 
   const { emotions: fetchedEmotions } = useTradesEmotions();
   useEffect(() => {
@@ -76,7 +66,7 @@ export default function JournalPage() {
 
   // Compute Statistics (Tier 1 & Tier 2)
   const stats = useMemo(() => {
-    const closedTrades = trades.filter((t) => t.closeTime !== null && t.closePrice !== null && !t.annotation?.tags?.some(tag => ignoredTags.has(tag)));
+    const closedTrades = trades.filter((t) => t.closeTime !== null && t.closePrice !== null);
     const totalCount = closedTrades.length;
 
     if (totalCount === 0) {
@@ -104,7 +94,7 @@ export default function JournalPage() {
         weekdays: [],
         hours: Array.from({ length: 24 }, (_, i) => ({ hour: i, pnl: 0, count: 0, className: '' })),
         emotions: [],
-        timeframeMatrix: {},
+
       };
     }
 
@@ -208,14 +198,6 @@ export default function JournalPage() {
     const hoursPnl = Array.from({ length: 24 }, () => ({ pnl: 0, count: 0 }));
     const emotionsGroup: { [key: string]: { pnl: number; wins: number; total: number } } = {};
 
-    const TIMEFRAMES = ['M1', 'M5', 'M15', 'M30', 'H1', 'H4', 'D1', 'W1', 'MN'];
-    const timeframeMatrix: Record<string, Record<string, { wins: number; total: number; pnl: number }>> = {};
-    TIMEFRAMES.forEach(a => {
-      timeframeMatrix[a] = {};
-      TIMEFRAMES.forEach(e => {
-        timeframeMatrix[a][e] = { wins: 0, total: 0, pnl: 0 };
-      });
-    });
 
     closedTrades.forEach((t) => {
       const isWin = t.profitUsd > 0;
@@ -246,15 +228,16 @@ export default function JournalPage() {
       symbolsGroup[mainPair].total += 1;
       if (isWin) symbolsGroup[mainPair].wins += 1;
 
-      // C. Strategy / Tags
-      const tags = Array.isArray(t.annotation?.tags) ? t.annotation.tags : [];
-      tags.forEach((tag) => {
-        if (!strategiesGroup[tag]) {
-          strategiesGroup[tag] = { pnl: 0, wins: 0, total: 0 };
+      // C. Strategy / Setups
+      const setups = t.setups || [];
+      setups.forEach((s: any) => {
+        const name = s.concept?.name || 'Unknown';
+        if (!strategiesGroup[name]) {
+          strategiesGroup[name] = { pnl: 0, wins: 0, total: 0 };
         }
-        strategiesGroup[tag].pnl += net;
-        strategiesGroup[tag].total += 1;
-        if (isWin) strategiesGroup[tag].wins += 1;
+        strategiesGroup[name].pnl += net;
+        strategiesGroup[name].total += 1;
+        if (isWin) strategiesGroup[name].wins += 1;
       });
 
       // D. Day of Week
@@ -290,14 +273,7 @@ export default function JournalPage() {
       emotionsGroup[emo].total += 1;
       if (isWin) emotionsGroup[emo].wins += 1;
 
-      // G. Timeframes
-const aTf = t.annotation?.analysisTimeframe;
-       const eTf = t.annotation?.entryTimeframe;
-      if (aTf && eTf && timeframeMatrix[aTf] && timeframeMatrix[aTf][eTf]) {
-        timeframeMatrix[aTf][eTf].total += 1;
-        timeframeMatrix[aTf][eTf].pnl += net;
-        if (isWin) timeframeMatrix[aTf][eTf].wins += 1;
-      }
+
     });
 
     // Format Session lists
@@ -392,17 +368,16 @@ const aTf = t.annotation?.analysisTimeframe;
       weekdays: weekdaysList,
       hours: hoursList,
       emotions: emotionsList,
-      timeframeMatrix,
     };
-  }, [trades, ignoredTags]);
+  }, [trades]);
 
   // ─── TIER 3 CHARTS & RISK CALCULATIONS ───────────────────────────────────
 
   const sortedClosedTrades = useMemo(() => {
     return [...trades]
-      .filter((t) => t.closeTime !== null && t.closePrice !== null && !t.annotation?.tags?.some(tag => ignoredTags.has(tag)))
+      .filter((t) => t.closeTime !== null && t.closePrice !== null)
       .sort((a, b) => new Date(a.closeTime!).getTime() - new Date(b.closeTime!).getTime());
-  }, [trades, ignoredTags]);
+  }, [trades]);
 
 
 
@@ -809,106 +784,7 @@ const aTf = t.annotation?.analysisTimeframe;
             </div>
           </div>
 
-          {/* Row A.2: Heatmap Timeframe Grid */}
-          <div className="journal-card timeframe-heatmap-container">
-            <div className="card-header">
-              <span className="card-title">{t('analytics.timeframeDistribution')}</span>
-              <span className="material-symbols-outlined card-icon">grid_on</span>
-            </div>
-            <div className="journal-table-wrapper" style={{ overflowX: 'auto', marginTop: '12px' }}>
-              <table className="timeframe-heatmap-table" style={{ width: '100%', borderCollapse: 'collapse', fontFamily: 'Vazirmatn' }}>
-                <thead>
-                  <tr>
-                    <th style={{ padding: '8px', fontSize: '12px', color: '#8898aa', borderBottom: '1px solid rgba(255,255,255,0.05)', textAlign: language === 'fa' ? 'right' : 'left' }}>
-                      {language === 'fa' ? 'تحلیل \\ ورود' : 'Analysis \\ Entry'}
-                    </th>
-                    {['M1', 'M5', 'M15', 'M30', 'H1', 'H4', 'D1', 'W1', 'MN'].map(tf => (
-                      <th key={tf} style={{ padding: '8px', fontSize: '12px', color: '#8898aa', borderBottom: '1px solid rgba(255,255,255,0.05)', textAlign: 'center', minWidth: '60px' }}>
-                        {tf}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {['M1', 'M5', 'M15', 'M30', 'H1', 'H4', 'D1', 'W1', 'MN'].map(aTf => (
-                    <tr key={aTf}>
-                      <td style={{ padding: '8px', fontSize: '13px', fontWeight: 'bold', color: '#8898aa', borderBottom: '1px solid rgba(255,255,255,0.02)', textAlign: language === 'fa' ? 'right' : 'left' }}>
-                        {aTf}
-                      </td>
-                      {['M1', 'M5', 'M15', 'M30', 'H1', 'H4', 'D1', 'W1', 'MN'].map(eTf => {
-                        const cell = stats.timeframeMatrix?.[aTf]?.[eTf] || { wins: 0, total: 0, pnl: 0 };
-                        const hasFewerThan10 = cell.total < 10;
-                        const winRate = cell.total > 0 ? Math.round((cell.wins / cell.total) * 100) : 0;
-                        const pnlVal = Math.round(cell.pnl);
 
-                        // Color scaling
-                        let bgColor = 'rgba(255, 255, 255, 0.02)';
-                        let textColor = 'rgba(255, 255, 255, 0.3)';
-                        if (!hasFewerThan10 && cell.total > 0) {
-                          if (winRate >= 50) {
-                            const opacity = Math.min(0.05 + ((winRate - 50) / 50) * 0.4, 0.45);
-                            bgColor = `rgba(16, 185, 129, ${opacity})`;
-                            textColor = '#10b981';
-                          } else {
-                            const opacity = Math.min(0.05 + ((50 - winRate) / 50) * 0.4, 0.45);
-                            bgColor = `rgba(255, 180, 171, ${opacity})`;
-                            textColor = '#ffb4ab';
-                          }
-                        }
-
-                        return (
-                          <td
-                            key={eTf}
-                            style={{
-                              padding: '8px',
-                              textAlign: 'center',
-                              borderBottom: '1px solid rgba(255,255,255,0.02)',
-                              backgroundColor: bgColor,
-                              color: textColor,
-                              fontSize: '12px',
-                              transition: 'all 0.2s',
-                              position: 'relative'
-                            }}
-                            title={
-                              hasFewerThan10
-                                ? (language === 'fa' 
-                                    ? `داده ناکافی (${cell.total} معامله). برای نمایش الگو حداقل ۱۰ معامله نیاز است.` 
-                                    : `Insufficient data (${cell.total} trades). At least 10 trades are needed to determine patterns.`)
-                                : (language === 'fa' 
-                                    ? `تعداد: ${cell.total} | سود/زیان: $${pnlVal}` 
-                                    : `Count: ${cell.total} | P&L: $${pnlVal}`)
-                            }
-                          >
-                            {hasFewerThan10 ? (
-                              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '2px', color: 'rgba(255,255,255,0.12)' }}>
-                                <span className="material-symbols-outlined" style={{ fontSize: '13px' }}>lock</span>
-                                <span>-</span>
-                              </div>
-                            ) : (
-                              <div>
-                                <div style={{ fontWeight: 'bold' }}>{language === 'fa' ? '%' + toPersianDigits(winRate.toString()) : winRate + '%'}</div>
-                                <div style={{ fontSize: '10px', opacity: 0.8 }}>
-                                  {language === 'fa' ? `(${toPersianDigits(cell.total)} معامله)` : `(${cell.total} trades)`}
-                                </div>
-                              </div>
-                            )}
-                          </td>
-                        );
-                      })}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '12px', padding: '8px 12px', background: 'rgba(255, 180, 171, 0.04)', borderRadius: '6px', border: '1px solid rgba(255, 180, 171, 0.12)' }}>
-              <span className="material-symbols-outlined" style={{ color: '#ffb4ab', fontSize: '18px' }}>warning</span>
-              <span style={{ fontSize: '11px', color: '#bbcabe', fontFamily: 'Vazirmatn' }}>
-                {language === 'fa'
-                  ? 'تایم‌فریم‌هایی که تعداد معاملات آن‌ها کمتر از ۱۰ مورد است، جهت جلوگیری از سوگیری‌های آماری غیردقیق و نادرست قفل شده و نمایش داده نمی‌شوند.'
-                  : 'Timeframes with fewer than 10 trades are locked and hidden to prevent inaccurate statistical biases.'}
-              </span>
-            </div>
-          </div>
 
           {/* Row B: Sessions & Emotions */}
           <div className="patterns-split-row">

@@ -24,13 +24,9 @@ export const MOCK_TRADES: Trade[] = [
     pips: 75.0,
     rMultiple: 1.5,
     annotation: {
-      tags: ['پرایس اکشن', 'برگشت از حمایت'],
       emotion: 'CONFIDENT',
       notes: 'در حمایت اصلی فریم زمانی ۴ ساعته الگو اینگالف صعودی تشکیل شد. ریسک به ریوارد مناسب بود. کمی زودتر از تارگت اصلی خارج شدم چون اخبار مهمی در راه بود.',
-      screenshots: [],
-      analysisTimeframe: null,
-      entryTimeframe: null
-    },
+      screenshots: [],},
   },
   {
     id: 'mock-2',
@@ -50,13 +46,9 @@ export const MOCK_TRADES: Trade[] = [
     pips: -20.0,
     rMultiple: -1.0,
     annotation: {
-      tags: ['شکست ساختار', 'نقض قانون'],
       emotion: 'ANXIOUS',
       notes: 'قیمت از ناحیه مقاومتی عبور کرد و حد ضرر من فعال شد. عجله کردم و تاییدیه دوم را نگرفتم.',
-      screenshots: [],
-      analysisTimeframe: null,
-      entryTimeframe: null
-    },
+      screenshots: [],},
   },
   {
     id: 'mock-3',
@@ -76,13 +68,9 @@ export const MOCK_TRADES: Trade[] = [
     pips: 60.0,
     rMultiple: 2.0,
     annotation: {
-      tags: ['روند گیری', 'مدیریت خوب'],
       emotion: 'NEUTRAL',
       notes: 'روند صعودی قوی در تایم ۳۰ دقیقه. معامله با موفقیت به حد سود رسید.',
-      screenshots: [],
-      analysisTimeframe: null,
-      entryTimeframe: null
-    },
+      screenshots: [],},
   },
   {
     id: 'mock-4',
@@ -102,13 +90,9 @@ export const MOCK_TRADES: Trade[] = [
     pips: 150.0,
     rMultiple: 0.5,
     annotation: {
-      tags: ['اسکالپ', 'خبری'],
       emotion: 'FOMO',
       notes: 'معامله در حال حاضر باز است. حجم معامله کم است و مدیریت ریسک رعایت شده است.',
-      screenshots: [],
-      analysisTimeframe: null,
-      entryTimeframe: null
-    },
+      screenshots: [],},
   },
   {
     id: 'mock-5',
@@ -128,13 +112,9 @@ export const MOCK_TRADES: Trade[] = [
     pips: 30.0,
     rMultiple: 1.2,
     annotation: {
-      tags: ['پرایس اکشن', 'برگشت از حمایت', 'مدیریت خوب'],
       emotion: 'CONFIDENT',
       notes: 'برگشت قیمت از کف کانال صعودی.',
-      screenshots: [],
-      analysisTimeframe: null,
-      entryTimeframe: null
-    },
+      screenshots: [],},
   },
   {
     id: 'mock-6',
@@ -154,13 +134,9 @@ export const MOCK_TRADES: Trade[] = [
     pips: -40.0,
     rMultiple: -1.0,
     annotation: {
-      tags: ['شکست ساختار', 'نقض قانون', 'حجم اضافه'],
       emotion: 'REVENGE',
       notes: 'معامله انتقامی بعد از ضرر روی EURUSD. متاسفانه باز هم با ضرر بسته شد. باید سیستم معاملاتی را رعایت کنم.',
-      screenshots: [],
-      analysisTimeframe: null,
-      entryTimeframe: null
-    },
+      screenshots: [],},
   },
   {
     id: 'mock-7',
@@ -180,13 +156,9 @@ export const MOCK_TRADES: Trade[] = [
     pips: 100.0,
     rMultiple: 2.5,
     annotation: {
-      tags: ['روند گیری', 'شکست ساختار'],
       emotion: 'NEUTRAL',
       notes: 'شکست پرقدرت مقاومت و ریزش تا اولین حمایت روزانه.',
-      screenshots: [],
-      analysisTimeframe: null,
-      entryTimeframe: null
-    },
+      screenshots: [],},
   },
   {
     id: 'mock-8',
@@ -206,13 +178,9 @@ export const MOCK_TRADES: Trade[] = [
     pips: -15.0,
     rMultiple: -1.0,
     annotation: {
-      tags: ['اسکالپ', 'خروج زود'],
       emotion: 'ANXIOUS',
       notes: 'خروج زودهنگام به دلیل استرس شدید، در حالی که تحلیل کلی درست بود.',
-      screenshots: [],
-      analysisTimeframe: null,
-      entryTimeframe: null
-    },
+      screenshots: [],},
   }
 ];
 
@@ -290,13 +258,20 @@ export const useTradeStore = create<TradeState>((set, get) => ({
             pips: item.pips ?? pips,
             rMultiple: rMultiple,
             annotation: item.annotation ? {
-              tags: item.annotation.tags ?? [],
+              htfBias: item.annotation.htf_bias ?? null,
+              session: item.annotation.session ?? null,
+              thesis: item.annotation.thesis ?? null,
+              expectation: item.annotation.expectation ?? null,
+              lesson: item.annotation.lesson ?? null,
+              conviction: item.annotation.conviction ?? null,
               emotion: item.annotation.emotion ?? null,
               notes: item.annotation.notes ?? null,
               screenshots: item.annotation.screenshots ?? [],
-              analysisTimeframe: item.annotation.analysisTimeframe ?? null,
-              entryTimeframe: item.annotation.entryTimeframe ?? null,
             } : null,
+            setups: item.setups ?? [],
+            triggers: item.triggers ?? [],
+            confluences: item.confluences ?? [],
+            plan: item.plan ?? null,
             chartData: item.chartData ?? null,
     importSource: item.importSource ?? null,
     accountType: item.accountType ?? null,
@@ -332,7 +307,6 @@ export const useTradeStore = create<TradeState>((set, get) => ({
         emotion: updatedTrade.annotation?.emotion,
         stopLoss: updatedTrade.stopLoss,
         takeProfit: updatedTrade.takeProfit,
-        tags: updatedTrade.annotation?.tags,
         accountId: updatedTrade.accountId,
         closeTime: updatedTrade.closeTime,
         closePrice: updatedTrade.closePrice,
@@ -344,8 +318,16 @@ export const useTradeStore = create<TradeState>((set, get) => ({
         lotSize: updatedTrade.lotSize,
         openPrice: updatedTrade.openPrice,
         openTime: updatedTrade.openTime,
-        analysisTimeframe: updatedTrade.annotation?.analysisTimeframe,
-        entryTimeframe: updatedTrade.annotation?.entryTimeframe,
+        htfBias: updatedTrade.annotation?.htfBias,
+        session: updatedTrade.annotation?.session,
+        thesis: updatedTrade.annotation?.thesis,
+        expectation: updatedTrade.annotation?.expectation,
+        lesson: updatedTrade.annotation?.lesson,
+        conviction: updatedTrade.annotation?.conviction,
+        setupIds: updatedTrade.setups?.map(s => s.concept.id) || [],
+        triggerIds: updatedTrade.triggers?.map(t => t.concept.id) || [],
+        confluenceIds: updatedTrade.confluences?.map(c => c.concept.id) || [],
+        plan: updatedTrade.plan || null,
       });
 
       if (res.status >= 200 && res.status < 300) {

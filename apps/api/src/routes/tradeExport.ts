@@ -125,16 +125,18 @@ router.get('/export', authenticate, async (req: AuthRequest, res: Response) => {
         } else if (status === 'CLOSED') {
           whereClause.close_time = { not: null };
         } else if (status === 'MISSED') {
-          whereClause.tags = {
-            hasSome: ['فرصت از دست رفته', 'Missed', 'ignore', 'Ignore', 'نادیده گرفتن'],
+          whereClause.setups = {
+            some: {
+              concept: { name: { in: ['فرصت از دست رفته', 'Missed', 'ignore', 'Ignore', 'نادیده گرفتن'] } }
+            }
           };
         }
       }
       if (search) {
         whereClause.OR = [
           { symbol: { contains: search, mode: 'insensitive' } },
-          { notes: { contains: search, mode: 'insensitive' } },
-          { tags: { has: search } },
+          { annotation: { notes: { contains: search, mode: 'insensitive' } } },
+          { annotation: { lesson: { contains: search, mode: 'insensitive' } } },
         ];
       }
       if (dates) {
@@ -162,6 +164,9 @@ const MAX_EXPORT_ROWS = 50_000;
            select: { broker_name: true, account_number: true },
          },
          annotation: true,
+         setups: { include: { concept: true } },
+         triggers: { include: { concept: true } },
+         confluences: { include: { concept: true } },
        },
      });
 
@@ -198,9 +203,9 @@ const MAX_EXPORT_ROWS = 50_000;
           t.pips,
           t.r_multiple,
           t.profit_usd,
-sanitizeCsvCell(t.annotation?.emotion || ''),
-           `"${(t.annotation?.tags || []).map(sanitizeCsvCell).join(' | ')}"`,
-           `"${(t.annotation?.notes || '').replace(/"/g, '""').replace(/\n/g, ' ')}"`,
+          sanitizeCsvCell(t.annotation?.emotion || ''),
+          `"${((t as any).setups || []).map((s: any) => s.concept?.name).filter(Boolean).map(sanitizeCsvCell).join(' | ')}"`,
+          `"${(t.annotation?.notes || '').replace(/"/g, '""').replace(/\n/g, ' ')}"`,
         ].join(',');
         res.write(rowData + '\n');
       }
@@ -250,9 +255,9 @@ sanitizeCsvCell(t.annotation?.emotion || ''),
           pips: t.pips,
           rMultiple: t.r_multiple,
           profitUsd: t.profit_usd,
-emotion: t.annotation?.emotion || '',
-           tags: (t.annotation?.tags || []).join(', '),
-           notes: t.annotation?.notes || '',
+          emotion: t.annotation?.emotion || '',
+          tags: ((t as any).setups || []).map((s: any) => s.concept?.name).filter(Boolean).join(', '),
+          notes: t.annotation?.notes || '',
         });
 
         // Align details

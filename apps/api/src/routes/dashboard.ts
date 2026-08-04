@@ -209,25 +209,15 @@ function generateEdgeInsight(recentTrades: any[], locale = 'fa'): EdgeInsight {
     const net = t.profit_usd + (t.commission ?? 0) + (t.swap ?? 0);
     const openDate = new Date(t.open_time);
     
-// Analysis Timeframe
-     if (t.annotation?.analysis_timeframe) {
-       if (!analysisTfs[t.annotation.analysis_timeframe]) {
-         analysisTfs[t.annotation.analysis_timeframe] = { label: t.annotation.analysis_timeframe, wins: 0, total: 0, pnl: 0 };
-       }
-       analysisTfs[t.annotation.analysis_timeframe].total++;
-       analysisTfs[t.annotation.analysis_timeframe].pnl += net;
-       if (isWin) analysisTfs[t.annotation.analysis_timeframe].wins++;
-     }
-
-     // Entry Timeframe
-     if (t.annotation?.entry_timeframe) {
-       if (!entryTfs[t.annotation.entry_timeframe]) {
-         entryTfs[t.annotation.entry_timeframe] = { label: t.annotation.entry_timeframe, wins: 0, total: 0, pnl: 0 };
-       }
-       entryTfs[t.annotation.entry_timeframe].total++;
-       entryTfs[t.annotation.entry_timeframe].pnl += net;
-       if (isWin) entryTfs[t.annotation.entry_timeframe].wins++;
-     }
+// HTF Bias
+      if (t.annotation?.htf_bias) {
+        if (!analysisTfs[t.annotation.htf_bias]) {
+          analysisTfs[t.annotation.htf_bias] = { label: t.annotation.htf_bias, wins: 0, total: 0, pnl: 0 };
+        }
+        analysisTfs[t.annotation.htf_bias].total++;
+        analysisTfs[t.annotation.htf_bias].pnl += net;
+        if (isWin) analysisTfs[t.annotation.htf_bias].wins++;
+      }
 
     // Session
     const session = getTradingSession(openDate);
@@ -236,13 +226,13 @@ function generateEdgeInsight(recentTrades: any[], locale = 'fa'): EdgeInsight {
     sessions[session].pnl += net;
     if (isWin) sessions[session].wins++;
 
-    // Strategy tags
-    const tags = Array.isArray(t.annotation?.tags) ? t.annotation.tags : [];
-    for (const tag of tags) {
-      if (!strategies[tag]) strategies[tag] = { label: tag, wins: 0, total: 0, pnl: 0 };
-      strategies[tag].total++;
-      strategies[tag].pnl += net;
-      if (isWin) strategies[tag].wins++;
+    // Setups
+    const setups = Array.isArray(t.setups) ? t.setups.map((s: any) => s.concept?.name).filter(Boolean) : [];
+    for (const setup of setups) {
+      if (!strategies[setup]) strategies[setup] = { label: setup, wins: 0, total: 0, pnl: 0 };
+      strategies[setup].total++;
+      strategies[setup].pnl += net;
+      if (isWin) strategies[setup].wins++;
     }
 
     // Weekday
@@ -424,15 +414,22 @@ const [allTrades, totalTrades] = await Promise.all([
            pips: true,
            r_multiple: true,
            import_source: true,
-           annotation: {
-             select: {
-               tags: true,
-               emotion: true,
-               notes: true,
-               analysis_timeframe: true,
-               entry_timeframe: true,
-             },
-           },
+            annotation: {
+              select: {
+                htf_bias: true,
+                session: true,
+                thesis: true,
+                expectation: true,
+                lesson: true,
+                conviction: true,
+                emotion: true,
+                notes: true,
+              },
+            },
+            setups: { select: { concept: true } },
+            triggers: { select: { concept: true } },
+            confluences: { select: { concept: true } },
+            plan: true,
          },
        }),
        prisma.trade.count({ where: accountWhere }),
@@ -607,8 +604,7 @@ const [allTrades, totalTrades] = await Promise.all([
         swap: t.swap,
         pips: t.pips,
         rMultiple: t.r_multiple,
-tags: t.annotation?.tags ?? [],
-         emotion: t.annotation?.emotion ?? null,
+        emotion: t.annotation?.emotion ?? null,
         direction_is_buy: t.direction === 'BUY',
       }));
 

@@ -9,9 +9,10 @@ import { notify } from '../../lib/notify';
 import { useTranslation } from '../../store/useAppStore';
 import ConnectExchangeModal from '../../components/modals/ConnectExchangeModal';
 import LoadingButton from '../../components/ui/LoadingButton';
+import ConceptsSettings from '../../components/settings/ConceptsSettings';
 import './settings.scss';
 
-type Tab = 'profile' | 'accounts' | 'subscription' | 'security';
+type Tab = 'profile' | 'accounts' | 'subscription' | 'security' | 'concepts';
 
 interface ProfileData {
   id: string;
@@ -635,6 +636,7 @@ export default function SettingsPage() {
           { key: 'profile', label: t('settings.profile'), icon: 'person' },
           { key: 'accounts', label: t('settings.brokerAccounts'), icon: 'account_balance' },
           { key: 'subscription', label: t('settings.subscription'), icon: 'card_membership' },
+          { key: 'concepts', label: language === 'fa' ? 'مفاهیم معاملاتی' : 'Concepts', icon: 'category' },
           { key: 'security', label: t('settings.security'), icon: 'shield' },
         ] as const).map((tab) => (
           <button
@@ -1851,6 +1853,11 @@ export default function SettingsPage() {
               )}
             </div>
           </section>
+        )}
+
+        {/* ═════ CONCEPTS TAB ═════ */}
+        {activeTab === 'concepts' && (
+          <ConceptsSettings />
         )}
       </div>
 

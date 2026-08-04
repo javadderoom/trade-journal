@@ -6,7 +6,7 @@ import { useTranslation, useAppStore } from '../../store/useAppStore';
 import { getSharedTranslations } from '../../locales/components';
 import { api } from '../../lib/api';
 import { notify } from '../../lib/notify';
-import { useTradesTags, TagObject } from '../../hooks/useTradesTags';
+import { useTradingConcepts, TradingConcept } from '../../hooks/useTradingConcepts';
 import { useTradesEmotions } from '../../hooks/useTradesEmotions';
 import SummaryBar from './SummaryBar';
 import FilterBar from './FilterBar';
@@ -20,7 +20,7 @@ import { Trade } from '../../types/trade';
 import { getDefaultEmotions } from '../../constants/emotions';
 
 export type { Trade };
-export type { TagObject } from '../../hooks/useTradesTags';
+export type { TradingConcept } from '../../hooks/useTradingConcepts';
 
 interface TradesTableProps {
   initialTrades: Trade[];
@@ -38,13 +38,6 @@ interface TradesTableProps {
   onAccountIdChange?: (val: string) => void;
 }
 
-const getDefaultSystemTags = (isEn: boolean): TagObject[] => [
-  { name: isEn ? 'Missed' : 'فرصت از دست رفته', is_ignored: true, show_first: false },
-  { name: 'Missed', is_ignored: true, show_first: false },
-  { name: 'ignore', is_ignored: true, show_first: false },
-  { name: 'Ignore', is_ignored: true, show_first: false },
-  { name: isEn ? 'Ignore' : 'نادیده گرفتن', is_ignored: true, show_first: false },
-];
 
 const getJalaliDisplayDate = (gregorianDateStr: string) => {
   try {
@@ -168,8 +161,7 @@ export default function TradesTable({
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedSymbol, setSelectedSymbol] = useState(t('filters.allSymbols'));
   const [selectedDirection, setSelectedDirection] = useState(t('filters.allDirections'));
-  const [selectedTimeframe, setSelectedTimeframe] = useState('ALL');
-  const [selectedStatus, setSelectedStatus] = useState<'ALL' | 'OPEN' | 'CLOSED' | 'MISSED'>('ALL');
+  const [selectedStatus, setSelectedStatus] = useState<'ALL' | 'OPEN' | 'CLOSED'>('ALL');
   const [isAdvancedFiltersOpen, setIsAdvancedFiltersOpen] = useState(false);
   const [allEmotions, setAllEmotions] = useState<{ value: string; label: string; emoji?: string }[]>(() => getDefaultEmotions(language));
   const [selectedTimezone, setSelectedTimezone] = useState('Asia/Tehran');
@@ -197,62 +189,7 @@ export default function TradesTable({
     trades.forEach(t => symbols.add(t.symbol));
     return [t('filters.allSymbols'), ...Array.from(symbols)];
   }, [trades]);
-
-  const [allTags, setAllTags] = useState<TagObject[]>([]);
-  const { tags: fetchedTags } = useTradesTags();
-
-  useEffect(() => {
-    if (Array.isArray(fetchedTags)) {
-      setAllTags(prev => {
-        const map = new Map<string, TagObject>();
-        prev.forEach(t => map.set(t.name, t));
-        fetchedTags.forEach((t: TagObject) => {
-          map.set(t.name, {
-            name: t.name,
-            is_ignored: Boolean(t.is_ignored),
-            show_first: Boolean(t.show_first),
-          });
-        });
-        return Array.from(map.values());
-      });
-    }
-  }, [fetchedTags]);
-
-  const handleAddCustomTag = async (newTag: string) => {
-    try {
-      const res = await api.post('/api/trades/tags', { name: newTag, is_ignored: false, show_first: false });
-      const persisted = res.data;
-      setAllTags(prev => {
-        const map = new Map<string, TagObject>();
-        prev.forEach(t => map.set(t.name, t));
-        map.set(newTag, {
-          name: newTag,
-          is_ignored: Boolean(persisted.is_ignored),
-          show_first: Boolean(persisted.show_first),
-        });
-        return Array.from(map.values());
-      });
-    } catch (err) {
-      console.error('Failed to persist custom tag:', err);
-    }
-  };
-
-  const handleSaveTagConfigurations = async (tagsList: TagObject[], deletedNames: string[]) => {
-    try {
-      // Update local state for trades if there are deletions
-      if (deletedNames.length > 0) {
-        setTrades(prev => prev.map(t => ({
-          ...t,
-          tags: t.annotation?.tags ? t.annotation?.tags.filter(tag => !deletedNames.includes(tag)) : []
-        })));
-      }
-
-      // Send bulk save request to backend
-      await api.post('/api/trades/tags/bulk', { tags: tagsList, deletes: deletedNames });
-    } catch (err) {
-      console.error('Failed to save tag configurations:', err);
-    }
-  };
+  const { concepts: tradingConcepts } = useTradingConcepts();
 
   // Fetch custom persistent emotions from database on mount
   const { emotions: fetchedEmotions } = useTradesEmotions();
@@ -261,6 +198,7 @@ export default function TradesTable({
       setAllEmotions(fetchedEmotions);
     }
   }, [fetchedEmotions]);
+
 
   const handleSaveEmotionConfigurations = async (emotionsList: { value: string; label: string; emoji: string }[], deletedValues: string[]) => {
     try {
@@ -279,24 +217,6 @@ export default function TradesTable({
     }
   };
 
-  // Seed allTags from trades
-  useEffect(() => {
-    if (trades.length === 0) return;
-    setAllTags(prev => {
-      const map = new Map<string, TagObject>();
-      prev.forEach(t => map.set(t.name, t));
-      trades.forEach(t => {
-        if (t.annotation?.tags && Array.isArray(t.annotation?.tags)) {
-          t.annotation?.tags.forEach(tag => {
-            if (tag && !map.has(tag)) {
-              map.set(tag, { name: tag, is_ignored: false, show_first: false });
-            }
-          });
-        }
-      });
-      return Array.from(map.values());
-    });
-  }, [trades]);
 
   // Seed allEmotions from trades
   useEffect(() => {
@@ -317,14 +237,6 @@ export default function TradesTable({
   const activeTrade = useMemo(() => {
     return trades.find(t => t.id === activeTradeId) || null;
   }, [trades, activeTradeId]);
-
-  const ignoredTagsSet = useMemo(() => {
-    const set = new Set<string>();
-    allTags.forEach(t => {
-      if (t.is_ignored) set.add(t.name);
-    });
-    return set;
-  }, [allTags]);
 
   // Filtered trades
   const filteredTrades = useMemo(() => {
@@ -350,11 +262,6 @@ export default function TradesTable({
         const dir = selectedDirection === t('filters.buy') ? 'BUY' : 'SELL';
         if (trade.direction !== dir) return false;
       }
-      if (selectedTimeframe !== 'ALL') {
-        const matchAnalysis = trade.annotation?.analysisTimeframe === selectedTimeframe;
-        const matchEntry = trade.annotation?.entryTimeframe === selectedTimeframe;
-        if (!matchAnalysis && !matchEntry) return false;
-      }
       if (searchQuery) {
         const query = searchQuery.toLowerCase().trim();
         const symbolMatch = trade.symbol.toLowerCase().includes(query);
@@ -365,10 +272,8 @@ export default function TradesTable({
           return false;
         }
       }
-      const isMissed = trade.annotation?.tags?.some(tag => ignoredTagsSet.has(tag));
-      if (selectedStatus === 'OPEN' && (isMissed || trade.closeTime !== null)) return false;
-      if (selectedStatus === 'CLOSED' && (isMissed || trade.closeTime === null)) return false;
-      if (selectedStatus === 'MISSED' && !isMissed) return false;
+      if (selectedStatus === 'OPEN' && trade.closeTime !== null) return false;
+      if (selectedStatus === 'CLOSED' && trade.closeTime === null) return false;
       return true;
     });
 
@@ -401,19 +306,17 @@ export default function TradesTable({
     });
 
     return result;
-  }, [trades, selectedSymbol, selectedDirection, selectedTimeframe, searchQuery, selectedStatus, filterDatesArray, selectedTimezone, ignoredTagsSet, sortKey, sortDir]);
+  }, [trades, selectedSymbol, selectedDirection, searchQuery, selectedStatus, filterDatesArray, selectedTimezone, sortKey, sortDir]);
 
   // Summary Metrics
   const summary = useMemo(() => {
-    const activeTrades = filteredTrades.filter(
-      t => !t.annotation?.tags?.some(tag => ignoredTagsSet.has(tag))
-    );
+    const activeTrades = filteredTrades;
     const count = activeTrades.length;
     const wins = activeTrades.filter(t => getNetPnl(t) > 0).length;
     const winRate = count > 0 ? Math.round((wins / count) * 100) : 0;
     const totalProfit = activeTrades.reduce((sum, t) => sum + getNetPnl(t), 0);
     return { count, winRate, totalProfit };
-  }, [filteredTrades, ignoredTagsSet]);
+  }, [filteredTrades]);
 
   // Paginated trades (Load More logic)
   const paginatedTrades = useMemo(() => {
@@ -579,9 +482,9 @@ export default function TradesTable({
     }
   };
 
-  const ANNOTATION_FIELDS = new Set(['tags', 'emotion', 'notes', 'screenshots', 'analysisTimeframe', 'entryTimeframe']);
+  const ANNOTATION_FIELDS = new Set(['emotion', 'notes', 'screenshots', 'htfBias', 'session', 'thesis', 'expectation', 'lesson', 'conviction']);
 
-  const updateActiveTradeField = (key: keyof Trade | 'tags' | 'emotion' | 'notes' | 'screenshots' | 'analysisTimeframe' | 'entryTimeframe', value: any) => {
+  const updateActiveTradeField = (key: keyof Trade | 'emotion' | 'notes' | 'screenshots' | 'htfBias' | 'session' | 'thesis' | 'expectation' | 'lesson' | 'conviction' | 'setups' | 'triggers' | 'confluences' | 'plan', value: any) => {
     if (!activeTradeId) return;
     setTrades(prev =>
       prev.map(t => {
@@ -804,8 +707,6 @@ export default function TradesTable({
           symbolOptions={symbolOptions}
           selectedDirection={selectedDirection}
           setSelectedDirection={setSelectedDirection}
-          selectedTimeframe={selectedTimeframe}
-          setSelectedTimeframe={setSelectedTimeframe}
           selectedTimezone={selectedTimezone}
           setSelectedTimezone={setSelectedTimezone}
           usdToToman={usdToToman}
@@ -836,8 +737,7 @@ export default function TradesTable({
             usdToToman={usdToToman}
             allEmotions={allEmotions}
             accounts={accounts}
-            ignoredTags={ignoredTagsSet}
-            allTags={allTags}
+            tradingConcepts={tradingConcepts}
             sortKey={sortKey}
             sortDir={sortDir}
             onSort={handleSort}
@@ -858,8 +758,7 @@ export default function TradesTable({
           currentPage={currentPage}
           setCurrentPage={setCurrentPage}
           itemsPerPage={itemsPerPage}
-          ignoredTags={ignoredTagsSet}
-          allTags={allTags}
+          tradingConcepts={tradingConcepts}
           accounts={accounts}
         />
 
@@ -892,11 +791,8 @@ export default function TradesTable({
           key={activeTrade.id}
           activeTrade={activeTrade}
           setActiveTradeId={setActiveTradeId}
-          allTags={allTags}
-          setAllTags={setAllTags}
+          tradingConcepts={tradingConcepts}
           allEmotions={allEmotions}
-          onAddCustomTag={handleAddCustomTag}
-          onSaveTagConfigurations={handleSaveTagConfigurations}
           onSaveEmotionConfigurations={handleSaveEmotionConfigurations}
           setAllEmotions={setAllEmotions}
           isUploading={isUploading}

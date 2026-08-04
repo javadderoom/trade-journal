@@ -1,7 +1,9 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Trade, TagObject } from './TradesTable';
+import { Trade } from '../../types/trade';
+import { TradingConcept } from '../../hooks/useTradingConcepts';
+
 import TradeChart from './TradeChart';
 import { toPersianDigits, formatToman, normalizeNumericInput } from '../../utils/farsi';
 import { useTranslation } from '../../store/useAppStore';
@@ -19,30 +21,28 @@ import {
 interface DetailPanelProps {
   activeTrade: Trade;
   setActiveTradeId: (id: string | null) => void;
-  allTags: TagObject[];
-  setAllTags: React.Dispatch<React.SetStateAction<TagObject[]>>;
+  tradingConcepts: TradingConcept[];
   allEmotions: { value: string; label: string; emoji?: string }[];
   setAllEmotions: React.Dispatch<React.SetStateAction<{ value: string; label: string; emoji?: string }[]>>;
+
   isUploading: boolean;
   setLightboxUrl: (url: string | null) => void;
-  updateActiveTradeField: (key: keyof Trade | 'tags' | 'emotion' | 'notes' | 'screenshots' | 'analysisTimeframe' | 'entryTimeframe', value: any) => void;
-  handleSaveDetails: (e: React.FormEvent) => void;
+  updateActiveTradeField: (key: keyof Trade | 'emotion' | 'notes' | 'screenshots' | 'htfBias' | 'session' | 'thesis' | 'expectation' | 'lesson' | 'conviction' | 'setups' | 'triggers' | 'confluences' | 'plan', value: any) => void;
+  handleSaveDetails: (e: React.FormEvent) => void | Promise<void>;
   handleDeleteClick: () => void;
   handleScreenshotUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handleDeleteScreenshot: (url: string) => void;
   selectedTimezone: string;
   usdToToman: number;
   accounts?: any[];
-  onAddCustomTag?: (newTag: string) => void;
-  onSaveTagConfigurations?: (tags: TagObject[], deletes: string[]) => Promise<void>;
+
   onSaveEmotionConfigurations?: (emotions: { value: string; label: string; emoji: string }[], deletes: string[]) => Promise<void>;
 }
 
 export default function DetailPanel({
   activeTrade,
   setActiveTradeId,
-  allTags,
-  setAllTags,
+  tradingConcepts = [],
   allEmotions,
   setAllEmotions,
   isUploading,
@@ -55,8 +55,7 @@ export default function DetailPanel({
   selectedTimezone,
   usdToToman,
   accounts = [],
-  onAddCustomTag,
-  onSaveTagConfigurations,
+
   onSaveEmotionConfigurations,
 }: DetailPanelProps) {
   const { t, language } = useTranslation();
@@ -142,42 +141,10 @@ export default function DetailPanel({
   };
 
   const [activeTab, setActiveTab] = useState<'stats' | 'journal'>('stats');
-  const [isAddingTag, setIsAddingTag] = useState(false);
   const [isAddingEmotion, setIsAddingEmotion] = useState(false);
-  const [isConfiguringTags, setIsConfiguringTags] = useState(false);
   const [isConfiguringEmotions, setIsConfiguringEmotions] = useState(false);
-  const [deletedTagDrafts, setDeletedTagDrafts] = useState<string[]>([]);
   const [deletedEmotionDrafts, setDeletedEmotionDrafts] = useState<string[]>([]);
 
-  // Keep ref of state to save on unmount/drawer closure if needed
-  const configStateRef = React.useRef({ allTags, deletedTagDrafts, isConfiguringTags });
-  React.useEffect(() => {
-    configStateRef.current = { allTags, deletedTagDrafts, isConfiguringTags };
-  }, [allTags, deletedTagDrafts, isConfiguringTags]);
-
-  const saveCallbackRef = React.useRef(onSaveTagConfigurations);
-  React.useEffect(() => {
-    saveCallbackRef.current = onSaveTagConfigurations;
-  }, [onSaveTagConfigurations]);
-
-  React.useEffect(() => {
-    return () => {
-      const { allTags: finalTags, deletedTagDrafts: finalDeletes, isConfiguringTags: wasConfiguring } = configStateRef.current;
-      if (wasConfiguring && saveCallbackRef.current) {
-        saveCallbackRef.current(finalTags, finalDeletes);
-      }
-    };
-  }, []);
-
-  const handleToggleConfigMode = async () => {
-    if (isConfiguringTags) {
-      if (onSaveTagConfigurations) {
-        await onSaveTagConfigurations(allTags, deletedTagDrafts);
-      }
-      setDeletedTagDrafts([]);
-    }
-    setIsConfiguringTags(!isConfiguringTags);
-  };
 
   const configEmotionsStateRef = React.useRef({ allEmotions, deletedEmotionDrafts, isConfiguringEmotions });
   React.useEffect(() => {
@@ -572,254 +539,123 @@ if (activeTrade.annotation?.emotion === value) {
             </>
          ) : (
           <>
-            {/* Timeframe Selectors */}
+            {/* Concepts & Strategy */}
             <div className="form-group">
-              <label>{p.timeframe}</label>
-              <div className="details-grid" style={{ marginTop: '6px' }}>
-                <span className="grid-label">{p.analysisTimeframe}</span>
-                <span className="grid-value">
-                  <select
-                    className="grid-input"
-                    value={activeTrade.annotation?.analysisTimeframe || ''}
-                    onChange={e => updateActiveTradeField('analysisTimeframe', e.target.value || null)}
-                    style={inputStyle}
-                  >
-                    <option value="" style={{ backgroundColor: '#1e222b', color: '#fff' }}>—</option>
-                    <option value="M1" style={{ backgroundColor: '#1e222b', color: '#fff' }}>{language === 'fa' ? '۱ دقیقه (M1)' : '1 Minute (M1)'}</option>
-                    <option value="M5" style={{ backgroundColor: '#1e222b', color: '#fff' }}>{language === 'fa' ? '۵ دقیقه (M5)' : '5 Minutes (M5)'}</option>
-                    <option value="M15" style={{ backgroundColor: '#1e222b', color: '#fff' }}>{language === 'fa' ? '۱۵ دقیقه (M15)' : '15 Minutes (M15)'}</option>
-                    <option value="M30" style={{ backgroundColor: '#1e222b', color: '#fff' }}>{language === 'fa' ? '۳۰ دقیقه (M30)' : '30 Minutes (M30)'}</option>
-                    <option value="H1" style={{ backgroundColor: '#1e222b', color: '#fff' }}>{language === 'fa' ? '۱ ساعته (H1)' : '1 Hour (H1)'}</option>
-                    <option value="H4" style={{ backgroundColor: '#1e222b', color: '#fff' }}>{language === 'fa' ? '۴ ساعته (H4)' : '4 Hours (H4)'}</option>
-                    <option value="D1" style={{ backgroundColor: '#1e222b', color: '#fff' }}>{language === 'fa' ? 'روزانه (D1)' : 'Daily (D1)'}</option>
-                    <option value="W1" style={{ backgroundColor: '#1e222b', color: '#fff' }}>{language === 'fa' ? 'هفتگی (W1)' : 'Weekly (W1)'}</option>
-                    <option value="MN" style={{ backgroundColor: '#1e222b', color: '#fff' }}>{language === 'fa' ? 'ماهانه (MN)' : 'Monthly (MN)'}</option>
-                  </select>
-                </span>
-
-                <span className="grid-label">{p.entryTimeframe}</span>
-                <span className="grid-value">
-                  <select
-                    className="grid-input"
-                    value={activeTrade.annotation?.entryTimeframe || ''}
-                    onChange={e => updateActiveTradeField('entryTimeframe', e.target.value || null)}
-                    style={inputStyle}
-                  >
-                    <option value="" style={{ backgroundColor: '#1e222b', color: '#fff' }}>—</option>
-                    <option value="M1" style={{ backgroundColor: '#1e222b', color: '#fff' }}>{language === 'fa' ? '۱ دقیقه (M1)' : '1 Minute (M1)'}</option>
-                    <option value="M5" style={{ backgroundColor: '#1e222b', color: '#fff' }}>{language === 'fa' ? '۵ دقیقه (M5)' : '5 Minutes (M5)'}</option>
-                    <option value="M15" style={{ backgroundColor: '#1e222b', color: '#fff' }}>{language === 'fa' ? '۱۵ دقیقه (M15)' : '15 Minutes (M15)'}</option>
-                    <option value="M30" style={{ backgroundColor: '#1e222b', color: '#fff' }}>{language === 'fa' ? '۳۰ دقیقه (M30)' : '30 Minutes (M30)'}</option>
-                    <option value="H1" style={{ backgroundColor: '#1e222b', color: '#fff' }}>{language === 'fa' ? '۱ ساعته (H1)' : '1 Hour (H1)'}</option>
-                    <option value="H4" style={{ backgroundColor: '#1e222b', color: '#fff' }}>{language === 'fa' ? '۴ ساعته (H4)' : '4 Hours (H4)'}</option>
-                    <option value="D1" style={{ backgroundColor: '#1e222b', color: '#fff' }}>{language === 'fa' ? 'روزانه (D1)' : 'Daily (D1)'}</option>
-                    <option value="W1" style={{ backgroundColor: '#1e222b', color: '#fff' }}>{language === 'fa' ? 'هفتگی (W1)' : 'Weekly (W1)'}</option>
-                    <option value="MN" style={{ backgroundColor: '#1e222b', color: '#fff' }}>{language === 'fa' ? 'ماهانه (MN)' : 'Monthly (MN)'}</option>
-                  </select>
-                </span>
-              </div>
-            </div>
-
-            {/* Strategy & Emotions / Tags */}
-            <div className="form-group">
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                <label style={{ marginBottom: 0 }}>{isEn ? 'Trade Tags' : 'برچسب‌های معامله'}</label>
-                <button
-                  type="button"
-                  onClick={handleToggleConfigMode}
-                  style={{
-                    background: 'transparent',
-                    border: 'none',
-                    color: isConfiguringTags ? '#10b981' : '#8898aa',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '4px',
-                    fontSize: '12px',
-                    fontFamily: language === 'fa' ? 'Vazirmatn' : 'inherit',
-                    outline: 'none',
-                  }}
-                >
-                  <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>
-                    {isConfiguringTags ? 'check' : 'settings'}
-                  </span>
-                  {isConfiguringTags ? p.confirmSettings : p.manageProps}
-                </button>
-              </div>
-
-              {isConfiguringTags ? (
-                /* Management List View */
-                <div className="tags-management-list" style={{ display: 'flex', flexDirection: 'column', gap: '8px', background: 'rgba(255,255,255,0.02)', padding: '10px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.05)' }}>
-                  {allTags.map(tag => (
-                    <div key={tag.name} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '4px 0', borderBottom: '1px solid rgba(255,255,255,0.03)' }}>
-                      <span style={{ fontSize: '13px', fontWeight: '600', color: '#fff' }}>{tag.name}</span>
-                      <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                        {/* Ignore toggle */}
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setAllTags(prev => prev.map(t => t.name === tag.name ? { ...t, is_ignored: !t.is_ignored } : t));
-                          }}
-                          style={{
-                            background: tag.is_ignored ? 'rgba(255, 180, 171, 0.15)' : 'transparent',
-                            border: '1px solid ' + (tag.is_ignored ? '#ffb4ab' : 'rgba(255,255,255,0.15)'),
-                            borderRadius: '4px',
-                            color: tag.is_ignored ? '#ffb4ab' : '#8898aa',
-                            padding: '2px 6px',
-                            fontSize: '11px',
-                            cursor: 'pointer',
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            gap: '2px',
-                            fontFamily: language === 'fa' ? 'Vazirmatn' : 'inherit',
-                          }}
-                          title={isEn ? 'Ignore in stats' : 'نادیده گرفتن از آمار'}
-                        >
-                          <span className="material-symbols-outlined" style={{ fontSize: '12px' }}>block</span>
-                          {isEn ? 'Ignore' : 'نادیده'}
-                        </button>
-
-                        {/* Show first toggle */}
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setAllTags(prev => prev.map(t => t.name === tag.name ? { ...t, show_first: !t.show_first } : t));
-                          }}
-                          style={{
-                            background: tag.show_first ? 'rgba(16, 185, 129, 0.15)' : 'transparent',
-                            border: '1px solid ' + (tag.show_first ? '#10b981' : 'rgba(255,255,255,0.15)'),
-                            borderRadius: '4px',
-                            color: tag.show_first ? '#10b981' : '#8898aa',
-                            padding: '2px 6px',
-                            fontSize: '11px',
-                            cursor: 'pointer',
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            gap: '2px',
-                            fontFamily: language === 'fa' ? 'Vazirmatn' : 'inherit',
-                          }}
-                          title={isEn ? 'Show first in list' : 'نمایش در ابتدای لیست'}
-                        >
-                          <span className="material-symbols-outlined" style={{ fontSize: '12px' }}>star</span>
-                          {isEn ? 'Pin' : 'مهم'}
-                        </button>
-
-                        {/* Delete tag */}
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setDeletedTagDrafts(prev => [...prev, tag.name]);
-                            setAllTags(prev => prev.filter(t => t.name !== tag.name));
-if (activeTrade.annotation?.tags?.includes(tag.name)) {
-                               updateActiveTradeField('tags', activeTrade.annotation.tags.filter(t => t !== tag.name));
-                            }
-                          }}
-                          style={{
-                            background: 'transparent',
-                            border: 'none',
-                            color: '#ffb4ab',
-                            cursor: 'pointer',
-                            padding: '2px',
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                          }}
-                          title={p.deleteTagTitle}
-                        >
-                          <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>delete</span>
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                /* Default Selection Pool View */
-                <div className="tags-container">
-                  {[...allTags]
-                    .sort((a, b) => {
-                      if (a.show_first && !b.show_first) return -1;
-                      if (!a.show_first && b.show_first) return 1;
-const aSelected = activeTrade.annotation?.tags?.includes(a.name) ? 1 : 0;
-                       const bSelected = activeTrade.annotation?.tags?.includes(b.name) ? 1 : 0;
-                      if (aSelected !== bSelected) return bSelected - aSelected;
-                      return a.name.localeCompare(b.name, 'fa');
-                    })
-                    .map(tag => {
-                      const isSelected = activeTrade.annotation?.tags && activeTrade.annotation.tags.includes(tag.name);
-                      return (
-                        <span
-                          key={tag.name}
-                          className={`tag ${isSelected ? 'selected' : ''}`}
-                          style={{
-                            border: tag.show_first ? '1px dashed #10b981' : undefined,
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            gap: '4px'
-                          }}
-onClick={() => {
-                             const currentTags = activeTrade.annotation?.tags || [];
-                             const newTags = isSelected
-                               ? currentTags.filter(t => t !== tag.name)
-                               : [...currentTags, tag.name];
-                             updateActiveTradeField('tags', newTags);
-                           }}
-                        >
-                          {tag.show_first && (
-                            <span className="material-symbols-outlined" style={{ fontSize: '10px', color: '#10b981' }}>star</span>
-                          )}
-                          {tag.name}
-                          {tag.is_ignored && (
-                            <span className="material-symbols-outlined" style={{ fontSize: '10px', color: '#ffb4ab' }} title={p.ignoreTag}>block</span>
-                          )}
-                        </span>
-                      );
-                    })}
-                  {isAddingTag ? (
-                    <input
-                      type="text"
-                      autoFocus
-                      placeholder={p.tagPlaceholder}
-                      onBlur={() => setIsAddingTag(false)}
-                      onKeyDown={e => {
-if (e.key === 'Enter') {
-                           e.preventDefault();
-                           const val = e.currentTarget.value.trim();
-                           if (val) {
-                             const currentTags = activeTrade.annotation?.tags || [];
-                             if (!currentTags.includes(val)) {
-                               updateActiveTradeField('tags', [...currentTags, val]);
-                             }
-                             onAddCustomTag?.(val);
-                           }
-                          setIsAddingTag(false);
-                        } else if (e.key === 'Escape') {
-                          setIsAddingTag(false);
-                        }
-                      }}
-                      style={{
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        padding: '4px 12px',
-                        backgroundColor: 'rgba(16, 185, 129, 0.05)',
-                        color: '#fff',
-                        borderRadius: '9999px',
-                        fontSize: '12px',
-                        border: '1px dashed rgba(16, 185, 129, 0.5)',
-                        outline: 'none',
-                        width: '100px',
-                        fontFamily: language === 'fa' ? 'Vazirmatn' : 'inherit'
-                      }}
-                    />
-                  ) : (
-                    <span
-                      className="add-tag-btn"
-                      onClick={() => setIsAddingTag(true)}
-                    >
-                      <span className="material-symbols-outlined btn-icon" style={{ fontSize: '14px' }}>add</span>
-                      {p.addTag}
-                    </span>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <span className="material-symbols-outlined" style={{ fontSize: '16px', color: '#8898aa' }}>category</span>
+                {isEn ? 'Concepts & Strategy' : 'استراتژی و مفاهیم'}
+              </label>
+              
+              {/* Setups */}
+              <div style={{ marginTop: '12px' }}>
+                <div style={{ fontSize: '12px', color: '#8898aa', marginBottom: '6px' }}>{isEn ? 'Setups:' : 'ستاپ‌ها:'}</div>
+                <div className="tags-container" style={{ gap: '6px' }}>
+                  {tradingConcepts.filter(c => c.allowed_roles.includes('SETUP')).map(concept => {
+                    const isSelected = activeTrade.setups?.some(s => s.concept.id === concept.id);
+                    return (
+                      <span
+                        key={concept.id}
+                        className={`tag ${isSelected ? 'selected' : ''}`}
+                        style={{
+                          borderLeft: `3px solid ${concept.color || '#3b82f6'}`,
+                          cursor: 'pointer',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '4px'
+                        }}
+                        onClick={() => {
+                          const current = activeTrade.setups || [];
+                          if (isSelected) {
+                            updateActiveTradeField('setups', current.filter(s => s.concept.id !== concept.id));
+                          } else {
+                            updateActiveTradeField('setups', [...current, { concept: { id: concept.id, name: concept.name, color: concept.color, icon: concept.icon } }]);
+                          }
+                        }}
+                      >
+                        {concept.icon && <span>{concept.icon}</span>}
+                        {concept.name}
+                      </span>
+                    );
+                  })}
+                  {tradingConcepts.filter(c => c.allowed_roles.includes('SETUP')).length === 0 && (
+                    <span style={{ fontSize: '12px', color: '#555' }}>{isEn ? 'No setup concepts defined' : 'ستاپ تعریف نشده است'}</span>
                   )}
                 </div>
-              )}
+              </div>
+
+              {/* Triggers */}
+              <div style={{ marginTop: '12px' }}>
+                <div style={{ fontSize: '12px', color: '#8898aa', marginBottom: '6px' }}>{isEn ? 'Triggers:' : 'تاییدیه / تریگر:'}</div>
+                <div className="tags-container" style={{ gap: '6px' }}>
+                  {tradingConcepts.filter(c => c.allowed_roles.includes('TRIGGER')).map(concept => {
+                    const isSelected = activeTrade.triggers?.some(t => t.concept.id === concept.id);
+                    return (
+                      <span
+                        key={concept.id}
+                        className={`tag ${isSelected ? 'selected' : ''}`}
+                        style={{
+                          borderLeft: `3px solid ${concept.color || '#10b981'}`,
+                          cursor: 'pointer',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '4px'
+                        }}
+                        onClick={() => {
+                          const current = activeTrade.triggers || [];
+                          if (isSelected) {
+                            updateActiveTradeField('triggers', current.filter(t => t.concept.id !== concept.id));
+                          } else {
+                            updateActiveTradeField('triggers', [...current, { concept: { id: concept.id, name: concept.name, color: concept.color, icon: concept.icon } }]);
+                          }
+                        }}
+                      >
+                        {concept.icon && <span>{concept.icon}</span>}
+                        {concept.name}
+                      </span>
+                    );
+                  })}
+                  {tradingConcepts.filter(c => c.allowed_roles.includes('TRIGGER')).length === 0 && (
+                    <span style={{ fontSize: '12px', color: '#555' }}>{isEn ? 'No trigger concepts defined' : 'تریگر تعریف نشده است'}</span>
+                  )}
+                </div>
+              </div>
+
+              {/* Confluences */}
+              <div style={{ marginTop: '12px' }}>
+                <div style={{ fontSize: '12px', color: '#8898aa', marginBottom: '6px' }}>{isEn ? 'Confluences:' : 'هم‌گرایی‌ها (کانفلوئنس):'}</div>
+                <div className="tags-container" style={{ gap: '6px' }}>
+                  {tradingConcepts.filter(c => c.allowed_roles.includes('CONFLUENCE')).map(concept => {
+                    const isSelected = activeTrade.confluences?.some(c => c.concept.id === concept.id);
+                    return (
+                      <span
+                        key={concept.id}
+                        className={`tag ${isSelected ? 'selected' : ''}`}
+                        style={{
+                          borderLeft: `3px solid ${concept.color || '#8b5cf6'}`,
+                          cursor: 'pointer',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '4px'
+                        }}
+                        onClick={() => {
+                          const current = activeTrade.confluences || [];
+                          if (isSelected) {
+                            updateActiveTradeField('confluences', current.filter(c => c.concept.id !== concept.id));
+                          } else {
+                            updateActiveTradeField('confluences', [...current, { concept: { id: concept.id, name: concept.name, color: concept.color, icon: concept.icon } }]);
+                          }
+                        }}
+                      >
+                        {concept.icon && <span>{concept.icon}</span>}
+                        {concept.name}
+                      </span>
+                    );
+                  })}
+                  {tradingConcepts.filter(c => c.allowed_roles.includes('CONFLUENCE')).length === 0 && (
+                    <span style={{ fontSize: '12px', color: '#555' }}>{isEn ? 'No confluence concepts defined' : 'هم‌گرایی تعریف نشده است'}</span>
+                  )}
+                </div>
+              </div>
             </div>
 
             <div className="form-group">

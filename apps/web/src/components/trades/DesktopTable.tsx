@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Trade, TagObject } from './TradesTable';
+import { Trade } from './TradesTable';
 import { toPersianDigits, formatToman } from '../../utils/farsi';
 import { useTranslation } from '../../store/useAppStore';
 import {
@@ -24,8 +24,7 @@ interface DesktopTableProps {
   usdToToman: number;
   allEmotions: { value: string; label: string; emoji?: string }[];
   accounts?: any[];
-  ignoredTags: Set<string>;
-  allTags: TagObject[];
+  tradingConcepts: any[];
   sortKey: string;
   sortDir: 'asc' | 'desc';
   onSort: (key: string) => void;
@@ -42,8 +41,7 @@ export default function DesktopTable({
   usdToToman,
   allEmotions,
   accounts = [],
-  ignoredTags,
-  allTags,
+  tradingConcepts,
   sortKey,
   sortDir,
   onSort,
@@ -101,29 +99,22 @@ export default function DesktopTable({
               const isActive = trade.id === activeTradeId;
 
               // P&L color logic
-              const isMissed = trade.annotation?.tags?.some(tag => ignoredTags.has(tag));
+              // P&L color logic
+              // const isMissed = false; // Add missed status logic later if needed
               const netPnl = getNetPnl(trade);
               let profitClass = 'profit-zero';
               if (netPnl > 0) profitClass = 'profit-positive';
               else if (netPnl < 0) profitClass = 'profit-negative';
               if (!isClosed) profitClass = 'profit-open';
-              if (isMissed) profitClass = 'profit-missed';
+              // if (isMissed) profitClass = 'profit-missed';
 
               const account = accounts.find(a => a.id === trade.accountId);
               const initialBalance = account?.initial_balance || 0;
               const pnlPercent = initialBalance > 0 ? (netPnl / initialBalance) * 100 : null;
 
-              // Sort tags to show show_first (important) ones first
-              const importantTagNames = new Set(
-                (allTags || []).filter(t => t.show_first).map(t => t.name)
-              );
-              const sortedTags = [...(trade.annotation?.tags || [])].sort((a, b) => {
-                const aImp = importantTagNames.has(a);
-                const bImp = importantTagNames.has(b);
-                if (aImp && !bImp) return -1;
-                if (!aImp && bImp) return 1;
-                return 0;
-              });
+              // Render setups instead of tags
+              const setups = trade.setups?.map((s: any) => s.concept) || [];
+
 
               return (
                 <tr
@@ -158,43 +149,28 @@ export default function DesktopTable({
                           </span>
                         );
                       })()}
-                      {(trade.annotation?.analysisTimeframe || trade.annotation?.entryTimeframe) && (
-                        <div className="timeframe-badges">
-                          {trade.annotation?.analysisTimeframe && (
-                            <span className="timeframe-badge analysis" title={t('trades.analysisTimeframe')}>
-                              📊 {trade.annotation?.analysisTimeframe}
-                            </span>
-                          )}
-                          {trade.annotation?.entryTimeframe && (
-                            <span className="timeframe-badge entry" title={t('trades.entryTimeframe')}>
-                              🎯 {trade.annotation?.entryTimeframe}
-                            </span>
-                          )}
-                        </div>
-                      )}
                     </div>
                   </td>
                   <td className="col-symbol">
                     <div className="symbol-cell-content">
                       <span className="symbol-name">{trade.symbol}</span>
-                      {(trade.annotation?.emotion || (sortedTags.length > 0)) && (
+                      {(trade.annotation?.emotion || setups.length > 0) && (
                         <div className="symbol-metadata">
                           {trade.annotation?.emotion && (
                             <span className={`emotion-mini-badge emotion-${trade.annotation?.emotion.toLowerCase()}`} title={`${t('trades.emotion')}: ${getEmotionLabel(trade.annotation?.emotion, allEmotions)}`}>
                               {getEmotionEmoji(trade.annotation?.emotion, allEmotions)} {getEmotionLabel(trade.annotation?.emotion, allEmotions)}
                             </span>
                           )}
-                          {sortedTags.slice(0, 2).map(tag => {
-                            const isImportant = importantTagNames.has(tag);
+                          {setups.slice(0, 2).map((setup: any) => {
                             return (
-                              <span key={tag} className={`tag-mini-pill ${isImportant ? 'important' : ''}`}>
-                                {isImportant ? '⭐ ' : ''}{tag}
+                              <span key={setup.id} className="tag-mini-pill important" style={{ borderLeft: `2px solid ${setup.color || '#3b82f6'}` }}>
+                                {setup.name}
                               </span>
                             );
                           })}
-                          {sortedTags.length > 2 && (
-                            <span className="tag-mini-more" title={sortedTags.slice(2).join(', ')}>
-                              +{toPersianDigits(sortedTags.length - 2)}
+                          {setups.length > 2 && (
+                            <span className="tag-mini-more" title={setups.slice(2).map((s:any) => s.name).join(', ')}>
+                              +{toPersianDigits(setups.length - 2)}
                             </span>
                           )}
                         </div>
@@ -239,23 +215,9 @@ export default function DesktopTable({
                     )}
                   </td>
                   <td style={{ textAlign: 'center' }}>
-                    {isMissed ? (
-                      <span
-                        className="material-symbols-outlined status-icon status-missed"
-                        title={t('trades.statusMissed')}
-                        style={{ color: '#9ca3af' }}
-                      >
-                        block
+                      <span className={`status-icon ${isClosed ? 'status-closed' : 'status-open'}`} title={isClosed ? t('trades.closed') : t('trades.open')}>
+                        {isClosed ? 'check_circle' : 'timelapse'}
                       </span>
-                    ) : (
-                      <span
-                        className={`material-symbols-outlined status-icon ${isClosed ? 'status-closed' : 'status-open'
-                          }`}
-                        title={isClosed ? t('trades.statusClosed') : t('trades.statusOpen')}
-                      >
-                        {isClosed ? 'check_circle' : 'sync'}
-                      </span>
-                    )}
                   </td>
                 </tr>
               );

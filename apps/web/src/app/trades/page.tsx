@@ -141,12 +141,9 @@ export default function TradesPage() {
         pips: newTrade.pips,
         rMultiple: newTrade.rMultiple,
         annotation: {
-          tags: newTrade.annotation?.tags ?? [],
           emotion: newTrade.annotation?.emotion ?? null,
           notes: newTrade.annotation?.notes ?? null,
           screenshots: newTrade.annotation?.screenshots ?? [],
-          analysisTimeframe: newTrade.annotation?.analysisTimeframe ?? null,
-          entryTimeframe: newTrade.annotation?.entryTimeframe ?? null,
         }
       };
       useTradeStore.setState({ trades: [mappedTrade, ...currentTrades] });

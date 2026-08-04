@@ -32,6 +32,7 @@ import adminDiagnosisRouter from './routes/adminDiagnosis';
 import marketDataRouter from './routes/marketData';
 import backtestRouter from './routes/backtest';
 import aiAutomationRouter from './routes/aiAutomation';
+import tradingConceptsRouter from './routes/tradingConcepts';
 import { syncExchangeTrades } from './services/ccxtSync';
 import { runDailyAIBlogPipeline } from './services/aiDiscoveryService';
 
@@ -89,6 +90,7 @@ app.use('/api', accountTokensRouter);
 app.use('/api/trades/export', tradeExportRouter);
 app.use('/api/trades', tradeSyncRouter);
 app.use('/api/journal', journalRouter);
+app.use('/api/trading-concepts', tradingConceptsRouter);
 app.use('/api/dashboard', dashboardRouter);
 app.use('/api/settings', settingsRouter);
 app.use('/api/payments', paymentsRouter);

@@ -22,8 +22,10 @@ type PrismaTrade = {
   take_profit: number | null;
   profit_usd: number;
   annotation?: {
-    tags: string[];
+    emotion?: string;
+    notes?: string;
   } | null;
+  setups?: { concept: { id: string; name: string } }[];
 };
 
 /**
@@ -173,15 +175,16 @@ async function checkWeakStrategy(
   prisma: PrismaClient,
   costUsd: number
 ): Promise<SuggestedMistake | null> {
-  const tags = trade.annotation?.tags;
-  if (!tags || tags.length === 0) return null;
+  const setups = trade.setups || [];
+  if (setups.length === 0) return null;
 
-  for (const tag of tags) {
+  for (const s of setups) {
+    const conceptId = s.concept.id;
     const tagTrades = await prisma.trade.findMany({
       where: {
         user_id: trade.user_id,
         id: { not: trade.id },
-        annotation: { tags: { has: tag } },
+        setups: { some: { concept_id: conceptId } },
         close_time: { not: null },
       },
       orderBy: { close_time: 'desc' },
@@ -198,7 +201,7 @@ async function checkWeakStrategy(
       return {
         ruleKey: 'WEAK_STRATEGY',
         label: 'استراتژی ضعیف تکرار شده',
-        reason: `استراتژی "${tag}" در ${tagTrades.length} معامله اخیر فقط ${Math.round(winRate * 100)}٪ نرخ برد داشته.`,
+        reason: `در ۵۰ معامله اخیر با ستاپ '${s.concept.name}'، وین‌ریت شما تنها ${(winRate * 100).toFixed(0)}٪ بوده است.`,
         costUsd,
       };
     }
