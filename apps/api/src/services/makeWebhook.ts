@@ -19,6 +19,7 @@ interface BlogPostPayload {
   content: string;
   cover_image?: string | null;
   locale: string;
+  social_copy?: string | null;
 }
 
 /**
@@ -67,12 +68,18 @@ export async function triggerBlogWebhook(post: BlogPostPayload): Promise<void> {
       snippet = snippet.slice(0, 117) + '...';
     }
 
+    // Use AI generated social copy if available, otherwise fallback to standard snippet formatting
+    const formatted_text = post.social_copy 
+      ? `${post.social_copy}\n\n🔗 ${postUrl}`
+      : `${post.title}\n\n${snippet}\n\n🔗 ${postUrl}`;
+
     const payload = {
       title: post.title,
       snippet,
       url: postUrl,
       image_url: coverImageUrl,
       locale: post.locale,
+      formatted_text,
     };
 
     console.log(`[Make Webhook] Sending blog "${post.title}" via Cloudflare proxy...`);

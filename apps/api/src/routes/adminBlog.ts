@@ -8,6 +8,7 @@ import path from 'path';
 import fs from 'fs';
 import sharp from 'sharp';
 import { triggerBlogWebhook } from '../services/makeWebhook';
+import { generateSocialCopy } from '../services/aiBlogService';
 
 // ─── Cover Image Upload Setup ─────────────────────────────────────────────
 const coverDir = path.join(__dirname, '../../uploads/blogs');
@@ -175,6 +176,20 @@ router.post('/posts/generate-ai', async (req: AuthRequest, res: Response) => {
   }
 });
 
+router.post('/posts/generate-social-copy', async (req: AuthRequest, res: Response) => {
+  try {
+    const { title, content, locale } = req.body;
+    if (!title || !content) {
+      return res.status(400).json({ error: 'Title and content are required' });
+    }
+    const socialCopy = await generateSocialCopy(title, content, locale || 'fa');
+    res.json({ socialCopy });
+  } catch (error) {
+    console.error('[AI Blog] Generate social copy error:', error);
+    res.status(500).json({ error: 'Failed to generate social copy' });
+  }
+});
+
 router.get('/posts/generate-ai-status', (req: AuthRequest, res: Response) => {
   res.json({
     isRunning: aiLogger.isRunning,
@@ -187,7 +202,7 @@ router.post('/posts', async (req: AuthRequest, res: Response) => {
     const { 
       title, slug, content, excerpt, cover_image, status, 
       seo_title, seo_description, category_id, tag_ids, locale = 'fa', translation_id,
-      featured_image_prompt
+      featured_image_prompt, social_copy
     } = req.body;
 
     const isPublishing = status === 'PUBLISHED';
@@ -195,7 +210,7 @@ router.post('/posts', async (req: AuthRequest, res: Response) => {
     const post = await prisma.blogPost.create({
       data: {
         title, slug, content, excerpt, cover_image, status, locale,
-        seo_title, seo_description, translation_id, featured_image_prompt,
+        seo_title, seo_description, translation_id, featured_image_prompt, social_copy,
         author_id: req.user!.userId as string,
         category_id,
         published_at: isPublishing ? new Date() : null,
@@ -216,7 +231,7 @@ router.put('/posts/:id', async (req: AuthRequest, res: Response) => {
     const { 
       title, slug, content, excerpt, cover_image, status, 
       seo_title, seo_description, category_id, tag_ids, locale, translation_id,
-      featured_image_prompt
+      featured_image_prompt, social_copy
     } = req.body;
 
     const existing = await prisma.blogPost.findUnique({ where: { id: req.params.id as string }});
@@ -228,7 +243,7 @@ router.put('/posts/:id', async (req: AuthRequest, res: Response) => {
       where: { id: req.params.id as string },
       data: {
         title, slug, content, excerpt, cover_image, status, locale,
-        seo_title, seo_description, translation_id, featured_image_prompt,
+        seo_title, seo_description, translation_id, featured_image_prompt, social_copy,
         category_id,
         published_at,
         tags: tag_ids ? {
@@ -259,6 +274,7 @@ router.post('/posts/:id/share', async (req: AuthRequest, res: Response) => {
       content: post.content,
       cover_image: post.cover_image,
       locale: post.locale,
+      social_copy: post.social_copy,
     }).catch(() => {});
 
     // Update the flag to true (for tracking)

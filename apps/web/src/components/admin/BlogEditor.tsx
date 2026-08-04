@@ -21,6 +21,8 @@ export default function BlogEditor({ initialData, locale, onSuccess, onCancel }:
   const [title, setTitle] = useState(initialData?.title || '');
   const [slug, setSlug] = useState(initialData?.slug || '');
   const [excerpt, setExcerpt] = useState(initialData?.excerpt || '');
+  const [socialCopy, setSocialCopy] = useState(initialData?.social_copy || '');
+  const [isGeneratingCopy, setIsGeneratingCopy] = useState(false);
   const [coverImage, setCoverImage] = useState(initialData?.cover_image || '');
   const [status, setStatus] = useState(initialData?.status || 'DRAFT');
   const [categoryId, setCategoryId] = useState(initialData?.category_id || '');
@@ -66,6 +68,7 @@ export default function BlogEditor({ initialData, locale, onSuccess, onCancel }:
       seo_title: seoTitle,
       seo_description: seoDescription,
       featured_image_prompt: featuredImagePrompt,
+      social_copy: socialCopy,
       locale,
     };
 
@@ -102,6 +105,29 @@ export default function BlogEditor({ initialData, locale, onSuccess, onCancel }:
 
   const handleTagToggle = (id: string) => {
     setTagIds(prev => prev.includes(id) ? prev.filter(t => t !== id) : [...prev, id]);
+  };
+
+  const handleGenerateSocialCopy = async () => {
+    if (!title || !editor?.getHTML() || editor?.getHTML() === '<p></p>') {
+      notify.error('Title and content are required to generate social copy');
+      return;
+    }
+    setIsGeneratingCopy(true);
+    try {
+      const res = await api.post('/api/admin/blog/posts/generate-social-copy', {
+        title,
+        content: editor.getHTML(),
+        locale
+      });
+      if (res.data.socialCopy) {
+        setSocialCopy(res.data.socialCopy);
+        notify.success('Social copy generated! Review and save it.');
+      }
+    } catch (err) {
+      notify.error('Failed to generate social copy');
+    } finally {
+      setIsGeneratingCopy(false);
+    }
   };
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -230,6 +256,31 @@ export default function BlogEditor({ initialData, locale, onSuccess, onCancel }:
       <div className="form-group">
         <label>خلاصه مقاله</label>
         <textarea className="input-field" rows={3} value={excerpt} onChange={(e) => setExcerpt(e.target.value)} />
+      </div>
+
+      <div className="form-group" style={{ background: '#111827', padding: '15px', borderRadius: '8px', border: '1px solid #1f2937' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+          <label style={{ margin: 0, color: '#a78bfa' }}>متن شبکه‌های اجتماعی (Social Copy)</label>
+          <LoadingButton 
+            className="btn btn-secondary" 
+            style={{ padding: '5px 12px', fontSize: '12px' }}
+            isLoading={isGeneratingCopy} 
+            onClick={handleGenerateSocialCopy}
+          >
+            <span className="material-symbols-outlined" style={{ fontSize: '16px', marginRight: '4px' }}>auto_awesome</span>
+            تولید با هوش مصنوعی
+          </LoadingButton>
+        </div>
+        <textarea 
+          className="input-field" 
+          rows={4} 
+          value={socialCopy} 
+          onChange={(e) => setSocialCopy(e.target.value)} 
+          placeholder="متن جذاب برای شبکه‌های اجتماعی. لینک به صورت خودکار اضافه خواهد شد..."
+        />
+        <small style={{ display: 'block', marginTop: '5px', color: '#6b7280' }}>
+          این متن هنگام انتشار در X یا LinkedIn استفاده می‌شود. لینک مقاله به انتهای آن اضافه خواهد شد.
+        </small>
       </div>
 
       <div className="form-row">

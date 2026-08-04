@@ -391,3 +391,28 @@ Return ONLY a raw JSON object (without markdown wrappers like \`\`\`json) with t
   console.log(`[AI Blog] Translation successful! Farsi post ID: ${newPost.id}`);
   return newPost;
 }
+
+export async function generateSocialCopy(title: string, content: string, locale: string): Promise<string> {
+  const isEn = locale === 'en';
+  const prompt = `
+You are an expert Social Media Manager for a Trading Journal platform.
+Your task is to write a highly engaging, click-worthy social media post (for Twitter and LinkedIn) based on the following blog article.
+
+Article Title: ${title}
+Article Content (HTML):
+${content}
+
+RULES:
+1. ${isEn ? 'Write entirely in English.' : 'Write entirely in Farsi (Persian).'}
+2. It must be a short, punchy hook that makes traders want to read the full article.
+3. Use 2-3 relevant emojis.
+4. Keep the ENTIRE text under 220 characters so it fits on Twitter (we will automatically append the link at the end).
+5. Do NOT include a URL or placeholder like [Link here]. We handle that.
+6. Do NOT wrap your response in quotes.
+`;
+
+  const model = getGeminiModel('gemini-3.5-flash');
+  const result = await model.generateContent(prompt);
+  let text = (await result.response).text();
+  return text.trim();
+}

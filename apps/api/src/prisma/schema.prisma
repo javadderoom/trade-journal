@@ -632,6 +632,7 @@ model BlogPost {
   view_count       Int          @default(0)
   seo_title        String?
   seo_description  String?
+  social_copy      String?      @db.Text
   
   // AI Automation Fields
   featured_image_prompt String?      @db.Text
