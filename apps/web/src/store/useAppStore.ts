@@ -32,6 +32,10 @@ interface AppState {
   setManualTradeModalOpen: (isOpen: boolean) => void;
   isImportMT4ModalOpen: boolean;
   setImportMT4ModalOpen: (isOpen: boolean) => void;
+  
+  // App Layout Sidebar
+  isSidebarCollapsed: boolean;
+  setSidebarCollapsed: (isCollapsed: boolean) => void;
 
   // Language i18n
   language: 'fa' | 'en';
@@ -64,6 +68,7 @@ export const useAppStore = create<AppState>((set) => ({
   activeTradeId: null,
   isManualTradeModalOpen: false,
   isImportMT4ModalOpen: false,
+  isSidebarCollapsed: false,
   language: getInitialLanguage(),
 
   // Setters
@@ -74,6 +79,7 @@ export const useAppStore = create<AppState>((set) => ({
   setActiveTradeId: (activeTradeId) => set({ activeTradeId }),
   setManualTradeModalOpen: (isOpen) => set({ isManualTradeModalOpen: isOpen }),
   setImportMT4ModalOpen: (isOpen) => set({ isImportMT4ModalOpen: isOpen }),
+  setSidebarCollapsed: (isCollapsed) => set({ isSidebarCollapsed: isCollapsed }),
   setLanguage: (language) => {
     if (typeof window !== 'undefined') {
       localStorage.setItem('language', language);

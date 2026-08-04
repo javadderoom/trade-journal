@@ -21,3 +21,8 @@ For every user request, analyze the required cognitive effort. At the very top o
 ## Language and Communication
 - **ALWAYS communicate and respond in ENGLISH.**
 - **NEVER** write or respond in Farsi (Persian) or any other language, even if the user prompts in that language.
+
+## Database Migration Rules
+- **Migration Plan Required**: Every time a database schema change is made (e.g., modifying `schema.prisma`), a proper migration plan must be formulated and executed to generate migration files.
+- Avoid using `prisma db push` in isolation, as it bypasses migration file generation and causes the local database to drift from the migration history.
+- Always use `prisma migrate dev --name <migration_name>` (or `prisma migrate diff`) to generate proper migration files so they can be safely checked into version control and applied to the production database during deployment.

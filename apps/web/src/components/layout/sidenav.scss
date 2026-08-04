@@ -14,6 +14,7 @@
   border: 1px solid rgba($outline-variant, 0.45);
   border-radius: 24px;
   z-index: 20;
+  overflow: hidden;
   box-shadow: 
     0 12px 32px -4px rgba(0, 0, 0, 0.5), 
     0 4px 12px -2px rgba(0, 0, 0, 0.3),
@@ -29,6 +30,21 @@
     padding: 24px 16px;
     gap: 8px;
     overflow-y: auto;
+    
+    // Custom thin scrollbar
+    &::-webkit-scrollbar {
+      width: 4px;
+    }
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    &::-webkit-scrollbar-thumb {
+      background: rgba($on-surface, 0.15);
+      border-radius: 4px;
+    }
+    &::-webkit-scrollbar-thumb:hover {
+      background: rgba($on-surface, 0.25);
+    }
   }
 
   .sidenav-header {
@@ -689,5 +705,37 @@
       translateY(-72px)
       rotate(var(--item-angle, 0deg))
       scale(1);
+  }
+}
+
+/* Collapsed State Styles */
+.sidenav-container.collapsed {
+  width: 84px;
+
+  .title-group, 
+  .lang-toggle-btn, 
+  .sidenav-cta-box, 
+  .sidenav-link-item .label, 
+  .logout-link .label {
+    display: none !important;
+  }
+
+  .sidenav-header {
+    justify-content: center !important;
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .sidenav-header > div:first-child {
+    flex-direction: column !important;
+  }
+  
+  .sidenav-header > div:last-child {
+    flex-direction: column !important;
+  }
+
+  .sidenav-link-item, .logout-link {
+    justify-content: center;
+    padding: 12px;
   }
 }

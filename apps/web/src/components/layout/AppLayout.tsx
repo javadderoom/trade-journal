@@ -7,7 +7,7 @@ import SideNavBar from './SideNavBar';
 import BottomNavBar from './BottomNavBar';
 import { useAuthStore } from '../../lib/auth';
 import { fetcher } from '../../lib/api';
-import { useTranslation } from '../../store/useAppStore';
+import { useTranslation, useAppStore } from '../../store/useAppStore';
 import Toaster from '../ui/Toaster';
 import PageLoader from '../ui/PageLoader';
 import { Agentation } from 'agentation';
@@ -25,6 +25,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const { user, isInitialized, initialize } = useAuthStore();
   const { language, setLanguage, dir } = useTranslation();
+  const isSidebarCollapsed = useAppStore(state => state.isSidebarCollapsed);
   const fontClass = language === 'fa' ? 'font-vazir' : 'font-inter';
 
   useEffect(() => {
@@ -231,7 +232,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <SWRConfig value={swrConfigValue}>
-      <div className={`app-container ${fontClass}`} dir={dir}>
+      <div className={`app-container ${fontClass} ${isSidebarCollapsed ? 'sidebar-collapsed' : ''}`} dir={dir}>
         <SideNavBar />
         <div className="main-content-wrapper">{children}</div>
         <BottomNavBar />

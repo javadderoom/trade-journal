@@ -86,38 +86,44 @@ export default function AdminExpertsPage() {
 
   return (
     <div className="admin-container">
-      <div className="admin-header">
-        <h1>مدیریت اکسپرت متاتریدر</h1>
-        <p>آپلود فایل‌های جدید و مشاهده گزارش فعالیت اکسپرت کاربران</p>
-      </div>
+      <header className="admin-header">
+        <div>
+          <h1>مدیریت اکسپرت متاتریدر</h1>
+          <span className="admin-sub">آپلود فایل‌های جدید و مشاهده گزارش فعالیت اکسپرت کاربران</span>
+        </div>
+      </header>
 
       <div className="admin-tabs">
         <button
           className={`admin-tab-btn ${activeTab === 'upload' ? 'active' : ''}`}
           onClick={() => setActiveTab('upload')}
         >
-          آپلود فایل
+          <span className="material-symbols-outlined">upload_file</span>
+          <span>آپلود فایل</span>
         </button>
         <button
           className={`admin-tab-btn ${activeTab === 'logs' ? 'active' : ''}`}
           onClick={() => setActiveTab('logs')}
         >
-          لاگ فعالیت‌ها
+          <span className="material-symbols-outlined">history</span>
+          <span>لاگ فعالیت‌ها</span>
         </button>
       </div>
 
       {activeTab === 'upload' && (
-        <div className="admin-section">
-          <h2>آپلود نسخه جدید اکسپرت</h2>
-          <p style={{ marginBottom: '1rem', color: 'var(--text-muted)' }}>
+        <div className="admin-panel-card">
+          <div className="card-header-actions">
+            <h3>آپلود نسخه جدید اکسپرت</h3>
+          </div>
+          <p style={{ marginBottom: '16px', color: '#a0aec0', fontSize: '0.88rem' }}>
             فایل‌های .mq4، .mq5، .ex4 یا .ex5 را اینجا آپلود کنید.
           </p>
-          <form onSubmit={handleUpload} className="admin-form" style={{ maxWidth: 400 }}>
+          <form onSubmit={handleUpload} className="admin-form-grid" style={{ maxWidth: 400 }}>
             <div className="form-group">
               <label>انتخاب فایل</label>
               <input type="file" ref={fileInputRef} accept=".ex4,.ex5,.mq4,.mq5" />
             </div>
-            <button type="submit" className="btn-primary" disabled={isUploading}>
+            <button type="submit" className="admin-btn" disabled={isUploading}>
               {isUploading ? 'در حال آپلود...' : 'آپلود فایل'}
             </button>
           </form>
@@ -125,24 +131,26 @@ export default function AdminExpertsPage() {
       )}
 
       {activeTab === 'logs' && (
-        <div className="admin-section">
-          <h2>لاگ فعالیت‌های اکسپرت</h2>
-          <form onSubmit={handleFilter} style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
+        <div className="admin-panel-card">
+          <div className="card-header-actions">
+            <h3>لاگ فعالیت‌های اکسپرت</h3>
+          </div>
+          
+          <form onSubmit={handleFilter} style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}>
             <input
               type="text"
               placeholder="فیلتر بر اساس User ID"
               value={userIdFilter}
               onChange={(e) => setUserIdFilter(e.target.value)}
-              className="form-input"
-              style={{ width: 300 }}
+              style={{ background: '#0b0d19', border: '1px solid rgba(255,255,255,0.1)', padding: '8px 12px', color: '#fff', borderRadius: '6px', fontSize: '0.85rem', flex: 1, maxWidth: '360px' }}
             />
-            <button type="submit" className="btn-secondary">اعمال فیلتر</button>
+            <button type="submit" className="admin-btn" style={{ padding: '8px 16px' }}>اعمال فیلتر</button>
           </form>
 
           {isLoadingLogs ? (
-            <p>در حال بارگذاری...</p>
+            <p style={{ color: '#a0aec0' }}>در حال بارگذاری...</p>
           ) : (
-            <div className="table-responsive">
+            <div className="admin-table-wrapper">
               <table className="admin-table">
                 <thead>
                   <tr>
@@ -167,7 +175,7 @@ export default function AdminExpertsPage() {
                         </td>
                         <td>
                           <div style={{ fontSize: '0.85rem' }}>{log.user?.email}</div>
-                          <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{log.user_id}</div>
+                          <div style={{ fontSize: '0.75rem', color: '#a0aec0' }}>{log.user_id}</div>
                         </td>
                         <td dir="ltr" style={{ textAlign: 'right' }}>
                           {log.account?.broker_name} <br/> {log.account?.account_number}
@@ -188,11 +196,12 @@ export default function AdminExpertsPage() {
           )}
 
           {totalPages > 1 && (
-            <div className="pagination">
+            <div style={{ display: 'flex', gap: '8px', alignItems: 'center', justifyContent: 'center', marginTop: '16px' }}>
               <button
                 disabled={page === 1}
                 onClick={() => fetchLogs(page - 1)}
-                className="btn-secondary"
+                className="admin-btn btn-secondary"
+                style={{ padding: '6px 12px', fontSize: '0.78rem' }}
               >
                 قبلی
               </button>
@@ -200,7 +209,8 @@ export default function AdminExpertsPage() {
               <button
                 disabled={page === totalPages}
                 onClick={() => fetchLogs(page + 1)}
-                className="btn-secondary"
+                className="admin-btn btn-secondary"
+                style={{ padding: '6px 12px', fontSize: '0.78rem' }}
               >
                 بعدی
               </button>

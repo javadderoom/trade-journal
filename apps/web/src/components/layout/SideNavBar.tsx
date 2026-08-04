@@ -4,7 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuthStore } from '../../lib/auth';
-import { useTranslation } from '../../store/useAppStore';
+import { useTranslation, useAppStore } from '../../store/useAppStore';
 import { notify } from '../../lib/notify';
 
 export default function SideNavBar() {
@@ -13,6 +13,8 @@ export default function SideNavBar() {
   const user = useAuthStore(state => state.user);
   const logout = useAuthStore(state => state.logout);
   const { t, language, setLanguage } = useTranslation();
+  const isSidebarCollapsed = useAppStore(state => state.isSidebarCollapsed);
+  const setSidebarCollapsed = useAppStore(state => state.setSidebarCollapsed);
 
   const planLabel = language === 'fa'
     ? (user?.plan === 'PRO' ? 'نسخه حرفه‌ای' : user?.plan === 'STANDARD' ? 'نسخه استاندارد' : 'نسخه رایگان')
@@ -36,7 +38,7 @@ export default function SideNavBar() {
   }
 
   return (
-    <nav className="sidenav-container">
+    <nav className={`sidenav-container ${isSidebarCollapsed ? 'collapsed' : ''}`}>
       <div className="sidenav-inner">
         {/* Header */}
         <div className="sidenav-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -55,23 +57,44 @@ export default function SideNavBar() {
               <span className="subtitle-text">{planLabel}</span>
             </div>
           </div>
-          <button
-            onClick={() => setLanguage(language === 'fa' ? 'en' : 'fa')}
-            style={{
-              background: 'rgba(255,255,255,0.06)',
-              border: '1px solid rgba(255,255,255,0.1)',
-              borderRadius: '6px',
-              color: 'rgba(255,255,255,0.6)',
-              padding: '4px 8px',
-              fontSize: '11px',
-              fontWeight: '700',
-              cursor: 'pointer',
-              outline: 'none',
-              fontFamily: 'inherit'
-            }}
-          >
-            {language === 'fa' ? 'EN' : 'FA'}
-          </button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <button
+              onClick={() => setSidebarCollapsed(!isSidebarCollapsed)}
+              style={{
+                background: 'transparent',
+                border: 'none',
+                color: 'rgba(255,255,255,0.6)',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: '4px',
+                borderRadius: '6px'
+              }}
+            >
+              <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>
+                {isSidebarCollapsed ? 'menu_open' : 'menu'}
+              </span>
+            </button>
+            <button
+              onClick={() => setLanguage(language === 'fa' ? 'en' : 'fa')}
+              className="lang-toggle-btn"
+              style={{
+                background: 'rgba(255,255,255,0.06)',
+                border: '1px solid rgba(255,255,255,0.1)',
+                borderRadius: '6px',
+                color: 'rgba(255,255,255,0.6)',
+                padding: '4px 8px',
+                fontSize: '11px',
+                fontWeight: '700',
+                cursor: 'pointer',
+                outline: 'none',
+                fontFamily: 'inherit'
+              }}
+            >
+              {language === 'fa' ? 'EN' : 'FA'}
+            </button>
+          </div>
         </div>
 
         {/* Navigation Links */}

@@ -174,10 +174,16 @@ label.small {
   background-color: $background;
   position: relative;
   width: calc(100% - 288px);
+  transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.app-container.sidebar-collapsed .main-content-wrapper {
+  margin-right: 100px;
+  width: calc(100% - 100px);
 }
 
 @media (max-width: 1024px) {
-  .main-content-wrapper {
+  .main-content-wrapper, .app-container.sidebar-collapsed .main-content-wrapper {
     margin-right: 0;
     width: 100%;
     padding-bottom: 96px;
@@ -196,6 +202,12 @@ label.small {
     margin-right: 0;
     margin-left: 288px;
     width: calc(100% - 288px);
+  }
+
+  &.sidebar-collapsed .main-content-wrapper {
+    margin-left: 100px;
+    margin-right: 0;
+    width: calc(100% - 100px);
   }
 }
 
