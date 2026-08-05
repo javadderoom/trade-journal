@@ -132,6 +132,14 @@ Return ONLY a raw JSON object (without any markdown formatting like \`\`\`json) 
       }
     } catch (error) {
       aiLogger.log(`[AI Blog] Attempt ${attempts} failed: ${error}`);
+      
+      if (currentDraft) {
+        aiLogger.log(`[AI Blog] Saving partial draft to avoid losing progress...`);
+        currentDraft.seo_score = 0;
+        currentDraft.quality_score = 0;
+        break;
+      }
+      
       if (attempts >= MAX_ATTEMPTS) throw new Error('AI Generation failed after max attempts');
     }
   }
@@ -225,8 +233,8 @@ Return ONLY a raw JSON object (without any markdown formatting like \`\`\`json) 
   return newPost;
 }
 
-// Phase 3 (Bonus): Auto-translate English to Farsi
-export async function translateBlogArticle(originalPostId: string) {
+// Phase 3 (Bonus): Auto-translate Article
+export async function translateBlogArticle(originalPostId: string, targetLocale: string = 'fa') {
   const original = await prisma.blogPost.findUnique({
     where: { id: originalPostId },
     include: {
@@ -235,58 +243,66 @@ export async function translateBlogArticle(originalPostId: string) {
     }
   });
 
-  if (!original || original.locale !== 'en') {
-    throw new Error('Original post not found or is not in English.');
+  if (!original) {
+    throw new Error('Original post not found.');
   }
 
-  aiLogger.log(`[AI Blog] Translating article ${original.title} to Farsi...`);
+  if (original.locale === targetLocale) {
+    throw new Error('Original post is already in the target locale.');
+  }
+
+  const isToFarsi = targetLocale === 'fa';
+  const sourceLang = isToFarsi ? 'English' : 'Farsi (Persian)';
+  const targetLang = isToFarsi ? 'Farsi (Persian)' : 'English';
+
+  aiLogger.log(`[AI Blog] Translating article ${original.title} to ${targetLang}...`);
 
   let categoryContext = '';
   if (original.category) {
     if (original.category.parent) {
-      categoryContext = `English Main Category: "${original.category.parent.name}" (slug: ${original.category.parent.slug})\nEnglish Sub-Category: "${original.category.name}" (slug: ${original.category.slug})`;
+      categoryContext = `${sourceLang} Main Category: "${original.category.parent.name}" (slug: ${original.category.parent.slug})\n${sourceLang} Sub-Category: "${original.category.name}" (slug: ${original.category.slug})`;
     } else {
-      categoryContext = `English Main Category: "${original.category.name}" (slug: ${original.category.slug})\nEnglish Sub-Category: None`;
+      categoryContext = `${sourceLang} Main Category: "${original.category.name}" (slug: ${original.category.slug})\n${sourceLang} Sub-Category: None`;
     }
   } else {
-    categoryContext = 'English Main Category: None\nEnglish Sub-Category: None';
+    categoryContext = `${sourceLang} Main Category: None\n${sourceLang} Sub-Category: None`;
   }
 
   const tagsContext = original.tags.length > 0
-    ? `English Tags:\n${original.tags.map(t => `- "${t.name}" (slug: ${t.slug})`).join('\n')}`
-    : `English Tags: None`;
+    ? `${sourceLang} Tags:\n${original.tags.map((t: any) => `- "${t.name}" (slug: ${t.slug})`).join('\n')}`
+    : `${sourceLang} Tags: None`;
 
   const prompt = `
-You are an expert Farsi (Persian) translator and financial market specialist.
-Your task is to translate the following English trading article into highly professional and natural-sounding Persian.
+You are an expert ${targetLang} translator and financial market specialist.
+Your task is to translate the following ${sourceLang} trading article into highly professional and natural-sounding ${targetLang}.
 CRITICAL RULES:
 1. Preserve all HTML tags exactly as they are (e.g., <p>, <h2>, <a>, <strong>). Do NOT alter the HTML structure.
 2. Translate the text inside the HTML tags.
-3. Keep technical trading terms (like RSI, MACD, Support, Resistance) either in English or their well-accepted Farsi equivalents (e.g. حمایت و مقاومت).
+3. Keep technical trading terms (like RSI, MACD, Support, Resistance) either in English or their well-accepted equivalents.
 
-English Title: ${original.title}
-English Excerpt: ${original.excerpt}
+${sourceLang} Title: ${original.title}
+${sourceLang} Excerpt: ${original.excerpt}
 
-English HTML Content:
+${sourceLang} HTML Content:
 ${original.content}
 
 CATEGORY AND TAGS TRANSLATION:
-You must translate the EXACT categories and tags used in the English article. Do not invent new ones or leave any out.
+You must translate the EXACT categories and tags used in the ${sourceLang} article. Do not invent new ones or leave any out.
 ${categoryContext}
 ${tagsContext}
-For the Farsi slugs, you MUST use the exact English slug but appended with "-fa". For example, if the English slug is "crypto", the Farsi slug MUST be "crypto-fa".
+For the ${targetLang} slugs, you MUST use the exact ${sourceLang} slug but ${isToFarsi ? 'appended with "-fa"' : 'without the "-fa" suffix or appended with "-en"'}. For example, if translating to Farsi and the english slug is "crypto", it MUST be "crypto-fa". If translating to English and the Farsi slug is "crypto-fa", it MUST be "crypto".
 
 Return ONLY a raw JSON object (without markdown wrappers like \`\`\`json) with this exact structure:
 {
-  "title": "...", // The translated Farsi H1 title
-  "slug": "...", // Provide a brief english slug representing the farsi title (for URL routing)
-  "excerpt": "...", // The translated Farsi excerpt
-  "seo_title": "...", // The translated Farsi SEO title
-  "seo_description": "...", // The translated Farsi SEO description
+  "title": "...", // The translated ${targetLang} H1 title
+  "slug": "...", // Provide a brief english slug representing the title (for URL routing)
+  "excerpt": "...", // The translated ${targetLang} excerpt
+  "seo_title": "...", // The translated ${targetLang} SEO title
+  "seo_description": "...", // The translated ${targetLang} SEO description
   "content": "...", // The full translated HTML article
-  "category": { "name": "...", "slug": "...-fa" }, // The exact translated main category. Null if none.
-  "sub_category": { "name": "...", "slug": "...-fa" }, // The exact translated sub-category. Null if none.
-  "tags": [ { "name": "...", "slug": "...-fa" } ] // The exact translated tags matching the English ones
+  "category": { "name": "...", "slug": "..." }, // The exact translated main category. Null if none.
+  "sub_category": { "name": "...", "slug": "..." }, // The exact translated sub-category. Null if none.
+  "tags": [ { "name": "...", "slug": "..." } ] // The exact translated tags matching the ${sourceLang} ones
 }
 `;
 
@@ -295,11 +311,11 @@ Return ONLY a raw JSON object (without markdown wrappers like \`\`\`json) with t
   let text = (await result.response).text();
   text = text.replace(/```json/g, '').replace(/```/g, '').trim();
   
-  const farsiDraft = JSON.parse(text);
+  const draft = JSON.parse(text);
 
   // Handle Category
-  let categorySlug = farsiDraft.category?.slug || 'trading-education-fa';
-  let categoryName = farsiDraft.category?.name || 'آموزش ترید';
+  let categorySlug = draft.category?.slug || (isToFarsi ? 'trading-education-fa' : 'trading-education');
+  let categoryName = draft.category?.name || (isToFarsi ? 'آموزش ترید' : 'Trading Education');
   
   let parentCategory = await prisma.blogCategory.findFirst({
     where: { slug: categorySlug }
@@ -310,7 +326,7 @@ Return ONLY a raw JSON object (without markdown wrappers like \`\`\`json) with t
       data: {
         name: categoryName,
         slug: categorySlug,
-        locale: 'fa'
+        locale: targetLocale
       }
     });
   }
@@ -318,17 +334,17 @@ Return ONLY a raw JSON object (without markdown wrappers like \`\`\`json) with t
   let targetCategoryId = parentCategory.id;
 
   // Handle Sub-category
-  if (farsiDraft.sub_category?.name && farsiDraft.sub_category?.slug) {
+  if (draft.sub_category?.name && draft.sub_category?.slug) {
     let subCategory = await prisma.blogCategory.findFirst({
-      where: { slug: farsiDraft.sub_category.slug }
+      where: { slug: draft.sub_category.slug }
     });
 
     if (!subCategory) {
       subCategory = await prisma.blogCategory.create({
         data: {
-          name: farsiDraft.sub_category.name,
-          slug: farsiDraft.sub_category.slug,
-          locale: 'fa',
+          name: draft.sub_category.name,
+          slug: draft.sub_category.slug,
+          locale: targetLocale,
           parent_id: parentCategory.id
         }
       });
@@ -338,8 +354,8 @@ Return ONLY a raw JSON object (without markdown wrappers like \`\`\`json) with t
 
   // Handle Tags
   const tagIds: string[] = [];
-  if (farsiDraft.tags && Array.isArray(farsiDraft.tags)) {
-    for (const tagData of farsiDraft.tags) {
+  if (draft.tags && Array.isArray(draft.tags)) {
+    for (const tagData of draft.tags) {
       if (!tagData.slug || !tagData.name) continue;
       
       let tag = await prisma.blogTag.findFirst({
@@ -351,7 +367,7 @@ Return ONLY a raw JSON object (without markdown wrappers like \`\`\`json) with t
           data: {
             name: tagData.name,
             slug: tagData.slug,
-            locale: 'fa'
+            locale: targetLocale
           }
         });
       }
@@ -361,20 +377,21 @@ Return ONLY a raw JSON object (without markdown wrappers like \`\`\`json) with t
 
   const newPost = await prisma.blogPost.create({
     data: {
-      title: farsiDraft.title,
-      slug: farsiDraft.slug + '-' + Date.now().toString().slice(-4),
-      content: farsiDraft.content,
-      excerpt: farsiDraft.excerpt,
-      seo_title: farsiDraft.seo_title,
-      seo_description: farsiDraft.seo_description,
+      title: draft.title,
+      slug: draft.slug + '-' + Date.now().toString().slice(-4),
+      content: draft.content,
+      excerpt: draft.excerpt,
+      seo_title: draft.seo_title,
+      seo_description: draft.seo_description,
       seo_score: original.seo_score,
       quality_score: original.quality_score,
       reading_time: original.reading_time,
       featured_image_prompt: original.featured_image_prompt,
+      cover_image: original.cover_image, // Copy cover image from original
       status: 'DRAFT',
       author_id: original.author_id,
       category_id: targetCategoryId,
-      locale: 'fa',
+      locale: targetLocale,
       translation_id: original.id, // Link to the English post
       tags: tagIds.length > 0 ? {
         connect: tagIds.map(id => ({ id }))
@@ -382,13 +399,13 @@ Return ONLY a raw JSON object (without markdown wrappers like \`\`\`json) with t
     }
   });
 
-  // Link English post back to Farsi post
+  // Link original post back to new post
   await prisma.blogPost.update({
     where: { id: original.id },
     data: { translation_id: newPost.id }
   });
 
-  console.log(`[AI Blog] Translation successful! Farsi post ID: ${newPost.id}`);
+  console.log(`[AI Blog] Translation successful! ${targetLang} post ID: ${newPost.id}`);
   return newPost;
 }
 

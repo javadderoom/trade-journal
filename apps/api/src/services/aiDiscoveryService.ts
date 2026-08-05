@@ -60,19 +60,43 @@ export async function runDailyAIBlogPipeline() {
     const authorId = admin?.id || (await prisma.user.findFirst())?.id;
     if (!authorId) throw new Error('No users found in database to act as author.');
 
-    // 2. Discover Topic
-    aiLogger.log('[Cron] AI Discovery Phase...');
-    const topic = await generateTrendingTopic();
+    // 2. Check for incomplete pipeline runs (English draft without translation)
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
 
-    // 3. Generate English Article (with Review Loop)
-    aiLogger.log(`[Cron] AI Generation Phase for topic: ${topic}...`);
+    const pendingDraft = await prisma.blogPost.findFirst({
+      where: {
+        locale: 'en',
+        status: 'DRAFT',
+        translation_id: null,
+        created_at: { gte: today }
+      },
+      orderBy: { created_at: 'desc' }
+    });
+
     const { generateBlogArticle, translateBlogArticle } = require('./aiBlogService');
-    const post = await generateBlogArticle(topic, authorId);
-    aiLogger.log(`[Cron] English Pipeline Success! Draft saved with ID: ${post.id}`);
+    
+    let post = pendingDraft;
 
-    // 4. Translate to Farsi
+    if (pendingDraft) {
+      aiLogger.log(`[Cron] Resuming incomplete pipeline for draft ID: ${pendingDraft.id}`);
+    } else {
+      // 3. Discover Topic
+      aiLogger.log('[Cron] AI Discovery Phase...');
+      const topic = await generateTrendingTopic();
+
+      // 4. Generate English Article (with Review Loop)
+      aiLogger.log(`[Cron] AI Generation Phase for topic: ${topic}...`);
+      post = await generateBlogArticle(topic, authorId);
+      if (!post) throw new Error('Generation returned null');
+      aiLogger.log(`[Cron] English Pipeline Success! Draft saved with ID: ${post.id}`);
+    }
+
+    if (!post) throw new Error('Post is missing before translation');
+
+    // 5. Translate to Farsi
     aiLogger.log(`[Cron] AI Translation Phase...`);
-    const farsiPost = await translateBlogArticle(post.id);
+    const farsiPost = await translateBlogArticle(post.id, 'fa');
     aiLogger.log(`[Cron] Farsi Pipeline Success! Draft saved with ID: ${farsiPost.id}`);
 
   } catch (error) {

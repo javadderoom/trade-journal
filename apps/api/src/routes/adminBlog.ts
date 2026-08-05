@@ -8,7 +8,7 @@ import path from 'path';
 import fs from 'fs';
 import sharp from 'sharp';
 import { triggerBlogWebhook } from '../services/makeWebhook';
-import { generateSocialCopy } from '../services/aiBlogService';
+import { generateSocialCopy, translateBlogArticle } from '../services/aiBlogService';
 
 // ─── Cover Image Upload Setup ─────────────────────────────────────────────
 const coverDir = path.join(__dirname, '../../uploads/blogs');
@@ -127,6 +127,13 @@ router.get('/posts', async (req: AuthRequest, res: Response) => {
   }
 });
 
+router.get('/posts/generate-ai-status', (req: AuthRequest, res: Response) => {
+  res.json({
+    isRunning: aiLogger.isRunning,
+    logs: aiLogger.logs,
+  });
+});
+
 router.get('/posts/:id', async (req: AuthRequest, res: Response) => {
   try {
     const post = await prisma.blogPost.findUnique({
@@ -190,12 +197,7 @@ router.post('/posts/generate-social-copy', async (req: AuthRequest, res: Respons
   }
 });
 
-router.get('/posts/generate-ai-status', (req: AuthRequest, res: Response) => {
-  res.json({
-    isRunning: aiLogger.isRunning,
-    logs: aiLogger.logs,
-  });
-});
+
 
 router.post('/posts', async (req: AuthRequest, res: Response) => {
   try {
@@ -299,22 +301,9 @@ router.post('/posts/:id/translate', async (req: AuthRequest, res: Response) => {
     if (!originalPost) return res.status(404).json({ error: 'Not found' });
 
     const newLocale = originalPost.locale === 'fa' ? 'en' : 'fa';
-    const newSlug = `${originalPost.slug}-${newLocale}`;
-
-    const newPost = await prisma.blogPost.create({
-      data: {
-        title: `${originalPost.title} (${newLocale.toUpperCase()})`,
-        slug: newSlug,
-        content: originalPost.content,
-        excerpt: originalPost.excerpt,
-        cover_image: originalPost.cover_image,
-        status: 'DRAFT',
-        locale: newLocale,
-        author_id: originalPost.author_id,
-        category_id: originalPost.category_id,
-        translation_id: originalPost.id,
-      }
-    });
+    
+    // Call the AI translation service
+    const newPost = await translateBlogArticle(originalPost.id, newLocale);
     
     res.status(201).json(newPost);
   } catch (error) {
