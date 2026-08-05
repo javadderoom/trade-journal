@@ -14,10 +14,11 @@ import DesktopTable from './DesktopTable';
 import MobileCardsList from './MobileCardsList';
 import DetailPanel from './DetailPanel';
 import { getMainPair, getNetPnl } from '../../utils/tradeHelpers';
-import { useAuthStore } from '../../lib/auth';
+import { useRouter } from 'next/navigation';
 import ExportModal from '../modals/ExportModal';
 import { Trade } from '../../types/trade';
 import { getDefaultEmotions } from '../../constants/emotions';
+import { useAuthStore } from '../../lib/auth';
 
 export type { Trade };
 export type { TradingConcept } from '../../hooks/useTradingConcepts';
@@ -91,6 +92,7 @@ export default function TradesTable({
   const { t, language } = useTranslation();
   const isEn = language === 'en';
 
+  const router = useRouter();
   const p = {
     ...getSharedTranslations(isEn),
     trades: isEn ? 'Trades' : 'معاملات',
@@ -805,6 +807,12 @@ export default function TradesTable({
           selectedTimezone={selectedTimezone}
           usdToToman={usdToToman}
           accounts={accounts}
+          onOpenReview={() => router.push(`/trades/${activeTrade.id}/review`)}
+          onOpenInspect={() => {
+            if (activeTradeId) {
+              router.push(`/trades/${activeTradeId}/inspect`);
+            }
+          }}
         />
       )}
 

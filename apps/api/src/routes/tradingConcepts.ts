@@ -4,6 +4,8 @@ import { prisma } from '../services/tradeSync';
 import { z } from 'zod';
 import { ConceptRole } from '@prisma/client';
 
+import { seedDefaultConcepts } from '../services/seedDefaultConcepts';
+
 const router = express.Router();
 
 const conceptSchema = z.object({
@@ -17,10 +19,20 @@ const conceptSchema = z.object({
 router.get('/', authenticate, async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user!.userId;
-    const concepts = await prisma.tradingConcept.findMany({
+    let concepts = await prisma.tradingConcept.findMany({
       where: { user_id: userId },
       orderBy: { name: 'asc' },
     });
+
+    // Lazy-seed if this is an existing user with 0 concepts
+    if (concepts.length === 0) {
+      await seedDefaultConcepts(prisma, userId);
+      concepts = await prisma.tradingConcept.findMany({
+        where: { user_id: userId },
+        orderBy: { name: 'asc' },
+      });
+    }
+
     res.json(concepts);
   } catch (error) {
     console.error('Error fetching concepts:', error);

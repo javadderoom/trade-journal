@@ -142,7 +142,7 @@ export default function DesktopTable({
                     <div className="day-session-wrapper">
                       <span className="day-badge">{formatDate(trade.openTime, selectedTimezone).day}</span>
                       {(() => {
-                        const sess = getTradingSession(trade.openTime);
+                        const sess = getTradingSession(trade.openTime, trade.annotation?.session);
                         return (
                           <span className={`session-badge ${sess.className}`} title={sess.label}>
                             {sess.emoji} {sess.label}
@@ -154,16 +154,29 @@ export default function DesktopTable({
                   <td className="col-symbol">
                     <div className="symbol-cell-content">
                       <span className="symbol-name">{trade.symbol}</span>
-                      {(trade.annotation?.emotion || setup) && (
-                        <div className="symbol-metadata">
+                      {(trade.annotation?.emotion || setup || (trade.triggers && trade.triggers.length > 0) || (trade.confluences && trade.confluences.length > 0)) && (
+                        <div className="symbol-metadata" style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', marginTop: '4px' }}>
                           {trade.annotation?.emotion && (
                             <span className={`emotion-mini-badge emotion-${trade.annotation?.emotion.toLowerCase()}`} title={`${t('trades.emotion')}: ${getEmotionLabel(trade.annotation?.emotion, allEmotions)}`}>
                               {getEmotionEmoji(trade.annotation?.emotion, allEmotions)} {getEmotionLabel(trade.annotation?.emotion, allEmotions)}
                             </span>
                           )}
                           {setup && (
-                            <span key={setup.id} className="tag-mini-pill important" style={{ borderLeft: `2px solid ${setup.color || '#3b82f6'}` }}>
+                            <span key={setup.id} className="tag-mini-pill" style={{ borderLeft: `3px solid ${setup.color || '#3b82f6'}`, backgroundColor: 'rgba(59, 130, 246, 0.1)', padding: '2px 6px', borderRadius: '4px', fontSize: '11px', color: '#fff' }}>
+                              {setup.icon && <span style={{ marginRight: '4px' }}>{setup.icon}</span>}
                               {setup.name}
+                            </span>
+                          )}
+                          {trade.triggers && trade.triggers.map((t, idx) => (
+                            <span key={`trigger-${idx}`} className="tag-mini-pill" style={{ border: `1px solid ${t.concept.color || '#f59e0b'}`, backgroundColor: 'rgba(245, 158, 11, 0.05)', padding: '1px 5px', borderRadius: '4px', fontSize: '11px', color: '#fff', display: 'flex', alignItems: 'center' }}>
+                              <span className="material-symbols-outlined" style={{ fontSize: '12px', marginRight: '2px', color: t.concept.color || '#f59e0b' }}>bolt</span>
+                              {t.concept.name}
+                            </span>
+                          ))}
+                          {trade.confluences && trade.confluences.length > 0 && (
+                            <span className="tag-mini-pill" style={{ backgroundColor: 'rgba(16, 185, 129, 0.1)', border: '1px solid rgba(16, 185, 129, 0.3)', padding: '1px 6px', borderRadius: '12px', fontSize: '11px', color: '#10b981', display: 'flex', alignItems: 'center' }} title={`${trade.confluences.length} Confluences`}>
+                              <span className="material-symbols-outlined" style={{ fontSize: '12px', marginRight: '2px' }}>layers</span>
+                              +{trade.confluences.length}
                             </span>
                           )}
                         </div>

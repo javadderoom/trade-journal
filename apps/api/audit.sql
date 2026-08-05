@@ -1,0 +1,1 @@
+SELECT count(*) FROM "TradeAnnotation" WHERE (analysis_timeframe IS NOT NULL AND analysis_timeframe NOT IN ('M1', 'M5', 'M15', 'M30', 'H1', 'H4', 'D1', 'W1', 'MN1')) OR (entry_timeframe IS NOT NULL AND entry_timeframe NOT IN ('M1', 'M5', 'M15', 'M30', 'H1', 'H4', 'D1', 'W1', 'MN1'));

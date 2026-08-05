@@ -8,6 +8,7 @@ import {
   generateRefreshToken,
 } from '../lib/tokens';
 import { authenticate, AuthRequest } from '../middleware/auth';
+import { seedDefaultConcepts } from '../services/seedDefaultConcepts';
 import { registerSchema, loginSchema } from '../validators/auth';
 import { sendOtpSms } from '../services/sms';
 import { rateLimit } from '../middleware/rateLimit';
@@ -84,6 +85,9 @@ router.post('/register', registerLimiter, async (req: Request, res: Response) =>
         password_hash: passwordHash,
       },
     });
+
+    // Auto-seed default trading concepts
+    await seedDefaultConcepts(prisma, user.id);
 
     const accessToken = generateAccessToken({
       userId: user.id,
@@ -443,6 +447,9 @@ router.post('/otp/register', otpRegisterLimiter, async (req: Request, res: Respo
         password_hash: passwordHash,
       },
     });
+
+    // Auto-seed default trading concepts
+    await seedDefaultConcepts(prisma, user.id);
 
     const accessToken = generateAccessToken({
       userId: user.id,

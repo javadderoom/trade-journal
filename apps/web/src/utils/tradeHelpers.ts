@@ -90,7 +90,7 @@ export interface TradingSessionInfo {
   className: string;
 }
 
-export const getTradingSession = (dateStr: string): TradingSessionInfo => {
+export const getTradingSession = (dateStr: string, override?: string | null): TradingSessionInfo => {
   const lang = useAppStore.getState().language;
   const isEn = lang === 'en';
 
@@ -103,6 +103,14 @@ export const getTradingSession = (dateStr: string): TradingSessionInfo => {
     ASIAN: isEn ? 'Tokyo' : 'توکیو',
     SYDNEY: isEn ? 'Sydney' : 'سیدنی',
   };
+
+  if (override) {
+    const overUpper = override.toUpperCase();
+    if (overUpper === 'LONDON') return { name: 'LONDON', label: labels.LONDON, emoji: '🇬🇧', className: 'session-london' };
+    if (overUpper === 'NEW_YORK') return { name: 'NEW_YORK', label: labels.NEW_YORK, emoji: '🇺🇸', className: 'session-ny' };
+    if (overUpper === 'OVERLAP') return { name: 'OVERLAP', label: labels.OVERLAP, emoji: '🤝', className: 'session-overlap' };
+    if (overUpper === 'ASIA') return { name: 'ASIAN', label: labels.ASIAN, emoji: '🇯🇵', className: 'session-asian' };
+  }
 
   try {
     const d = new Date(dateStr);

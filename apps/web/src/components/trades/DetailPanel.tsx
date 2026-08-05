@@ -37,6 +37,8 @@ interface DetailPanelProps {
   accounts?: any[];
 
   onSaveEmotionConfigurations?: (emotions: { value: string; label: string; emoji: string }[], deletes: string[]) => Promise<void>;
+  onOpenReview?: () => void;
+  onOpenInspect?: () => void;
 }
 
 export default function DetailPanel({
@@ -57,6 +59,8 @@ export default function DetailPanel({
   accounts = [],
 
   onSaveEmotionConfigurations,
+  onOpenReview,
+  onOpenInspect,
 }: DetailPanelProps) {
   const { t, language } = useTranslation();
   const isEn = language === 'en';
@@ -140,7 +144,7 @@ export default function DetailPanel({
     sell: isEn ? 'Sell' : 'فروش',
   };
 
-  const [activeTab, setActiveTab] = useState<'stats' | 'journal'>('stats');
+
   const [isAddingEmotion, setIsAddingEmotion] = useState(false);
   const [isConfiguringEmotions, setIsConfiguringEmotions] = useState(false);
   const [deletedEmotionDrafts, setDeletedEmotionDrafts] = useState<string[]>([]);
@@ -228,28 +232,11 @@ if (activeTrade.annotation?.emotion === value) {
         </button>
       </div>
 
-      {/* Panel Tabs */}
-      <div className="panel-tabs">
-        <button
-          className={`tab-btn ${activeTab === 'stats' ? 'active' : ''}`}
-          onClick={() => setActiveTab('stats')}
-        >
-          <span className="material-symbols-outlined tab-icon">analytics</span>
-          {p.details}
-        </button>
-        <button
-          className={`tab-btn ${activeTab === 'journal' ? 'active' : ''}`}
-          onClick={() => setActiveTab('journal')}
-        >
-          <span className="material-symbols-outlined tab-icon">rate_review</span>
-          {p.notesTab}
-        </button>
-      </div>
+      {/* Removed Tabs */}
 
       {/* Panel Body */}
       <div className="panel-body">
-        {activeTab === 'stats' ? (
-          <>
+        <>
             {/* Financial Summary Box */}
             <div className={`financial-box ${getNetPnl(activeTrade) < 0 ? 'loss-box' : ''}`}>
               <div className="box-bar"></div>
@@ -286,259 +273,33 @@ if (activeTrade.annotation?.emotion === value) {
               </div>
             </div>
 
-            {/* Trade Candlestick Chart */}
-            {activeTrade.chartData && Array.isArray(activeTrade.chartData) && activeTrade.chartData.length > 0 && (
-              <div className="trade-chart-section">
-                <label className="section-label">{p.chartTitle}</label>
-                <TradeChart 
-                  candlesticks={activeTrade.chartData}
-                  symbol={activeTrade.symbol}
-                  direction={activeTrade.direction}
-                  openPrice={activeTrade.openPrice}
-                  closePrice={activeTrade.closePrice}
-                  openTime={activeTrade.openTime}
-                  closeTime={activeTrade.closeTime}
-                  stopLoss={activeTrade.stopLoss}
-                  takeProfit={activeTrade.takeProfit}
-                />
-              </div>
-            )}
-
-            {/* Execution Details */}
-            <div className="details-section">
-              <h3>{p.executionDetails}</h3>
-              <div className="details-grid">
-                 <span className="grid-label">{p.account}</span>
-                 <span className="grid-value">
-                    <select
-                      className="grid-input"
-                      value={activeTrade.accountId || 'dev-account'}
-                      onChange={e => updateActiveTradeField('accountId', e.target.value)}
-                      style={inputStyle}
-                    >
-                      {accounts.map((acc: any) => (
-                        <option key={acc.id} value={acc.id} style={{ backgroundColor: '#1e222b', color: '#fff' }}>
-                          {acc.broker_name || 'MT5'} ({acc.account_number || acc.id})
-                        </option>
-                      ))}
-                    </select>
-                  </span>
-
-                 <span className="grid-label">{p.symbol}</span>
-                 <span className="grid-value">
-                   <input
-                     type="text"
-                     className="grid-input"
-                     value={activeTrade.symbol}
-                     onChange={e => updateActiveTradeField('symbol', e.target.value.toUpperCase())}
-                     style={inputStyle}
-                   />
-                 </span>
-
-                 <span className="grid-label">{p.direction}</span>
-                 <span className="grid-value">
-                   <select
-                     className="grid-input"
-                     value={activeTrade.direction}
-                     onChange={e => updateActiveTradeField('direction', e.target.value)}
-                     style={{ ...inputStyle, cursor: 'pointer' }}
-                   >
-                     <option value="BUY" style={{ backgroundColor: '#1e222b', color: '#fff' }}>Buy</option>
-                     <option value="SELL" style={{ backgroundColor: '#1e222b', color: '#fff' }}>Sell</option>
-                   </select>
-                 </span>
-
-                 <span className="grid-label">{p.volume}</span>
-                 <span className="grid-value">
-                   <input
-                     type="number"
-                     step="any"
-                     className="grid-input"
-                     value={activeTrade.lotSize}
-                      onChange={e => updateActiveTradeField('lotSize', parseFloat(normalizeNumericInput(e.target.value)) || 0)}
-                     style={inputStyle}
-                   />
-                 </span>
-
-                 <span className="grid-label">{p.openTime}</span>
-                 <span className="grid-value">
-                   <input
-                     type="datetime-local"
-                     className="grid-input"
-                     value={activeTrade.openTime ? activeTrade.openTime.substring(0, 16) : ''}
-                     onChange={e => updateActiveTradeField('openTime', e.target.value ? new Date(e.target.value).toISOString() : null)}
-                     style={inputStyle}
-                   />
-                 </span>
-
-<span className="grid-label">{p.openSession}</span>
-                  <span className="grid-value">
-                    {(() => {
-                      const sess = getTradingSession(activeTrade.openTime);
-                      return (
-                        <span className={`session-badge ${sess.className}`}>
-                          {sess.emoji} {sess.label}
-                        </span>
-                      );
-                    })()}
-                   </span>
-
-                  <span className="grid-label">{p.openPrice}</span>
-                 <span className="grid-value font-mono direction-ltr">
-                   <input
-                     type="number"
-                     step="any"
-                     className="grid-input"
-                     value={activeTrade.openPrice}
-                      onChange={e => updateActiveTradeField('openPrice', parseFloat(normalizeNumericInput(e.target.value)) || 0)}
-                     style={{ ...inputStyle, fontFamily: "'Courier New', monospace" }}
-                   />
-                 </span>
-
-                 <span className="grid-label">{p.sl}</span>
-                 <span className="grid-value">
-                   <input
-                     type="number"
-                     step="any"
-                     className="grid-input sl-input"
-                     placeholder="--"
-                     value={activeTrade.stopLoss !== null ? activeTrade.stopLoss : ''}
-                      onChange={e => {
-                        const val = e.target.value === '' ? null : parseFloat(normalizeNumericInput(e.target.value));
-                        updateActiveTradeField('stopLoss', val);
-                      }}
-                    />
-                  </span>
-
-                  <span className="grid-label">{p.tp}</span>
-                  <span className="grid-value">
-                    <input
-                      type="number"
-                      step="any"
-                      className="grid-input tp-input"
-                      placeholder="--"
-                      value={activeTrade.takeProfit !== null ? activeTrade.takeProfit : ''}
-                      onChange={e => {
-                        const val = e.target.value === '' ? null : parseFloat(normalizeNumericInput(e.target.value));
-                        updateActiveTradeField('takeProfit', val);
-                      }}
-                   />
-                 </span>
-
-                 <span className="grid-label">{p.closeTime}</span>
-                 <span className="grid-value">
-                   <input
-                     type="datetime-local"
-                     className="grid-input"
-                     value={activeTrade.closeTime ? activeTrade.closeTime.substring(0, 16) : ''}
-                     onChange={e => updateActiveTradeField('closeTime', e.target.value ? new Date(e.target.value).toISOString() : null)}
-                     style={inputStyle}
-                   />
-                 </span>
-
-                 <span className="grid-label">{p.closePrice}</span>
-                 <span className="grid-value font-mono direction-ltr">
-                   <input
-                     type="number"
-                     step="any"
-                     className="grid-input"
-                     value={activeTrade.closePrice !== null ? activeTrade.closePrice : ''}
-                     placeholder="--"
-                      onChange={e => {
-                        const val = e.target.value === '' ? null : parseFloat(normalizeNumericInput(e.target.value));
-                        updateActiveTradeField('closePrice', val);
-                      }}
-                     style={{ ...inputStyle, fontFamily: "'Courier New', monospace" }}
-                   />
-                 </span>
-
-                 <span className="grid-label">{p.profitUsd}</span>
-                 <span className="grid-value">
-                   <input
-                     type="number"
-                     step="any"
-                     className="grid-input"
-                     value={activeTrade.profitUsd}
-                      onChange={e => updateActiveTradeField('profitUsd', parseFloat(normalizeNumericInput(e.target.value)) || 0)}
-                     style={inputStyle}
-                   />
-                 </span>
-
-                 <span className="grid-label">{p.commission}</span>
-                 <span className="grid-value">
-                   <input
-                     type="number"
-                     step="any"
-                     className="grid-input"
-                     value={activeTrade.commission}
-                      onChange={e => updateActiveTradeField('commission', parseFloat(normalizeNumericInput(e.target.value)) || 0)}
-                     style={inputStyle}
-                   />
-                 </span>
-
-                 <span className="grid-label">{p.swap}</span>
-                 <span className="grid-value">
-                   <input
-                     type="number"
-                     step="any"
-                     className="grid-input"
-                     value={activeTrade.swap}
-                      onChange={e => updateActiveTradeField('swap', parseFloat(normalizeNumericInput(e.target.value)) || 0)}
-                     style={inputStyle}
-                   />
-                  </span>
-                </div>
-
-                {/* Read-only metadata badges */}
-                <div style={{ display: 'flex', gap: '8px', marginTop: '12px', flexWrap: 'wrap' }}>
-                  {activeTrade.importSource && (
-                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '4px 10px', borderRadius: '6px', fontSize: '12px', fontWeight: 500, background: 'rgba(16, 185, 129, 0.1)', color: '#10b981', border: '1px solid rgba(16, 185, 129, 0.2)' }}>
-                      <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>input</span>
-                      {t(`trades.importSource.${activeTrade.importSource}`)}
-                    </span>
-                  )}
-                  {activeTrade.accountType && (
-                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '4px 10px', borderRadius: '6px', fontSize: '12px', fontWeight: 500, background: activeTrade.accountType === 'DEMO' ? 'rgba(255, 180, 171, 0.1)' : 'rgba(16, 185, 129, 0.1)', color: activeTrade.accountType === 'DEMO' ? '#ffb4ab' : '#10b981', border: `1px solid ${activeTrade.accountType === 'DEMO' ? 'rgba(255, 180, 171, 0.2)' : 'rgba(16, 185, 129, 0.2)'}` }}>
-                      <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>{activeTrade.accountType === 'DEMO' ? 'science' : 'account_balance'}</span>
-                      {t(`trades.accountType.${activeTrade.accountType}`)}
-                    </span>
-                  )}
-                </div>
-
-                {!activeTrade.closeTime ? (
-                  <button
-                    type="button"
-                    className="btn btn-primary"
-                    style={{ marginTop: '12px', width: '100%' }}
-                    onClick={() => {
-                      const now = new Date().toISOString();
-                      if (activeTrade.closePrice === null) {
-                        updateActiveTradeField('closePrice', activeTrade.openPrice);
-                      }
-                      updateActiveTradeField('closeTime', now);
-                    }}
-                  >
-                    <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>check_circle</span>
-                    {p.closeTrade}
-                  </button>
-               ) : (
-                  <button
-                    type="button"
-                    className="btn btn-secondary"
-                    style={{ marginTop: '12px', width: '100%' }}
-                    onClick={() => {
-                      updateActiveTradeField('closeTime', null);
-                      updateActiveTradeField('closePrice', null);
-                    }}
-                  >
-                    <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>undo</span>
-                    {p.reopenTrade}
-                  </button>
-               )}
-              </div>
-            </>
-         ) : (
-          <>
+            {/* Review and Inspect buttons */}
+            <div style={{ marginTop: '24px', display: 'flex', gap: '8px' }}>
+              <button
+                type="button"
+                className="btn btn-primary"
+                style={{ flex: 1, padding: '12px', fontSize: '14px', background: 'rgba(97, 249, 177, 0.1)', color: '#61f9b1', border: '1px solid rgba(97, 249, 177, 0.3)' }}
+                onClick={() => {
+                  if (onOpenReview) onOpenReview();
+                }}
+              >
+                <span className="material-symbols-outlined" style={{ fontSize: '18px', marginRight: '8px' }}>open_in_new</span>
+                {isEn ? 'Full Review' : 'بررسی کامل'}
+              </button>
+              <button
+                type="button"
+                className="btn"
+                style={{ flex: 1, padding: '12px', fontSize: '14px', background: 'rgba(59, 130, 246, 0.1)', color: '#3b82f6', border: '1px solid rgba(59, 130, 246, 0.3)' }}
+                onClick={() => {
+                  if (onOpenInspect) onOpenInspect();
+                }}
+              >
+                <span className="material-symbols-outlined" style={{ fontSize: '18px', marginRight: '8px' }}>data_object</span>
+                {isEn ? 'Inspect Metadata' : 'داده‌های خام'}
+              </button>
+            </div>
+            
+            <hr style={{ borderColor: 'rgba(255,255,255,0.05)', margin: '24px 0' }} />
             {/* Concepts & Strategy */}
             <div className="form-group">
               <label style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
@@ -839,57 +600,7 @@ const aSelected = activeTrade.annotation?.emotion === a.value ? 1 : 0;
               )}
             </div>
 
-            {/* Notes Area */}
-            <div className="form-group" style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-              <label>{p.journalNotes}</label>
-              <textarea
-                placeholder={p.notesPlaceholder}
-                value={activeTrade.annotation?.notes || ''}
-                onChange={e => updateActiveTradeField('notes', e.target.value)}
-              />
-            </div>
-
-            {/* Screenshots Group */}
-            <div className="form-group screenshots-group">
-              <label>{p.screenshots}</label>
-              
-              <div className="screenshots-grid">
-                {activeTrade.annotation?.screenshots && activeTrade.annotation.screenshots.map((url, idx) => {
-                  const fullUrl = url.startsWith('http') ? url : `${process.env.NEXT_PUBLIC_API_BASE_URL || process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:3000'}${url}`;
-                  return (
-                    <div key={idx} className="screenshot-card">
-                      <img src={fullUrl} alt={`screenshot-${idx}`} onClick={() => setLightboxUrl(fullUrl)} />
-                      <button type="button" className="btn-delete-screenshot" onClick={(e) => { e.stopPropagation(); handleDeleteScreenshot(url); }} title="حذف تصویر">
-                        <span className="material-symbols-outlined">delete</span>
-                      </button>
-                    </div>
-                  );
-                })}
-
-                {/* Styled Upload Dropzone Card */}
-                <label className="upload-dropzone">
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleScreenshotUpload}
-                    style={{ display: 'none' }}
-                  />
-                  {isUploading ? (
-                    <div className="upload-loader">
-                      <span className="material-symbols-outlined spinner-icon">sync</span>
-                      <p>{p.uploading}</p>
-                    </div>
-                  ) : (
-                    <div className="upload-prompt">
-                      <span className="material-symbols-outlined upload-icon">add_photo_alternate</span>
-                      <p>{p.addImage}</p>
-                    </div>
-                  )}
-                </label>
-              </div>
-            </div>
           </>
-        )}
       </div>
 
       {/* Panel Footer Actions */}
