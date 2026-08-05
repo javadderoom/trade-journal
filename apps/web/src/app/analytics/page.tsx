@@ -229,16 +229,15 @@ export default function JournalPage() {
       if (isWin) symbolsGroup[mainPair].wins += 1;
 
       // C. Strategy / Setups
-      const setups = t.setups || [];
-      setups.forEach((s: any) => {
-        const name = s.concept?.name || 'Unknown';
-        if (!strategiesGroup[name]) {
-          strategiesGroup[name] = { pnl: 0, wins: 0, total: 0 };
+      const setupName = t.setup?.concept?.name;
+      if (setupName) {
+        if (!strategiesGroup[setupName]) {
+          strategiesGroup[setupName] = { pnl: 0, wins: 0, total: 0 };
         }
-        strategiesGroup[name].pnl += net;
-        strategiesGroup[name].total += 1;
-        if (isWin) strategiesGroup[name].wins += 1;
-      });
+        strategiesGroup[setupName].pnl += net;
+        strategiesGroup[setupName].total += 1;
+        if (isWin) strategiesGroup[setupName].wins += 1;
+      }
 
       // D. Day of Week
       const dayIdx = new Date(t.openTime).getDay();

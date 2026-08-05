@@ -25,7 +25,7 @@ type PrismaTrade = {
     emotion?: string;
     notes?: string;
   } | null;
-  setups?: { concept: { id: string; name: string } }[];
+  setup?: { concept: { id: string; name: string } } | null;
 };
 
 /**
@@ -175,36 +175,34 @@ async function checkWeakStrategy(
   prisma: PrismaClient,
   costUsd: number
 ): Promise<SuggestedMistake | null> {
-  const setups = trade.setups || [];
-  if (setups.length === 0) return null;
+  const setup = trade.setup;
+  if (!setup) return null;
 
-  for (const s of setups) {
-    const conceptId = s.concept.id;
-    const tagTrades = await prisma.trade.findMany({
-      where: {
-        user_id: trade.user_id,
-        id: { not: trade.id },
-        setups: { some: { concept_id: conceptId } },
-        close_time: { not: null },
-      },
-      orderBy: { close_time: 'desc' },
-      take: 50,
-      select: { profit_usd: true },
-    });
+  const conceptId = setup.concept.id;
+  const tagTrades = await prisma.trade.findMany({
+    where: {
+      user_id: trade.user_id,
+      id: { not: trade.id },
+      setup: { concept_id: conceptId },
+      close_time: { not: null },
+    },
+    orderBy: { close_time: 'desc' },
+    take: 50,
+    select: { profit_usd: true },
+  });
 
-    if (tagTrades.length < 10) continue;
+  if (tagTrades.length < 10) return null;
 
-    const wins = tagTrades.filter(t => t.profit_usd > 0).length;
-    const winRate = wins / tagTrades.length;
+  const wins = tagTrades.filter(t => t.profit_usd > 0).length;
+  const winRate = wins / tagTrades.length;
 
-    if (winRate < 0.35) {
-      return {
-        ruleKey: 'WEAK_STRATEGY',
-        label: 'استراتژی ضعیف تکرار شده',
-        reason: `در ۵۰ معامله اخیر با ستاپ '${s.concept.name}'، وین‌ریت شما تنها ${(winRate * 100).toFixed(0)}٪ بوده است.`,
-        costUsd,
-      };
-    }
+  if (winRate < 0.35) {
+    return {
+      ruleKey: 'WEAK_STRATEGY',
+      label: 'استراتژی ضعیف',
+      reason: `ستاپ «${setup.concept.name}» اخیراً وین‌ریت ضعیفی (${Math.round(winRate * 100)}%) در ${tagTrades.length} معامله اخیر داشته است.`,
+      costUsd,
+    };
   }
 
   return null;

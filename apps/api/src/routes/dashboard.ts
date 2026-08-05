@@ -226,9 +226,9 @@ function generateEdgeInsight(recentTrades: any[], locale = 'fa'): EdgeInsight {
     sessions[session].pnl += net;
     if (isWin) sessions[session].wins++;
 
-    // Setups
-    const setups = Array.isArray(t.setups) ? t.setups.map((s: any) => s.concept?.name).filter(Boolean) : [];
-    for (const setup of setups) {
+    // Setup
+    const setup = (t as any).setup?.concept?.name;
+    if (setup) {
       if (!strategies[setup]) strategies[setup] = { label: setup, wins: 0, total: 0, pnl: 0 };
       strategies[setup].total++;
       strategies[setup].pnl += net;
@@ -418,6 +418,8 @@ const [allTrades, totalTrades] = await Promise.all([
               select: {
                 htf_bias: true,
                 session: true,
+                analysis_timeframe: true,
+                entry_timeframe: true,
                 thesis: true,
                 expectation: true,
                 lesson: true,
@@ -426,7 +428,7 @@ const [allTrades, totalTrades] = await Promise.all([
                 notes: true,
               },
             },
-            setups: { select: { concept: true } },
+            setup: { select: { concept: true } },
             triggers: { select: { concept: true } },
             confluences: { select: { concept: true } },
             plan: true,

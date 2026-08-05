@@ -372,8 +372,8 @@ router.put('/:id', authenticate, async (req: AuthRequest, res: Response) => {
       notes, emotion, stopLoss, takeProfit, accountId,
       closeTime, closePrice, profitUsd, commission, swap,
       symbol, direction, lotSize, openPrice, openTime,
-      htfBias, session, thesis, expectation, lesson, conviction,
-      setupIds, triggerIds, confluenceIds, plan
+      htfBias, session, analysisTimeframe, entryTimeframe, thesis, expectation, lesson, conviction,
+      setupId, triggerIds, confluenceIds, plan
     } = parsed.data;
 
     const existing = await prisma.trade.findFirst({
@@ -494,6 +494,8 @@ const updated = await prisma.$transaction(async (tx) => {
        if (emotion !== undefined) annotationData.emotion = emotion;
        if (htfBias !== undefined) annotationData.htf_bias = htfBias;
        if (session !== undefined) annotationData.session = session;
+       if (analysisTimeframe !== undefined) annotationData.analysis_timeframe = analysisTimeframe;
+       if (entryTimeframe !== undefined) annotationData.entry_timeframe = entryTimeframe;
        if (thesis !== undefined) annotationData.thesis = thesis;
        if (expectation !== undefined) annotationData.expectation = expectation;
        if (lesson !== undefined) annotationData.lesson = lesson;
@@ -507,11 +509,14 @@ const updated = await prisma.$transaction(async (tx) => {
          });
        }
 
-       if (setupIds !== undefined) {
-         await tx.tradeSetup.deleteMany({ where: { trade_id: id } });
-         if (setupIds && setupIds.length > 0) {
-           await tx.tradeSetup.createMany({
-             data: setupIds.map(concept_id => ({ trade_id: id, concept_id }))
+       if (setupId !== undefined) {
+         if (setupId === null) {
+           await tx.tradeSetup.deleteMany({ where: { trade_id: id } });
+         } else {
+           await tx.tradeSetup.upsert({
+             where: { trade_id: id },
+             create: { trade_id: id, concept_id: setupId },
+             update: { concept_id: setupId }
            });
          }
        }

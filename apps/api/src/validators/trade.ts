@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { Direction, TradingSession } from '@prisma/client';
+import { Direction, TradingSession, Timeframe } from '@prisma/client';
 
 const MAX_STRING_LENGTH = 255;
 const MAX_NOTES_LENGTH = 5000;
@@ -34,6 +34,8 @@ export const createTradeSchema = z.object({
   // New structured rationale
   htfBias: z.nativeEnum(Direction).nullable().optional(),
   session: z.nativeEnum(TradingSession).nullable().optional(),
+  analysisTimeframe: z.nativeEnum(Timeframe).nullable().optional(),
+  entryTimeframe: z.nativeEnum(Timeframe).nullable().optional(),
   thesis: z.string().max(MAX_NOTES_LENGTH).nullable().optional(),
   expectation: z.string().max(MAX_NOTES_LENGTH).nullable().optional(),
   lesson: z.string().max(MAX_NOTES_LENGTH).nullable().optional(),
@@ -41,7 +43,7 @@ export const createTradeSchema = z.object({
   notes: z.string().max(MAX_NOTES_LENGTH).nullable().optional(),
   emotion: z.string().max(MAX_EMOTION_LENGTH).nullable().optional(),
   
-  setupIds: z.array(z.string()).optional(),
+  setupId: z.string().nullable().optional(),
   triggerIds: z.array(z.string()).optional(),
   confluenceIds: z.array(z.string()).optional(),
   plan: tradePlanSchema.optional(),
@@ -65,6 +67,8 @@ export const updateTradeSchema = z.object({
   // New structured rationale
   htfBias: z.nativeEnum(Direction).nullable().optional(),
   session: z.nativeEnum(TradingSession).nullable().optional(),
+  analysisTimeframe: z.nativeEnum(Timeframe).nullable().optional(),
+  entryTimeframe: z.nativeEnum(Timeframe).nullable().optional(),
   thesis: z.string().max(MAX_NOTES_LENGTH).nullable().optional(),
   expectation: z.string().max(MAX_NOTES_LENGTH).nullable().optional(),
   lesson: z.string().max(MAX_NOTES_LENGTH).nullable().optional(),
@@ -72,7 +76,7 @@ export const updateTradeSchema = z.object({
   notes: z.string().max(MAX_NOTES_LENGTH).nullable().optional(),
   emotion: z.string().max(MAX_EMOTION_LENGTH).nullable().optional(),
   
-  setupIds: z.array(z.string()).nullable().optional(),
+  setupId: z.string().nullable().optional(),
   triggerIds: z.array(z.string()).nullable().optional(),
   confluenceIds: z.array(z.string()).nullable().optional(),
   plan: tradePlanSchema.nullable().optional(),

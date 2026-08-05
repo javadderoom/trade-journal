@@ -223,21 +223,19 @@ export default function MobileCardsList({
 
               {/* Concepts & Emotions Row */}
               {(() => {
-                const setups = trade.setups?.map((s: any) => s.concept) || [];
-                return (trade.annotation?.emotion || (setups.length > 0)) && (
+                const setup = trade.setup?.concept;
+                return (trade.annotation?.emotion || setup) && (
                   <div className="card-tags-row">
                     {trade.annotation?.emotion && (
                       <span className={`emotion-mini-badge emotion-${trade.annotation?.emotion.toLowerCase()}`} title={`${t('trades.emotion')}: ${getEmotionLabel(trade.annotation?.emotion, allEmotions)}`}>
                         {getEmotionEmoji(trade.annotation?.emotion, allEmotions)} {getEmotionLabel(trade.annotation?.emotion, allEmotions)}
                       </span>
                     )}
-                    {setups.map((setup: any) => {
-                      return (
-                        <span key={setup.id} className="tag-mini-pill important" style={{ borderLeft: `2px solid ${setup.color || '#3b82f6'}` }}>
-                          {setup.name}
-                        </span>
-                      );
-                    })}
+                    {setup && (
+                      <span key={setup.id} className="tag-mini-pill important" style={{ borderLeft: `2px solid ${setup.color || '#3b82f6'}` }}>
+                        {setup.name}
+                      </span>
+                    )}
                   </div>
                 );
               })()}

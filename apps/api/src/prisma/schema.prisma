@@ -119,7 +119,7 @@ model Trade {
   executions    Execution[]
 
   annotation    TradeAnnotation?
-  setups        TradeSetup[]
+  setup         TradeSetup?
   triggers      TradeTrigger[]
   confluences   TradeConfluence[]
   plan          TradePlan?
@@ -141,6 +141,8 @@ model TradeAnnotation {
   
   htf_bias          Direction?
   session           TradingSession?
+  analysis_timeframe Timeframe?
+  entry_timeframe    Timeframe?
   
   thesis            String?
   expectation       String?
@@ -160,6 +162,18 @@ enum TradingSession {
   LONDON
   NEW_YORK
   OVERLAP
+}
+
+enum Timeframe {
+  M1
+  M5
+  M15
+  M30
+  H1
+  H4
+  D1
+  W1
+  MN1
 }
 
 model Execution {
@@ -731,7 +745,7 @@ enum ConceptRole {
 }
 
 model TradeSetup {
-  trade_id   String @unique
+  trade_id   String @id
   trade      Trade  @relation(fields: [trade_id], references: [id], onDelete: Cascade)
   concept_id String
   concept    TradingConcept @relation(fields: [concept_id], references: [id])

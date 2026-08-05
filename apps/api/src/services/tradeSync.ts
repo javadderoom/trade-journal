@@ -314,7 +314,7 @@ export type TradeListRow = {
     notes: string | null;
     screenshots: string[];
   } | null;
-  setups?: { concept: { id: string; name: string; color: string | null; icon: string | null } }[];
+  setup?: { concept: { id: string; name: string; color: string | null; icon: string | null } } | null;
   triggers?: { concept: { id: string; name: string; color: string | null; icon: string | null } }[];
   confluences?: { concept: { id: string; name: string; color: string | null; icon: string | null } }[];
   plan?: {
@@ -419,7 +419,7 @@ export async function getTradesForAccount(params: {
           screenshots: true,
         },
       },
-      setups: { select: { concept: { select: { id: true, name: true, color: true, icon: true } } } },
+      setup: { select: { concept: { select: { id: true, name: true, color: true, icon: true } } } },
       triggers: { select: { concept: { select: { id: true, name: true, color: true, icon: true } } } },
       confluences: { select: { concept: { select: { id: true, name: true, color: true, icon: true } } } },
       plan: {
@@ -465,7 +465,7 @@ export async function getTradesForAccount(params: {
       notes: t.annotation.notes,
       screenshots: t.annotation.screenshots,
     } : null,
-    setups: t.setups,
+    setup: (t as any).setup || null,
     triggers: t.triggers,
     confluences: t.confluences,
     plan: t.plan ? {

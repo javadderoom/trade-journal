@@ -112,8 +112,8 @@ export default function DesktopTable({
               const initialBalance = account?.initial_balance || 0;
               const pnlPercent = initialBalance > 0 ? (netPnl / initialBalance) * 100 : null;
 
-              // Render setups instead of tags
-              const setups = trade.setups?.map((s: any) => s.concept) || [];
+              // Render setup instead of tags
+              const setup = trade.setup?.concept;
 
 
               return (
@@ -154,23 +154,16 @@ export default function DesktopTable({
                   <td className="col-symbol">
                     <div className="symbol-cell-content">
                       <span className="symbol-name">{trade.symbol}</span>
-                      {(trade.annotation?.emotion || setups.length > 0) && (
+                      {(trade.annotation?.emotion || setup) && (
                         <div className="symbol-metadata">
                           {trade.annotation?.emotion && (
                             <span className={`emotion-mini-badge emotion-${trade.annotation?.emotion.toLowerCase()}`} title={`${t('trades.emotion')}: ${getEmotionLabel(trade.annotation?.emotion, allEmotions)}`}>
                               {getEmotionEmoji(trade.annotation?.emotion, allEmotions)} {getEmotionLabel(trade.annotation?.emotion, allEmotions)}
                             </span>
                           )}
-                          {setups.slice(0, 2).map((setup: any) => {
-                            return (
-                              <span key={setup.id} className="tag-mini-pill important" style={{ borderLeft: `2px solid ${setup.color || '#3b82f6'}` }}>
-                                {setup.name}
-                              </span>
-                            );
-                          })}
-                          {setups.length > 2 && (
-                            <span className="tag-mini-more" title={setups.slice(2).map((s:any) => s.name).join(', ')}>
-                              +{toPersianDigits(setups.length - 2)}
+                          {setup && (
+                            <span key={setup.id} className="tag-mini-pill important" style={{ borderLeft: `2px solid ${setup.color || '#3b82f6'}` }}>
+                              {setup.name}
                             </span>
                           )}
                         </div>

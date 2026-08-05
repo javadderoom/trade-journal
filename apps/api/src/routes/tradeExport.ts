@@ -125,10 +125,8 @@ router.get('/export', authenticate, async (req: AuthRequest, res: Response) => {
         } else if (status === 'CLOSED') {
           whereClause.close_time = { not: null };
         } else if (status === 'MISSED') {
-          whereClause.setups = {
-            some: {
-              concept: { name: { in: ['فرصت از دست رفته', 'Missed', 'ignore', 'Ignore', 'نادیده گرفتن'] } }
-            }
+          whereClause.setup = {
+            concept: { name: { in: ['فرصت از دست رفته', 'Missed', 'ignore', 'Ignore', 'نادیده گرفتن'] } }
           };
         }
       }
@@ -164,7 +162,7 @@ const MAX_EXPORT_ROWS = 50_000;
            select: { broker_name: true, account_number: true },
          },
          annotation: true,
-         setups: { include: { concept: true } },
+         setup: { include: { concept: true } },
          triggers: { include: { concept: true } },
          confluences: { include: { concept: true } },
        },
@@ -204,7 +202,7 @@ const MAX_EXPORT_ROWS = 50_000;
           t.r_multiple,
           t.profit_usd,
           sanitizeCsvCell(t.annotation?.emotion || ''),
-          `"${((t as any).setups || []).map((s: any) => s.concept?.name).filter(Boolean).map(sanitizeCsvCell).join(' | ')}"`,
+          `"${(t as any).setup?.concept?.name ? sanitizeCsvCell((t as any).setup.concept.name) : ''}"`,
           `"${(t.annotation?.notes || '').replace(/"/g, '""').replace(/\n/g, ' ')}"`,
         ].join(',');
         res.write(rowData + '\n');
@@ -256,7 +254,7 @@ const MAX_EXPORT_ROWS = 50_000;
           rMultiple: t.r_multiple,
           profitUsd: t.profit_usd,
           emotion: t.annotation?.emotion || '',
-          tags: ((t as any).setups || []).map((s: any) => s.concept?.name).filter(Boolean).join(', '),
+          tags: (t as any).setup?.concept?.name || '',
           notes: t.annotation?.notes || '',
         });
 

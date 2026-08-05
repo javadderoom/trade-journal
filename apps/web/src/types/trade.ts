@@ -1,3 +1,5 @@
+export type Timeframe = 'M1' | 'M5' | 'M15' | 'M30' | 'H1' | 'H4' | 'D1' | 'W1' | 'MN1';
+
 export interface Trade {
   id: string;
   accountId?: string;
@@ -19,6 +21,8 @@ export interface Trade {
   annotation?: {
     htfBias?: 'BUY' | 'SELL' | null;
     session?: 'ASIA' | 'LONDON' | 'NEW_YORK' | 'OVERLAP' | null;
+    analysisTimeframe?: Timeframe | null;
+    entryTimeframe?: Timeframe | null;
     thesis?: string | null;
     expectation?: string | null;
     lesson?: string | null;
@@ -27,7 +31,7 @@ export interface Trade {
     notes: string | null;
     screenshots: string[];
   } | null;
-  setups?: { concept: { id: string; name: string; color: string | null; icon: string | null } }[];
+  setup?: { concept: { id: string; name: string; color: string | null; icon: string | null } } | null;
   triggers?: { concept: { id: string; name: string; color: string | null; icon: string | null } }[];
   confluences?: { concept: { id: string; name: string; color: string | null; icon: string | null } }[];
   plan?: {

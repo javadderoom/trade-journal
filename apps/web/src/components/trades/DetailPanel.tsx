@@ -27,7 +27,7 @@ interface DetailPanelProps {
 
   isUploading: boolean;
   setLightboxUrl: (url: string | null) => void;
-  updateActiveTradeField: (key: keyof Trade | 'emotion' | 'notes' | 'screenshots' | 'htfBias' | 'session' | 'thesis' | 'expectation' | 'lesson' | 'conviction' | 'setups' | 'triggers' | 'confluences' | 'plan', value: any) => void;
+  updateActiveTradeField: (key: keyof Trade | 'emotion' | 'notes' | 'screenshots' | 'htfBias' | 'session' | 'analysisTimeframe' | 'entryTimeframe' | 'thesis' | 'expectation' | 'lesson' | 'conviction' | 'setup' | 'triggers' | 'confluences' | 'plan', value: any) => void;
   handleSaveDetails: (e: React.FormEvent) => void | Promise<void>;
   handleDeleteClick: () => void;
   handleScreenshotUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
@@ -551,7 +551,7 @@ if (activeTrade.annotation?.emotion === value) {
                 <div style={{ fontSize: '12px', color: '#8898aa', marginBottom: '6px' }}>{isEn ? 'Setups:' : 'ستاپ‌ها:'}</div>
                 <div className="tags-container" style={{ gap: '6px' }}>
                   {tradingConcepts.filter(c => c.allowed_roles.includes('SETUP')).map(concept => {
-                    const isSelected = activeTrade.setups?.some(s => s.concept.id === concept.id);
+                    const isSelected = activeTrade.setup?.concept.id === concept.id;
                     return (
                       <span
                         key={concept.id}
@@ -564,11 +564,10 @@ if (activeTrade.annotation?.emotion === value) {
                           gap: '4px'
                         }}
                         onClick={() => {
-                          const current = activeTrade.setups || [];
                           if (isSelected) {
-                            updateActiveTradeField('setups', current.filter(s => s.concept.id !== concept.id));
+                            updateActiveTradeField('setup', null);
                           } else {
-                            updateActiveTradeField('setups', [...current, { concept: { id: concept.id, name: concept.name, color: concept.color, icon: concept.icon } }]);
+                            updateActiveTradeField('setup', { concept: { id: concept.id, name: concept.name, color: concept.color, icon: concept.icon } });
                           }
                         }}
                       >

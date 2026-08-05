@@ -482,9 +482,9 @@ export default function TradesTable({
     }
   };
 
-  const ANNOTATION_FIELDS = new Set(['emotion', 'notes', 'screenshots', 'htfBias', 'session', 'thesis', 'expectation', 'lesson', 'conviction']);
+  const ANNOTATION_FIELDS = new Set(['emotion', 'notes', 'screenshots', 'htfBias', 'session', 'analysisTimeframe', 'entryTimeframe', 'thesis', 'expectation', 'lesson', 'conviction']);
 
-  const updateActiveTradeField = (key: keyof Trade | 'emotion' | 'notes' | 'screenshots' | 'htfBias' | 'session' | 'thesis' | 'expectation' | 'lesson' | 'conviction' | 'setups' | 'triggers' | 'confluences' | 'plan', value: any) => {
+  const updateActiveTradeField = (key: keyof Trade | 'emotion' | 'notes' | 'screenshots' | 'htfBias' | 'session' | 'analysisTimeframe' | 'entryTimeframe' | 'thesis' | 'expectation' | 'lesson' | 'conviction' | 'setup' | 'triggers' | 'confluences' | 'plan', value: any) => {
     if (!activeTradeId) return;
     setTrades(prev =>
       prev.map(t => {
