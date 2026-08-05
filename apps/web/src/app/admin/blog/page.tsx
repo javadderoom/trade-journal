@@ -25,6 +25,7 @@ export default function AdminBlogPage() {
 
   const [activeTab, setActiveTab] = useState<'posts' | 'categories' | 'tags' | 'comments'>('posts');
   const [activeLocale, setActiveLocale] = useState<'fa' | 'en'>('fa');
+  const [aiModel, setAiModel] = useState<string>('gemini-3.5-flash');
   
   // States
   const [posts, setPosts] = useState<any[]>([]);
@@ -60,7 +61,7 @@ export default function AdminBlogPage() {
 
   const handleTranslatePost = async (id: string) => {
     try {
-      const res = await api.post(`/api/admin/blog/posts/${id}/translate`);
+      const res = await api.post(`/api/admin/blog/posts/${id}/translate`, { modelId: aiModel });
       notify.success('پیش‌نویس ترجمه ایجاد شد!');
       setEditingPost(res.data);
       setShowEditor(true);
@@ -182,7 +183,7 @@ export default function AdminBlogPage() {
   const handleGenerateAIPost = async () => {
     if (!await notify.confirm({ title: 'تولید مقاله با هوش مصنوعی', message: 'آیا مطمئن هستید که می‌خواهید پروسه تولید مقاله با هوش مصنوعی را به صورت دستی آغاز کنید؟ این کار ممکن است چند دقیقه طول بکشد.' })) return;
     try {
-      await api.post('/api/admin/blog/posts/generate-ai');
+      await api.post('/api/admin/blog/posts/generate-ai', { modelId: aiModel });
       notify.success('پروسه تولید مقاله در پس‌زمینه آغاز شد.');
       setShowAILogModal(true);
     } catch (err) {
@@ -326,6 +327,15 @@ export default function AdminBlogPage() {
           <div className="card-header-actions">
             <h3>لیست مقالات</h3>
             <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+              <Select
+                value={aiModel}
+                onChange={(val) => setAiModel(val as string)}
+                options={[
+                  { value: 'gemini-3.5-flash', label: 'Gemini 3.5 Flash' },
+                  { value: 'gemini-3.1-pro', label: 'Gemini 3.1 Pro' },
+                  { value: 'gemini-3.5-pro', label: 'Gemini 3.5 Pro' }
+                ]}
+              />
               <Select
                 value={activeLocale}
                 onChange={(val) => setActiveLocale(val as 'fa' | 'en')}

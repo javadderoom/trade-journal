@@ -2,7 +2,7 @@ import { getGeminiModel } from '../lib/gemini';
 import { prisma } from './tradeSync';
 import { aiLogger } from './aiLogger';
 
-export async function generateTrendingTopic(): Promise<string> {
+export async function generateTrendingTopic(modelId: string = 'gemini-3.5-flash'): Promise<string> {
   // Fetch recent posts to avoid duplication
   const recentPosts = await prisma.blogPost.findMany({
     where: { locale: 'en' },
@@ -29,7 +29,7 @@ Return ONLY a raw JSON object (without markdown wrappers like \`\`\`json) with t
 }
 `;
 
-  const model = getGeminiModel('gemini-3.5-flash');
+  const model = getGeminiModel(modelId);
   const result = await model.generateContent(prompt);
   let text = (await result.response).text();
   text = text.replace(/```json/g, '').replace(/```/g, '').trim();
@@ -40,7 +40,7 @@ Return ONLY a raw JSON object (without markdown wrappers like \`\`\`json) with t
   return parsed.topic;
 }
 
-export async function runDailyAIBlogPipeline() {
+export async function runDailyAIBlogPipeline(modelId: string = 'gemini-3.5-flash') {
   if (aiLogger.isRunning) {
     aiLogger.log('[Cron] AI Pipeline is already running, skipped.');
     return;
@@ -83,11 +83,11 @@ export async function runDailyAIBlogPipeline() {
     } else {
       // 3. Discover Topic
       aiLogger.log('[Cron] AI Discovery Phase...');
-      const topic = await generateTrendingTopic();
+      const topic = await generateTrendingTopic(modelId);
 
       // 4. Generate English Article (with Review Loop)
       aiLogger.log(`[Cron] AI Generation Phase for topic: ${topic}...`);
-      post = await generateBlogArticle(topic, authorId);
+      post = await generateBlogArticle(topic, authorId, modelId);
       if (!post) throw new Error('Generation returned null');
       aiLogger.log(`[Cron] English Pipeline Success! Draft saved with ID: ${post.id}`);
     }
@@ -96,7 +96,7 @@ export async function runDailyAIBlogPipeline() {
 
     // 5. Translate to Farsi
     aiLogger.log(`[Cron] AI Translation Phase...`);
-    const farsiPost = await translateBlogArticle(post.id, 'fa');
+    const farsiPost = await translateBlogArticle(post.id, 'fa', modelId);
     aiLogger.log(`[Cron] Farsi Pipeline Success! Draft saved with ID: ${farsiPost.id}`);
 
   } catch (error) {

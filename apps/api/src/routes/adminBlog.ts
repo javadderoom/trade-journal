@@ -174,9 +174,10 @@ router.post('/upload-image', coverUpload.single('image'), async (req: AuthReques
 
 router.post('/posts/generate-ai', async (req: AuthRequest, res: Response) => {
   try {
+    const { modelId } = req.body;
     // Run asynchronously to not block the request, or we can await it.
     // Since it takes time, let's run it async and return immediately.
-    runDailyAIBlogPipeline().catch(console.error);
+    runDailyAIBlogPipeline(modelId).catch(console.error);
     res.json({ message: 'AI Blog generation started in the background.' });
   } catch (error) {
     res.status(500).json({ error: 'Failed to start AI generation' });
@@ -185,11 +186,11 @@ router.post('/posts/generate-ai', async (req: AuthRequest, res: Response) => {
 
 router.post('/posts/generate-social-copy', async (req: AuthRequest, res: Response) => {
   try {
-    const { title, content, locale } = req.body;
+    const { title, content, locale, modelId } = req.body;
     if (!title || !content) {
       return res.status(400).json({ error: 'Title and content are required' });
     }
-    const socialCopy = await generateSocialCopy(title, content, locale || 'fa');
+    const socialCopy = await generateSocialCopy(title, content, locale || 'fa', modelId);
     res.json({ socialCopy });
   } catch (error) {
     console.error('[AI Blog] Generate social copy error:', error);
@@ -294,6 +295,7 @@ router.post('/posts/:id/share', async (req: AuthRequest, res: Response) => {
 
 router.post('/posts/:id/translate', async (req: AuthRequest, res: Response) => {
   try {
+    const { modelId } = req.body;
     const originalPost = await prisma.blogPost.findUnique({
       where: { id: req.params.id as string }
     });
@@ -303,7 +305,7 @@ router.post('/posts/:id/translate', async (req: AuthRequest, res: Response) => {
     const newLocale = originalPost.locale === 'fa' ? 'en' : 'fa';
     
     // Call the AI translation service
-    const newPost = await translateBlogArticle(originalPost.id, newLocale);
+    const newPost = await translateBlogArticle(originalPost.id, newLocale, modelId);
     
     res.status(201).json(newPost);
   } catch (error) {

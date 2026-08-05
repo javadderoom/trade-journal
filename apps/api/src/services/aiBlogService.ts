@@ -3,7 +3,7 @@ import { prisma } from './tradeSync'; // reusing prisma instance
 import { aiLogger } from './aiLogger';
 
 // Phase 2: SEO Review Agent
-async function reviewArticle(parsedArticle: any, topic: string) {
+async function reviewArticle(parsedArticle: any, topic: string, modelId: string = 'gemini-3.5-flash') {
   const prompt = `
 You are a ruthless SEO Editor and Trading Expert.
 Review this drafted article about "${topic}".
@@ -23,7 +23,7 @@ Return ONLY a raw JSON object (without markdown wrappers like \`\`\`json) with t
 }
 `;
 
-  const model = getGeminiModel('gemini-3.5-flash');
+  const model = getGeminiModel(modelId);
   const result = await model.generateContent(prompt);
   let text = (await result.response).text();
   text = text.replace(/```json/g, '').replace(/```/g, '').trim();
@@ -32,7 +32,7 @@ Return ONLY a raw JSON object (without markdown wrappers like \`\`\`json) with t
 }
 
 // Phase 1 + 2: Generation with Internal Links & Revision Loop
-export async function generateBlogArticle(topic: string, authorId: string) {
+export async function generateBlogArticle(topic: string, authorId: string, modelId: string = 'gemini-3.5-flash') {
   // Phase 2: Internal Linking Engine
   const existingPosts = await prisma.blogPost.findMany({
     where: { status: 'PUBLISHED', locale: 'en' },
@@ -68,7 +68,7 @@ Existing Tags:
 ${existingTags.length > 0 ? existingTags.map(t => `- ${t.name} (slug: ${t.slug})`).join('\n') : 'None'}
 `;
 
-  const model = getGeminiModel('gemini-3.5-flash');
+  const model = getGeminiModel(modelId);
   let currentDraft: any = null;
   let attempts = 0;
   const MAX_ATTEMPTS = 3;
@@ -116,7 +116,7 @@ Return ONLY a raw JSON object (without any markdown formatting like \`\`\`json) 
 
       // Phase 2: Critic Review
       aiLogger.log(`[AI Blog] Reviewing draft...`);
-      const review = await reviewArticle(currentDraft, topic);
+      const review = await reviewArticle(currentDraft, topic, modelId);
       
       aiLogger.log(`[AI Blog] Review Results - SEO: ${review.seo_score}, Quality: ${review.quality_score}`);
       
@@ -234,7 +234,7 @@ Return ONLY a raw JSON object (without any markdown formatting like \`\`\`json) 
 }
 
 // Phase 3 (Bonus): Auto-translate Article
-export async function translateBlogArticle(originalPostId: string, targetLocale: string = 'fa') {
+export async function translateBlogArticle(originalPostId: string, targetLocale: string = 'fa', modelId: string = 'gemini-3.5-flash') {
   const original = await prisma.blogPost.findUnique({
     where: { id: originalPostId },
     include: {
@@ -306,7 +306,7 @@ Return ONLY a raw JSON object (without markdown wrappers like \`\`\`json) with t
 }
 `;
 
-  const model = getGeminiModel('gemini-3.5-flash');
+  const model = getGeminiModel(modelId);
   const result = await model.generateContent(prompt);
   let text = (await result.response).text();
   text = text.replace(/```json/g, '').replace(/```/g, '').trim();
@@ -409,7 +409,7 @@ Return ONLY a raw JSON object (without markdown wrappers like \`\`\`json) with t
   return newPost;
 }
 
-export async function generateSocialCopy(title: string, content: string, locale: string): Promise<string> {
+export async function generateSocialCopy(title: string, content: string, locale: string, modelId: string = 'gemini-3.5-flash'): Promise<string> {
   const isEn = locale === 'en';
   const prompt = `
 You are an expert Social Media Manager for a Trading Journal platform.
@@ -428,7 +428,7 @@ RULES:
 6. Do NOT wrap your response in quotes.
 `;
 
-  const model = getGeminiModel('gemini-3.5-flash');
+  const model = getGeminiModel(modelId);
   const result = await model.generateContent(prompt);
   let text = (await result.response).text();
   return text.trim();
