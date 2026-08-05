@@ -1,0 +1,366 @@
+@import '../../app/variables';
+
+.trade-review-page {
+  padding: 24px;
+  max-width: 1400px;
+  margin: 0 auto;
+  color: $on-surface;
+  background-color: transparent;
+  min-height: 100vh;
+  
+  // Header
+  .review-header-sticky {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background-color: rgba($surface, 0.9);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba($outline, 0.5);
+    padding: 16px 24px;
+    margin: -24px -24px 24px -24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+
+      .btn-back {
+        background: transparent;
+        border: none;
+        color: $on-surface-variant;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        transition: color 0.2s;
+        &:hover { color: $primary; }
+      }
+
+      .symbol-badge {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 20px;
+        font-weight: 700;
+        
+        .direction {
+          font-size: 11px;
+          padding: 2px 6px;
+          border-radius: 4px;
+          font-weight: 800;
+          letter-spacing: 0.5px;
+          &.buy { background: rgba($primary, 0.15); color: $primary; }
+          &.sell { background: rgba($error, 0.15); color: $error; }
+        }
+      }
+
+      .header-stats {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        color: $on-surface-variant;
+        font-size: 14px;
+        border-left: 1px solid rgba($outline, 0.5);
+        padding-left: 16px;
+
+        [dir="rtl"] & {
+          border-left: none;
+          border-right: 1px solid rgba($outline, 0.5);
+          padding-left: 0;
+          padding-right: 16px;
+        }
+
+        .stat-badge {
+          display: flex;
+          align-items: center;
+          gap: 4px;
+          
+          &.win { color: $primary; }
+          &.loss { color: $error; }
+        }
+      }
+    }
+  }
+
+  // Layout Grid
+  .review-grid {
+    display: grid;
+    grid-template-columns: 1fr 360px;
+    gap: 32px;
+    align-items: start;
+    
+    @media (max-width: 1024px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  // Sections
+  .review-section {
+    background: rgba($surface-container, 0.4);
+    border: 1px solid rgba($outline, 0.3);
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 24px;
+
+    .section-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: $on-surface;
+      margin: 0 0 16px 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      
+      .material-symbols-outlined {
+        font-size: 20px;
+        color: $on-surface-variant;
+      }
+    }
+  }
+
+  // Story Timeline
+  .timeline {
+    position: relative;
+    padding-left: 32px;
+    
+    [dir="rtl"] & {
+      padding-left: 0;
+      padding-right: 32px;
+    }
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 15px;
+      width: 2px;
+      background: rgba($outline, 0.3);
+
+      [dir="rtl"] & {
+        left: auto;
+        right: 15px;
+      }
+    }
+
+    .timeline-event {
+      position: relative;
+      margin-bottom: 32px;
+      
+      &:last-child {
+        margin-bottom: 0;
+      }
+
+      .event-dot {
+        position: absolute;
+        left: -32px;
+        top: 0;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: $surface;
+        border: 2px solid rgba($outline, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: $on-surface-variant;
+        z-index: 2;
+
+        [dir="rtl"] & {
+          left: auto;
+          right: -32px;
+        }
+
+        &.active {
+          background: rgba($primary, 0.15);
+          color: $primary;
+          border-color: rgba($primary, 0.3);
+        }
+      }
+
+      .event-content {
+        .event-time {
+          font-size: 12px;
+          color: $on-surface-variant;
+          margin-bottom: 4px;
+          display: block;
+        }
+
+        .event-title {
+          font-size: 14px;
+          font-weight: 600;
+          color: $on-surface;
+          margin-bottom: 8px;
+        }
+        
+        .event-box {
+          background: rgba($surface, 0.5);
+          border: 1px solid rgba($outline, 0.2);
+          border-radius: 8px;
+          padding: 12px;
+          font-size: 14px;
+          color: $on-surface-variant;
+
+          textarea {
+            width: 100%;
+            background: transparent;
+            border: none;
+            color: $on-surface;
+            resize: vertical;
+            outline: none;
+            min-height: 40px;
+            font-family: inherit;
+            
+            &::placeholder {
+              color: rgba($on-surface-variant, 0.5);
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // Scorecard (Execution Review)
+  .scorecard {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    
+    .score-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 12px;
+      border-bottom: 1px dashed rgba($outline, 0.3);
+      
+      &:last-child {
+        border-bottom: none;
+        padding-bottom: 0;
+      }
+
+      .score-label {
+        font-size: 13px;
+        color: $on-surface-variant;
+        flex: 1;
+      }
+
+      .score-toggles {
+        display: flex;
+        background: rgba(0,0,0,0.2);
+        border-radius: 6px;
+        padding: 2px;
+        
+        button {
+          background: transparent;
+          border: none;
+          color: $on-surface-variant;
+          font-size: 12px;
+          padding: 4px 12px;
+          border-radius: 4px;
+          cursor: pointer;
+          font-weight: 600;
+          transition: all 0.2s;
+          
+          &.active-yes {
+            background: rgba($primary, 0.2);
+            color: $primary;
+          }
+          &.active-no {
+            background: rgba($error, 0.2);
+            color: $error;
+          }
+        }
+      }
+    }
+
+    .total-score {
+      margin-top: 16px;
+      text-align: center;
+      font-size: 24px;
+      font-weight: 700;
+      color: $primary;
+      background: rgba($primary, 0.1);
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid rgba($primary, 0.2);
+      
+      .score-subtitle {
+        display: block;
+        font-size: 11px;
+        font-weight: 400;
+        color: rgba($primary, 0.8);
+        margin-top: 2px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+    }
+  }
+
+  // Screenshots Journey
+  .screenshot-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 12px;
+    
+    .screenshot-card {
+      aspect-ratio: 1;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid rgba($outline, 0.3);
+      position: relative;
+      background: rgba(0,0,0,0.2);
+      cursor: pointer;
+      
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      
+      .delete-btn {
+        position: absolute;
+        top: 4px;
+        right: 4px;
+        background: rgba(0,0,0,0.7);
+        border: none;
+        color: #fff;
+        border-radius: 4px;
+        padding: 4px;
+        display: flex;
+        opacity: 0;
+        transition: opacity 0.2s;
+        cursor: pointer;
+        
+        [dir="rtl"] & {
+          right: auto;
+          left: 4px;
+        }
+      }
+      
+      &:hover .delete-btn {
+        opacity: 1;
+      }
+    }
+    
+    .upload-card {
+      border: 1px dashed rgba($outline, 0.5);
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: $on-surface-variant;
+      transition: all 0.2s;
+      
+      &:hover {
+        border-color: $primary;
+        color: $primary;
+        background: rgba($primary, 0.05);
+      }
+    }
+  }
+}

@@ -431,12 +431,15 @@ export async function getTradesForAccount(params: {
           target_zone: true,
           expected_hold_time: true,
           plan_followed: true,
+          entry_timing_correct: true,
+          emotions_affected: true,
+          managed_according_to_rules: true,
         }
       }
     },
   });
 
-  return trades.map(t => ({
+  return trades.map((t: any) => ({
     id: t.id,
     accountId: t.account_id,
     ticket: t.ticket,
@@ -476,6 +479,9 @@ export async function getTradesForAccount(params: {
       targetZone: t.plan.target_zone,
       expectedHoldTime: t.plan.expected_hold_time,
       planFollowed: t.plan.plan_followed,
+      entryTimingCorrect: t.plan.entry_timing_correct,
+      emotionsAffected: t.plan.emotions_affected,
+      managedAccordingToRules: t.plan.managed_according_to_rules,
     } : null,
     chartData: t.chart_data,
     importSource: t.import_source,

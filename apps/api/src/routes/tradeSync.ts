@@ -554,6 +554,9 @@ const updated = await prisma.$transaction(async (tx) => {
                target_zone: plan.targetZone ?? null,
                expected_hold_time: plan.expectedHoldTime ?? null,
                plan_followed: plan.planFollowed ?? null,
+               entry_timing_correct: plan.entryTimingCorrect ?? null,
+               emotions_affected: plan.emotionsAffected ?? null,
+               managed_according_to_rules: plan.managedAccordingToRules ?? null,
              },
              update: {
                max_risk: plan.maxRisk !== undefined ? plan.maxRisk : undefined,
@@ -563,6 +566,9 @@ const updated = await prisma.$transaction(async (tx) => {
                target_zone: plan.targetZone !== undefined ? plan.targetZone : undefined,
                expected_hold_time: plan.expectedHoldTime !== undefined ? plan.expectedHoldTime : undefined,
                plan_followed: plan.planFollowed !== undefined ? plan.planFollowed : undefined,
+               entry_timing_correct: plan.entryTimingCorrect !== undefined ? plan.entryTimingCorrect : undefined,
+               emotions_affected: plan.emotionsAffected !== undefined ? plan.emotionsAffected : undefined,
+               managed_according_to_rules: plan.managedAccordingToRules !== undefined ? plan.managedAccordingToRules : undefined,
              },
            });
          }

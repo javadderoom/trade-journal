@@ -42,6 +42,9 @@ export interface Trade {
     targetZone: string | null;
     expectedHoldTime: string | null;
     planFollowed: boolean | null;
+    entryTimingCorrect: boolean | null;
+    emotionsAffected: boolean | null;
+    managedAccordingToRules: boolean | null;
   } | null;
   chartData?: any;
   importSource?: string;

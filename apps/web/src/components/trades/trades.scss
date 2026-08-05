@@ -889,7 +889,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 24px; // p-lg
+    padding: 16px 20px;
     border-bottom: 1px solid rgba($outline-variant, 0.5);
     position: sticky;
     top: 0;
@@ -903,8 +903,8 @@
       gap: 8px; // gap-sm
 
       .icon-wrapper {
-        width: 32px;
-        height: 32px;
+        width: 28px;
+        height: 28px;
         border-radius: 50%;
         background-color: rgba($primary, 0.2);
         display: flex;
@@ -918,21 +918,21 @@
         }
 
         .dir-icon {
-          font-size: 18px;
+          font-size: 16px;
         }
       }
 
       .title-text {
         h2 {
-          font-size: 20px; // text-headline-md
-          line-height: 32px;
+          font-size: 16px;
+          line-height: 24px;
           color: $on-surface;
           margin: 0;
           letter-spacing: 0.02em;
         }
 
         p {
-          font-size: 12px; // label-sm
+          font-size: 11px;
           color: $on-surface-variant;
           margin: 0;
           direction: ltr;
@@ -942,8 +942,8 @@
     }
 
     .close-btn {
-      width: 32px;
-      height: 32px;
+      width: 28px;
+      height: 28px;
       border-radius: 50%;
       background-color: $surface-variant;
       border: none;
@@ -1034,20 +1034,23 @@
     }
 
     .financial-box {
-      background-color: $surface-container;
-      border-radius: 12px;
-      padding: 16px; // p-md
-      border: 1px solid rgba($primary, 0.3);
-      box-shadow: 0 4px 20px rgba($primary, 0.15); // glow-profit
+      background-color: rgba($surface-container, 0.4);
+      border-radius: 8px;
+      padding: 12px;
+      border: 1px solid rgba($primary, 0.1);
+      box-shadow: none;
       position: relative;
       overflow: hidden;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
 
       &.loss-box {
-        border-color: rgba($error, 0.3);
-        box-shadow: 0 4px 20px rgba($error, 0.15);
+        border-color: rgba($error, 0.1);
+        box-shadow: none;
 
         .box-bar {
-          background-color: $error;
+          background-color: rgba($error, 0.5);
         }
 
         .pnl-value {
@@ -1063,45 +1066,39 @@
         position: absolute;
         top: 0;
         right: 0;
-        width: 8px;
+        width: 4px;
         height: 100%;
-        background-color: $primary;
-      }
+        background-color: rgba($primary, 0.5);
 
-      .box-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 8px; // mb-sm
-
-        .label {
-          font-size: 14px; // text-label-md
-          color: $on-surface-variant;
-        }
-
-        .status {
-          font-size: 12px; // text-label-sm
-          color: $on-surface-variant;
+        [dir="ltr"] & {
+          right: auto;
+          left: 0;
         }
       }
 
       .pnl-value {
-        font-size: 32px; // text-headline-xl
-        font-weight: 700;
+        font-size: 20px;
+        font-weight: 600;
         color: $primary;
-        letter-spacing: -0.02em;
+        letter-spacing: -0.01em;
         margin-bottom: 2px;
         direction: ltr;
         text-align: right;
+        [dir="ltr"] & {
+          text-align: left;
+        }
       }
 
       .pnl-toman {
-        font-size: 14px;
+        font-size: 12px;
         color: $primary;
-        opacity: 0.7;
+        opacity: 0.6;
         direction: rtl;
         text-align: right;
-        margin-bottom: 8px;
+        margin-bottom: 0;
+        [dir="ltr"] & {
+          text-align: left;
+        }
       }
 
       &.loss-box {
@@ -1112,9 +1109,10 @@
 
       .metrics-grid {
         display: flex;
-        gap: 16px; // gap-md
-        font-size: 16px;
-        color: $on-surface;
+        align-items: center;
+        gap: 12px;
+        font-size: 14px;
+        color: $on-surface-variant;
 
         .divider {
           width: 1px;

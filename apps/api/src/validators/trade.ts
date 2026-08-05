@@ -14,6 +14,9 @@ const tradePlanSchema = z.object({
   targetZone: z.string().nullable().optional(),
   expectedHoldTime: z.string().nullable().optional(),
   planFollowed: z.boolean().nullable().optional(),
+  entryTimingCorrect: z.boolean().nullable().optional(),
+  emotionsAffected: z.boolean().nullable().optional(),
+  managedAccordingToRules: z.boolean().nullable().optional(),
 });
 
 export const createTradeSchema = z.object({

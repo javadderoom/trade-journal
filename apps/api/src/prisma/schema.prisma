@@ -781,5 +781,8 @@ model TradePlan {
   invalidation       String?
   target_zone        String?
   expected_hold_time String?
-  plan_followed      Boolean?
+  plan_followed              Boolean?
+  entry_timing_correct       Boolean?
+  emotions_affected          Boolean?
+  managed_according_to_rules Boolean?
 }
