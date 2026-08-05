@@ -15,6 +15,7 @@ import compression from 'compression';
 import cron from 'node-cron';
 import { prisma } from './services/tradeSync';
 import tradeSyncRouter from './routes/tradeSync';
+import tradeEventsRouter from './routes/tradeEvents';
 import authRouter from './routes/auth';
 import accountTokensRouter from './routes/accountTokens';
 import journalRouter from './routes/journal';
@@ -88,6 +89,7 @@ app.use((req, res, next) => {
 app.use('/api/auth', authRouter);
 app.use('/api', accountTokensRouter);
 app.use('/api/trades/export', tradeExportRouter);
+app.use('/api/trades/:tradeId/events', tradeEventsRouter);
 app.use('/api/trades', tradeSyncRouter);
 app.use('/api/journal', journalRouter);
 app.use('/api/trading-concepts', tradingConceptsRouter);

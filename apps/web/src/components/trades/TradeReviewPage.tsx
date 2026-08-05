@@ -27,6 +27,16 @@ export default function TradeReviewPage({ tradeId }: TradeReviewPageProps) {
   const [saving, setSaving] = useState(false);
   const [lightboxUrl, setLightboxUrl] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
+  
+  // Event form state
+  const [showAddEvent, setShowAddEvent] = useState(false);
+  const [newEvent, setNewEvent] = useState({
+    type: 'ANALYSIS',
+    timestamp: new Date().toISOString().slice(0, 16),
+    title: '',
+    description: ''
+  });
+  const [isAddingEvent, setIsAddingEvent] = useState(false);
 
   useEffect(() => {
     const existing = trades.find(t => t.id === tradeId);
@@ -150,6 +160,77 @@ export default function TradeReviewPage({ tradeId }: TradeReviewPageProps) {
     }
   };
 
+  const handleAddEvent = async () => {
+    if (!newEvent.title.trim()) {
+      notify.error(isEn ? 'Title is required' : 'عنوان الزامی است');
+      return;
+    }
+    
+    setIsAddingEvent(true);
+    try {
+      const payload = {
+        type: newEvent.type,
+        timestamp: new Date(newEvent.timestamp).toISOString(),
+        title: newEvent.title,
+        description: newEvent.description
+      };
+      const res = await api.post(`/api/trades/${trade.id}/events`, payload);
+      
+      const updatedEvents = [...(trade.events || []), res.data].sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
+      
+      setTrade(prev => {
+        if (!prev) return prev;
+        return { ...prev, events: updatedEvents };
+      });
+      
+      // Update store so it persists on back navigation
+      const currentTrades = useTradeStore.getState().trades;
+      useTradeStore.setState({
+        trades: currentTrades.map(t => t.id === trade.id ? { ...t, events: updatedEvents } : t)
+      });
+      
+      setShowAddEvent(false);
+      setNewEvent({
+        type: 'ANALYSIS',
+        timestamp: new Date().toISOString().slice(0, 16),
+        title: '',
+        description: ''
+      });
+      notify.success(isEn ? 'Event added' : 'رویداد اضافه شد');
+    } catch (error) {
+      console.error('Failed to add event:', error);
+      notify.error(isEn ? 'Failed to add event' : 'خطا در افزودن رویداد');
+    } finally {
+      setIsAddingEvent(false);
+    }
+  };
+
+  const handleDeleteEvent = async (eventId: string) => {
+    const ok = window.confirm(isEn ? 'Are you sure you want to delete this event?' : 'آیا از حذف این رویداد اطمینان دارید؟');
+    if (!ok) return;
+
+    try {
+      await api.delete(`/api/trades/${trade.id}/events/${eventId}`);
+      
+      const updatedEvents = (trade.events || []).filter(e => e.id !== eventId);
+      
+      setTrade(prev => {
+        if (!prev) return prev;
+        return { ...prev, events: updatedEvents };
+      });
+      
+      const currentTrades = useTradeStore.getState().trades;
+      useTradeStore.setState({
+        trades: currentTrades.map(t => t.id === trade.id ? { ...t, events: updatedEvents } : t)
+      });
+      
+      notify.success(isEn ? 'Event deleted' : 'رویداد حذف شد');
+    } catch (error) {
+      console.error('Failed to delete event:', error);
+      notify.error(isEn ? 'Failed to delete event' : 'خطا در حذف رویداد');
+    }
+  };
+
   const calculateScore = () => {
     if (!trade.plan) return 0;
     let score = 0;
@@ -162,6 +243,25 @@ export default function TradeReviewPage({ tradeId }: TradeReviewPageProps) {
 
   const score = calculateScore();
   const isWin = trade.rMultiple > 0;
+
+  const fmtTime = (dateStr: string) => {
+    const d = new Date(dateStr);
+    return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  };
+  
+  const getEventIcon = (type: string) => {
+    switch (type) {
+      case 'SESSION_START': return 'schedule';
+      case 'ANALYSIS': return 'search';
+      case 'SETUP_FOUND': return 'lightbulb';
+      case 'ENTRY': return 'ads_click';
+      case 'MANAGEMENT': return 'settings';
+      case 'PARTIAL_EXIT': return 'call_split';
+      case 'EXIT': return 'flag';
+      case 'REVIEW': return 'fact_check';
+      default: return 'fiber_manual_record';
+    }
+  };
 
   return (
     <div className="trade-review-page">
@@ -270,50 +370,116 @@ export default function TradeReviewPage({ tradeId }: TradeReviewPageProps) {
             </h3>
 
             <div className="timeline">
-              {/* Event 1 */}
-              <div className="timeline-event">
-                <div className="event-dot"><span className="material-symbols-outlined" style={{ fontSize: '16px' }}>search</span></div>
-                <div className="event-content">
-                  <span className="event-title">{isEn ? 'Analysis & Context' : 'تحلیل و زمینه'}</span>
-                  <div className="event-box">
-                    <textarea
-                      placeholder={isEn ? 'What was the higher timeframe context?' : 'زمینه تایم‌فریم بالاتر چه بود؟'}
-                      value={trade.annotation?.expectation || ''}
-                      onChange={(e) => updateTradeField('annotation', 'expectation', e.target.value)}
-                    />
-                  </div>
+              {(!trade.events || trade.events.length === 0) && (
+                <div style={{ padding: '20px', textAlign: 'center', color: '#8898aa', fontSize: '13px' }}>
+                  {isEn ? 'No events recorded yet.' : 'هنوز رویدادی ثبت نشده است.'}
                 </div>
-              </div>
+              )}
               
-              {/* Event 2 */}
-              <div className="timeline-event">
-                <div className="event-dot active"><span className="material-symbols-outlined" style={{ fontSize: '16px' }}>ads_click</span></div>
-                <div className="event-content">
-                  <span className="event-title">{isEn ? 'Entry Decision' : 'تصمیم برای ورود'}</span>
-                  <div className="event-box">
-                    <textarea
-                      placeholder={isEn ? 'What triggered the entry?' : 'چه چیزی باعث ورود شد؟'}
-                      value={trade.plan?.entryCondition || ''}
-                      onChange={(e) => updateTradeField('plan', 'entryCondition', e.target.value)}
-                    />
+              {trade.events && trade.events.map((event, idx) => (
+                <div className="timeline-event" key={event.id}>
+                  <div className="event-time-col">{fmtTime(event.timestamp)}</div>
+                  <div className="event-divider">
+                    <div className={`event-dot ${event.type === 'ENTRY' ? 'active' : ''}`}>
+                      <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>{getEventIcon(event.type)}</span>
+                    </div>
+                    {idx < trade.events!.length - 1 && <div className="event-line"></div>}
+                  </div>
+                  <div className="event-content">
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span className="event-title">{event.title}</span>
+                      <button 
+                        onClick={() => handleDeleteEvent(event.id)}
+                        style={{ background: 'transparent', border: 'none', color: '#8898aa', cursor: 'pointer', display: 'flex', alignItems: 'center', padding: '4px' }}
+                        title={isEn ? 'Delete' : 'حذف'}
+                      >
+                        <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>delete</span>
+                      </button>
+                    </div>
+                    {event.description && (
+                      <div className="event-box read-only">
+                        <div style={{ whiteSpace: 'pre-wrap', fontSize: '13px', lineHeight: 1.5 }}>
+                          {event.description}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
-              </div>
+              ))}
 
-              {/* Event 3 */}
-              <div className="timeline-event">
-                <div className="event-dot"><span className="material-symbols-outlined" style={{ fontSize: '16px' }}>timeline</span></div>
-                <div className="event-content">
-                  <span className="event-title">{isEn ? 'Trade Management' : 'مدیریت معامله'}</span>
-                  <div className="event-box">
-                    <textarea
-                      placeholder={isEn ? 'How did you manage the trade while it was open?' : 'هنگامی که معامله باز بود، چگونه آن را مدیریت کردید؟'}
-                      value={trade.annotation?.notes || ''}
-                      onChange={(e) => updateTradeField('annotation', 'notes', e.target.value)}
-                    />
+              {showAddEvent ? (
+                <div className="timeline-event">
+                  <div className="event-time-col">--:--</div>
+                  <div className="event-divider">
+                    <div className="event-dot"><span className="material-symbols-outlined" style={{ fontSize: '16px' }}>add</span></div>
+                  </div>
+                  <div className="event-content">
+                    <div style={{ background: 'rgba(0,0,0,0.15)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', padding: '16px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                      <div style={{ display: 'flex', gap: '12px' }}>
+                        <select 
+                          value={newEvent.type} 
+                          onChange={(e) => setNewEvent({...newEvent, type: e.target.value})}
+                          style={{ flex: 1, background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: '#fff', borderRadius: '4px', padding: '8px' }}
+                        >
+                          <option value="SESSION_START">Session Start</option>
+                          <option value="ANALYSIS">Analysis</option>
+                          <option value="SETUP_FOUND">Setup Found</option>
+                          <option value="ENTRY">Entry</option>
+                          <option value="MANAGEMENT">Management</option>
+                          <option value="PARTIAL_EXIT">Partial Exit</option>
+                          <option value="EXIT">Exit</option>
+                          <option value="REVIEW">Review</option>
+                        </select>
+                        <input 
+                          type="datetime-local" 
+                          value={newEvent.timestamp}
+                          onChange={(e) => setNewEvent({...newEvent, timestamp: e.target.value})}
+                          style={{ flex: 1, background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: '#fff', borderRadius: '4px', padding: '8px', colorScheme: 'dark' }}
+                        />
+                      </div>
+                      <input 
+                        type="text" 
+                        placeholder={isEn ? 'Event Title (e.g. Liquidity sweep)' : 'عنوان رویداد'}
+                        value={newEvent.title}
+                        onChange={(e) => setNewEvent({...newEvent, title: e.target.value})}
+                        style={{ width: '100%', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: '#fff', borderRadius: '4px', padding: '8px' }}
+                      />
+                      <textarea 
+                        placeholder={isEn ? 'Description / Notes' : 'توضیحات'}
+                        value={newEvent.description}
+                        onChange={(e) => setNewEvent({...newEvent, description: e.target.value})}
+                        style={{ width: '100%', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: '#fff', borderRadius: '4px', padding: '8px', minHeight: '60px', resize: 'vertical' }}
+                      />
+                      <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+                        <button 
+                          onClick={() => setShowAddEvent(false)} 
+                          style={{ background: 'transparent', border: '1px solid rgba(255,255,255,0.1)', color: '#fff', padding: '6px 12px', borderRadius: '4px', cursor: 'pointer' }}
+                        >
+                          {isEn ? 'Cancel' : 'انصراف'}
+                        </button>
+                        <LoadingButton 
+                          onClick={handleAddEvent} 
+                          isLoading={isAddingEvent}
+                          className="btn btn-primary"
+                          style={{ padding: '6px 12px', borderRadius: '4px' }}
+                        >
+                          {isEn ? 'Add Event' : 'افزودن رویداد'}
+                        </LoadingButton>
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </div>
+              ) : (
+                <div style={{ marginTop: '16px', display: 'flex', justifyContent: 'center' }}>
+                  <button 
+                    onClick={() => setShowAddEvent(true)}
+                    style={{ background: 'transparent', border: '1px dashed rgba(255,255,255,0.2)', color: '#06b6d4', padding: '8px 16px', borderRadius: '8px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px' }}
+                  >
+                    <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>add</span>
+                    {isEn ? 'Add Trade Event' : 'افزودن رویداد معاملاتی'}
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </div>

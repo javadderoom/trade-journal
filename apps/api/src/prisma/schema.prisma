@@ -123,6 +123,7 @@ model Trade {
   triggers      TradeTrigger[]
   confluences   TradeConfluence[]
   plan          TradePlan?
+  events        TradeEvent[]
 
   @@unique([account_id, ticket])
   @@index([user_id])
@@ -786,3 +787,31 @@ model TradePlan {
   emotions_affected          Boolean?
   managed_according_to_rules Boolean?
 }
+
+model TradeEvent {
+  id          String         @id @default(uuid())
+  trade_id    String
+  trade       Trade          @relation(fields: [trade_id], references: [id], onDelete: Cascade)
+  type        TradeEventType
+  timestamp   DateTime
+  title       String
+  description String?
+  metadata    Json?
+  attachments String[]       @default([])
+  created_at  DateTime       @default(now())
+
+  @@index([trade_id])
+  @@index([trade_id, timestamp])
+}
+
+enum TradeEventType {
+  SESSION_START
+  ANALYSIS
+  SETUP_FOUND
+  ENTRY
+  MANAGEMENT
+  PARTIAL_EXIT
+  EXIT
+  REVIEW
+}
+

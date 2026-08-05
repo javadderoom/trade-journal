@@ -46,6 +46,17 @@ export interface Trade {
     emotionsAffected: boolean | null;
     managedAccordingToRules: boolean | null;
   } | null;
+  events?: {
+    id: string;
+    tradeId: string;
+    type: 'SESSION_START' | 'ANALYSIS' | 'SETUP_FOUND' | 'ENTRY' | 'MANAGEMENT' | 'PARTIAL_EXIT' | 'EXIT' | 'REVIEW';
+    timestamp: string;
+    title: string;
+    description: string | null;
+    metadata: any;
+    attachments: string[];
+    createdAt: string;
+  }[];
   chartData?: any;
   importSource?: string;
   accountType?: string;

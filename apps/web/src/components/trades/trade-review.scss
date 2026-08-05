@@ -123,77 +123,83 @@
 
   // Story Timeline
   .timeline {
-    position: relative;
-    padding-left: 32px;
+    display: flex;
+    flex-direction: column;
     
-    [dir="rtl"] & {
-      padding-left: 0;
-      padding-right: 32px;
-    }
-
-    &::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      bottom: 0;
-      left: 15px;
-      width: 2px;
-      background: rgba($outline, 0.3);
-
-      [dir="rtl"] & {
-        left: auto;
-        right: 15px;
-      }
-    }
-
     .timeline-event {
+      display: flex;
+      gap: 16px;
       position: relative;
-      margin-bottom: 32px;
+      padding-bottom: 24px;
       
       &:last-child {
-        margin-bottom: 0;
+        padding-bottom: 0;
+        .event-line { display: none; }
       }
 
-      .event-dot {
-        position: absolute;
-        left: -32px;
-        top: 0;
-        width: 32px;
-        height: 32px;
-        border-radius: 50%;
-        background: $surface;
-        border: 2px solid rgba($outline, 0.5);
-        display: flex;
-        align-items: center;
-        justify-content: center;
+      .event-time-col {
+        width: 48px;
+        flex-shrink: 0;
+        text-align: right;
+        padding-top: 6px;
+        font-size: 13px;
+        font-weight: 600;
+        font-family: monospace;
         color: $on-surface-variant;
-        z-index: 2;
 
         [dir="rtl"] & {
-          left: auto;
-          right: -32px;
+          text-align: left;
+        }
+      }
+
+      .event-divider {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 32px;
+        flex-shrink: 0;
+
+        .event-dot {
+          width: 32px;
+          height: 32px;
+          border-radius: 50%;
+          background: $surface;
+          border: 2px solid rgba($outline, 0.5);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: $on-surface-variant;
+          z-index: 2;
+
+          &.active {
+            background: rgba($primary, 0.15);
+            color: $primary;
+            border-color: rgba($primary, 0.3);
+          }
         }
 
-        &.active {
-          background: rgba($primary, 0.15);
-          color: $primary;
-          border-color: rgba($primary, 0.3);
+        .event-line {
+          flex-grow: 1;
+          width: 2px;
+          background: rgba($outline, 0.3);
+          margin-top: 4px;
+          margin-bottom: -24px; // overlap with next event's top padding
+          z-index: 1;
         }
       }
 
       .event-content {
-        .event-time {
-          font-size: 12px;
-          color: $on-surface-variant;
-          margin-bottom: 4px;
-          display: block;
-        }
+        flex-grow: 1;
+        padding-top: 4px;
 
         .event-title {
-          font-size: 14px;
+          font-size: 15px;
           font-weight: 600;
           color: $on-surface;
           margin-bottom: 8px;
+          display: flex;
+          align-items: center;
+          gap: 6px;
         }
         
         .event-box {
@@ -201,9 +207,7 @@
           border: 1px solid rgba($outline, 0.2);
           border-radius: 8px;
           padding: 12px;
-          font-size: 14px;
-          color: $on-surface-variant;
-
+          
           textarea {
             width: 100%;
             background: transparent;
@@ -211,12 +215,22 @@
             color: $on-surface;
             resize: vertical;
             outline: none;
-            min-height: 40px;
+            min-height: 48px;
             font-family: inherit;
+            font-size: 14px;
+            line-height: 1.5;
             
             &::placeholder {
               color: rgba($on-surface-variant, 0.5);
             }
+          }
+
+          &.read-only {
+            background: rgba(0,0,0,0.2);
+            font-size: 14px;
+            border-style: dashed;
+            display: flex;
+            align-items: center;
           }
         }
       }

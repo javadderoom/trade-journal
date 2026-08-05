@@ -326,6 +326,17 @@ export type TradeListRow = {
     expectedHoldTime: string | null;
     planFollowed: boolean | null;
   } | null;
+  events: {
+    id: string;
+    tradeId: string;
+    type: string;
+    timestamp: string;
+    title: string;
+    description: string | null;
+    metadata: any;
+    attachments: string[];
+    createdAt: string;
+  }[];
   chartData?: any;
   importSource?: string;
   accountType?: string;
@@ -435,6 +446,9 @@ export async function getTradesForAccount(params: {
           emotions_affected: true,
           managed_according_to_rules: true,
         }
+      },
+      events: {
+        orderBy: { timestamp: 'asc' }
       }
     },
   });
@@ -483,6 +497,17 @@ export async function getTradesForAccount(params: {
       emotionsAffected: t.plan.emotions_affected,
       managedAccordingToRules: t.plan.managed_according_to_rules,
     } : null,
+    events: t.events ? t.events.map((e: any) => ({
+      id: e.id,
+      tradeId: e.trade_id,
+      type: e.type,
+      timestamp: e.timestamp.toISOString(),
+      title: e.title,
+      description: e.description,
+      metadata: e.metadata,
+      attachments: e.attachments,
+      createdAt: e.created_at.toISOString(),
+    })) : [],
     chartData: t.chart_data,
     importSource: t.import_source,
     accountType: t.account.account_type,
