@@ -83,6 +83,55 @@
         }
       }
     }
+
+    @media (max-width: 768px) {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 16px;
+      padding: 16px;
+
+      .header-left {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+
+        .header-stats {
+          border: none !important;
+          padding: 0 !important;
+          flex-wrap: wrap;
+        }
+      }
+      
+      .btn {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+  }
+
+  .thesis-grid {
+    display: flex;
+    gap: 24px;
+    margin-bottom: 16px;
+    font-size: 14px;
+    
+    @media (max-width: 768px) {
+      flex-wrap: wrap;
+      gap: 16px;
+      
+      > div {
+        flex: 1 1 40%;
+      }
+    }
+  }
+
+  .event-form-row {
+    display: flex;
+    gap: 12px;
+    
+    @media (max-width: 600px) {
+      flex-direction: column;
+    }
   }
 
   // Layout Grid
@@ -259,6 +308,19 @@
         font-size: 13px;
         color: $on-surface-variant;
         flex: 1;
+      }
+
+      @media (max-width: 480px) {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+        
+        .score-toggles {
+          align-self: stretch;
+          button {
+            flex: 1;
+          }
+        }
       }
 
       .score-toggles {

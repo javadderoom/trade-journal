@@ -332,7 +332,7 @@ export default function TradeReviewPage({ tradeId }: TradeReviewPageProps) {
               {isEn ? 'Why did I take this trade?' : 'چرا این معامله را باز کردم؟'}
             </h3>
             
-            <div style={{ display: 'flex', gap: '24px', marginBottom: '16px', fontSize: '14px' }}>
+            <div className="thesis-grid">
               <div>
                 <span style={{ color: '#8898aa', display: 'block', marginBottom: '4px', fontSize: '12px' }}>{isEn ? 'Market Bias' : 'سوگیری بازار'}</span>
                 <span style={{ fontWeight: 600, color: trade.annotation?.htfBias === 'BUY' ? '#10b981' : (trade.annotation?.htfBias === 'SELL' ? '#ef4444' : '#fff') }}>
@@ -412,7 +412,7 @@ export default function TradeReviewPage({ tradeId }: TradeReviewPageProps) {
                   </div>
                   <div className="event-content">
                     <div style={{ background: 'rgba(0,0,0,0.15)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', padding: '16px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                      <div style={{ display: 'flex', gap: '12px' }}>
+                      <div className="event-form-row">
                         <select 
                           value={newEvent.type} 
                           onChange={(e) => setNewEvent({...newEvent, type: e.target.value})}
