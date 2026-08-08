@@ -87,26 +87,46 @@ export async function fetchTradeChartCandles(
     candleSeconds = 14400;
   }
 
-  try {
-    // We pass start and end timestamps so the backend doesn't slice off our historical candles!
-    const rangeStart = openTs - (100 * candleSeconds); 
-    const rangeEnd = closeTs + (30 * candleSeconds);   
+  const availableTimeframes: { tf: Timeframe; sec: number }[] = [
+    { tf: '1m', sec: 60 },
+    { tf: '5m', sec: 300 },
+    { tf: '15m', sec: 900 },
+    { tf: '1h', sec: 3600 },
+    { tf: '4h', sec: 14400 },
+    { tf: '1d', sec: 86400 }
+  ];
 
-    const res = await api.get('/api/market-data/history', {
-      params: { 
-        symbol: normSymbol, 
-        timeframe, 
-        limit: 1000,
-        start: rangeStart,
-        end: rangeEnd
+  // Find the starting index based on calculated ideal timeframe
+  let startIndex = availableTimeframes.findIndex(t => t.tf === timeframe);
+  if (startIndex === -1) startIndex = 2; // Default to 15m if not found
+
+  // Try the ideal timeframe, and if it's too old (not in cache), escalate to higher timeframes
+  for (let i = startIndex; i < availableTimeframes.length; i++) {
+    const currentTf = availableTimeframes[i].tf;
+    const currentSec = availableTimeframes[i].sec;
+    
+    try {
+      const rangeStart = openTs - (100 * currentSec); 
+      const rangeEnd = closeTs + (30 * currentSec);   
+
+      const res = await api.get('/api/market-data/history', {
+        params: { 
+          symbol: normSymbol, 
+          timeframe: currentTf, 
+          limit: 1000,
+          start: rangeStart,
+          end: rangeEnd
+        }
+      });
+
+      if (res.data?.candles && res.data.candles.length > 0) {
+        return res.data.candles;
       }
-    });
-
-    if (res.data?.candles) {
-      return res.data.candles;
+      
+      console.log(`[TradeChart] No candles found for ${currentTf}, escalating to next timeframe...`);
+    } catch (err: any) {
+      console.warn(`[TradeChart] Fetch failed for ${normSymbol} (${currentTf}):`, err.message);
     }
-  } catch (err: any) {
-    console.warn(`[TradeChart] Fetch failed for ${normSymbol} (${timeframe}):`, err.message);
   }
 
   return [];
