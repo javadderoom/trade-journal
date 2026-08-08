@@ -113,7 +113,6 @@ model Trade {
   r_multiple    Float        // Aggregated: R-multiple from last exit
   ticket        String?      // MT4/MT5 deal ticket for deduplication
   import_source ImportSource @default(MANUAL)
-  chart_data         Json?
   created_at         DateTime     @default(now())
 
   executions    Execution[]

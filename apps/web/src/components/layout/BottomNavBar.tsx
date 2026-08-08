@@ -67,6 +67,7 @@ export default function BottomNavBar() {
   if (user?.role === 'ADMIN') {
     drawerItems.splice(0, 0,
       { href: '/admin', label: t('nav.admin'), icon: 'admin_panel_settings' },
+      { href: '/admin2', label: language === 'fa' ? 'ادمین جدید' : 'Admin v2', icon: 'dashboard_customize' },
       { href: '/admin/blog', label: language === 'fa' ? 'مدیریت وبلاگ' : 'Blog Admin', icon: 'edit_document' },
       { href: '/admin/experts', label: language === 'fa' ? 'مدیریت اکسپرت' : 'EA Admin', icon: 'upload_file' }
     );

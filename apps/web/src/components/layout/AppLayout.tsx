@@ -147,6 +147,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const isBlogPage = cleanPath.startsWith('/blog');
   const isToolsPage = cleanPath.startsWith('/tools');
   const isPublicPage = isLandingPage || isHelpPage || isContactPage || isTopicPage || isBlogPage || isToolsPage;
+  const isAdmin2Page = cleanPath.startsWith('/admin2');
 
   useEffect(() => {
     if (!isInitialized || !pathname) return;
@@ -222,6 +223,18 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     return (
       <SWRConfig value={swrConfigValue}>
         <div className={`auth-wrapper ${fontClass}`}>
+          <Toaster />
+          {children}
+          {process.env.NODE_ENV === 'development' && <Agentation />}
+        </div>
+      </SWRConfig>
+    );
+  }
+
+  if (isAdmin2Page) {
+    return (
+      <SWRConfig value={swrConfigValue}>
+        <div className={`app-container ${fontClass} ${isSidebarCollapsed ? 'sidebar-collapsed' : ''}`} dir={dir}>
           <Toaster />
           {children}
           {process.env.NODE_ENV === 'development' && <Agentation />}

@@ -36,6 +36,8 @@ import aiAutomationRouter from './routes/aiAutomation';
 import tradingConceptsRouter from './routes/tradingConcepts';
 import { syncExchangeTrades } from './services/ccxtSync';
 import { runDailyAIBlogPipeline } from './services/aiDiscoveryService';
+import { startHistoricalDataCron } from './services/historicalDataCron';
+import adminMarketDataRouter from './routes/adminMarketData';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -97,6 +99,7 @@ app.use('/api/dashboard', dashboardRouter);
 app.use('/api/settings', settingsRouter);
 app.use('/api/payments', paymentsRouter);
 app.use('/api/admin', adminRouter);
+app.use('/api/admin/market-data', adminMarketDataRouter);
 app.use('/api/admin/blog', adminBlogRouter);
 app.use('/api/blog', blogRouter);
 app.use('/api/admin/support', adminSupportRouter);
@@ -205,6 +208,7 @@ process.on('uncaughtException', (err) => {
 app.listen(PORT, () => {
   console.log(`معامله‌یار API running on http://localhost:${PORT}`);
   console.log(`Trade sync endpoint: POST http://localhost:${PORT}/api/trades/sync`);
+  startHistoricalDataCron();
 });
 
 export default app;

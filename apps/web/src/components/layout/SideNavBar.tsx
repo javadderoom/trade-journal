@@ -32,6 +32,7 @@ export default function SideNavBar() {
 
   if (user?.role === 'ADMIN') {
     navItems.push({ href: '/admin', label: t('nav.admin'), icon: 'admin_panel_settings' });
+    navItems.push({ href: '/admin2', label: language === 'fa' ? 'ادمین جدید' : 'Admin v2', icon: 'dashboard_customize' });
     navItems.push({ href: '/admin/support', label: t('nav.adminSupport'), icon: 'support_agent' });
     navItems.push({ href: '/admin/blog', label: language === 'fa' ? 'مدیریت وبلاگ' : 'Blog Admin', icon: 'edit_document' });
     navItems.push({ href: '/admin/experts', label: language === 'fa' ? 'مدیریت اکسپرت' : 'EA Admin', icon: 'upload_file' });

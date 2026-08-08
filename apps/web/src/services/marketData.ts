@@ -22,8 +22,7 @@ const SYMBOL_MAP: Record<string, { binanceSymbol?: string; yahooSymbol?: string;
 };
 
 /**
- * Fetch zero-cost historical candlestick data.
- * Tries Binance API first for crypto, Yahoo Finance proxy second, or generates realistic fallback data.
+ * Fetch zero-cost historical candlestick data from backend cache.
  */
 export async function fetchHistoricalCandles(
   symbol: string,
@@ -45,60 +44,45 @@ export async function fetchHistoricalCandles(
       return res.data.candles;
     }
   } catch (err: any) {
-    console.warn('[MarketData] Proxy fetch failed:', err.message || err);
+    console.warn('[MarketData] Cache fetch failed:', err.message || err);
     throw err;
   }
 
-  throw new Error(`Market data unavailable for ${normSymbol} (check rate limits or connectivity)`);
+  throw new Error(`Market data unavailable for ${normSymbol}`);
 }
 
 /**
- * Generate synthetic realistic OHLCV candles if offline or APIs are restricted.
+ * Fetch candles for a specific trade's chart.
+ * Fetches 15m candles around the trade's open/close times.
  */
-function generateSyntheticCandles(symbol: string, timeframe: Timeframe, count: number): CandleData[] {
-  const symbolInfo = SYMBOL_MAP[symbol] || { basePrice: 100.0 };
-  let currentPrice = symbolInfo.basePrice;
+export async function fetchTradeChartCandles(
+  symbol: string,
+  openTime: string,
+  closeTime: string | null
+): Promise<CandleData[]> {
+  const normSymbol = symbol.toUpperCase().trim();
 
-  const timeframeSecondsMap: Record<Timeframe, number> = {
-    '1m': 60,
-    '5m': 300,
-    '15m': 900,
-    '1h': 3600,
-    '4h': 14400,
-    '1d': 86400,
-  };
-
-  const stepSeconds = timeframeSecondsMap[timeframe] || 900;
-  const nowSec = Math.floor(Date.now() / 1000);
-  const startSec = nowSec - count * stepSeconds;
-
-  const candles: CandleData[] = [];
-  let prevClose = currentPrice;
-
-  for (let i = 0; i < count; i++) {
-    const candleTime = startSec + i * stepSeconds;
-    const volatility = prevClose * 0.003; // 0.3% volatility
-    const change = (Math.random() - 0.49) * volatility * 2;
-    const open = prevClose;
-    const close = open + change;
-
-    const high = Math.max(open, close) + Math.random() * volatility;
-    const low = Math.min(open, close) - Math.random() * volatility;
-    const volume = Math.round(100 + Math.random() * 5000);
-
-    candles.push({
-      time: candleTime,
-      open: Number(open.toFixed(symbol.includes('JPY') ? 3 : 5)),
-      high: Number(high.toFixed(symbol.includes('JPY') ? 3 : 5)),
-      low: Number(low.toFixed(symbol.includes('JPY') ? 3 : 5)),
-      close: Number(close.toFixed(symbol.includes('JPY') ? 3 : 5)),
-      volume,
+  try {
+    const res = await api.get('/api/market-data/history', {
+      params: { symbol: normSymbol, timeframe: '15m', limit: 500 }
     });
 
-    prevClose = close;
+    if (res.data?.candles) {
+      // Filter to relevant time range (200 candles before open, 50 after close)
+      const openTs = Math.floor(new Date(openTime).getTime() / 1000);
+      const closeTs = closeTime ? Math.floor(new Date(closeTime).getTime() / 1000) : openTs;
+      const rangeStart = openTs - 200 * 900; // 200 candles * 15min
+      const rangeEnd = closeTs + 50 * 900;   // 50 candles * 15min
+
+      return res.data.candles.filter((c: CandleData) =>
+        c.time >= rangeStart && c.time <= rangeEnd
+      );
+    }
+  } catch (err: any) {
+    console.warn('[TradeChart] Fetch failed:', err.message);
   }
 
-  return candles;
+  return [];
 }
 
 /**

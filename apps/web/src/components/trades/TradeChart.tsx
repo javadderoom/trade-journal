@@ -1,18 +1,10 @@
 'use client';
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { createChart, ColorType, ISeriesApi, UTCTimestamp } from 'lightweight-charts';
-
-interface CandlestickData {
-  time: number; // Unix timestamp in seconds
-  open: number;
-  high: number;
-  low: number;
-  close: number;
-}
+import { fetchTradeChartCandles, CandleData } from '../../services/marketData';
 
 interface TradeChartProps {
-  candlesticks: CandlestickData[];
   symbol?: string;
   direction: 'BUY' | 'SELL';
   openPrice: number;
@@ -24,7 +16,6 @@ interface TradeChartProps {
 }
 
 export default function TradeChart({
-  candlesticks,
   symbol,
   direction,
   openPrice,
@@ -36,9 +27,25 @@ export default function TradeChart({
 }: TradeChartProps) {
   const chartContainerRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<any>(null);
+  const [candlesticks, setCandlesticks] = useState<CandleData[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!chartContainerRef.current || !candlesticks || candlesticks.length === 0) return;
+    let cancelled = false;
+    setLoading(true);
+    async function fetchChartData() {
+      const data = await fetchTradeChartCandles(symbol ?? '', openTime, closeTime);
+      if (!cancelled) {
+        setCandlesticks(data);
+        setLoading(false);
+      }
+    }
+    fetchChartData();
+    return () => { cancelled = true; };
+  }, [symbol, openTime, closeTime]);
+
+  useEffect(() => {
+    if (loading || !chartContainerRef.current || !candlesticks || candlesticks.length === 0) return;
 
     // 1. Sort and deduplicate candlesticks (Lightweight Charts requirement)
     const sorted = [...candlesticks].sort((a, b) => a.time - b.time);

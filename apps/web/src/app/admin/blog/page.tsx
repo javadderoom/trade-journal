@@ -332,8 +332,7 @@ export default function AdminBlogPage() {
                 onChange={(val) => setAiModel(val as string)}
                 options={[
                   { value: 'gemini-3.5-flash', label: 'Gemini 3.5 Flash' },
-                  { value: 'gemini-3.1-pro', label: 'Gemini 3.1 Pro' },
-                  { value: 'gemini-3.5-pro', label: 'Gemini 3.5 Pro' }
+                  { value: 'gemini-3.6-flash', label: 'Gemini 3.6 Flash' }
                 ]}
               />
               <Select

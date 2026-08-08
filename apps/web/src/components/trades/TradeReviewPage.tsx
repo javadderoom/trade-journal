@@ -312,21 +312,18 @@ export default function TradeReviewPage({ tradeId }: TradeReviewPageProps) {
         {/* Main Column */}
         <div>
           {/* Chart Review */}
-          {trade.chartData && Array.isArray(trade.chartData) && trade.chartData.length > 0 && (
-            <div className="review-section" style={{ padding: 0, overflow: 'hidden' }}>
-              <TradeChart 
-                candlesticks={trade.chartData}
-                symbol={trade.symbol}
-                direction={trade.direction}
-                openPrice={trade.openPrice}
-                closePrice={trade.closePrice}
-                openTime={trade.openTime}
-                closeTime={trade.closeTime}
-                stopLoss={trade.stopLoss}
-                takeProfit={trade.takeProfit}
-              />
-            </div>
-          )}
+          <div className="review-section" style={{ padding: 0, overflow: 'hidden' }}>
+            <TradeChart 
+              symbol={trade.symbol}
+              direction={trade.direction}
+              openPrice={trade.openPrice}
+              closePrice={trade.closePrice}
+              openTime={trade.openTime}
+              closeTime={trade.closeTime}
+              stopLoss={trade.stopLoss}
+              takeProfit={trade.takeProfit}
+            />
+          </div>
 
           {/* Trade Thesis */}
           <div className="review-section">
