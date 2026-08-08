@@ -1,0 +1,92 @@
+@use '../../app/variables' as *;
+
+.container {
+  background-color: $surface;
+  border-bottom: 1px solid rgba($outline-variant, 0.4);
+  padding: 24px 0;
+  margin-bottom: 16px;
+  display: flex;
+  gap: 16px;
+}
+
+.avatar {
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background-color: $surface-container-high;
+}
+
+.form {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.textarea {
+  width: 100%;
+  background: transparent;
+  border: none;
+  resize: none;
+  font-family: inherit;
+  font-size: 15px;
+  color: $text;
+  line-height: 24px;
+  min-height: 64px;
+
+  &:focus {
+    outline: none;
+  }
+  
+  &::placeholder {
+    color: $muted;
+  }
+}
+
+.actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 12px;
+}
+
+.tools {
+  display: flex;
+  gap: 12px;
+
+  button {
+    background: none;
+    border: none;
+    color: $primary;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    transition: opacity 0.2s;
+
+    &:hover {
+      opacity: 0.8;
+    }
+  }
+}
+
+.submitBtn {
+  background-color: $primary;
+  color: $on-primary;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: opacity 0.2s;
+
+  &:hover {
+    opacity: 0.9;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}

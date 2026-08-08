@@ -1,0 +1,22 @@
+@use '../../app/variables' as *;
+
+.feedContainer {
+  max-width: 680px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.loading {
+  display: flex;
+  justify-content: center;
+  padding: 40px;
+  color: $muted;
+}
+
+.error {
+  color: $error;
+  padding: 16px;
+  background: rgba($error, 0.1);
+  border-radius: 8px;
+  margin-bottom: 24px;
+}

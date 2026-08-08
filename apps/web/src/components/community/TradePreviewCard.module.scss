@@ -1,0 +1,81 @@
+@use '../../app/variables' as *;
+
+.card {
+  background-color: $surface-container-low;
+  border: 1px solid $outline-variant;
+  border-radius: 8px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 12px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba($outline-variant, 0.4);
+  padding-bottom: 12px;
+}
+
+.symbol {
+  font-weight: 700;
+  font-size: 16px;
+  color: $text;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.direction {
+  font-weight: 600;
+  font-size: 12px;
+  padding: 2px 8px;
+  border-radius: 4px;
+
+  &.buy {
+    color: $profit;
+    background-color: rgba($profit, 0.1);
+  }
+
+  &.sell {
+    color: $loss;
+    background-color: rgba($loss, 0.1);
+  }
+}
+
+.metricsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 16px;
+}
+
+.metric {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  .label {
+    font-size: 12px;
+    color: $muted;
+  }
+
+  .value {
+    font-size: 14px;
+    font-weight: 500;
+    color: $text;
+  }
+}
+
+.result {
+  font-size: 16px;
+  font-weight: 700;
+
+  &.profit {
+    color: $profit;
+  }
+  &.loss {
+    color: $loss;
+  }
+}
