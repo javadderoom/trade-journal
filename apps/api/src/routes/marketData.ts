@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { prisma } from '../services/tradeSync';
 import { rateLimit } from '../middleware/rateLimit';
 import { authenticate, AuthRequest } from '../middleware/auth';
+import { normalizeSymbol } from '../config/symbols';
 
 const router = Router();
 
@@ -28,7 +29,8 @@ const MAX_CANDLE_LIMIT = 10000;
  */
 router.get('/history', rateLimit(60 * 1000, 30), async (req: Request, res: Response): Promise<void> => {
   res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
-  const symbol = (req.query.symbol as string || 'XAUUSD').toUpperCase();
+  const rawSymbol = (req.query.symbol as string || 'XAUUSD').toUpperCase();
+  const symbol = normalizeSymbol(rawSymbol);
   const timeframe = (req.query.timeframe as string || '15m').toLowerCase();
   const parsedLimit = parseInt(req.query.limit as string || '10000', 10);
   const limit = Math.min(

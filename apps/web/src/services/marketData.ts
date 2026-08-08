@@ -61,25 +61,49 @@ export async function fetchTradeChartCandles(
   closeTime: string | null
 ): Promise<CandleData[]> {
   const normSymbol = symbol.toUpperCase().trim();
+  const openTs = Math.floor(new Date(openTime).getTime() / 1000);
+  const closeTs = closeTime ? Math.floor(new Date(closeTime).getTime() / 1000) : openTs;
+  
+  // Dynamically determine the best timeframe based on trade duration
+  const durationMinutes = (closeTs - openTs) / 60;
+  
+  let timeframe: Timeframe = '15m';
+  let candleSeconds = 900; // 15m default
+  
+  if (durationMinutes <= 60) {
+    timeframe = '1m';
+    candleSeconds = 60;
+  } else if (durationMinutes <= 360) { // 6 hours
+    timeframe = '5m';
+    candleSeconds = 300;
+  } else if (durationMinutes <= 1440) { // 24 hours
+    timeframe = '15m';
+    candleSeconds = 900;
+  } else if (durationMinutes <= 7200) { // 5 days
+    timeframe = '1h';
+    candleSeconds = 3600;
+  } else {
+    timeframe = '4h';
+    candleSeconds = 14400;
+  }
 
   try {
     const res = await api.get('/api/market-data/history', {
-      params: { symbol: normSymbol, timeframe: '15m', limit: 500 }
+      params: { symbol: normSymbol, timeframe, limit: 1000 }
     });
 
     if (res.data?.candles) {
-      // Filter to relevant time range (200 candles before open, 50 after close)
-      const openTs = Math.floor(new Date(openTime).getTime() / 1000);
-      const closeTs = closeTime ? Math.floor(new Date(closeTime).getTime() / 1000) : openTs;
-      const rangeStart = openTs - 200 * 900; // 200 candles * 15min
-      const rangeEnd = closeTs + 50 * 900;   // 50 candles * 15min
+      // Filter to relevant time range (displaying enough context before and after)
+      // 100 candles before open, 30 after close
+      const rangeStart = openTs - (100 * candleSeconds); 
+      const rangeEnd = closeTs + (30 * candleSeconds);   
 
       return res.data.candles.filter((c: CandleData) =>
         c.time >= rangeStart && c.time <= rangeEnd
       );
     }
   } catch (err: any) {
-    console.warn('[TradeChart] Fetch failed:', err.message);
+    console.warn(`[TradeChart] Fetch failed for ${normSymbol} (${timeframe}):`, err.message);
   }
 
   return [];

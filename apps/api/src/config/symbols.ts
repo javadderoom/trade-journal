@@ -67,3 +67,20 @@ export function getLseSymbol(name: string): string | undefined {
 export function getSymbolsByProvider(provider: 'twelveData' | 'lse'): SymbolConfig[] {
   return SUPPORTED_SYMBOLS.filter(s => s.provider === provider);
 }
+
+export function normalizeSymbol(rawSymbol: string): string {
+  const upper = rawSymbol.toUpperCase();
+  
+  // 1. Direct match
+  if (SUPPORTED_SYMBOLS.some(s => s.name === upper)) return upper;
+  
+  // 2. Strip common delimiters (e.g. XAUUSD_O -> XAUUSD, EURUSD.p -> EURUSD)
+  const stripped = upper.split(/[_.\-#]/)[0];
+  if (SUPPORTED_SYMBOLS.some(s => s.name === stripped)) return stripped;
+
+  // 3. Prefix match (e.g. EURUSDm -> EURUSD)
+  const match = SUPPORTED_SYMBOLS.find(s => upper.startsWith(s.name));
+  if (match) return match.name;
+
+  return upper; // Fallback
+}
