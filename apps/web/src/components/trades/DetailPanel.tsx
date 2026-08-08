@@ -272,28 +272,25 @@ export default function DetailPanel({
             </div>
           )}
 
-          {/* Trade Candlestick Chart
-            {activeTrade.chartData && Array.isArray(activeTrade.chartData) && activeTrade.chartData.length > 0 && (
-              <div style={{ marginTop: '24px' }}>
-                <div style={{ fontSize: '13px', color: '#8898aa', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>candlestick_chart</span>
-                  {isEn ? 'Price Chart' : 'نمودار قیمت'}
-                </div>
-                <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '12px', padding: '16px' }}>
-                  <TradeChart 
-                    candlesticks={activeTrade.chartData}
-                    symbol={activeTrade.symbol}
-                    direction={activeTrade.direction}
-                    openPrice={activeTrade.openPrice}
-                    closePrice={activeTrade.closePrice}
-                    openTime={activeTrade.openTime}
-                    closeTime={activeTrade.closeTime}
-                    stopLoss={activeTrade.stopLoss}
-                    takeProfit={activeTrade.takeProfit}
-                  />
-                </div>
-              </div>
-            )} */}
+          {/* Trade Candlestick Chart */}
+          <div style={{ marginTop: '24px' }}>
+            <div style={{ fontSize: '13px', color: '#8898aa', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>candlestick_chart</span>
+              {isEn ? 'Price Chart' : 'نمودار قیمت'}
+            </div>
+            <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '12px', padding: '16px' }}>
+              <TradeChart 
+                symbol={activeTrade.symbol}
+                direction={activeTrade.direction}
+                openPrice={activeTrade.openPrice}
+                closePrice={activeTrade.closePrice}
+                openTime={activeTrade.openTime}
+                closeTime={activeTrade.closeTime}
+                stopLoss={activeTrade.stopLoss}
+                takeProfit={activeTrade.takeProfit}
+              />
+            </div>
+          </div>
 
           <hr style={{ borderColor: 'rgba(255,255,255,0.05)', margin: '4px 0' }} />
           {/* Concepts & Strategy */}

@@ -57,7 +57,7 @@ export interface Trade {
     attachments: string[];
     createdAt: string;
   }[];
-  chartData?: any;
+
   importSource?: string;
   accountType?: string;
 }

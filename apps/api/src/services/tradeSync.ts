@@ -95,7 +95,6 @@ export async function syncTradesFromEA(
               r_multiple: trade.rMultiple,
               ticket: ticketStr,
               import_source: 'MT5_EA',
-              chart_data: trade.chartData ? trade.chartData : undefined,
             },
           });
 
@@ -169,7 +168,6 @@ export async function syncTradesFromEA(
               swap: trade.swap,
               pips: trade.pips ?? 0,
               r_multiple: trade.rMultiple,
-              chart_data: trade.chartData ? trade.chartData : undefined,
               ...(isClosing
                 ? {
                     close_time: new Date(trade.closeTime!),
@@ -337,7 +335,6 @@ export type TradeListRow = {
     attachments: string[];
     createdAt: string;
   }[];
-  chartData?: any;
   importSource?: string;
   accountType?: string;
 };
@@ -414,7 +411,6 @@ export async function getTradesForAccount(params: {
       swap: true,
       pips: true,
       r_multiple: true,
-      chart_data: true,
       import_source: true,
       account: { select: { account_type: true } },
       annotation: {
@@ -508,7 +504,6 @@ export async function getTradesForAccount(params: {
       attachments: e.attachments,
       createdAt: e.created_at.toISOString(),
     })) : [],
-    chartData: t.chart_data,
     importSource: t.import_source,
     accountType: t.account.account_type,
   }));

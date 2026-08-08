@@ -274,7 +274,7 @@ export const useTradeStore = create<TradeState>((set, get) => ({
             triggers: item.triggers ?? [],
             confluences: item.confluences ?? [],
             plan: item.plan ?? null,
-            chartData: item.chartData ?? null,
+
             events: item.events ?? [],
             importSource: item.importSource ?? null,
             accountType: item.accountType ?? null,
