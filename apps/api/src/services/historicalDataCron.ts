@@ -44,7 +44,7 @@ export interface CacheStatus {
 }
 
 export function startHistoricalDataCron(): void {
-  cron.schedule('0 * * * *', async () => {
+  cron.schedule('0 */4 * * *', async () => {
     console.log('[Cron] Historical data refresh triggered');
     await refreshAllHistoricalData();
   });
@@ -54,7 +54,7 @@ export function startHistoricalDataCron(): void {
     await refreshAllHistoricalData();
   }, 5000);
 
-  console.log('[Cron] Historical data cron job scheduled (every hour)');
+  console.log('[Cron] Historical data cron job scheduled (every 4 hours)');
 }
 
 export async function refreshAllHistoricalData(): Promise<CronJobResult> {

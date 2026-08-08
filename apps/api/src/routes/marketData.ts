@@ -44,7 +44,22 @@ router.get('/history', rateLimit(60 * 1000, 30), async (req: Request, res: Respo
     });
 
     if (cached) {
-      const allCandles = cached.candles as any[];
+      let allCandles = cached.candles as any[];
+      
+      if (req.query.start) {
+        const startTs = parseInt(req.query.start as string, 10);
+        if (!isNaN(startTs)) {
+          allCandles = allCandles.filter(c => c.time >= startTs);
+        }
+      }
+      
+      if (req.query.end) {
+        const endTs = parseInt(req.query.end as string, 10);
+        if (!isNaN(endTs)) {
+          allCandles = allCandles.filter(c => c.time <= endTs);
+        }
+      }
+
       res.json({ symbol, timeframe, candles: allCandles.slice(-limit) });
       return;
     }

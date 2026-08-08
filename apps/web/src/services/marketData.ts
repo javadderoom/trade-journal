@@ -88,19 +88,22 @@ export async function fetchTradeChartCandles(
   }
 
   try {
+    // We pass start and end timestamps so the backend doesn't slice off our historical candles!
+    const rangeStart = openTs - (100 * candleSeconds); 
+    const rangeEnd = closeTs + (30 * candleSeconds);   
+
     const res = await api.get('/api/market-data/history', {
-      params: { symbol: normSymbol, timeframe, limit: 1000 }
+      params: { 
+        symbol: normSymbol, 
+        timeframe, 
+        limit: 1000,
+        start: rangeStart,
+        end: rangeEnd
+      }
     });
 
     if (res.data?.candles) {
-      // Filter to relevant time range (displaying enough context before and after)
-      // 100 candles before open, 30 after close
-      const rangeStart = openTs - (100 * candleSeconds); 
-      const rangeEnd = closeTs + (30 * candleSeconds);   
-
-      return res.data.candles.filter((c: CandleData) =>
-        c.time >= rangeStart && c.time <= rangeEnd
-      );
+      return res.data.candles;
     }
   } catch (err: any) {
     console.warn(`[TradeChart] Fetch failed for ${normSymbol} (${timeframe}):`, err.message);

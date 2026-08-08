@@ -225,8 +225,7 @@ string BuildOpenPositionsJson()
       jsonPayload += "\"commission\":" + DoubleToString(commission, 2) + ",";
       jsonPayload += "\"swap\":" + DoubleToString(swap, 2) + ",";
       jsonPayload += "\"pips\":" + DoubleToString(pips, 1) + ",";
-      jsonPayload += "\"rMultiple\":" + DoubleToString(rMultiple, 2) + ",";
-      jsonPayload += "\"chartData\":" + GetChartDataJson(symbol, (datetime)posTime, 0, timezoneOffset);
+      jsonPayload += "\"rMultiple\":" + DoubleToString(rMultiple, 2);
       jsonPayload += "}";
 
       count++;
@@ -357,8 +356,7 @@ string BuildClosedTradesJson()
       jsonPayload += "\"commission\":" + DoubleToString(totalCommission, 2) + ",";
       jsonPayload += "\"swap\":" + DoubleToString(swap, 2) + ",";
       jsonPayload += "\"pips\":" + DoubleToString(pips, 1) + ",";
-      jsonPayload += "\"rMultiple\":" + DoubleToString(rMultiple, 2) + ",";
-      jsonPayload += "\"chartData\":" + GetChartDataJson(symbol, openTime, (datetime)dealTime, timezoneOffset);
+      jsonPayload += "\"rMultiple\":" + DoubleToString(rMultiple, 2);
       jsonPayload += "}";
 
       newTrades++;
