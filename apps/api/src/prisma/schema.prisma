@@ -11,44 +11,50 @@ generator client {
 }
 
 model User {
-  id                    String                 @id @default(uuid())
-  email                 String                 @unique
-  phone                 String?                @unique
-  password_hash         String
-  name                  String?
-  plan                  Plan                   @default(FREE)
-  role                  Role                   @default(USER)
-  created_at            DateTime               @default(now())
-  display_currency      DisplayCurrency        @default(USD)
-  avatar_url            String?
-  deleted_at            DateTime?
-  accounts              Account[]
-  journalEntries        JournalEntry[]
-  subscriptions         Subscription[]
-  trades                Trade[]
-  importJobs            ImportJob[]
-  tags                  Tag[]
-  emotions              Emotion[]
-  refresh_tokens        RefreshToken[]
-  userDiscounts         UserDiscount[]
-  manualReceipts        ManualReceipt[]
-  mistakeIncidents      MistakeIncident[]
-  cryptoTransactions    CryptoTransaction[]
-  checkoutSessions      CheckoutSession[]
-  conversations         Conversation[]         @relation("UserConversations")
-  assignedConversations Conversation[]         @relation("AdminConversations")
-  sentMessages          Message[]              @relation("MessageSender")
-  activities            ConversationActivity[] @relation("ActivityActor")
-  backtestSessions      BacktestSession[]
-  blogPosts             BlogPost[]
-  blogComments          BlogComment[]
-  eaLogs                EALog[]
-  trading_concepts      TradingConcept[]
-  communityPosts        CommunityPost[]
-  communityComments     CommunityComment[]
-  communityLikes        CommunityLike[]
-  forumThreads          ForumThread[]
-  forumReplies          ForumReply[]
+  id                       String                    @id @default(uuid())
+  email                    String                    @unique
+  phone                    String?                   @unique
+  password_hash            String
+  name                     String?
+  plan                     Plan                      @default(FREE)
+  role                     Role                      @default(USER)
+  created_at               DateTime                  @default(now())
+  display_currency         DisplayCurrency           @default(USD)
+  avatar_url               String?
+  deleted_at               DateTime?
+  accounts                 Account[]
+  journalEntries           JournalEntry[]
+  subscriptions            Subscription[]
+  trades                   Trade[]
+  importJobs               ImportJob[]
+  tags                     Tag[]
+  emotions                 Emotion[]
+  refresh_tokens           RefreshToken[]
+  userDiscounts            UserDiscount[]
+  manualReceipts           ManualReceipt[]
+  mistakeIncidents         MistakeIncident[]
+  cryptoTransactions       CryptoTransaction[]
+  checkoutSessions         CheckoutSession[]
+  conversations            Conversation[]            @relation("UserConversations")
+  assignedConversations    Conversation[]            @relation("AdminConversations")
+  sentMessages             Message[]                 @relation("MessageSender")
+  activities               ConversationActivity[]    @relation("ActivityActor")
+  backtestSessions         BacktestSession[]
+  blogPosts                BlogPost[]
+  blogComments             BlogComment[]
+  eaLogs                   EALog[]
+  trading_concepts         TradingConcept[]
+  communityPosts           CommunityPost[]
+  communityComments        CommunityComment[]
+  communityLikes           CommunityLike[]
+  forumThreads             ForumThread[]
+  forumReplies             ForumReply[]
+  communityBookmarks       CommunityBookmark[]
+  communityFollowing       CommunityFollow[]         @relation("CommunityFollowing")
+  communityFollowers       CommunityFollow[]         @relation("CommunityFollowers")
+  communityCategoryFollows CommunityCategoryFollow[]
+  communitySymbolFollows   CommunitySymbolFollow[]
+  communityReports         CommunityReport[]
 }
 
 model Account {
@@ -129,6 +135,7 @@ model Trade {
   plan             TradePlan?
   events           TradeEvent[]
   mistakeIncidents MistakeIncident[]
+  communityPosts   CommunityPost[]
 
   @@unique([account_id, ticket])
   @@index([user_id])
@@ -817,84 +824,360 @@ enum TradeEventType {
   REVIEW
 }
 
-// --- Community Center Models ---
+// ============================================================
+// COMMUNITY
+// ============================================================
+
+enum CommunityPostType {
+  GENERAL
+  QUESTION
+  MARKET_ANALYSIS
+  TRADE_REVIEW
+  EDUCATION
+  DISCUSSION
+}
+
+enum CommunityContentStatus {
+  ACTIVE
+  HIDDEN
+  DELETED
+}
+
+enum CommunityVisibility {
+  PUBLIC
+  FOLLOWERS_ONLY
+}
 
 model CommunityPost {
-  id        String   @id @default(cuid())
-  content   String
-  authorId  String
-  author    User     @relation(fields: [authorId], references: [id])
-  likes     Int      @default(0)
-  replies   Int      @default(0)
-  symbols   String[] // e.g., ["EURUSD", "BTC"]
+  id      String @id @default(cuid())
+  content String
+
+  type       CommunityPostType      @default(GENERAL)
+  status     CommunityContentStatus @default(ACTIVE)
+  visibility CommunityVisibility    @default(PUBLIC)
+
+  authorId String
+  author   User   @relation(fields: [authorId], references: [id])
+
+  isAnonymous Boolean @default(false)
+
+  categoryId String?
+  category   CommunityCategory? @relation(fields: [categoryId], references: [id])
+
+  threadId String?
+  thread   ForumThread? @relation(fields: [threadId], references: [id])
+
+  tradeId String?
+  trade   Trade?  @relation(fields: [tradeId], references: [id], onDelete: SetNull)
+
+  likes    Int @default(0)
+  comments Int @default(0)
+  views    Int @default(0)
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  comments CommunityComment[]
-  likesRel CommunityLike[]
+  symbols     CommunityPostSymbol[]
+  likesRel    CommunityLike[]
+  commentsRel CommunityComment[]
+  bookmarks   CommunityBookmark[]
+  media       CommunityPostMedia[]
 
-  @@index([authorId])
+  @@index([authorId, createdAt])
+  @@index([categoryId, createdAt])
+  @@index([threadId])
+  @@index([tradeId])
+  @@index([status, createdAt])
   @@index([createdAt])
 }
 
+// ============================================================
+// COMMENTS
+// ============================================================
+
 model CommunityComment {
-  id        String        @id @default(cuid())
-  content   String
-  postId    String
-  post      CommunityPost @relation(fields: [postId], references: [id], onDelete: Cascade)
-  authorId  String
-  author    User          @relation(fields: [authorId], references: [id])
-  createdAt DateTime      @default(now())
+  id      String @id @default(cuid())
+  content String
+
+  status CommunityContentStatus @default(ACTIVE)
+
+  postId String
+  post   CommunityPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  authorId String
+  author   User   @relation(fields: [authorId], references: [id])
+
+  parentId String?
+  parent   CommunityComment? @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+
+  replies CommunityComment[] @relation("CommentReplies")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([postId, createdAt])
+  @@index([authorId])
+  @@index([parentId])
 }
+
+// ============================================================
+// LIKES
+// ============================================================
 
 model CommunityLike {
-  id        String        @id @default(cuid())
-  postId    String
-  post      CommunityPost @relation(fields: [postId], references: [id], onDelete: Cascade)
-  userId    String
-  user      User          @relation(fields: [userId], references: [id])
-  createdAt DateTime      @default(now())
+  id String @id @default(cuid())
+
+  postId String
+  post   CommunityPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  createdAt DateTime @default(now())
 
   @@unique([postId, userId])
+  @@index([userId])
 }
 
-model ForumCategory {
-  id          String        @id @default(cuid())
+// ============================================================
+// BOOKMARKS
+// ============================================================
+
+model CommunityBookmark {
+  userId String
+  postId String
+
+  user User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post CommunityPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@id([userId, postId])
+  @@index([postId])
+}
+
+// ============================================================
+// MEDIA
+// ============================================================
+
+model CommunityPostMedia {
+  id String @id @default(cuid())
+
+  postId String
+  post   CommunityPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  url       String
+  type      String
+  sortOrder Int    @default(0)
+
+  createdAt DateTime @default(now())
+
+  @@index([postId, sortOrder])
+}
+
+// ============================================================
+// SYMBOLS
+// ============================================================
+
+model CommunitySymbol {
+  id     String  @id @default(cuid())
+  symbol String  @unique
+  name   String?
+
+  posts     CommunityPostSymbol[]
+  followers CommunitySymbolFollow[]
+}
+
+model CommunityPostSymbol {
+  postId   String
+  symbolId String
+
+  post   CommunityPost   @relation(fields: [postId], references: [id], onDelete: Cascade)
+  symbol CommunitySymbol @relation(fields: [symbolId], references: [id], onDelete: Cascade)
+
+  @@id([postId, symbolId])
+  @@index([symbolId, postId])
+}
+
+// ============================================================
+// COMMUNITY CATEGORIES
+// ============================================================
+
+model CommunityCategory {
+  id          String  @id @default(cuid())
   nameEn      String
   nameFa      String
   description String?
-  icon        String        @default("💬")
-  order       Int           @default(0)
-  threads     ForumThread[]
+  icon        String?
+  order       Int     @default(0)
+
+  posts     CommunityPost[]
+  followers CommunityCategoryFollow[]
+
+  @@index([order])
+}
+
+// ============================================================
+// FORUM
+// ============================================================
+
+model ForumCategory {
+  id          String  @id @default(cuid())
+  nameEn      String
+  nameFa      String
+  description String?
+  icon        String?
+  order       Int     @default(0)
+
+  threads ForumThread[]
+
+  @@index([order])
 }
 
 model ForumThread {
-  id         String        @id @default(cuid())
-  title      String
-  content    String
+  id      String @id @default(cuid())
+  title   String
+  content String
+
+  status CommunityContentStatus @default(ACTIVE)
+
   categoryId String
   category   ForumCategory @relation(fields: [categoryId], references: [id])
-  authorId   String
-  author     User          @relation(fields: [authorId], references: [id])
-  isSolved   Boolean       @default(false)
-  views      Int           @default(0)
-  replies    Int           @default(0)
-  createdAt  DateTime      @default(now())
-  updatedAt  DateTime      @updatedAt
+
+  authorId String
+  author   User   @relation(fields: [authorId], references: [id])
+
+  isSolved Boolean @default(false)
+  views    Int     @default(0)
+  replies  Int     @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   repliesRel ForumReply[]
+  posts      CommunityPost[]
 
-  @@index([categoryId])
-  @@index([createdAt])
+  @@index([categoryId, createdAt])
+  @@index([authorId])
+  @@index([status, createdAt])
 }
 
 model ForumReply {
-  id         String      @id @default(cuid())
-  content    String
-  threadId   String
-  thread     ForumThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
-  authorId   String
-  author     User        @relation(fields: [authorId], references: [id])
-  isSolution Boolean     @default(false)
-  createdAt  DateTime    @default(now())
+  id      String @id @default(cuid())
+  content String
+
+  status CommunityContentStatus @default(ACTIVE)
+
+  threadId String
+  thread   ForumThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+
+  authorId String
+  author   User   @relation(fields: [authorId], references: [id])
+
+  isSolution Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([threadId, createdAt])
+  @@index([authorId])
+}
+
+// ============================================================
+// USER FOLLOWS
+// ============================================================
+
+model CommunityFollow {
+  followerId  String
+  followingId String
+
+  follower  User @relation("CommunityFollowing", fields: [followerId], references: [id])
+  following User @relation("CommunityFollowers", fields: [followingId], references: [id])
+
+  createdAt DateTime @default(now())
+
+  @@id([followerId, followingId])
+  @@index([followingId])
+}
+
+// ============================================================
+// CATEGORY FOLLOWS
+// ============================================================
+
+model CommunityCategoryFollow {
+  userId     String
+  categoryId String
+
+  user     User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category CommunityCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@id([userId, categoryId])
+  @@index([categoryId])
+}
+
+// ============================================================
+// SYMBOL FOLLOWS
+// ============================================================
+
+model CommunitySymbolFollow {
+  userId   String
+  symbolId String
+
+  user   User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  symbol CommunitySymbol @relation(fields: [symbolId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@id([userId, symbolId])
+  @@index([symbolId])
+}
+
+// ============================================================
+// MODERATION
+// ============================================================
+
+enum CommunityReportTargetType {
+  POST
+  COMMENT
+  THREAD
+  REPLY
+}
+
+enum CommunityReportReason {
+  SPAM
+  HARASSMENT
+  MISINFORMATION
+  SCAM
+  INAPPROPRIATE
+  OTHER
+}
+
+enum CommunityReportStatus {
+  PENDING
+  REVIEWED
+  DISMISSED
+  ACTION_TAKEN
+}
+
+model CommunityReport {
+  id String @id @default(cuid())
+
+  reason CommunityReportReason
+  status CommunityReportStatus @default(PENDING)
+  note   String?
+
+  reporterId String
+  reporter   User   @relation(fields: [reporterId], references: [id])
+
+  targetType CommunityReportTargetType
+  targetId   String
+
+  createdAt  DateTime  @default(now())
+  reviewedAt DateTime?
+
+  @@index([targetType, targetId])
+  @@index([status, createdAt])
+  @@index([reporterId])
 }
