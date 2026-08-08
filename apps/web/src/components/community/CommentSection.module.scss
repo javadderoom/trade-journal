@@ -1,0 +1,124 @@
+@use '../../app/variables' as *;
+
+.commentSection {
+  margin-top: 16px;
+  border-top: 1px solid rgba($outline-variant, 0.4);
+  padding-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.inputArea {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+
+  .avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background-color: $surface-container-high;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: bold;
+    color: $text;
+    overflow: hidden;
+
+    img { width: 100%; height: 100%; object-fit: cover; }
+  }
+
+  input {
+    flex: 1;
+    background-color: $surface-container-low;
+    border: 1px solid rgba($outline-variant, 0.4);
+    color: $text;
+    padding: 8px 12px;
+    border-radius: 20px;
+    font-family: inherit;
+    font-size: 14px;
+
+    &:focus {
+      outline: none;
+      border-color: $primary;
+    }
+  }
+
+  button {
+    background: none;
+    border: none;
+    color: $primary;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 14px;
+    padding: 4px 8px;
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.loading {
+  font-size: 13px;
+  color: $muted;
+  text-align: center;
+}
+
+.commentItem {
+  display: flex;
+  gap: 12px;
+
+  .avatarSmall {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background-color: $surface-container-high;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: bold;
+    color: $text;
+    overflow: hidden;
+    flex-shrink: 0;
+
+    img { width: 100%; height: 100%; object-fit: cover; }
+  }
+  
+  .commentContent {
+    flex: 1;
+    background-color: rgba($surface-container-low, 0.5);
+    padding: 10px 14px;
+    border-radius: 12px;
+    border: 1px solid rgba($outline-variant, 0.2);
+
+    .commentHeader {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 4px;
+      
+      .authorName {
+        font-weight: 700;
+        font-size: 13px;
+        color: $text;
+      }
+    }
+
+    .text {
+      font-size: 14px;
+      color: $text;
+      line-height: 20px;
+      white-space: pre-wrap;
+    }
+  }
+}

@@ -8,6 +8,7 @@ export interface User {
   phone?: string;
   plan: string;
   role: string;
+  avatar_url?: string | null;
 }
 
 interface AuthState {

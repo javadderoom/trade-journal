@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
+import axios from 'axios';
 import styles from './CommunityPostCard.module.scss';
 import { TradePreviewCard, TradePreviewProps } from './TradePreviewCard';
+import { CommentSection } from './CommentSection';
 
 export interface PostProps {
   id: string;
@@ -20,6 +22,23 @@ export interface PostProps {
 }
 
 export function CommunityPostCard({ post }: { post: PostProps }) {
+  const [showComments, setShowComments] = useState(false);
+  const [isLiked, setIsLiked] = useState(false);
+  const [likeCount, setLikeCount] = useState(post._count.likesRel);
+
+  const handleLike = async () => {
+    if (isLiked) return;
+    setIsLiked(true);
+    setLikeCount(prev => prev + 1);
+    try {
+      await axios.post(`http://localhost:3000/api/community/feed/${post.id}/like`, {}, { withCredentials: true });
+    } catch (e) {
+      console.error('Failed to like post:', e);
+      setIsLiked(false);
+      setLikeCount(prev => prev - 1);
+    }
+  };
+
   // simple relative time formatter
   const formatTime = (dateString: string) => {
     const date = new Date(dateString);
@@ -61,15 +80,25 @@ export function CommunityPostCard({ post }: { post: PostProps }) {
         {post.trade && <TradePreviewCard trade={post.trade} />}
 
         <div className={styles.actions}>
-          <button title="Like">
-             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
-             {post._count.likesRel > 0 && <span>{post._count.likesRel}</span>}
+          <button 
+            title="Like" 
+            onClick={handleLike} 
+            style={isLiked ? { color: 'var(--primary)' } : {}}
+          >
+             <svg fill={isLiked ? "currentColor" : "none"} stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
+             {likeCount > 0 && <span>{likeCount}</span>}
           </button>
-          <button title="Comment">
-             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>
+          <button 
+            title="Comment" 
+            onClick={() => setShowComments(!showComments)}
+            style={showComments ? { color: 'var(--primary)' } : {}}
+          >
+             <svg fill={showComments ? "currentColor" : "none"} stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>
              {post._count.commentsRel > 0 && <span>{post._count.commentsRel}</span>}
           </button>
         </div>
+
+        {showComments && <CommentSection postId={post.id} />}
       </div>
     </div>
   );

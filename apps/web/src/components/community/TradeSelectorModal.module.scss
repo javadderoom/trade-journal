@@ -1,0 +1,154 @@
+@use '../../app/variables' as *;
+
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+.modal {
+  background-color: $surface;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 500px;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+}
+
+.header {
+  padding: 16px 20px;
+  border-bottom: 1px solid rgba($outline-variant, 0.4);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  h2 {
+    margin: 0;
+    font-size: 18px;
+    color: $text;
+  }
+
+  .closeBtn {
+    background: none;
+    border: none;
+    color: $muted;
+    font-size: 24px;
+    cursor: pointer;
+    line-height: 1;
+
+    &:hover {
+      color: $text;
+    }
+  }
+}
+
+.body {
+  padding: 16px 20px;
+  overflow-y: auto;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.loading {
+  text-align: center;
+  padding: 20px;
+  color: $muted;
+}
+
+.tradeItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+  border-radius: 8px;
+  background-color: $surface-container-low;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover {
+    background-color: $surface-container;
+  }
+
+  &.selected {
+    border-color: $primary;
+    background-color: rgba($primary, 0.1);
+  }
+
+  .symbolInfo {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+
+    .symbol {
+      font-weight: 700;
+      color: $text;
+      font-size: 14px;
+    }
+    .date {
+      font-size: 12px;
+      color: $muted;
+    }
+  }
+
+  .result {
+    font-weight: 600;
+    font-size: 14px;
+    
+    &.profit {
+      color: $profit;
+    }
+    &.loss {
+      color: $loss;
+    }
+  }
+}
+
+.footer {
+  padding: 16px 20px;
+  border-top: 1px solid rgba($outline-variant, 0.4);
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+
+  button {
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .cancelBtn {
+    background: transparent;
+    border: 1px solid $outline-variant;
+    color: $text;
+
+    &:hover {
+      background: rgba($outline-variant, 0.2);
+    }
+  }
+
+  .confirmBtn {
+    background: $primary;
+    border: none;
+    color: $on-primary;
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+}
