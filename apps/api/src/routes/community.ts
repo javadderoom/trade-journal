@@ -297,5 +297,96 @@ router.post('/forum/thread', authenticate, async (req: any, res) => {
         res.status(500).json({ error: 'Failed to create thread' });
     }
 });
+// Get Single Thread
+router.get('/forum/thread/:id', async (req, res) => {
+    try {
+        const thread = await prisma.forumThread.findUnique({
+            where: { id: req.params.id },
+            include: {
+                author: { select: { id: true, name: true, avatar_url: true } },
+                category: true,
+                repliesRel: {
+                    include: {
+                        author: { select: { id: true, name: true, avatar_url: true } }
+                    },
+                    orderBy: { createdAt: 'asc' }
+                }
+            }
+        });
+        
+        if (!thread) return res.status(404).json({ error: 'Thread not found' });
+        
+        // increment views
+        prisma.forumThread.update({
+            where: { id: req.params.id },
+            data: { views: { increment: 1 } }
+        }).catch(console.error);
+
+        res.json(thread);
+    } catch (error) {
+        console.error("Error fetching thread:", error);
+        res.status(500).json({ error: 'Failed to fetch thread' });
+    }
+});
+
+// Reply to Thread
+router.post('/forum/thread/:id/reply', authenticate, async (req: any, res) => {
+    try {
+        const { content } = req.body;
+        const threadId = req.params.id;
+        const userId = req.user.id;
+
+        const reply = await prisma.forumReply.create({
+            data: {
+                content,
+                threadId,
+                authorId: userId
+            },
+            include: {
+                author: { select: { id: true, name: true, avatar_url: true } }
+            }
+        });
+
+        res.json(reply);
+    } catch (error) {
+        console.error("Error replying to thread:", error);
+        res.status(500).json({ error: 'Failed to reply to thread' });
+    }
+});
+
+// Mark Solution
+router.post('/forum/reply/:replyId/solution', authenticate, async (req: any, res) => {
+    try {
+        const { replyId } = req.params;
+        const userId = req.user.id;
+
+        const reply = await prisma.forumReply.findUnique({
+            where: { id: replyId },
+            include: { thread: true }
+        });
+
+        if (!reply) return res.status(404).json({ error: 'Reply not found' });
+        if (reply.thread.authorId !== userId) {
+            return res.status(403).json({ error: 'Only thread author can mark a solution' });
+        }
+
+        // Unmark previous solution if any, and mark this one
+        await prisma.$transaction([
+            prisma.forumReply.updateMany({
+                where: { threadId: reply.threadId, isSolution: true },
+                data: { isSolution: false }
+            }),
+            prisma.forumReply.update({
+                where: { id: replyId },
+                data: { isSolution: true }
+            })
+        ]);
+
+        res.json({ success: true });
+    } catch (error) {
+        console.error("Error marking solution:", error);
+        res.status(500).json({ error: 'Failed to mark solution' });
+    }
+});
 
 export default router;

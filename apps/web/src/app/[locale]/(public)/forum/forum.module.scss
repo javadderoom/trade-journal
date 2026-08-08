@@ -1,0 +1,83 @@
+@use '../../../variables' as *;
+
+.forumContainer {
+  max-width: 680px;
+  margin: 0 auto;
+  width: 100%;
+  padding: 32px 24px;
+}
+
+.header {
+  margin-bottom: 32px;
+
+  h1 {
+    margin: 0;
+    margin-bottom: 8px;
+    font-size: 28px;
+  }
+
+  p {
+    color: $muted;
+    font-size: 16px;
+    margin: 0;
+  }
+}
+
+.categoryList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.categoryCard {
+  background-color: $surface;
+  border: 1px solid rgba($outline-variant, 0.4);
+  border-radius: 8px;
+  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  text-decoration: none;
+  transition: background-color 0.2s, border-color 0.2s;
+
+  &:hover {
+    background-color: rgba($surface-container-low, 0.5);
+    border-color: rgba($outline-variant, 0.8);
+  }
+
+  .content {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+
+    h2 {
+      margin: 0;
+      font-size: 18px;
+      color: $text;
+    }
+
+    p {
+      margin: 0;
+      color: $muted;
+      font-size: 14px;
+    }
+  }
+
+  .stats {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+
+    .count {
+      font-size: 16px;
+      font-weight: 700;
+      color: $text;
+    }
+
+    .label {
+      font-size: 12px;
+      color: $muted;
+    }
+  }
+}
