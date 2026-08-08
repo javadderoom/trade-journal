@@ -11,39 +11,44 @@ generator client {
 }
 
 model User {
-  id               String           @id @default(uuid())
-  email            String           @unique
-  phone            String?          @unique
-  password_hash    String
-  name             String?
-  plan             Plan             @default(FREE)
-  role             Role             @default(USER)
-  created_at       DateTime         @default(now())
-  display_currency DisplayCurrency  @default(USD)
-  avatar_url       String?
-  deleted_at       DateTime?
-  accounts         Account[]
-  journalEntries   JournalEntry[]
-  subscriptions    Subscription[]
-  trades           Trade[]
-  importJobs       ImportJob[]
-  tags             Tag[]
-  emotions         Emotion[]
-  refresh_tokens   RefreshToken[]
-  userDiscounts    UserDiscount[]
-  manualReceipts   ManualReceipt[]
-   mistakeIncidents MistakeIncident[]
-   cryptoTransactions CryptoTransaction[]
-   checkoutSessions CheckoutSession[]
-   conversations Conversation[]             @relation("UserConversations")
-   assignedConversations Conversation[]     @relation("AdminConversations")
-   sentMessages Message[]                   @relation("MessageSender")
-   activities ConversationActivity[]        @relation("ActivityActor")
-   backtestSessions BacktestSession[]
-   blogPosts        BlogPost[]
-   blogComments     BlogComment[]
-   eaLogs           EALog[]
-   trading_concepts TradingConcept[]
+  id                    String                 @id @default(uuid())
+  email                 String                 @unique
+  phone                 String?                @unique
+  password_hash         String
+  name                  String?
+  plan                  Plan                   @default(FREE)
+  role                  Role                   @default(USER)
+  created_at            DateTime               @default(now())
+  display_currency      DisplayCurrency        @default(USD)
+  avatar_url            String?
+  deleted_at            DateTime?
+  accounts              Account[]
+  journalEntries        JournalEntry[]
+  subscriptions         Subscription[]
+  trades                Trade[]
+  importJobs            ImportJob[]
+  tags                  Tag[]
+  emotions              Emotion[]
+  refresh_tokens        RefreshToken[]
+  userDiscounts         UserDiscount[]
+  manualReceipts        ManualReceipt[]
+  mistakeIncidents      MistakeIncident[]
+  cryptoTransactions    CryptoTransaction[]
+  checkoutSessions      CheckoutSession[]
+  conversations         Conversation[]         @relation("UserConversations")
+  assignedConversations Conversation[]         @relation("AdminConversations")
+  sentMessages          Message[]              @relation("MessageSender")
+  activities            ConversationActivity[] @relation("ActivityActor")
+  backtestSessions      BacktestSession[]
+  blogPosts             BlogPost[]
+  blogComments          BlogComment[]
+  eaLogs                EALog[]
+  trading_concepts      TradingConcept[]
+  communityPosts        CommunityPost[]
+  communityComments     CommunityComment[]
+  communityLikes        CommunityLike[]
+  forumThreads          ForumThread[]
+  forumReplies          ForumReply[]
 }
 
 model Account {
@@ -68,13 +73,13 @@ model Account {
 }
 
 model RefreshToken {
-  id         String   @id @default(uuid())
-  token      String   @unique
-  user_id    String
-  user       User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
-  expires_at DateTime
-  created_at DateTime @default(now())
-  user_agent String?
+  id           String   @id @default(uuid())
+  token        String   @unique
+  user_id      String
+  user         User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  expires_at   DateTime
+  created_at   DateTime @default(now())
+  user_agent   String?
   last_used_at DateTime @default(now())
 
   @@index([user_id])
@@ -102,27 +107,28 @@ model Trade {
   open_time     DateTime
   close_time    DateTime?
   open_price    Float
-  close_price   Float?       // Aggregated: last exit price (null if still open)
-  lot_size      Float        // Aggregated: original entry lot size
+  close_price   Float? // Aggregated: last exit price (null if still open)
+  lot_size      Float // Aggregated: original entry lot size
   stop_loss     Float?
   take_profit   Float?
-  profit_usd    Float        // Aggregated: sum of all exit P&L
-  commission    Float        // Aggregated: sum of all execution commissions
-  swap          Float        // Aggregated: sum of all execution swaps
-  pips          Float        // Aggregated: pips from last exit
-  r_multiple    Float        // Aggregated: R-multiple from last exit
-  ticket        String?      // MT4/MT5 deal ticket for deduplication
+  profit_usd    Float // Aggregated: sum of all exit P&L
+  commission    Float // Aggregated: sum of all execution commissions
+  swap          Float // Aggregated: sum of all execution swaps
+  pips          Float // Aggregated: pips from last exit
+  r_multiple    Float // Aggregated: R-multiple from last exit
+  ticket        String? // MT4/MT5 deal ticket for deduplication
   import_source ImportSource @default(MANUAL)
-  created_at         DateTime     @default(now())
+  created_at    DateTime     @default(now())
 
-  executions    Execution[]
+  executions Execution[]
 
-  annotation    TradeAnnotation?
-  setup         TradeSetup?
-  triggers      TradeTrigger[]
-  confluences   TradeConfluence[]
-  plan          TradePlan?
-  events        TradeEvent[]
+  annotation       TradeAnnotation?
+  setup            TradeSetup?
+  triggers         TradeTrigger[]
+  confluences      TradeConfluence[]
+  plan             TradePlan?
+  events           TradeEvent[]
+  mistakeIncidents MistakeIncident[]
 
   @@unique([account_id, ticket])
   @@index([user_id])
@@ -131,30 +137,29 @@ model Trade {
   @@index([user_id, open_time])
   @@index([user_id, account_id, open_time])
   @@index([user_id, close_time])
-  mistakeIncidents MistakeIncident[]
 }
 
 model TradeAnnotation {
-  id                String   @id @default(uuid())
-  trade_id          String   @unique
-  trade             Trade    @relation(fields: [trade_id], references: [id], onDelete: Cascade)
-  
-  htf_bias          Direction?
-  session           TradingSession?
+  id       String @id @default(uuid())
+  trade_id String @unique
+  trade    Trade  @relation(fields: [trade_id], references: [id], onDelete: Cascade)
+
+  htf_bias           Direction?
+  session            TradingSession?
   analysis_timeframe Timeframe?
   entry_timeframe    Timeframe?
-  
-  thesis            String?
-  expectation       String?
-  lesson            String?
-  
-  notes             String?
-  conviction        Int?
-  emotion           String?
-  screenshots       String[] @default([])
 
-  created_at        DateTime @default(now())
-  updated_at        DateTime @updatedAt
+  thesis      String?
+  expectation String?
+  lesson      String?
+
+  notes       String?
+  conviction  Int?
+  emotion     String?
+  screenshots String[] @default([])
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
 }
 
 enum TradingSession {
@@ -183,12 +188,12 @@ model Execution {
   type        ExecutionType
   lot_size    Float
   price       Float
-  profit_usd  Float         @default(0)  // Realized P&L for this execution (exits only)
+  profit_usd  Float         @default(0) // Realized P&L for this execution (exits only)
   commission  Float         @default(0)
   swap        Float         @default(0)
   pips        Float         @default(0)
   r_multiple  Float         @default(0)
-  close_time  DateTime?     // When this exit was closed
+  close_time  DateTime? // When this exit was closed
   executed_at DateTime      @default(now())
   notes       String?
 
@@ -206,9 +211,9 @@ model MistakeIncident {
   id         String   @id @default(uuid())
   user_id    String
   trade_id   String
-  rule_key   String   // "NO_SL" | "SL_NOT_RESPECTED" | "REVENGE_TRADE" | "UNUSUAL_SIZE" | "WEAK_STRATEGY" | "WEAK_HOUR"
-  label      String   // user-visible Persian label
-  cost_usd   Float    // abs(profit_usd) of this trade
+  rule_key   String // "NO_SL" | "SL_NOT_RESPECTED" | "REVENGE_TRADE" | "UNUSUAL_SIZE" | "WEAK_STRATEGY" | "WEAK_HOUR"
+  label      String // user-visible Persian label
+  cost_usd   Float // abs(profit_usd) of this trade
   created_at DateTime @default(now())
 
   user  User  @relation(fields: [user_id], references: [id], onDelete: Cascade)
@@ -232,17 +237,17 @@ model JournalEntry {
 }
 
 model ImportJob {
-  id             String       @id @default(uuid())
-  user_id        String
-  user           User         @relation(fields: [user_id], references: [id], onDelete: Cascade)
-  account_id     String?
-  account        Account?     @relation(fields: [account_id], references: [id], onDelete: SetNull)
-  filename       String
-  status         ImportStatus @default(UPLOADED)
-  rows_total     Int
-  rows_imported  Int          @default(0)
-  errors         String[]
-  created_at     DateTime     @default(now())
+  id            String       @id @default(uuid())
+  user_id       String
+  user          User         @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  account_id    String?
+  account       Account?     @relation(fields: [account_id], references: [id], onDelete: SetNull)
+  filename      String
+  status        ImportStatus @default(UPLOADED)
+  rows_total    Int
+  rows_imported Int          @default(0)
+  errors        String[]
+  created_at    DateTime     @default(now())
 
   @@index([user_id])
   @@index([account_id])
@@ -277,8 +282,8 @@ model Emotion {
   id         String   @id @default(uuid())
   user_id    String
   user       User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
-  value      String   // Stored value string (e.g. "CONFIDENT", "REVENGE")
-  label      String   // Display label in Persian (e.g. "با اطمینان")
+  value      String // Stored value string (e.g. "CONFIDENT", "REVENGE")
+  label      String // Display label in Persian (e.g. "با اطمینان")
   emoji      String   @default("💭")
   created_at DateTime @default(now())
 
@@ -286,24 +291,24 @@ model Emotion {
 }
 
 model DiscountCode {
-  id             String         @id @default(uuid())
-  code           String         @unique
+  id              String         @id @default(uuid())
+  code            String         @unique
   discountPercent Int
-  maxUses        Int
-  usedCount      Int            @default(0)
-  expireDate     DateTime
-  isAccountBound Boolean        @default(false)
-  created_at     DateTime       @default(now())
-  userDiscounts  UserDiscount[]
+  maxUses         Int
+  usedCount       Int            @default(0)
+  expireDate      DateTime
+  isAccountBound  Boolean        @default(false)
+  created_at      DateTime       @default(now())
+  userDiscounts   UserDiscount[]
 }
 
 model UserDiscount {
-  id             String       @id @default(uuid())
-  user_id        String
-  user           User         @relation(fields: [user_id], references: [id], onDelete: Cascade)
-  discount_id    String
-  discountCode   DiscountCode @relation(fields: [discount_id], references: [id], onDelete: Cascade)
-  used_at        DateTime     @default(now())
+  id           String       @id @default(uuid())
+  user_id      String
+  user         User         @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  discount_id  String
+  discountCode DiscountCode @relation(fields: [discount_id], references: [id], onDelete: Cascade)
+  used_at      DateTime     @default(now())
 
   @@unique([user_id, discount_id])
 }
@@ -348,7 +353,6 @@ enum Direction {
   BUY
   SELL
 }
-
 
 enum Mood {
   HAPPY
@@ -409,37 +413,36 @@ model Otp {
 }
 
 model CryptoTransaction {
-  id           String            @id @default(uuid())
-  user_id      String
-  user         User              @relation(fields: [user_id], references: [id], onDelete: Cascade)
-  tx_hash      String            @unique
-  coin         String
-  amount       Float
-  plan         Plan
-  period       String
-  status       CryptoTxStatus    @default(PENDING)
-  created_at   DateTime          @default(now())
-  updated_at   DateTime          @updatedAt
+  id         String         @id @default(uuid())
+  user_id    String
+  user       User           @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  tx_hash    String         @unique
+  coin       String
+  amount     Float
+  plan       Plan
+  period     String
+  status     CryptoTxStatus @default(PENDING)
+  created_at DateTime       @default(now())
+  updated_at DateTime       @updatedAt
 
   @@index([user_id])
 }
 
 model ExchangeConnection {
-  id            String    @id @default(uuid())
-  account_id    String    @unique
-  account       Account   @relation(fields: [account_id], references: [id], onDelete: Cascade)
-  exchange_id   String    // e.g. "binance", "nobitex"
-  api_key       String    // encrypted
-  api_secret    String    // encrypted
-  passphrase    String?   // encrypted (optional)
-  last_trade_id String?   // last synced trade ID
-  is_active     Boolean   @default(true)
-  created_at    DateTime  @default(now())
-  updated_at    DateTime  @updatedAt
+  id            String   @id @default(uuid())
+  account_id    String   @unique
+  account       Account  @relation(fields: [account_id], references: [id], onDelete: Cascade)
+  exchange_id   String // e.g. "binance", "nobitex"
+  api_key       String // encrypted
+  api_secret    String // encrypted
+  passphrase    String? // encrypted (optional)
+  last_trade_id String? // last synced trade ID
+  is_active     Boolean  @default(true)
+  created_at    DateTime @default(now())
+  updated_at    DateTime @updatedAt
 
   @@index([account_id])
 }
-
 
 enum CryptoTxStatus {
   PENDING
@@ -448,16 +451,16 @@ enum CryptoTxStatus {
 }
 
 model CheckoutSession {
-  id            String   @id @default(uuid())
-  gateway       String   // "zarinpal" or "payping"
-  authority     String   @unique // ZarinPal authority string OR PayPing session code
-  user_id       String
-  user          User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
-  plan          Plan
-  period        String
-  amount        Float
-  discountCode  String?
-  created_at    DateTime @default(now())
+  id           String   @id @default(uuid())
+  gateway      String // "zarinpal" or "payping"
+  authority    String   @unique // ZarinPal authority string OR PayPing session code
+  user_id      String
+  user         User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  plan         Plan
+  period       String
+  amount       Float
+  discountCode String?
+  created_at   DateTime @default(now())
 
   @@index([user_id])
   @@index([authority])
@@ -466,21 +469,21 @@ model CheckoutSession {
 // ─── Support Chat ──────────────────────────────────────────────────────────────
 
 model Conversation {
-  id               String             @id @default(uuid())
-  user_id          String
-  user             User               @relation("UserConversations", fields: [user_id], references: [id], onDelete: Cascade)
-  subject          String
-  status           ConversationStatus @default(OPEN)
-  priority         Priority           @default(NORMAL)
-  category         SupportCategory    @default(GENERAL)
+  id                String                 @id @default(uuid())
+  user_id           String
+  user              User                   @relation("UserConversations", fields: [user_id], references: [id], onDelete: Cascade)
+  subject           String
+  status            ConversationStatus     @default(OPEN)
+  priority          Priority               @default(NORMAL)
+  category          SupportCategory        @default(GENERAL)
   assigned_admin_id String?
-  assigned_admin   User?              @relation("AdminConversations", fields: [assigned_admin_id], references: [id], onDelete: SetNull)
-  created_at       DateTime           @default(now())
-  updated_at       DateTime           @updatedAt
-  resolved_at      DateTime?
-  closed_at        DateTime?
-  messages         Message[]
-  activities       ConversationActivity[]
+  assigned_admin    User?                  @relation("AdminConversations", fields: [assigned_admin_id], references: [id], onDelete: SetNull)
+  created_at        DateTime               @default(now())
+  updated_at        DateTime               @updatedAt
+  resolved_at       DateTime?
+  closed_at         DateTime?
+  messages          Message[]
+  activities        ConversationActivity[]
 
   @@index([user_id])
   @@index([status])
@@ -548,7 +551,7 @@ enum LogLevel {
 }
 
 model SystemLog {
-  id         String    @id @default(uuid())
+  id         String   @id @default(uuid())
   level      LogLevel
   source     String
   message    String
@@ -569,7 +572,7 @@ model EALog {
   account_id String?
   account    Account? @relation(fields: [account_id], references: [id], onDelete: Cascade)
   level      LogLevel @default(INFO)
-  action     String   // e.g. "SYNC", "ERROR"
+  action     String // e.g. "SYNC", "ERROR"
   message    String
   ip_address String?
   created_at DateTime @default(now())
@@ -619,19 +622,19 @@ model CandleCache {
 // ─── Blog System ────────────────────────────────────────────────────────────
 
 model BlogCategory {
-  id          String     @id @default(uuid())
-  locale      String     @default("fa")
+  id          String   @id @default(uuid())
+  locale      String   @default("fa")
   name        String
-  slug        String     @unique
+  slug        String   @unique
   description String?
-  created_at  DateTime   @default(now())
-  updated_at  DateTime       @updatedAt
-  
-  parent_id   String?
-  parent      BlogCategory?  @relation("CategoryHierarchy", fields: [parent_id], references: [id])
-  children    BlogCategory[] @relation("CategoryHierarchy")
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
 
-  posts       BlogPost[]
+  parent_id String?
+  parent    BlogCategory?  @relation("CategoryHierarchy", fields: [parent_id], references: [id])
+  children  BlogCategory[] @relation("CategoryHierarchy")
+
+  posts BlogPost[]
 
   @@index([slug])
 }
@@ -642,7 +645,7 @@ model BlogTag {
   name       String
   slug       String     @unique
   created_at DateTime   @default(now())
-  posts       BlogPost[]
+  posts      BlogPost[]
 
   @@index([slug])
 }
@@ -654,43 +657,43 @@ enum PostStatus {
 }
 
 model BlogPost {
-  id               String       @id @default(uuid())
-  locale           String       @default("fa")
-  title            String
-  slug             String       @unique
-  content          String       @db.Text
-  excerpt          String?      @db.Text
-  cover_image      String?
-  status           PostStatus   @default(DRAFT)
-  view_count       Int          @default(0)
-  seo_title        String?
-  seo_description  String?
-  social_copy      String?      @db.Text
-  
+  id              String     @id @default(uuid())
+  locale          String     @default("fa")
+  title           String
+  slug            String     @unique
+  content         String     @db.Text
+  excerpt         String?    @db.Text
+  cover_image     String?
+  status          PostStatus @default(DRAFT)
+  view_count      Int        @default(0)
+  seo_title       String?
+  seo_description String?
+  social_copy     String?    @db.Text
+
   // AI Automation Fields
-  featured_image_prompt String?      @db.Text
+  featured_image_prompt String? @db.Text
   reading_time          Int?
   seo_score             Int?
   quality_score         Int?
-  
-  author_id        String
-  author           User         @relation(fields: [author_id], references: [id])
-  
-  category_id      String?
-  category         BlogCategory? @relation(fields: [category_id], references: [id], onDelete: SetNull)
-  
-  tags             BlogTag[]
-  comments         BlogComment[]
 
-  published_at     DateTime?
-  created_at       DateTime     @default(now())
-  updated_at       DateTime     @updatedAt
+  author_id String
+  author    User   @relation(fields: [author_id], references: [id])
 
-  social_posted    Boolean      @default(false)
+  category_id String?
+  category    BlogCategory? @relation(fields: [category_id], references: [id], onDelete: SetNull)
 
-  translation_id   String?      @unique
-  translation      BlogPost?    @relation("PostTranslations", fields: [translation_id], references: [id])
-  translated_from  BlogPost?    @relation("PostTranslations")
+  tags     BlogTag[]
+  comments BlogComment[]
+
+  published_at DateTime?
+  created_at   DateTime  @default(now())
+  updated_at   DateTime  @updatedAt
+
+  social_posted Boolean @default(false)
+
+  translation_id  String?   @unique
+  translation     BlogPost? @relation("PostTranslations", fields: [translation_id], references: [id])
+  translated_from BlogPost? @relation("PostTranslations")
 
   @@index([slug])
   @@index([status, published_at])
@@ -698,22 +701,22 @@ model BlogPost {
 }
 
 model BlogComment {
-  id          String       @id @default(uuid())
-  content     String       @db.Text
-  is_approved Boolean      @default(false)
-  
-  post_id     String
-  post        BlogPost     @relation(fields: [post_id], references: [id], onDelete: Cascade)
-  
-  user_id     String
-  user        User         @relation(fields: [user_id], references: [id], onDelete: Cascade)
-  
-  created_at  DateTime     @default(now())
-  updated_at  DateTime     @updatedAt
+  id          String  @id @default(uuid())
+  content     String  @db.Text
+  is_approved Boolean @default(false)
 
-  parent_id   String?
-  parent      BlogComment?  @relation("CommentReplies", fields: [parent_id], references: [id])
-  replies     BlogComment[] @relation("CommentReplies")
+  post_id String
+  post    BlogPost @relation(fields: [post_id], references: [id], onDelete: Cascade)
+
+  user_id String
+  user    User   @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  parent_id String?
+  parent    BlogComment?  @relation("CommentReplies", fields: [parent_id], references: [id])
+  replies   BlogComment[] @relation("CommentReplies")
 
   @@index([post_id, is_approved])
   @@index([user_id])
@@ -745,26 +748,26 @@ enum ConceptRole {
 }
 
 model TradeSetup {
-  trade_id   String @id
-  trade      Trade  @relation(fields: [trade_id], references: [id], onDelete: Cascade)
+  trade_id   String         @id
+  trade      Trade          @relation(fields: [trade_id], references: [id], onDelete: Cascade)
   concept_id String
   concept    TradingConcept @relation(fields: [concept_id], references: [id])
 }
 
 model TradeTrigger {
-  id         String  @id @default(uuid())
+  id         String         @id @default(uuid())
   trade_id   String
-  trade      Trade   @relation(fields: [trade_id], references: [id], onDelete: Cascade)
+  trade      Trade          @relation(fields: [trade_id], references: [id], onDelete: Cascade)
   concept_id String
   concept    TradingConcept @relation(fields: [concept_id], references: [id])
-  is_primary Boolean @default(false)
+  is_primary Boolean        @default(false)
 
   @@unique([trade_id, concept_id])
 }
 
 model TradeConfluence {
   trade_id   String
-  trade      Trade   @relation(fields: [trade_id], references: [id], onDelete: Cascade)
+  trade      Trade          @relation(fields: [trade_id], references: [id], onDelete: Cascade)
   concept_id String
   concept    TradingConcept @relation(fields: [concept_id], references: [id])
 
@@ -772,15 +775,15 @@ model TradeConfluence {
 }
 
 model TradePlan {
-  id                 String   @id @default(uuid())
-  trade_id           String   @unique
-  trade              Trade    @relation(fields: [trade_id], references: [id], onDelete: Cascade)
-  max_risk           Float?
-  expected_rr        Float?
-  entry_condition    String?
-  invalidation       String?
-  target_zone        String?
-  expected_hold_time String?
+  id                         String   @id @default(uuid())
+  trade_id                   String   @unique
+  trade                      Trade    @relation(fields: [trade_id], references: [id], onDelete: Cascade)
+  max_risk                   Float?
+  expected_rr                Float?
+  entry_condition            String?
+  invalidation               String?
+  target_zone                String?
+  expected_hold_time         String?
   plan_followed              Boolean?
   entry_timing_correct       Boolean?
   emotions_affected          Boolean?
@@ -814,3 +817,84 @@ enum TradeEventType {
   REVIEW
 }
 
+// --- Community Center Models ---
+
+model CommunityPost {
+  id        String   @id @default(cuid())
+  content   String
+  authorId  String
+  author    User     @relation(fields: [authorId], references: [id])
+  likes     Int      @default(0)
+  replies   Int      @default(0)
+  symbols   String[] // e.g., ["EURUSD", "BTC"]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  comments CommunityComment[]
+  likesRel CommunityLike[]
+
+  @@index([authorId])
+  @@index([createdAt])
+}
+
+model CommunityComment {
+  id        String        @id @default(cuid())
+  content   String
+  postId    String
+  post      CommunityPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  authorId  String
+  author    User          @relation(fields: [authorId], references: [id])
+  createdAt DateTime      @default(now())
+}
+
+model CommunityLike {
+  id        String        @id @default(cuid())
+  postId    String
+  post      CommunityPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User          @relation(fields: [userId], references: [id])
+  createdAt DateTime      @default(now())
+
+  @@unique([postId, userId])
+}
+
+model ForumCategory {
+  id          String        @id @default(cuid())
+  nameEn      String
+  nameFa      String
+  description String?
+  icon        String        @default("💬")
+  order       Int           @default(0)
+  threads     ForumThread[]
+}
+
+model ForumThread {
+  id         String        @id @default(cuid())
+  title      String
+  content    String
+  categoryId String
+  category   ForumCategory @relation(fields: [categoryId], references: [id])
+  authorId   String
+  author     User          @relation(fields: [authorId], references: [id])
+  isSolved   Boolean       @default(false)
+  views      Int           @default(0)
+  replies    Int           @default(0)
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+
+  repliesRel ForumReply[]
+
+  @@index([categoryId])
+  @@index([createdAt])
+}
+
+model ForumReply {
+  id         String      @id @default(cuid())
+  content    String
+  threadId   String
+  thread     ForumThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  authorId   String
+  author     User        @relation(fields: [authorId], references: [id])
+  isSolution Boolean     @default(false)
+  createdAt  DateTime    @default(now())
+}
