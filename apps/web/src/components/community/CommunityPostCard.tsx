@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
+import Link from 'next/link';
+import { useParams } from 'next/navigation';
 import axios from 'axios';
 import styles from './CommunityPostCard.module.scss';
 import { TradePreviewCard, TradePreviewProps } from './TradePreviewCard';
 import { CommentSection } from './CommentSection';
+import { FollowButton } from './FollowButton';
 
 export interface PostProps {
   id: string;
@@ -19,11 +22,14 @@ export interface PostProps {
     commentsRel: number;
     likesRel: number;
   };
+  isLikedByMe?: boolean;
 }
 
 export function CommunityPostCard({ post }: { post: PostProps }) {
+  const params = useParams();
+  const locale = params?.locale || 'en';
   const [showComments, setShowComments] = useState(false);
-  const [isLiked, setIsLiked] = useState(false);
+  const [isLiked, setIsLiked] = useState(post.isLikedByMe || false);
   const [likeCount, setLikeCount] = useState(post._count.likesRel);
 
   const handleLike = async () => {
@@ -63,7 +69,10 @@ export function CommunityPostCard({ post }: { post: PostProps }) {
 
       <div className={styles.contentWrapper}>
         <div className={styles.header}>
-          <span className={styles.authorName}>{post.author.name}</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span className={styles.authorName}>{post.author.name}</span>
+            <FollowButton targetId={post.author.id} targetType="USER" />
+          </div>
           <span className={styles.time}>· {formatTime(post.createdAt)}</span>
         </div>
 
@@ -71,8 +80,10 @@ export function CommunityPostCard({ post }: { post: PostProps }) {
 
         {post.symbols && post.symbols.length > 0 && (
           <div className={styles.symbols}>
-            {post.symbols.map(sym => (
-              <span key={sym} className={styles.symbol}>#{sym}</span>
+            {post.symbols.map((symbol: any) => (
+              <Link key={symbol.id} href={`/${locale}/community/symbols/${symbol.symbol}`} className={styles.symbol}>
+                ${symbol.symbol}
+              </Link>
             ))}
           </div>
         )}

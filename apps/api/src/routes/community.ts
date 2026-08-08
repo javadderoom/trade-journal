@@ -8,9 +8,35 @@ const router = Router();
 // --- MICRO-POSTS (Feed) ---
 
 // Get Feed
-router.get('/feed', async (req, res) => {
+router.get('/feed', authenticate, async (req: any, res) => {
     try {
+        const { type } = req.query;
+        const userId = req.user.id;
+        
+        let whereClause = {};
+        
+        if (type === 'following') {
+            // Get followed users and symbols
+            const userFollows = await prisma.communityFollow.findMany({ where: { followerId: userId } });
+            const symbolFollows = await prisma.communitySymbolFollow.findMany({ where: { userId } });
+            
+            const followedUserIds = userFollows.map(f => f.followingId);
+            const followedSymbolIds = symbolFollows.map(f => f.symbolId);
+
+            whereClause = {
+                OR: [
+                    { authorId: { in: followedUserIds } },
+                    { symbols: { some: { symbolId: { in: followedSymbolIds } } } }
+                ]
+            };
+        } else if (req.query.symbol) {
+            whereClause = {
+                symbols: { some: { symbol: { symbol: (req.query.symbol as string).toUpperCase() } } }
+            };
+        }
+
         const posts = await prisma.communityPost.findMany({
+            where: whereClause,
             include: {
                 author: { select: { id: true, name: true, avatar_url: true } },
                 _count: { select: { commentsRel: true, likesRel: true } },
@@ -386,6 +412,99 @@ router.post('/forum/reply/:replyId/solution', authenticate, async (req: any, res
     } catch (error) {
         console.error("Error marking solution:", error);
         res.status(500).json({ error: 'Failed to mark solution' });
+    }
+});
+
+// --- FOLLOWS ---
+
+router.post('/follow', authenticate, async (req: any, res) => {
+    try {
+        const { targetId, targetType } = req.body; // targetType: 'USER' | 'SYMBOL'
+        const userId = req.user.id;
+
+        if (targetType === 'USER') {
+            await prisma.communityFollow.upsert({
+                where: { followerId_followingId: { followerId: userId, followingId: targetId } },
+                create: { followerId: userId, followingId: targetId },
+                update: {}
+            });
+        } else if (targetType === 'SYMBOL') {
+            await prisma.communitySymbolFollow.upsert({
+                where: { userId_symbolId: { userId, symbolId: targetId } },
+                create: { userId, symbolId: targetId },
+                update: {}
+            });
+        }
+        res.json({ success: true });
+    } catch (error) {
+        console.error("Error following:", error);
+        res.status(500).json({ error: 'Failed to follow' });
+    }
+});
+
+router.delete('/follow', authenticate, async (req: any, res) => {
+    try {
+        const { targetId, targetType } = req.body;
+        const userId = req.user.id;
+
+        if (targetType === 'USER') {
+            await prisma.communityFollow.deleteMany({
+                where: { followerId: userId, followingId: targetId }
+            });
+        } else if (targetType === 'SYMBOL') {
+            await prisma.communitySymbolFollow.deleteMany({
+                where: { userId, symbolId: targetId }
+            });
+        }
+        res.json({ success: true });
+    } catch (error) {
+        console.error("Error unfollowing:", error);
+        res.status(500).json({ error: 'Failed to unfollow' });
+    }
+});
+
+router.get('/follow/status', authenticate, async (req: any, res) => {
+    try {
+        const { targetId, targetType } = req.query;
+        const userId = req.user.id;
+
+        let isFollowing = false;
+        if (targetType === 'USER') {
+            const f = await prisma.communityFollow.findUnique({
+                where: { followerId_followingId: { followerId: userId, followingId: targetId as string } }
+            });
+            isFollowing = !!f;
+        } else if (targetType === 'SYMBOL') {
+            const f = await prisma.communitySymbolFollow.findUnique({
+                where: { userId_symbolId: { userId, symbolId: targetId as string } }
+            });
+            isFollowing = !!f;
+        }
+        res.json({ isFollowing });
+    } catch (error) {
+        console.error("Error checking follow status:", error);
+        res.status(500).json({ error: 'Failed to check status' });
+    }
+});
+
+router.get('/symbol/:name', async (req, res) => {
+    try {
+        const { name } = req.params;
+        const sym = await prisma.communitySymbol.findUnique({
+            where: { symbol: name.toUpperCase() },
+            include: {
+                _count: { select: { posts: true, follows: true } }
+            }
+        });
+        
+        if (!sym) {
+            return res.status(404).json({ error: 'Symbol not found' });
+        }
+        
+        res.json(sym);
+    } catch (error) {
+        console.error("Error fetching symbol:", error);
+        res.status(500).json({ error: 'Failed to fetch symbol' });
     }
 });
 

@@ -1,0 +1,33 @@
+@use '../../app/variables' as *;
+
+.followBtn {
+  background: transparent;
+  color: $primary;
+  border: 1px solid $primary;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+
+  &:hover {
+    background: rgba($primary, 0.1);
+  }
+
+  &.following {
+    background: $surface-container-high;
+    color: $text;
+    border-color: $outline-variant;
+
+    &:hover {
+      background: rgba($outline-variant, 0.2);
+    }
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
