@@ -116,10 +116,11 @@ router.get('/feed', optionalAuthenticate, async (req: any, res) => {
 router.post('/feed', authenticate, async (req: any, res) => {
     try {
         const { content, isAnonymous, media } = req.body;
-        const userId = req.user.id;
+        const userId = req.user.userId || req.user.id;
 
+        const safeContent = content || '';
         // Simple symbol detection regex
-        const rawSymbols = content.match(/\b[A-Z]{3,6}\b/g) || [];
+        const rawSymbols = safeContent.match(/\b[A-Z]{3,6}\b/g) || [];
         const uniqueSymbols = [...new Set(rawSymbols)] as string[];
 
         // create symbols if they don't exist
@@ -133,7 +134,7 @@ router.post('/feed', authenticate, async (req: any, res) => {
 
         const post = await prisma.communityPost.create({
             data: {
-                content,
+                content: safeContent,
                 authorId: userId,
                 isAnonymous: !!isAnonymous,
                 symbols: {
@@ -175,7 +176,7 @@ router.post('/feed', authenticate, async (req: any, res) => {
 router.post('/feed/trade', authenticate, async (req: any, res) => {
     try {
         const { content, tradeId, isAnonymous } = req.body;
-        const userId = req.user.id;
+        const userId = req.user.userId || req.user.id;
 
         // Verify the trade belongs to the user
         const trade = await prisma.trade.findUnique({
@@ -187,10 +188,10 @@ router.post('/feed/trade', authenticate, async (req: any, res) => {
         }
 
         const rawSymbols = [trade.symbol];
-        if (content) {
-            const extraSymbols = content.match(/\b[A-Z]{3,6}\b/g) || [];
-            rawSymbols.push(...extraSymbols);
-        }
+        const safeContent = content || '';
+        const extraSymbols = safeContent.match(/\b[A-Z]{3,6}\b/g) || [];
+        rawSymbols.push(...extraSymbols);
+        
         const uniqueSymbols = [...new Set(rawSymbols)];
 
         // Upsert symbols
@@ -322,21 +323,21 @@ router.get('/feed/bookmarks', authenticate, async (req: any, res) => {
 // Toggle Bookmark
 router.post('/feed/:id/bookmark', authenticate, async (req: any, res) => {
     try {
-        const { id } = req.params;
-        const userId = req.user.id;
+        const postId = req.params.id;
+        const userId = req.user.userId || req.user.id;
 
         const existing = await prisma.communityBookmark.findUnique({
-            where: { userId_postId: { userId, postId: id } }
+            where: { userId_postId: { userId, postId: postId } }
         });
 
         if (existing) {
             await prisma.communityBookmark.delete({
-                where: { userId_postId: { userId, postId: id } }
+                where: { userId_postId: { userId, postId: postId } }
             });
             res.json({ success: true, bookmarked: false });
         } else {
             await prisma.communityBookmark.create({
-                data: { userId, postId: id }
+                data: { userId, postId: postId }
             });
             res.json({ success: true, bookmarked: true });
         }
@@ -349,13 +350,13 @@ router.post('/feed/:id/bookmark', authenticate, async (req: any, res) => {
 // Like Post
 router.post('/feed/:id/like', authenticate, async (req: any, res) => {
     try {
-        const { id } = req.params;
-        const userId = req.user.id;
+        const postId = req.params.id;
+        const userId = req.user.userId || req.user.id;
 
         // upsert relationship
         const like = await prisma.communityLike.upsert({
-            where: { postId_userId: { postId: id, userId } },
-            create: { postId: id, userId },
+            where: { postId_userId: { postId: postId, userId } },
+            create: { postId: postId, userId },
             update: {}
         });
 
@@ -395,7 +396,7 @@ router.post('/feed/:id/comments', authenticate, async (req: any, res) => {
     try {
         const { id } = req.params;
         const { content, parentId } = req.body;
-        const userId = req.user.id;
+        const userId = req.user.userId || req.user.id;
 
         const comment = await prisma.communityComment.create({
             data: {
@@ -420,7 +421,7 @@ router.post('/feed/:id/comments', authenticate, async (req: any, res) => {
 router.post('/feed/report', authenticate, async (req: any, res) => {
     try {
         const { targetId, targetType, reason, note } = req.body;
-        const userId = req.user.id;
+        const userId = req.user.userId || req.user.id;
 
         const report = await prisma.communityReport.create({
             data: {
@@ -482,7 +483,7 @@ router.post('/forum/thread', authenticate, async (req: any, res) => {
                 title,
                 content,
                 categoryId,
-                authorId: req.user.id
+                authorId: req.user.userId || req.user.id
             }
         });
         res.json(thread);
@@ -528,7 +529,7 @@ router.post('/forum/thread/:id/reply', authenticate, async (req: any, res) => {
     try {
         const { content } = req.body;
         const threadId = req.params.id;
-        const userId = req.user.id;
+        const userId = req.user.userId || req.user.id;
 
         const reply = await prisma.forumReply.create({
             data: {
@@ -552,7 +553,7 @@ router.post('/forum/thread/:id/reply', authenticate, async (req: any, res) => {
 router.post('/forum/reply/:replyId/solution', authenticate, async (req: any, res) => {
     try {
         const { replyId } = req.params;
-        const userId = req.user.id;
+        const userId = req.user.userId || req.user.id;
 
         const reply = await prisma.forumReply.findUnique({
             where: { id: replyId },
@@ -588,7 +589,7 @@ router.post('/forum/reply/:replyId/solution', authenticate, async (req: any, res
 router.post('/follow', authenticate, async (req: any, res) => {
     try {
         const { targetId, targetType } = req.body; // targetType: 'USER' | 'SYMBOL'
-        const userId = req.user.id;
+        const userId = req.user.userId || req.user.id;
 
         if (targetType === 'USER') {
             await prisma.communityFollow.upsert({
@@ -613,7 +614,7 @@ router.post('/follow', authenticate, async (req: any, res) => {
 router.delete('/follow', authenticate, async (req: any, res) => {
     try {
         const { targetId, targetType } = req.body;
-        const userId = req.user.id;
+        const userId = req.user.userId || req.user.id;
 
         if (targetType === 'USER') {
             await prisma.communityFollow.deleteMany({
@@ -633,7 +634,7 @@ router.delete('/follow', authenticate, async (req: any, res) => {
 
 router.get('/follow/list', authenticate, async (req: any, res) => {
     try {
-        const userId = req.user.id;
+        const userId = req.user.userId || req.user.id;
         
         const [users, symbols, categories] = await Promise.all([
             prisma.communityFollow.findMany({

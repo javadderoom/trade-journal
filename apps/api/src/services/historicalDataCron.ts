@@ -44,6 +44,11 @@ export interface CacheStatus {
 }
 
 export function startHistoricalDataCron(): void {
+  if (process.env.NODE_ENV === 'development') {
+    console.log('[Cron] Historical data refresh disabled in development');
+    return;
+  }
+
   cron.schedule('0 */4 * * *', async () => {
     console.log('[Cron] Historical data refresh triggered');
     await refreshAllHistoricalData();
