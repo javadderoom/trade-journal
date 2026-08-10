@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import { api } from '@/lib/api';
 import styles from './ReportModal.module.scss';
+import { useTranslation } from '@/store/useAppStore';
 
 export type ReportTargetType = 'POST' | 'COMMENT' | 'THREAD' | 'REPLY';
 
@@ -10,18 +11,19 @@ export interface ReportModalProps {
   onClose: () => void;
 }
 
-const REPORT_REASONS = [
-  { value: 'SPAM', label: 'Spam' },
-  { value: 'HARASSMENT', label: 'Harassment' },
-  { value: 'MISINFORMATION', label: 'Misinformation' },
-  { value: 'SCAM', label: 'Scam' },
-  { value: 'INAPPROPRIATE', label: 'Inappropriate Content' },
-  { value: 'OTHER', label: 'Other' },
-];
-
-const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
-
 export function ReportModal({ targetId, targetType, onClose }: ReportModalProps) {
+  const { language } = useTranslation();
+  const isFa = language === 'fa';
+  
+  const REPORT_REASONS = [
+    { value: 'SPAM', label: isFa ? 'اسپم' : 'Spam' },
+    { value: 'HARASSMENT', label: isFa ? 'آزار و اذیت' : 'Harassment' },
+    { value: 'MISINFORMATION', label: isFa ? 'اطلاعات غلط' : 'Misinformation' },
+    { value: 'SCAM', label: isFa ? 'کلاهبرداری' : 'Scam' },
+    { value: 'INAPPROPRIATE', label: isFa ? 'محتوای نامناسب' : 'Inappropriate Content' },
+    { value: 'OTHER', label: isFa ? 'دیگر' : 'Other' },
+  ];
+
   const [reason, setReason] = useState(REPORT_REASONS[0].value);
   const [note, setNote] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -29,18 +31,18 @@ export function ReportModal({ targetId, targetType, onClose }: ReportModalProps)
   const handleSubmit = async () => {
     setIsSubmitting(true);
     try {
-      await axios.post(`${API_URL}/api/community/feed/report`, {
+      await api.post('/api/community/feed/report', {
         targetId,
         targetType,
         reason,
         note
-      }, { withCredentials: true });
+      });
       
-      alert('Report submitted successfully.');
+      alert(isFa ? 'گزارش با موفقیت ثبت شد.' : 'Report submitted successfully.');
       onClose();
     } catch (error) {
       console.error('Failed to submit report:', error);
-      alert('Failed to submit report. Please try again later.');
+      alert(isFa ? 'ثبت گزارش با خطا مواجه شد. لطفاً دوباره تلاش کنید.' : 'Failed to submit report. Please try again later.');
       setIsSubmitting(false);
     }
   };
@@ -49,12 +51,12 @@ export function ReportModal({ targetId, targetType, onClose }: ReportModalProps)
     <div className={styles.overlay} onClick={onClose}>
       <div className={styles.modal} onClick={e => e.stopPropagation()}>
         <div className={styles.header}>
-          <h3>Report Content</h3>
+          <h3>{isFa ? 'گزارش تخلف' : 'Report Content'}</h3>
           <button className={styles.closeBtn} onClick={onClose}>&times;</button>
         </div>
         
         <div className={styles.formGroup}>
-          <label>Reason</label>
+          <label>{isFa ? 'دلیل' : 'Reason'}</label>
           <select value={reason} onChange={e => setReason(e.target.value)}>
             {REPORT_REASONS.map(r => (
               <option key={r.value} value={r.value}>{r.label}</option>
@@ -63,9 +65,9 @@ export function ReportModal({ targetId, targetType, onClose }: ReportModalProps)
         </div>
         
         <div className={styles.formGroup}>
-          <label>Additional Details (Optional)</label>
+          <label>{isFa ? 'جزئیات بیشتر (اختیاری)' : 'Additional Details (Optional)'}</label>
           <textarea 
-            placeholder="Provide any additional context..."
+            placeholder={isFa ? 'توضیحات تکمیلی...' : 'Provide any additional context...'}
             value={note}
             onChange={e => setNote(e.target.value)}
           />
@@ -73,10 +75,10 @@ export function ReportModal({ targetId, targetType, onClose }: ReportModalProps)
         
         <div className={styles.actions}>
           <button className={styles.cancelBtn} onClick={onClose} disabled={isSubmitting}>
-            Cancel
+            {isFa ? 'انصراف' : 'Cancel'}
           </button>
           <button className={styles.submitBtn} onClick={handleSubmit} disabled={isSubmitting}>
-            {isSubmitting ? 'Submitting...' : 'Submit Report'}
+            {isFa ? (isSubmitting ? 'در حال ثبت...' : 'ثبت گزارش') : (isSubmitting ? 'Submitting...' : 'Submit Report')}
           </button>
         </div>
       </div>

@@ -1,11 +1,10 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import { api } from '@/lib/api';
 import styles from './FollowButton.module.scss';
 import { useAuthStore } from '@/lib/auth';
-
-const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+import { useTranslation } from '@/store/useAppStore';
 
 interface FollowButtonProps {
   targetId: string;
@@ -16,13 +15,14 @@ export function FollowButton({ targetId, targetType }: FollowButtonProps) {
   const [isFollowing, setIsFollowing] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const { user } = useAuthStore();
+  const { language } = useTranslation();
+  const isFa = language === 'fa';
 
   useEffect(() => {
     if (!user || !targetId) return;
     
-    axios.get(`${API_URL}/api/community/follow/status`, {
-      params: { targetId, targetType },
-      withCredentials: true
+    api.get('/api/community/follow/status', {
+      params: { targetId, targetType }
     })
     .then(res => {
       setIsFollowing(res.data.isFollowing);
@@ -43,14 +43,13 @@ export function FollowButton({ targetId, targetType }: FollowButtonProps) {
     
     try {
       if (wasFollowing) {
-        await axios.delete(`${API_URL}/api/community/follow`, {
-          data: { targetId, targetType },
-          withCredentials: true
+        await api.delete('/api/community/follow', {
+          data: { targetId, targetType }
         });
       } else {
-        await axios.post(`${API_URL}/api/community/follow`, {
+        await api.post('/api/community/follow', {
           targetId, targetType
-        }, { withCredentials: true });
+        });
       }
     } catch (e) {
       console.error(e);
@@ -67,7 +66,7 @@ export function FollowButton({ targetId, targetType }: FollowButtonProps) {
       onClick={handleToggle}
       disabled={isLoading}
     >
-      {isFollowing ? 'Following' : 'Follow'}
+      {isFollowing ? (isFa ? 'دنبال‌شونده' : 'Following') : (isFa ? 'دنبال کردن' : 'Follow')}
     </button>
   );
 }

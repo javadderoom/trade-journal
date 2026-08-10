@@ -2,17 +2,17 @@
 
 import React from 'react';
 import useSWR from 'swr';
-import axios from 'axios';
+import { useTranslation } from '@/store/useAppStore';
+import { fetcher } from '@/lib/api';
 import { FollowButton } from './FollowButton';
 
-const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
-const fetcher = (url: string) => axios.get(`${API_URL}${url}`, { withCredentials: true }).then(res => res.data);
-
 export function FollowingManager() {
-  const { data, error, isLoading, mutate } = useSWR('/api/community/follow/list', fetcher);
+  const { language } = useTranslation();
+  const isFa = language === 'fa';
+  const { data, error, isLoading } = useSWR<any>('/api/community/follow/list', fetcher);
 
-  if (isLoading) return <div style={{ textAlign: 'center', padding: '40px', color: 'var(--muted)' }}>Loading following list...</div>;
-  if (error) return <div style={{ textAlign: 'center', padding: '40px', color: 'var(--error)' }}>Failed to load following list.</div>;
+  if (isLoading) return <div style={{ textAlign: 'center', padding: '40px', color: 'var(--muted)' }}>{isFa ? 'در حال بارگذاری دنبال‌شوندگان...' : 'Loading following list...'}</div>;
+  if (error) return <div style={{ textAlign: 'center', padding: '40px', color: 'var(--error)' }}>{isFa ? 'خطا در بارگذاری دنبال‌شوندگان.' : 'Failed to load following list.'}</div>;
 
   const { users, symbols, categories } = data;
 
@@ -35,8 +35,8 @@ export function FollowingManager() {
   return (
     <div>
       <div style={sectionStyle}>
-        <h2 style={{ marginBottom: '16px' }}>Users</h2>
-        {users?.length === 0 ? <p style={{ color: 'var(--muted)' }}>You aren't following any users.</p> : (
+        <h2 style={{ marginBottom: '16px' }}>{isFa ? 'کاربران' : 'Users'}</h2>
+        {users?.length === 0 ? <p style={{ color: 'var(--muted)' }}>{isFa ? 'شما کاربری را دنبال نمی‌کنید.' : "You aren't following any users."}</p> : (
           <div style={{ display: 'flex', flexDirection: 'column' }}>
             {users.map((f: any) => (
               <div key={f.following.id} style={itemStyle}>
@@ -54,8 +54,8 @@ export function FollowingManager() {
       </div>
 
       <div style={sectionStyle}>
-        <h2 style={{ marginBottom: '16px' }}>Symbols</h2>
-        {symbols?.length === 0 ? <p style={{ color: 'var(--muted)' }}>You aren't following any symbols.</p> : (
+        <h2 style={{ marginBottom: '16px' }}>{isFa ? 'نمادها' : 'Symbols'}</h2>
+        {symbols?.length === 0 ? <p style={{ color: 'var(--muted)' }}>{isFa ? 'شما نمادی را دنبال نمی‌کنید.' : "You aren't following any symbols."}</p> : (
           <div style={{ display: 'flex', flexDirection: 'column' }}>
             {symbols.map((f: any) => (
               <div key={f.symbol.id} style={itemStyle}>
@@ -69,13 +69,13 @@ export function FollowingManager() {
 
       {categories && categories.length > 0 && (
         <div style={sectionStyle}>
-          <h2 style={{ marginBottom: '16px' }}>Categories</h2>
+          <h2 style={{ marginBottom: '16px' }}>{isFa ? 'دسته‌بندی‌ها' : 'Categories'}</h2>
           <div style={{ display: 'flex', flexDirection: 'column' }}>
             {categories.map((f: any) => (
               <div key={f.category.id} style={itemStyle}>
-                <span style={{ fontWeight: 600 }}>{f.category.nameEn}</span>
+                <span style={{ fontWeight: 600 }}>{isFa ? (f.category.nameFa || f.category.nameEn) : f.category.nameEn}</span>
                 {/* Add FollowButton for CATEGORY if implemented in future */}
-                <button style={{ background: 'var(--surface-container-high)', border: 'none', padding: '6px 12px', borderRadius: '20px', cursor: 'not-allowed', color: 'var(--text)' }}>Following</button>
+                <button style={{ background: 'var(--surface-container-high)', border: 'none', padding: '6px 12px', borderRadius: '20px', cursor: 'not-allowed', color: 'var(--text)' }}>{isFa ? 'دنبال‌شونده' : 'Following'}</button>
               </div>
             ))}
           </div>

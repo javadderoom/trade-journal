@@ -146,7 +146,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const isTopicPage = cleanPath.startsWith('/topic');
   const isBlogPage = cleanPath.startsWith('/blog');
   const isToolsPage = cleanPath.startsWith('/tools');
-  const isPublicPage = isLandingPage || isHelpPage || isContactPage || isTopicPage || isBlogPage || isToolsPage;
+  const isCommunityPage = cleanPath.startsWith('/community');
+  const isForumPage = cleanPath.startsWith('/forum');
+  const isPublicPage = isLandingPage || isHelpPage || isContactPage || isTopicPage || isBlogPage || isToolsPage || isCommunityPage || isForumPage;
   const isAdmin2Page = cleanPath.startsWith('/admin2');
 
   useEffect(() => {

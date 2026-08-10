@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import useSWR from 'swr';
-import axios from 'axios';
+import { api, fetcher } from '@/lib/api';
 import styles from './CommentSection.module.scss';
 import { useAuthStore } from '@/lib/auth';
+import { useTranslation } from '@/store/useAppStore';
 import { ReportModal } from './ReportModal';
 
 interface Comment {
@@ -16,25 +17,23 @@ interface Comment {
   };
   replies?: Comment[];
 }
-
-const fetcher = (url: string) => axios.get(url, { withCredentials: true }).then(res => res.data);
-const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
-
 function CommentNode({ comment, postId, onReplySuccess }: { comment: Comment; postId: string; onReplySuccess: () => void }) {
   const [showReplyInput, setShowReplyInput] = useState(false);
   const [replyContent, setReplyContent] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showReport, setShowReport] = useState(false);
   const { user } = useAuthStore();
+  const { language } = useTranslation();
+  const isFa = language === 'fa';
 
   const handleReplySubmit = async () => {
     if (!replyContent.trim()) return;
     setIsSubmitting(true);
     try {
-      await axios.post(`${API_URL}/api/community/feed/${postId}/comments`, { 
+      await api.post(`/api/community/feed/${postId}/comments`, { 
         content: replyContent, 
         parentId: comment.id 
-      }, { withCredentials: true });
+      });
       setReplyContent('');
       setShowReplyInput(false);
       onReplySuccess();
@@ -61,8 +60,8 @@ function CommentNode({ comment, postId, onReplySuccess }: { comment: Comment; po
         <div className={styles.text}>{comment.content}</div>
         
         <div className={styles.commentActions}>
-          <button onClick={() => setShowReplyInput(!showReplyInput)}>Reply</button>
-          <button className={styles.reportBtn} onClick={() => setShowReport(true)}>Report</button>
+          <button onClick={() => setShowReplyInput(!showReplyInput)}>{isFa ? 'پاسخ' : 'Reply'}</button>
+          <button className={styles.reportBtn} onClick={() => setShowReport(true)}>{isFa ? 'گزارش' : 'Report'}</button>
         </div>
 
         {showReplyInput && (
@@ -71,11 +70,11 @@ function CommentNode({ comment, postId, onReplySuccess }: { comment: Comment; po
               type="text" 
               value={replyContent} 
               onChange={e => setReplyContent(e.target.value)}
-              placeholder="Write a reply..." 
+              placeholder={isFa ? 'نوشتن پاسخ...' : 'Write a reply...'} 
               disabled={isSubmitting}
               onKeyDown={e => { if (e.key === 'Enter') handleReplySubmit(); }}
             />
-            <button disabled={!replyContent.trim() || isSubmitting} onClick={handleReplySubmit}>Post</button>
+            <button disabled={!replyContent.trim() || isSubmitting} onClick={handleReplySubmit}>{isFa ? 'ارسال' : 'Post'}</button>
           </div>
         )}
 
@@ -100,16 +99,18 @@ function CommentNode({ comment, postId, onReplySuccess }: { comment: Comment; po
 }
 
 export function CommentSection({ postId }: { postId: string }) {
-  const { data: comments, mutate, isLoading } = useSWR<Comment[]>(`${API_URL}/api/community/feed/${postId}/comments`, fetcher);
+  const { data: comments, mutate, isLoading } = useSWR<Comment[]>(`/api/community/feed/${postId}/comments`, fetcher);
   const [newComment, setNewComment] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { user } = useAuthStore();
+  const { language } = useTranslation();
+  const isFa = language === 'fa';
 
   const handleSubmit = async () => {
     if (!newComment.trim()) return;
     setIsSubmitting(true);
     try {
-      await axios.post(`${API_URL}/api/community/feed/${postId}/comments`, { content: newComment }, { withCredentials: true });
+      await api.post(`/api/community/feed/${postId}/comments`, { content: newComment });
       setNewComment('');
       mutate();
     } catch (e) {
@@ -133,17 +134,17 @@ export function CommentSection({ postId }: { postId: string }) {
           type="text" 
           value={newComment} 
           onChange={e => setNewComment(e.target.value)}
-          placeholder="Write a comment..." 
+          placeholder={isFa ? 'نوشتن نظر...' : 'Write a comment...'} 
           disabled={isSubmitting}
           onKeyDown={e => {
             if (e.key === 'Enter') handleSubmit();
           }}
         />
-        <button disabled={!newComment.trim() || isSubmitting} onClick={handleSubmit}>Post</button>
+        <button disabled={!newComment.trim() || isSubmitting} onClick={handleSubmit}>{isFa ? 'ارسال' : 'Post'}</button>
       </div>
       
       <div className={styles.list}>
-        {isLoading && <div className={styles.loading}>Loading comments...</div>}
+        {isLoading && <div className={styles.loading}>{isFa ? 'در حال بارگذاری نظرات...' : 'Loading comments...'}</div>}
         {comments && comments.map(comment => (
           <CommentNode key={comment.id} comment={comment} postId={postId} onReplySuccess={() => mutate()} />
         ))}

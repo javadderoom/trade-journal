@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import styles from './CreatePostForm.module.scss';
-import axios from 'axios';
+import { api } from '@/lib/api';
 import { useAuthStore } from '@/lib/auth';
+import { useTranslation } from '@/store/useAppStore';
 import { TradeSelectorModal, MinimalTrade } from './TradeSelectorModal';
 
 export function CreatePostForm({ onPostCreated }: { onPostCreated: () => void }) {
@@ -12,6 +13,8 @@ export function CreatePostForm({ onPostCreated }: { onPostCreated: () => void })
   const [isAnonymous, setIsAnonymous] = useState(false);
   const [mediaFiles, setMediaFiles] = useState<File[]>([]);
   const { user } = useAuthStore();
+  const { language } = useTranslation();
+  const isFa = language === 'fa';
 
   const handleMediaChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -28,8 +31,7 @@ export function CreatePostForm({ onPostCreated }: { onPostCreated: () => void })
       if (mediaFiles.length > 0) {
         const formData = new FormData();
         mediaFiles.forEach(f => formData.append('media', f));
-        const uploadRes = await axios.post('http://localhost:3000/api/community/feed/upload-media', formData, { 
-          withCredentials: true,
+        const uploadRes = await api.post('/api/community/feed/upload-media', formData, { 
           headers: { 'Content-Type': 'multipart/form-data' }
         });
         uploadedMedia = uploadRes.data.urls;
@@ -38,9 +40,9 @@ export function CreatePostForm({ onPostCreated }: { onPostCreated: () => void })
       const payload = { content, isAnonymous, media: uploadedMedia, tradeId: attachedTrade?.id };
 
       if (attachedTrade) {
-        await axios.post('http://localhost:3000/api/community/feed/trade', payload, { withCredentials: true });
+        await api.post('/api/community/feed/trade', payload);
       } else {
-        await axios.post('http://localhost:3000/api/community/feed', payload, { withCredentials: true });
+        await api.post('/api/community/feed', payload);
       }
       setContent('');
       setAttachedTrade(null);
@@ -68,36 +70,36 @@ export function CreatePostForm({ onPostCreated }: { onPostCreated: () => void })
       <div className={styles.form}>
         <textarea
           className={styles.textarea}
-          placeholder="Share your trading thoughts, analysis, or setups..."
+          placeholder={isFa ? "ایده‌ها، تحلیل‌ها یا موقعیت‌های معاملاتی خود را به اشتراک بگذارید..." : "Share your trading thoughts, analysis, or setups..."}
           value={content}
           onChange={(e) => setContent(e.target.value)}
         />
         <div className={styles.actions}>
           <div className={styles.tools}>
             <button 
-              title="Attach Trade" 
+              title={isFa ? "پیوست معامله" : "Attach Trade"} 
               onClick={() => setShowModal(true)}
               style={attachedTrade ? { color: 'var(--text)', backgroundColor: 'var(--primary-container)', padding: '4px 8px', borderRadius: '4px' } : {}}
             >
-              🔗 {attachedTrade ? `Attached: ${attachedTrade.symbol}` : 'Attach Trade'}
+              🔗 {attachedTrade ? (isFa ? `پیوست شده: ${attachedTrade.symbol}` : `Attached: ${attachedTrade.symbol}`) : (isFa ? 'پیوست معامله' : 'Attach Trade')}
             </button>
             {attachedTrade && (
-              <button title="Remove" onClick={() => setAttachedTrade(null)} style={{ color: 'var(--error)' }}>
+              <button title={isFa ? "حذف" : "Remove"} onClick={() => setAttachedTrade(null)} style={{ color: 'var(--error)' }}>
                 &times;
               </button>
             )}
             <label style={{ cursor: 'pointer', color: 'var(--primary)', marginLeft: '10px' }}>
-              📷 {mediaFiles.length > 0 ? `${mediaFiles.length} Images` : 'Add Media'}
+              📷 {mediaFiles.length > 0 ? (isFa ? `${mediaFiles.length} تصویر` : `${mediaFiles.length} Images`) : (isFa ? 'افزودن تصویر' : 'Add Media')}
               <input type="file" multiple accept="image/*" onChange={handleMediaChange} style={{ display: 'none' }} />
             </label>
             {mediaFiles.length > 0 && (
-              <button title="Clear Media" onClick={() => setMediaFiles([])} style={{ color: 'var(--error)', marginLeft: '4px' }}>
+              <button title={isFa ? "حذف تصویر" : "Clear Media"} onClick={() => setMediaFiles([])} style={{ color: 'var(--error)', marginLeft: '4px' }}>
                 &times;
               </button>
             )}
             <label style={{ display: 'flex', alignItems: 'center', gap: '4px', marginLeft: '10px', fontSize: '0.9rem', color: 'var(--text-muted)', cursor: 'pointer' }}>
               <input type="checkbox" checked={isAnonymous} onChange={(e) => setIsAnonymous(e.target.checked)} />
-              Anonymous
+              {isFa ? 'ناشناس' : 'Anonymous'}
             </label>
           </div>
           <button 
@@ -105,7 +107,7 @@ export function CreatePostForm({ onPostCreated }: { onPostCreated: () => void })
             onClick={handleSubmit}
             disabled={(!content.trim() && !attachedTrade && mediaFiles.length === 0) || isSubmitting}
           >
-            Post
+            {isFa ? (isSubmitting ? 'در حال ارسال...' : 'ارسال') : (isSubmitting ? 'Posting...' : 'Post')}
           </button>
         </div>
       </div>

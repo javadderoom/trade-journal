@@ -2,22 +2,22 @@
 
 import React from 'react';
 import useSWR from 'swr';
-import axios from 'axios';
+import { fetcher } from '@/lib/api';
+import { useTranslation } from '@/store/useAppStore';
 import { CommunityPostCard, PostProps } from './CommunityPostCard';
 
-const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
-const fetcher = (url: string) => axios.get(`${API_URL}${url}`, { withCredentials: true }).then(res => res.data);
-
 export function BookmarksFeed() {
+  const { language } = useTranslation();
+  const isFa = language === 'fa';
   const { data: posts, error, isLoading } = useSWR<PostProps[]>('/api/community/feed/bookmarks', fetcher);
 
-  if (isLoading) return <div style={{ textAlign: 'center', padding: '40px', color: 'var(--muted)' }}>Loading bookmarks...</div>;
-  if (error) return <div style={{ textAlign: 'center', padding: '40px', color: 'var(--error)' }}>Failed to load bookmarks.</div>;
+  if (isLoading) return <div style={{ textAlign: 'center', padding: '40px', color: 'var(--muted)' }}>{isFa ? 'در حال بارگذاری نشان‌شده‌ها...' : 'Loading bookmarks...'}</div>;
+  if (error) return <div style={{ textAlign: 'center', padding: '40px', color: 'var(--error)' }}>{isFa ? 'خطا در بارگذاری نشان‌شده‌ها.' : 'Failed to load bookmarks.'}</div>;
   
   if (posts?.length === 0) {
     return (
       <div style={{ textAlign: 'center', padding: '60px', color: 'var(--muted)' }}>
-        <p>You haven't bookmarked any posts yet.</p>
+        <p>{isFa ? 'شما هنوز پستی را نشان نکرده‌اید.' : "You haven't bookmarked any posts yet."}</p>
       </div>
     );
   }

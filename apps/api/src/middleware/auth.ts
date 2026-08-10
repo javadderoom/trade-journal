@@ -38,6 +38,29 @@ export const authenticate = (
   }
 };
 
+export const optionalAuthenticate = (
+  req: AuthRequest,
+  res: Response,
+  next: NextFunction
+) => {
+  const authHeader = req.headers.authorization;
+  const token = authHeader?.startsWith('Bearer ')
+    ? authHeader.slice(7)
+    : null;
+
+  if (!token) {
+    return next();
+  }
+
+  try {
+    const payload = verifyAccessToken(token);
+    req.user = payload;
+  } catch (err) {
+    // Ignore invalid tokens for optional auth
+  }
+  next();
+};
+
 export const requireAdmin = (
   req: AuthRequest,
   res: Response,

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useTranslation } from '@/store/useAppStore';
 import { ReportModal, ReportTargetType } from './ReportModal';
 
 interface ReportButtonProps {
@@ -12,11 +13,13 @@ interface ReportButtonProps {
 
 export function ReportButton({ targetId, targetType, className, style }: ReportButtonProps) {
   const [showModal, setShowModal] = useState(false);
+  const { language } = useTranslation();
+  const isFa = language === 'fa';
 
   return (
     <>
       <button 
-        title="Report" 
+        title={isFa ? 'گزارش تخلف' : 'Report'} 
         onClick={() => setShowModal(true)} 
         className={className}
         style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, ...style }}

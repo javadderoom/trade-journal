@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { authenticate } from '../middleware/auth';
+import { authenticate, optionalAuthenticate } from '../middleware/auth';
 import { prisma } from '../services/tradeSync';
 import { mapTradeToCommunityPreview } from '../services/communityService';
 import multer from 'multer';
@@ -17,14 +17,17 @@ const upload = multer({ dest: uploadDir });
 // --- MICRO-POSTS (Feed) ---
 
 // Get Feed
-router.get('/feed', authenticate, async (req: any, res) => {
+router.get('/feed', optionalAuthenticate, async (req: any, res) => {
     try {
         const { type } = req.query;
-        const userId = req.user.id;
+        const userId = req.user?.userId || req.user?.id; // Support both standard and extended token formats
         
         let whereClause = {};
         
         if (type === 'following') {
+            if (!userId) {
+                return res.status(401).json({ error: 'Authentication required for following feed' });
+            }
             // Get followed users and symbols
             const userFollows = await prisma.communityFollow.findMany({ where: { followerId: userId } });
             const symbolFollows = await prisma.communitySymbolFollow.findMany({ where: { userId } });
@@ -57,20 +60,32 @@ router.get('/feed', authenticate, async (req: any, res) => {
                 },
                 symbols: { include: { symbol: true } },
                 media: { orderBy: { sortOrder: 'asc' } },
-                bookmarks: { where: { userId } }
+                ...(userId ? { bookmarks: { where: { userId } } } : {})
             },
             orderBy: { createdAt: 'desc' },
             take: 50
         });
 
-        // Map trades using the mapper
-        const mappedPosts = posts.map((post: any) => {
+        // Add isLikedByMe and isBookmarked to each post
+        const enrichedPosts = await Promise.all(posts.map(async (post) => {
+            let isLikedByMe = false;
+            let isBookmarked = false;
+
+            if (userId) {
+                const like = await prisma.communityLike.findUnique({
+                    where: { postId_userId: { postId: post.id, userId } }
+                });
+                isLikedByMe = !!like;
+                isBookmarked = (post as any).bookmarks && (post as any).bookmarks.length > 0;
+            }
+
+            // Map trades using the mapper
             let mappedTrade = null;
             if (post.trade) {
                 mappedTrade = mapTradeToCommunityPreview(post.trade as any);
             }
-            // we remove the original trade and attach the mapped one
-            const { trade, bookmarks, ...postWithoutTrade } = post;
+            
+            const { trade, bookmarks, ...postWithoutTrade } = post as any;
             
             if (postWithoutTrade.isAnonymous) {
                 postWithoutTrade.author = {
@@ -85,11 +100,12 @@ router.get('/feed', authenticate, async (req: any, res) => {
                 trade: mappedTrade,
                 // Flatten the symbols structure to make it easier for clients
                 symbols: post.symbols.map((ps: any) => ps.symbol),
-                isBookmarked: bookmarks && bookmarks.length > 0
+                isLikedByMe,
+                isBookmarked
             };
-        });
+        }));
 
-        res.json(mappedPosts);
+        res.json(enrichedPosts);
     } catch (error) {
         console.error("Error fetching feed:", error);
         res.status(500).json({ error: 'Failed to fetch feed' });

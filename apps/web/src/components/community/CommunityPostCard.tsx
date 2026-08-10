@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import axios from 'axios';
+import { api } from '@/lib/api';
 import styles from './CommunityPostCard.module.scss';
 import { TradePreviewCard, TradePreviewProps } from './TradePreviewCard';
 import { CommentSection } from './CommentSection';
@@ -31,6 +31,7 @@ export interface PostProps {
 export function CommunityPostCard({ post }: { post: PostProps }) {
   const params = useParams();
   const locale = params?.locale || 'en';
+  const isFa = locale === 'fa';
   const [showComments, setShowComments] = useState(false);
   const [isLiked, setIsLiked] = useState(post.isLikedByMe || false);
   const [likeCount, setLikeCount] = useState(post._count.likesRel);
@@ -40,7 +41,7 @@ export function CommunityPostCard({ post }: { post: PostProps }) {
   const handleBookmark = async () => {
     try {
       setIsBookmarked(!isBookmarked);
-      await axios.post(`http://localhost:3000/api/community/feed/${post.id}/bookmark`, {}, { withCredentials: true });
+      await api.post(`/api/community/feed/${post.id}/bookmark`);
     } catch (e) {
       console.error('Failed to bookmark post:', e);
       setIsBookmarked(isBookmarked);
@@ -56,7 +57,7 @@ export function CommunityPostCard({ post }: { post: PostProps }) {
     setIsLiked(true);
     setLikeCount(prev => prev + 1);
     try {
-      await axios.post(`http://localhost:3000/api/community/feed/${post.id}/like`, {}, { withCredentials: true });
+      await api.post(`/api/community/feed/${post.id}/like`);
     } catch (e) {
       console.error('Failed to like post:', e);
       setIsLiked(false);
@@ -70,10 +71,10 @@ export function CommunityPostCard({ post }: { post: PostProps }) {
     const now = new Date();
     const diff = Math.floor((now.getTime() - date.getTime()) / 1000);
     
-    if (diff < 60) return `${diff}s`;
-    if (diff < 3600) return `${Math.floor(diff / 60)}m`;
-    if (diff < 86400) return `${Math.floor(diff / 3600)}h`;
-    return `${Math.floor(diff / 86400)}d`;
+    if (diff < 60) return isFa ? 'لحظاتی پیش' : `${diff}s`;
+    if (diff < 3600) return isFa ? `${Math.floor(diff / 60)} دقیقه پیش` : `${Math.floor(diff / 60)}m`;
+    if (diff < 86400) return isFa ? `${Math.floor(diff / 3600)} ساعت پیش` : `${Math.floor(diff / 3600)}h`;
+    return isFa ? `${Math.floor(diff / 86400)} روز پیش` : `${Math.floor(diff / 86400)}d`;
   };
 
   return (
@@ -110,7 +111,7 @@ export function CommunityPostCard({ post }: { post: PostProps }) {
         {post.media && post.media.length > 0 && (
           <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginTop: '12px' }}>
             {post.media.map(m => (
-              <img key={m.id} src={`http://localhost:3000${m.url}`} alt="Post media" style={{ maxWidth: '100%', maxHeight: '400px', borderRadius: '8px', objectFit: 'contain' }} />
+              <img key={m.id} src={`${api.defaults.baseURL || 'http://localhost:3000'}${m.url}`} alt="Post media" style={{ maxWidth: '100%', maxHeight: '400px', borderRadius: '8px', objectFit: 'contain' }} />
             ))}
           </div>
         )}
@@ -119,7 +120,7 @@ export function CommunityPostCard({ post }: { post: PostProps }) {
 
         <div className={styles.actions}>
           <button 
-            title="Like" 
+            title={isFa ? "پسندیدن" : "Like"} 
             onClick={handleLike} 
             style={isLiked ? { color: 'var(--primary)' } : {}}
           >
@@ -127,7 +128,7 @@ export function CommunityPostCard({ post }: { post: PostProps }) {
              {likeCount > 0 && <span>{likeCount}</span>}
           </button>
           <button 
-            title="Comment" 
+            title={isFa ? "نظر" : "Comment"} 
             onClick={() => setShowComments(!showComments)}
             style={showComments ? { color: 'var(--primary)' } : {}}
           >
@@ -135,14 +136,14 @@ export function CommunityPostCard({ post }: { post: PostProps }) {
              {post._count.commentsRel > 0 && <span>{post._count.commentsRel}</span>}
           </button>
           <button 
-            title="Bookmark" 
+            title={isFa ? "نشان کردن" : "Bookmark"} 
             onClick={handleBookmark} 
             style={isBookmarked ? { color: 'var(--primary)' } : {}}
           >
              <svg fill={isBookmarked ? "currentColor" : "none"} stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" width="24" height="24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" /></svg>
           </button>
           
-          <button title="Report" onClick={handleReportClick} style={{ marginLeft: 'auto', color: 'var(--error)' }}>
+          <button title={isFa ? "گزارش تخلف" : "Report"} onClick={handleReportClick} style={{ marginLeft: 'auto', color: 'var(--error)' }}>
              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" width="24" height="24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
           </button>
         </div>
