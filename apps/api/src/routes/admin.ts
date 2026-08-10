@@ -605,4 +605,90 @@ router.get('/ea/logs', async (req: AuthRequest, res: Response) => {
   }
 });
 
+// --- Community Moderation ---
+
+/**
+ * GET /api/admin/community/reports
+ * Fetch all pending community reports
+ */
+router.get('/community/reports', async (req: AuthRequest, res: Response) => {
+  try {
+    const page = Math.max(1, parseInt((req.query.page as string) || '1', 10) || 1);
+    const pageSize = Math.min(100, Math.max(1, parseInt((req.query.pageSize as string) || '50', 10) || 50));
+    
+    const [total, reports] = await Promise.all([
+      prisma.communityReport.count(),
+      prisma.communityReport.findMany({
+        orderBy: { createdAt: 'desc' },
+        skip: (page - 1) * pageSize,
+        take: pageSize,
+        include: {
+          reporter: { select: { email: true, name: true } }
+        }
+      })
+    ]);
+
+    res.status(200).json({
+      data: reports,
+      pagination: {
+        page,
+        pageSize,
+        total,
+        totalPages: Math.ceil(total / pageSize)
+      }
+    });
+  } catch (err) {
+    console.error('Fetch reports error:', err);
+    res.status(500).json({ error: 'Failed to fetch community reports' });
+  }
+});
+
+/**
+ * POST /api/admin/community/reports/:id/action
+ * Take action on a report (Dismiss or Hide target content)
+ */
+router.post('/community/reports/:id/action', async (req: AuthRequest, res: Response) => {
+  try {
+    const id = req.params.id as string;
+    const { action } = req.body; // 'DISMISS' | 'HIDE'
+    
+    const report = await prisma.communityReport.findUnique({ where: { id } });
+    if (!report) return res.status(404).json({ error: 'Report not found' });
+
+    if (action === 'DISMISS') {
+      await prisma.communityReport.update({
+        where: { id },
+        data: { status: 'DISMISSED', reviewedAt: new Date() }
+      });
+    } else if (action === 'HIDE') {
+      await prisma.$transaction(async (tx) => {
+        // Mark report as ACTION_TAKEN
+        await tx.communityReport.update({
+          where: { id },
+          data: { status: 'ACTION_TAKEN', reviewedAt: new Date() }
+        });
+
+        // Hide target content
+        const { targetType, targetId } = report;
+        if (targetType === 'POST') {
+          await tx.communityPost.update({ where: { id: targetId }, data: { status: 'HIDDEN' } });
+        } else if (targetType === 'COMMENT') {
+          await tx.communityComment.update({ where: { id: targetId }, data: { status: 'HIDDEN' } });
+        } else if (targetType === 'THREAD') {
+          await tx.forumThread.update({ where: { id: targetId }, data: { status: 'HIDDEN' } });
+        } else if (targetType === 'REPLY') {
+          await tx.forumReply.update({ where: { id: targetId }, data: { status: 'HIDDEN' } });
+        }
+      });
+    } else {
+      return res.status(400).json({ error: 'Invalid action' });
+    }
+
+    res.status(200).json({ message: 'Action taken successfully' });
+  } catch (err) {
+    console.error('Report action error:', err);
+    res.status(500).json({ error: 'Failed to take action on report' });
+  }
+});
+
 export default router;

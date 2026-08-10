@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { Metadata } from 'next';
 import styles from '../../forum.module.scss';
 import { ThreadReplyForm } from './ThreadReplyForm';
+import { ReportButton } from '@/components/community/ReportButton';
 
 export const metadata: Metadata = {
   title: 'Thread | TradeKav',
@@ -70,6 +71,9 @@ export default async function ThreadPage({ params }: { params: { locale: string,
               <div style={{ fontWeight: 700, color: 'var(--text)' }}>{thread.author.name}</div>
               <div style={{ fontSize: '12px', color: 'var(--muted)' }}>{new Date(thread.createdAt).toLocaleString()}</div>
             </div>
+            <div style={{ marginLeft: 'auto' }}>
+              <ReportButton targetId={thread.id} targetType="THREAD" style={{ color: 'var(--error)' }} />
+            </div>
           </div>
           <div style={{ whiteSpace: 'pre-wrap', color: 'var(--text)', lineHeight: '1.6' }}>
             {thread.content}
@@ -105,6 +109,9 @@ export default async function ThreadPage({ params }: { params: { locale: string,
                 <div>
                   <div style={{ fontWeight: 700, fontSize: '14px', color: 'var(--text)' }}>{reply.author.name}</div>
                   <div style={{ fontSize: '11px', color: 'var(--muted)' }}>{new Date(reply.createdAt).toLocaleString()}</div>
+                </div>
+                <div style={{ marginLeft: 'auto' }}>
+                  <ReportButton targetId={reply.id} targetType="REPLY" style={{ color: 'var(--error)' }} />
                 </div>
               </div>
               <div style={{ whiteSpace: 'pre-wrap', color: 'var(--text)', fontSize: '14px', lineHeight: '1.6' }}>

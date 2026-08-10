@@ -6,6 +6,7 @@ import styles from './CommunityPostCard.module.scss';
 import { TradePreviewCard, TradePreviewProps } from './TradePreviewCard';
 import { CommentSection } from './CommentSection';
 import { FollowButton } from './FollowButton';
+import { ReportModal } from './ReportModal';
 
 export interface PostProps {
   id: string;
@@ -23,6 +24,8 @@ export interface PostProps {
     likesRel: number;
   };
   isLikedByMe?: boolean;
+  isBookmarked?: boolean;
+  media?: { id: string; url: string; sortOrder: number }[];
 }
 
 export function CommunityPostCard({ post }: { post: PostProps }) {
@@ -31,6 +34,22 @@ export function CommunityPostCard({ post }: { post: PostProps }) {
   const [showComments, setShowComments] = useState(false);
   const [isLiked, setIsLiked] = useState(post.isLikedByMe || false);
   const [likeCount, setLikeCount] = useState(post._count.likesRel);
+  const [isBookmarked, setIsBookmarked] = useState(post.isBookmarked || false);
+  const [showReportModal, setShowReportModal] = useState(false);
+
+  const handleBookmark = async () => {
+    try {
+      setIsBookmarked(!isBookmarked);
+      await axios.post(`http://localhost:3000/api/community/feed/${post.id}/bookmark`, {}, { withCredentials: true });
+    } catch (e) {
+      console.error('Failed to bookmark post:', e);
+      setIsBookmarked(isBookmarked);
+    }
+  };
+
+  const handleReportClick = () => {
+    setShowReportModal(true);
+  };
 
   const handleLike = async () => {
     if (isLiked) return;
@@ -88,6 +107,14 @@ export function CommunityPostCard({ post }: { post: PostProps }) {
           </div>
         )}
 
+        {post.media && post.media.length > 0 && (
+          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginTop: '12px' }}>
+            {post.media.map(m => (
+              <img key={m.id} src={`http://localhost:3000${m.url}`} alt="Post media" style={{ maxWidth: '100%', maxHeight: '400px', borderRadius: '8px', objectFit: 'contain' }} />
+            ))}
+          </div>
+        )}
+
         {post.trade && <TradePreviewCard trade={post.trade} />}
 
         <div className={styles.actions}>
@@ -107,10 +134,29 @@ export function CommunityPostCard({ post }: { post: PostProps }) {
              <svg fill={showComments ? "currentColor" : "none"} stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>
              {post._count.commentsRel > 0 && <span>{post._count.commentsRel}</span>}
           </button>
+          <button 
+            title="Bookmark" 
+            onClick={handleBookmark} 
+            style={isBookmarked ? { color: 'var(--primary)' } : {}}
+          >
+             <svg fill={isBookmarked ? "currentColor" : "none"} stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" width="24" height="24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" /></svg>
+          </button>
+          
+          <button title="Report" onClick={handleReportClick} style={{ marginLeft: 'auto', color: 'var(--error)' }}>
+             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" width="24" height="24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+          </button>
         </div>
 
         {showComments && <CommentSection postId={post.id} />}
       </div>
+      
+      {showReportModal && (
+        <ReportModal 
+          targetId={post.id}
+          targetType="POST"
+          onClose={() => setShowReportModal(false)}
+        />
+      )}
     </div>
   );
 }

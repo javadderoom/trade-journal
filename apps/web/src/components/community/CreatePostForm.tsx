@@ -9,22 +9,43 @@ export function CreatePostForm({ onPostCreated }: { onPostCreated: () => void })
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [attachedTrade, setAttachedTrade] = useState<MinimalTrade | null>(null);
+  const [isAnonymous, setIsAnonymous] = useState(false);
+  const [mediaFiles, setMediaFiles] = useState<File[]>([]);
   const { user } = useAuthStore();
 
+  const handleMediaChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      const files = Array.from(e.target.files).slice(0, 5); // limit to 5
+      setMediaFiles(prev => [...prev, ...files].slice(0, 5));
+    }
+  };
+
   const handleSubmit = async () => {
-    if (!content.trim() && !attachedTrade) return;
+    if (!content.trim() && !attachedTrade && mediaFiles.length === 0) return;
     setIsSubmitting(true);
     try {
+      let uploadedMedia: string[] = [];
+      if (mediaFiles.length > 0) {
+        const formData = new FormData();
+        mediaFiles.forEach(f => formData.append('media', f));
+        const uploadRes = await axios.post('http://localhost:3000/api/community/feed/upload-media', formData, { 
+          withCredentials: true,
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
+        uploadedMedia = uploadRes.data.urls;
+      }
+      
+      const payload = { content, isAnonymous, media: uploadedMedia, tradeId: attachedTrade?.id };
+
       if (attachedTrade) {
-        await axios.post('http://localhost:3000/api/community/feed/trade', { 
-          content,
-          tradeId: attachedTrade.id 
-        }, { withCredentials: true });
+        await axios.post('http://localhost:3000/api/community/feed/trade', payload, { withCredentials: true });
       } else {
-        await axios.post('http://localhost:3000/api/community/feed', { content }, { withCredentials: true });
+        await axios.post('http://localhost:3000/api/community/feed', payload, { withCredentials: true });
       }
       setContent('');
       setAttachedTrade(null);
+      setMediaFiles([]);
+      setIsAnonymous(false);
       onPostCreated();
     } catch (error) {
       console.error('Failed to create post:', error);
@@ -65,11 +86,24 @@ export function CreatePostForm({ onPostCreated }: { onPostCreated: () => void })
                 &times;
               </button>
             )}
+            <label style={{ cursor: 'pointer', color: 'var(--primary)', marginLeft: '10px' }}>
+              📷 {mediaFiles.length > 0 ? `${mediaFiles.length} Images` : 'Add Media'}
+              <input type="file" multiple accept="image/*" onChange={handleMediaChange} style={{ display: 'none' }} />
+            </label>
+            {mediaFiles.length > 0 && (
+              <button title="Clear Media" onClick={() => setMediaFiles([])} style={{ color: 'var(--error)', marginLeft: '4px' }}>
+                &times;
+              </button>
+            )}
+            <label style={{ display: 'flex', alignItems: 'center', gap: '4px', marginLeft: '10px', fontSize: '0.9rem', color: 'var(--text-muted)', cursor: 'pointer' }}>
+              <input type="checkbox" checked={isAnonymous} onChange={(e) => setIsAnonymous(e.target.checked)} />
+              Anonymous
+            </label>
           </div>
           <button 
             className={styles.submitBtn} 
             onClick={handleSubmit}
-            disabled={(!content.trim() && !attachedTrade) || isSubmitting}
+            disabled={(!content.trim() && !attachedTrade && mediaFiles.length === 0) || isSubmitting}
           >
             Post
           </button>
