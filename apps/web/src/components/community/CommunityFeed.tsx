@@ -6,6 +6,7 @@ import styles from './CommunityFeed.module.scss';
 import { useTranslation } from '@/store/useAppStore';
 import { CommunityPostCard, PostProps } from './CommunityPostCard';
 import { CreatePostForm } from './CreatePostForm';
+import { PostSkeleton } from './PostSkeleton';
 import { useAuthStore } from '@/lib/auth';
 import { fetcher } from '@/lib/api';
 
@@ -57,7 +58,13 @@ export function CommunityFeed({ defaultType = 'all', symbol }: { defaultType?: '
 
       {user && <CreatePostForm onPostCreated={() => mutate()} />}
 
-      {isLoading && <div className={styles.loading}>{isFa ? 'در حال بارگذاری فید...' : 'Loading feed...'}</div>}
+      {isLoading && (
+        <div style={{ display: 'flex', flexDirection: 'column' }}>
+          <PostSkeleton />
+          <PostSkeleton />
+          <PostSkeleton />
+        </div>
+      )}
       
       {error && <div className={styles.error}>{isFa ? 'خطا در بارگذاری فید انجمن. لطفاً دوباره تلاش کنید.' : 'Failed to load community feed. Please try again.'}</div>}
 
