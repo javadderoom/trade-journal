@@ -1,15 +1,17 @@
 @use '../../app/variables' as *;
 
 .card {
-  background-color: $surface;
-  border-bottom: 1px solid rgba($outline-variant, 0.4);
-  padding: 24px 0;
+  background-color: var(--surface-container-low);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 16px;
   display: flex;
   gap: 16px;
-  transition: background-color 0.2s ease;
+  transition: transform 160ms cubic-bezier(0.23, 1, 0.32, 1), background-color 160ms ease-out;
 
   &:hover {
-    background-color: rgba($surface-container-low, 0.5);
+    background-color: var(--surface-container);
   }
 }
 
@@ -103,16 +105,18 @@
     cursor: pointer;
     padding: 4px 8px;
     border-radius: 4px;
-    transition: all 0.2s ease;
+    transition: transform 160ms cubic-bezier(0.23, 1, 0.32, 1), background-color 160ms ease-out, color 160ms ease-out;
     font-family: inherit;
 
-    &:hover {
-      background-color: rgba($outline-variant, 0.2);
-      color: $text;
+    @media (hover: hover) and (pointer: fine) {
+      &:hover {
+        background-color: rgba(255, 255, 255, 0.05); /* slightly visible outline-variant replacement */
+        color: var(--text);
+      }
     }
 
     &:active {
-      transform: scale(0.95);
+      transform: scale(0.97);
     }
 
     svg {

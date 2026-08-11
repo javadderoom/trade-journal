@@ -10,6 +10,35 @@
 @use '../components/journal/journal';
 /* Vazirmatn is loaded via /fonts/vazirmatn.css in layout.tsx (self-hosted, no CDN) */
 
+:root {
+  --primary: #{$primary};
+  --background: #{$background};
+  --surface: #{$surface};
+  --text: #{$text};
+  --muted: #{$muted};
+  --surface-dim: #{$surface-dim};
+  --surface-bright: #{$surface-bright};
+  --surface-container-lowest: #{$surface-container-lowest};
+  --surface-container-low: #{$surface-container-low};
+  --surface-container: #{$surface-container};
+  --surface-container-high: #{$surface-container-high};
+  --surface-container-highest: #{$surface-container-highest};
+  --on-surface: #{$on-surface};
+  --on-surface-variant: #{$on-surface-variant};
+  --inverse-surface: #{$inverse-surface};
+  --inverse-on-surface: #{$inverse-on-surface};
+  --outline: #{$outline};
+  --outline-variant: #{$outline-variant};
+  --surface-tint: #{$surface-tint};
+  --on-primary: #{$on-primary};
+  --primary-container: #{$primary-container};
+  --on-primary-container: #{$on-primary-container};
+  --inverse-primary: #{$inverse-primary};
+  --surface-variant: #{$surface-variant};
+  
+  --primary-rgb: 16, 185, 129;
+  --outline-variant-rgb: 60, 74, 65;
+}
 
 /* Universal font reset — browsers don't inherit font into inputs/buttons by default */
 *,

@@ -598,9 +598,14 @@ router.post('/follow', authenticate, async (req: any, res) => {
                 update: {}
             });
         } else if (targetType === 'SYMBOL') {
+            // targetId is likely the string symbol (e.g. BTCUSDT)
+            let sym = await prisma.communitySymbol.findUnique({ where: { symbol: targetId } });
+            if (!sym) {
+                sym = await prisma.communitySymbol.create({ data: { symbol: targetId } });
+            }
             await prisma.communitySymbolFollow.upsert({
-                where: { userId_symbolId: { userId, symbolId: targetId } },
-                create: { userId, symbolId: targetId },
+                where: { userId_symbolId: { userId, symbolId: sym.id } },
+                create: { userId, symbolId: sym.id },
                 update: {}
             });
         }
@@ -621,9 +626,12 @@ router.delete('/follow', authenticate, async (req: any, res) => {
                 where: { followerId: userId, followingId: targetId }
             });
         } else if (targetType === 'SYMBOL') {
-            await prisma.communitySymbolFollow.deleteMany({
-                where: { userId, symbolId: targetId }
-            });
+            const sym = await prisma.communitySymbol.findUnique({ where: { symbol: targetId } });
+            if (sym) {
+                await prisma.communitySymbolFollow.deleteMany({
+                    where: { userId, symbolId: sym.id }
+                });
+            }
         }
         res.json({ success: true });
     } catch (error) {
@@ -661,7 +669,7 @@ router.get('/follow/list', authenticate, async (req: any, res) => {
 router.get('/follow/status', authenticate, async (req: any, res) => {
     try {
         const { targetId, targetType } = req.query;
-        const userId = req.user.id;
+        const userId = req.user.userId || req.user.id;
 
         let isFollowing = false;
         if (targetType === 'USER') {
@@ -670,10 +678,13 @@ router.get('/follow/status', authenticate, async (req: any, res) => {
             });
             isFollowing = !!f;
         } else if (targetType === 'SYMBOL') {
-            const f = await prisma.communitySymbolFollow.findUnique({
-                where: { userId_symbolId: { userId, symbolId: targetId as string } }
-            });
-            isFollowing = !!f;
+            const sym = await prisma.communitySymbol.findUnique({ where: { symbol: targetId as string } });
+            if (sym) {
+                const f = await prisma.communitySymbolFollow.findUnique({
+                    where: { userId_symbolId: { userId, symbolId: sym.id } }
+                });
+                isFollowing = !!f;
+            }
         }
         res.json({ isFollowing });
     } catch (error) {

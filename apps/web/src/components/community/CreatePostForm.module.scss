@@ -1,9 +1,10 @@
 @use '../../app/variables' as *;
 
 .container {
-  background-color: $surface;
-  border-bottom: 1px solid rgba($outline-variant, 0.4);
-  padding: 24px 0;
+  background-color: var(--surface-container-low);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  border-radius: 16px;
+  padding: 24px;
   margin-bottom: 16px;
   display: flex;
   gap: 16px;
