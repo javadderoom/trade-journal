@@ -163,6 +163,7 @@
     "badgeSell": "فروش"
   },
   "trades": {
+    "selectLoadedTrades": "انتخاب همه معاملات بارگذاری شده",
     "count": "تعداد",
     "tradeUnit": "معامله",
     "winRate": "وین‌ریت",

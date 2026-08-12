@@ -221,7 +221,7 @@ export default function DesktopTable({
                     )}
                   </td>
                   <td style={{ textAlign: 'center' }}>
-                      <span className={`status-icon ${isClosed ? 'status-closed' : 'status-open'}`} title={isClosed ? t('trades.closed') : t('trades.open')}>
+                      <span className={`material-symbols-outlined status-icon ${isClosed ? 'status-closed' : 'status-open'}`} title={isClosed ? t('trades.closed') : t('trades.open')}>
                         {isClosed ? 'check_circle' : 'timelapse'}
                       </span>
                   </td>

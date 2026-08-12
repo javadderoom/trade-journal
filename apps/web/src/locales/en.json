@@ -163,6 +163,7 @@
     "badgeSell": "Sell"
   },
   "trades": {
+    "selectLoadedTrades": "Select all loaded trades",
     "count": "Count",
     "tradeUnit": "trades",
     "winRate": "Win Rate",
