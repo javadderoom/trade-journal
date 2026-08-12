@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useRouter, usePathname, useParams } from 'next/navigation';
+import { useAuthStore } from '@/lib/auth';
 
 export default function PublicHeader() {
   const router = useRouter();
@@ -23,6 +24,9 @@ export default function PublicHeader() {
 
   const goRegister = () => router.push('/register');
   const goLogin = () => router.push('/login');
+
+  const { user, logout } = useAuthStore();
+  const [dropdownOpen, setDropdownOpen] = useState(false);
 
   const handleLangSwitch = () => {
     let newPath = pathname;
@@ -107,6 +111,11 @@ export default function PublicHeader() {
     }
   };
 
+  const handleLogout = async () => {
+    await logout();
+    setDropdownOpen(false);
+  };
+
   return (
     <nav className={`landing-nav ${navScrolled ? 'scrolled' : ''}`}>
       <a className="landing-logo" href="#top" aria-label="TradeKav" onClick={(e) => handleScroll(e, '#top')}>
@@ -126,8 +135,62 @@ export default function PublicHeader() {
         >
           {isEn ? 'فارسی' : 'English'}
         </button>
-        <button className="btn-ghost" onClick={goLogin}>{signinLabel}</button>
-        <button className="btn-primary" onClick={goRegister}>{registerLabel}</button>
+        {user ? (
+          <div style={{ position: 'relative' }}>
+            <button 
+              onClick={() => setDropdownOpen(!dropdownOpen)}
+              style={{
+                background: 'transparent',
+                border: 'none',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                padding: 0
+              }}
+            >
+              {user.avatar_url ? (
+                <img src={user.avatar_url} alt="Avatar" style={{ width: '36px', height: '36px', borderRadius: '50%', objectFit: 'cover', border: '1px solid rgba(255,255,255,0.1)' }} />
+              ) : (
+                <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: 'var(--primary)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' }}>
+                  {user.name?.charAt(0).toUpperCase() || '?'}
+                </div>
+              )}
+            </button>
+            {dropdownOpen && (
+              <div style={{
+                position: 'absolute',
+                top: 'calc(100% + 8px)',
+                right: isEn ? 0 : 'auto',
+                left: isEn ? 'auto' : 0,
+                background: '#111319',
+                border: '1px solid rgba(255,255,255,0.1)',
+                borderRadius: '8px',
+                padding: '8px 0',
+                minWidth: '180px',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '4px',
+                zIndex: 100
+              }}>
+                <button onClick={() => router.push('/dashboard')} style={{ background: 'none', border: 'none', color: '#f8fafc', padding: '8px 16px', textAlign: isEn ? 'left' : 'right', cursor: 'pointer', width: '100%' }}>
+                  {isEn ? 'Dashboard' : 'پنل کاربری'}
+                </button>
+                <button onClick={() => router.push(`/${locale}/community/user/${user.id}`)} style={{ background: 'none', border: 'none', color: '#f8fafc', padding: '8px 16px', textAlign: isEn ? 'left' : 'right', cursor: 'pointer', width: '100%' }}>
+                  {isEn ? 'Your Profile' : 'پروفایل شما'}
+                </button>
+                <div style={{ height: '1px', background: 'rgba(255,255,255,0.1)', margin: '4px 0' }} />
+                <button onClick={handleLogout} style={{ background: 'none', border: 'none', color: '#ef4444', padding: '8px 16px', textAlign: isEn ? 'left' : 'right', cursor: 'pointer', width: '100%' }}>
+                  {isEn ? 'Log Out' : 'خروج'}
+                </button>
+              </div>
+            )}
+          </div>
+        ) : (
+          <>
+            <button className="btn-ghost" onClick={goLogin}>{signinLabel}</button>
+            <button className="btn-primary" onClick={goRegister}>{registerLabel}</button>
+          </>
+        )}
       </div>
       <button
         className={`landing-nav-burger ${mobileMenuOpen ? 'open' : ''}`}
@@ -141,9 +204,20 @@ export default function PublicHeader() {
           {navLinks.map((l) => (
             <a key={l.href} href={l.href} onClick={(e) => handleScroll(e, l.href)}>{l.label}</a>
           ))}
-          <button className="btn-primary full" onClick={() => { setMobileMenuOpen(false); goRegister(); }}>
-            {registerLabel}
-          </button>
+          {user ? (
+            <>
+              <button className="btn-ghost full" onClick={() => { setMobileMenuOpen(false); router.push('/dashboard'); }}>
+                {isEn ? 'Dashboard' : 'پنل کاربری'}
+              </button>
+              <button className="btn-primary full" onClick={() => { setMobileMenuOpen(false); handleLogout(); }}>
+                {isEn ? 'Log Out' : 'خروج'}
+              </button>
+            </>
+          ) : (
+            <button className="btn-primary full" onClick={() => { setMobileMenuOpen(false); goRegister(); }}>
+              {registerLabel}
+            </button>
+          )}
         </div>
       )}
     </nav>

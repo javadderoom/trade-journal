@@ -79,18 +79,22 @@ export function CommunityPostCard({ post }: { post: PostProps }) {
 
   return (
     <div className={styles.card}>
-      <div className={styles.avatarContainer}>
-        {post.author.avatar_url ? (
-          <img src={post.author.avatar_url} alt={post.author.name} />
-        ) : (
-          post.author.name.charAt(0).toUpperCase()
-        )}
-      </div>
+      <Link href={`/${locale}/community/user/${post.author.id}`} style={{ textDecoration: 'none' }}>
+        <div className={styles.avatarContainer} style={{ cursor: 'pointer' }}>
+          {post.author.avatar_url ? (
+            <img src={post.author.avatar_url} alt={post.author.name} />
+          ) : (
+            post.author.name.charAt(0).toUpperCase()
+          )}
+        </div>
+      </Link>
 
       <div className={styles.contentWrapper}>
         <div className={styles.header}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span className={styles.authorName}>{post.author.name}</span>
+            <Link href={`/${locale}/community/user/${post.author.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+              <span className={styles.authorName} style={{ cursor: 'pointer' }}>{post.author.name}</span>
+            </Link>
             <FollowButton targetId={post.author.id} targetType="USER" />
           </div>
           <span className={styles.time}>· {formatTime(post.createdAt)}</span>

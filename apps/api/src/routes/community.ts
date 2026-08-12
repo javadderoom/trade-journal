@@ -41,6 +41,11 @@ router.get('/feed', optionalAuthenticate, async (req: any, res) => {
                     { symbols: { some: { symbolId: { in: followedSymbolIds } } } }
                 ]
             };
+        } else if (type === 'bookmarks') {
+            if (!userId) return res.status(401).json({ error: 'Auth required' });
+            whereClause = { bookmarks: { some: { userId } } };
+        } else if (req.query.userId) {
+            whereClause = { authorId: req.query.userId };
         } else if (req.query.symbol) {
             whereClause = {
                 symbols: { some: { symbol: { symbol: (req.query.symbol as string).toUpperCase() } } }
@@ -711,6 +716,38 @@ router.get('/symbol/:name', async (req, res) => {
     } catch (error) {
         console.error("Error fetching symbol:", error);
         res.status(500).json({ error: 'Failed to fetch symbol' });
+    }
+});
+
+router.get('/user/:id', async (req: any, res) => {
+    try {
+        const { id } = req.params;
+        const userProfile = await prisma.user.findUnique({
+            where: { id },
+            select: {
+                id: true,
+                name: true,
+                avatar_url: true,
+                created_at: true,
+                plan: true,
+                _count: {
+                    select: {
+                        communityPosts: true,
+                        communityFollowers: true,
+                        communityFollowing: true
+                    }
+                }
+            }
+        });
+        
+        if (!userProfile) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+        
+        res.json(userProfile);
+    } catch (error) {
+        console.error("Error fetching user profile:", error);
+        res.status(500).json({ error: 'Failed to fetch user profile' });
     }
 });
 

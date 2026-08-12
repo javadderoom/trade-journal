@@ -12,24 +12,26 @@ import { useAuthStore } from '@/lib/auth';
 import { fetcher } from '@/lib/api';
 import { motion } from 'framer-motion';
 
-export function CommunityFeed({ defaultType = 'all', symbol }: { defaultType?: 'all' | 'following', symbol?: string }) {
+export function CommunityFeed({ defaultType = 'all', symbol, feedUrl }: { defaultType?: 'all' | 'following', symbol?: string, feedUrl?: string }) {
   const { user } = useAuthStore();
   const { language } = useTranslation();
   const isFa = language === 'fa';
   const [feedType, setFeedType] = useState<'all' | 'following'>(defaultType);
   
-  let endpoint = '/api/community/feed';
-  if (symbol) {
-    endpoint = `/api/community/feed?symbol=${symbol}`;
-  } else if (feedType === 'following') {
-    endpoint = '/api/community/feed?type=following';
+  let endpoint = feedUrl || '/api/community/feed';
+  if (!feedUrl) {
+    if (symbol) {
+      endpoint = `/api/community/feed?symbol=${symbol}`;
+    } else if (feedType === 'following') {
+      endpoint = '/api/community/feed?type=following';
+    }
   }
 
   const { data: posts, error, isLoading, mutate } = useSWR<PostProps[]>(endpoint, fetcher);
 
   return (
     <div className={styles.feedContainer}>
-      {!symbol && (
+      {!symbol && !feedUrl && (
         <div style={{ display: 'flex', gap: '24px', marginBottom: '24px', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
           <button 
             onClick={() => setFeedType('all')}
@@ -78,7 +80,7 @@ export function CommunityFeed({ defaultType = 'all', symbol }: { defaultType?: '
         </div>
       )}
 
-      {user && <CreatePostForm onPostCreated={() => mutate()} />}
+      {user && !feedUrl && <CreatePostForm onPostCreated={() => mutate()} />}
 
       {isLoading && (
         <div style={{ display: 'flex', flexDirection: 'column' }}>
