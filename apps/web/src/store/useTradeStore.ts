@@ -184,12 +184,27 @@ export const MOCK_TRADES: Trade[] = [
   }
 ];
 
+interface FetchTradesParams {
+  isManualRefresh?: boolean;
+  accountId?: string;
+  limit?: number;
+  offset?: number;
+  sortKey?: string;
+  sortDir?: 'asc' | 'desc';
+  search?: string;
+  symbol?: string;
+  direction?: 'BUY' | 'SELL';
+  status?: 'OPEN' | 'CLOSED';
+  dates?: string[];
+}
+
 interface TradeState {
   trades: Trade[];
+  totalCount: number;
   loading: boolean;
   error: string | null;
   setTrades: (trades: Trade[]) => void;
-  fetchTrades: (isManualRefresh?: boolean, accountId?: string, sortKey?: string, sortDir?: 'asc' | 'desc') => Promise<void>;
+  fetchTrades: (params?: FetchTradesParams) => Promise<void>;
   updateTrade: (updatedTrade: Trade) => Promise<boolean>;
   deleteTrade: (tradeId: string) => Promise<boolean>;
   deleteMultipleTrades: (tradeIds: string[]) => Promise<boolean>;
@@ -197,20 +212,49 @@ interface TradeState {
 
 export const useTradeStore = create<TradeState>((set, get) => ({
   trades: [],
+  totalCount: 0,
   loading: false,
   error: null,
 
   setTrades: (trades) => set({ trades }),
 
-  fetchTrades: async (isManualRefresh = false, accountId = 'all', sortKey?: string, sortDir?: 'asc' | 'desc') => {
+  fetchTrades: async (params = {}) => {
     try {
+      const {
+        isManualRefresh = false,
+        accountId = 'all',
+        limit = 500,
+        offset = 0,
+        sortKey = 'date',
+        sortDir = 'desc',
+        search,
+        symbol,
+        direction,
+        status,
+        dates
+      } = params;
+
       if (!isManualRefresh) {
         set({ loading: true });
       }
       set({ error: null });
 
-      const sortParams = sortKey ? `&sortKey=${sortKey}&sortDir=${sortDir || 'desc'}` : '';
-      const res = await api.get(`/api/trades?limit=200&offset=0&accountId=${accountId}${sortParams}&t=${Date.now()}`);
+      const queryParams = new URLSearchParams({
+        accountId,
+        limit: limit.toString(),
+        offset: offset.toString(),
+        sortKey,
+        sortDir,
+        t: Date.now().toString()
+      });
+
+      if (search) queryParams.append('search', search);
+      if (symbol) queryParams.append('symbol', symbol);
+      if (direction) queryParams.append('direction', direction);
+      if (status) queryParams.append('status', status);
+      if (dates && dates.length > 0) queryParams.append('dates', dates.join(','));
+
+      const res = await api.get(`/api/trades?${queryParams.toString()}`);
       
       const apiItems = Array.isArray(res.data?.items) ? res.data.items : [];
 
@@ -280,9 +324,9 @@ export const useTradeStore = create<TradeState>((set, get) => ({
             accountType: item.accountType ?? null,
           };
         });
-        set({ trades: mapped, error: null });
+        set({ trades: mapped, totalCount: res.data.totalCount || 0, error: null });
       } else {
-        set({ trades: [], error: null });
+        set({ trades: [], totalCount: 0, error: null });
       }
     } catch (e: any) {
       console.error('Failed to fetch trades:', e.message);

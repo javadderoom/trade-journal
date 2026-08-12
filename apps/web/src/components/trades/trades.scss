@@ -863,10 +863,8 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  height: 100vh;
-  position: fixed;
-  top: 0;
-  bottom: 0;
+  height: 100%;
+  position: relative;
   z-index: 1000;
 
   [dir="rtl"] & {
@@ -2457,6 +2455,10 @@ input[type="checkbox"] {
     .detail-panel {
       width: 480px;
       z-index: 1100;
+      position: fixed;
+      height: 100vh;
+      top: 0;
+      bottom: 0;
     }
 
     .trades-page-header {

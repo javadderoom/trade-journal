@@ -13,6 +13,93 @@ import { createTradeSchema, updateTradeSchema } from '../validators/trade';
 const router = Router();
 
 /**
+ * POST /api/trades/bulk-tags
+ * Bulk apply or remove tags (setup, triggers, confluences) to trades.
+ */
+router.post('/bulk-tags', authenticate, async (req: AuthRequest, res: Response) => {
+  try {
+    const userId = req.user!.userId;
+    const { tradeIds, action, setupId, triggerIds, confluenceIds } = req.body;
+
+    if (!Array.isArray(tradeIds) || tradeIds.length === 0) {
+      return res.status(400).json({ error: 'tradeIds required' });
+    }
+    if (action !== 'ADD' && action !== 'REMOVE' && action !== 'SET') {
+      return res.status(400).json({ error: 'invalid action' });
+    }
+
+    // Verify all trades belong to user
+    const userTrades = await prisma.trade.findMany({
+      where: {
+        id: { in: tradeIds },
+        user_id: userId
+      },
+      select: { id: true }
+    });
+
+    if (userTrades.length !== tradeIds.length) {
+      return res.status(403).json({ error: 'Some trades not found or unauthorized' });
+    }
+
+    const validTradeIds = userTrades.map(t => t.id);
+
+    await prisma.$transaction(async (tx) => {
+      for (const tradeId of validTradeIds) {
+        if (action === 'SET' || action === 'ADD') {
+          if (setupId !== undefined) {
+            if (setupId === null) {
+              await tx.tradeSetup.deleteMany({ where: { trade_id: tradeId } });
+            } else {
+              await tx.tradeSetup.upsert({
+                where: { trade_id: tradeId },
+                update: { concept_id: setupId },
+                create: { trade_id: tradeId, concept_id: setupId }
+              });
+            }
+          }
+
+          if (triggerIds && triggerIds.length > 0) {
+            if (action === 'SET') {
+              await tx.tradeTrigger.deleteMany({ where: { trade_id: tradeId } });
+            }
+            await tx.tradeTrigger.createMany({
+              data: triggerIds.map((cId: string) => ({ trade_id: tradeId, concept_id: cId })),
+              skipDuplicates: true
+            });
+          }
+
+          if (confluenceIds && confluenceIds.length > 0) {
+            if (action === 'SET') {
+              await tx.tradeConfluence.deleteMany({ where: { trade_id: tradeId } });
+            }
+            await tx.tradeConfluence.createMany({
+              data: confluenceIds.map((cId: string) => ({ trade_id: tradeId, concept_id: cId })),
+              skipDuplicates: true
+            });
+          }
+        } else if (action === 'REMOVE') {
+          if (triggerIds && triggerIds.length > 0) {
+            await tx.tradeTrigger.deleteMany({
+              where: { trade_id: tradeId, concept_id: { in: triggerIds } }
+            });
+          }
+          if (confluenceIds && confluenceIds.length > 0) {
+            await tx.tradeConfluence.deleteMany({
+              where: { trade_id: tradeId, concept_id: { in: confluenceIds } }
+            });
+          }
+        }
+      }
+    });
+
+    res.status(200).json({ success: true, count: validTradeIds.length });
+  } catch (err: any) {
+    console.error('Bulk tags error:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+/**
  * POST /api/trades/sync
  * Receives trade data from MT5 Expert Advisor and stores in DB.
  *
@@ -70,7 +157,13 @@ router.get('/', authenticate, async (req: AuthRequest, res: Response) => {
     const limit = limitRaw ? Number.parseInt(limitRaw, 10) : undefined;
     const offset = offsetRaw ? Number.parseInt(offsetRaw, 10) : undefined;
 
-    const items = await getTradesForAccount({
+    const search = body.search as string | undefined;
+    const symbol = body.symbol as string | undefined;
+    const direction = body.direction as 'BUY' | 'SELL' | undefined;
+    const status = body.status as 'OPEN' | 'CLOSED' | undefined;
+    const dates = body.dates ? (body.dates as string).split(',') : undefined;
+
+    const { items, totalCount } = await getTradesForAccount({
       userId,
       accountId,
       limit,
@@ -78,6 +171,11 @@ router.get('/', authenticate, async (req: AuthRequest, res: Response) => {
       sortKey,
       sortDir,
       plan: req.user?.plan,
+      search,
+      symbol,
+      direction,
+      status,
+      dates,
     });
 
     res.status(200).json({
@@ -85,6 +183,7 @@ router.get('/', authenticate, async (req: AuthRequest, res: Response) => {
       limit: limit ?? 100,
       offset: offset ?? 0,
       count: items.length,
+      totalCount,
     });
   } catch (err: any) {
     console.error('Trade list error:', err);

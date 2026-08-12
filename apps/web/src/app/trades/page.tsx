@@ -93,7 +93,7 @@ export default function TradesPage() {
   };
 
   useEffect(() => {
-    fetchTrades(false, selectedAccountId);
+    fetchTrades({ isManualRefresh: false, accountId: selectedAccountId });
   }, [selectedAccountId]);
 
   useEffect(() => {
@@ -106,7 +106,7 @@ export default function TradesPage() {
         ? `Import completed successfully:\nFound trades: ${result.found}\nImported: ${result.imported}\nDuplicate (ignored): ${result.skipped}`
         : `واردات فایل با موفقیت انجام شد:\nتعداد معامله یافت شده: ${result.found}\nتعداد وارد شده: ${result.imported}\nتعداد تکراری (نادیده گرفته شده): ${result.skipped}`
     );
-    await fetchTrades(true, selectedAccountId);
+    await fetchTrades({ isManualRefresh: true, accountId: selectedAccountId });
     fetchSubStatus();
     // Open batch mistake summary if any were detected
     if (result.mistakeSummary && result.mistakeSummary.length > 0) {
@@ -153,7 +153,7 @@ export default function TradesPage() {
     }
 
     // Real server response — re-fetch to get accurate data
-    await fetchTrades(true);
+    await fetchTrades({ isManualRefresh: true });
     fetchSubStatus();
     // Set newly created trade to open in sidebar automatically
     if (newTrade && newTrade.id) {
@@ -185,7 +185,7 @@ export default function TradesPage() {
         initialTrades={trades}
         initialUsdToToman={usdToToman}
         initialDateFilter={dateFilter}
-        onRefresh={() => fetchTrades(true)}
+        onRefresh={() => fetchTrades({ isManualRefresh: true })}
         onImportMT4={handleImportMT4}
         onAddManualTrade={handleAddManualTrade}
         onUpdateTrade={handleUpdateTrade}

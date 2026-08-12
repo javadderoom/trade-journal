@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { toPersianDigits } from '../../utils/farsi';
 import { useTranslation, useAppStore } from '../../store/useAppStore';
+import { useTradeStore } from '../../store/useTradeStore';
 import { getSharedTranslations } from '../../locales/components';
 import { api } from '../../lib/api';
 import { notify } from '../../lib/notify';
@@ -14,8 +15,9 @@ import DesktopTable from './DesktopTable';
 import MobileCardsList from './MobileCardsList';
 import DetailPanel from './DetailPanel';
 import { getMainPair, getNetPnl } from '../../utils/tradeHelpers';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import ExportModal from '../modals/ExportModal';
+import BulkTagModal from '../modals/BulkTagModal';
 import { Trade } from '../../types/trade';
 import { getDefaultEmotions } from '../../constants/emotions';
 import { useAuthStore } from '../../lib/auth';
@@ -152,21 +154,52 @@ export default function TradesTable({
     return dateFilter.split(',').map(d => d.trim()).filter(Boolean);
   }, [dateFilter]);
 
-  // Sync prop-level activeTradeId if provided by parent
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
+
+  // Initialize activeTradeId from URL or prop
   useEffect(() => {
-    if (initialActiveTradeId !== undefined) {
+    const tradeIdParam = searchParams?.get('trade');
+    if (tradeIdParam) {
+      setActiveTradeId(tradeIdParam);
+    } else if (initialActiveTradeId !== undefined) {
       setActiveTradeId(initialActiveTradeId);
     }
-  }, [initialActiveTradeId]);
+  }, [initialActiveTradeId, searchParams]);
+
+  const handleSetActiveTradeId = (id: string | null) => {
+    setActiveTradeId(id);
+    if (typeof window !== 'undefined') {
+      const url = new URL(window.location.href);
+      if (id) {
+        url.searchParams.set('trade', id);
+      } else {
+        url.searchParams.delete('trade');
+      }
+      window.history.pushState({}, '', url.toString());
+    }
+  };
+
+  const { fetchTrades, totalCount: storeTotalCount } = useTradeStore();
 
   // Filter states
   const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState('');
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearchQuery(searchQuery);
+    }, 400);
+    return () => clearTimeout(handler);
+  }, [searchQuery]);
+
   const [selectedSymbol, setSelectedSymbol] = useState(t('filters.allSymbols'));
   const [selectedDirection, setSelectedDirection] = useState(t('filters.allDirections'));
   const [selectedStatus, setSelectedStatus] = useState<'ALL' | 'OPEN' | 'CLOSED'>('ALL');
   const [isAdvancedFiltersOpen, setIsAdvancedFiltersOpen] = useState(false);
   const [allEmotions, setAllEmotions] = useState<{ value: string; label: string; emoji?: string }[]>(() => getDefaultEmotions(language));
   const [selectedTimezone, setSelectedTimezone] = useState('Asia/Tehran');
+  const [isBulkTagModalOpen, setIsBulkTagModalOpen] = useState(false);
 
   // USD → Toman exchange rate
   const [usdToToman, setUsdToToman] = useState<number>(initialUsdToToman);
@@ -240,90 +273,79 @@ export default function TradesTable({
     return trades.find(t => t.id === activeTradeId) || null;
   }, [trades, activeTradeId]);
 
-  // Filtered trades
-  const filteredTrades = useMemo(() => {
-    const result = trades.filter(trade => {
-      if (filterDatesArray.length > 0) {
-        const closeDate = getLocalDateStr(trade.closeTime, selectedTimezone);
-        const matchClose = closeDate ? filterDatesArray.includes(closeDate) : false;
-        if (!matchClose) {
-          return false;
-        }
-      }
-      if (selectedSymbol !== t('filters.allSymbols')) {
-        if (selectedSymbol.startsWith('main:')) {
-          const mainPair = selectedSymbol.substring(5);
-          if (getMainPair(trade.symbol) !== mainPair) {
-            return false;
-          }
-        } else if (trade.symbol !== selectedSymbol) {
-          return false;
-        }
-      }
-      if (selectedDirection !== t('filters.allDirections')) {
-        const dir = selectedDirection === t('filters.buy') ? 'BUY' : 'SELL';
-        if (trade.direction !== dir) return false;
-      }
-      if (searchQuery) {
-        const query = searchQuery.toLowerCase().trim();
-        const symbolMatch = trade.symbol.toLowerCase().includes(query);
-        const ticketMatch = trade.ticket ? String(trade.ticket).includes(query) : false;
-        const notesMatch = trade.annotation?.notes ? trade.annotation?.notes.toLowerCase().includes(query) : false;
-        const dateMatch = trade.openTime.includes(query);
-        if (!symbolMatch && !ticketMatch && !notesMatch && !dateMatch) {
-          return false;
-        }
-      }
-      if (selectedStatus === 'OPEN' && trade.closeTime !== null) return false;
-      if (selectedStatus === 'CLOSED' && trade.closeTime === null) return false;
-      return true;
+  // Trigger fetch when filters change
+  useEffect(() => {
+    fetchTrades({
+      isManualRefresh: true,
+      accountId: selectedAccountId,
+      limit: 500, // Fetch up to 500 for client-side pagination
+      offset: 0,
+      sortKey,
+      sortDir,
+      search: debouncedSearchQuery,
+      symbol: selectedSymbol !== t('filters.allSymbols') ? selectedSymbol : undefined,
+      direction: selectedDirection !== t('filters.allDirections') ? (selectedDirection === t('filters.buy') ? 'BUY' : 'SELL') : undefined,
+      status: selectedStatus !== 'ALL' ? selectedStatus : undefined,
+      dates: filterDatesArray
     });
+    // Reset to page 1 on filter change
+    setCurrentPage(1);
+  }, [
+    selectedAccountId,
+    debouncedSearchQuery,
+    selectedSymbol,
+    selectedDirection,
+    selectedStatus,
+    filterDatesArray,
+    sortKey,
+    sortDir
+  ]);
 
-    // Client-side sort
-    result.sort((a, b) => {
-      let cmp = 0;
-      switch (sortKey) {
-        case 'date':
-          cmp = new Date(a.openTime).getTime() - new Date(b.openTime).getTime();
-          break;
-        case 'symbol':
-          cmp = a.symbol.localeCompare(b.symbol);
-          break;
-        case 'direction':
-          cmp = a.direction.localeCompare(b.direction);
-          break;
-        case 'volume':
-          cmp = a.lotSize - b.lotSize;
-          break;
-        case 'pnl':
-          cmp = getNetPnl(a) - getNetPnl(b);
-          break;
-        case 'rr':
-          cmp = a.rMultiple - b.rMultiple;
-          break;
-        default:
-          cmp = new Date(a.openTime).getTime() - new Date(b.openTime).getTime();
-      }
-      return sortDir === 'asc' ? cmp : -cmp;
-    });
-
-    return result;
-  }, [trades, selectedSymbol, selectedDirection, searchQuery, selectedStatus, filterDatesArray, selectedTimezone, sortKey, sortDir]);
+  // Filtered trades (now handled by backend, we just pass trades down)
+  const filteredTrades = trades;
 
   // Summary Metrics
   const summary = useMemo(() => {
     const activeTrades = filteredTrades;
-    const count = activeTrades.length;
     const wins = activeTrades.filter(t => getNetPnl(t) > 0).length;
-    const winRate = count > 0 ? Math.round((wins / count) * 100) : 0;
+    const winRate = activeTrades.length > 0 ? Math.round((wins / activeTrades.length) * 100) : 0;
     const totalProfit = activeTrades.reduce((sum, t) => sum + getNetPnl(t), 0);
+    const count = Math.max(activeTrades.length, storeTotalCount);
     return { count, winRate, totalProfit };
-  }, [filteredTrades]);
+  }, [filteredTrades, storeTotalCount]);
 
   // Paginated trades (Load More logic)
   const paginatedTrades = useMemo(() => {
     return filteredTrades.slice(0, currentPage * itemsPerPage);
   }, [filteredTrades, currentPage]);
+
+  // Keyboard navigation for activeTradeId
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!activeTradeId) return;
+
+      // Ignore if user is typing in an input or textarea
+      if (['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement?.tagName || '')) {
+        return;
+      }
+
+      if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+        e.preventDefault(); // Prevent scrolling
+        
+        const currentIndex = paginatedTrades.findIndex(t => t.id === activeTradeId);
+        if (currentIndex === -1) return; // Not in current page view
+        
+        if (e.key === 'ArrowUp' && currentIndex > 0) {
+          handleSetActiveTradeId(paginatedTrades[currentIndex - 1].id);
+        } else if (e.key === 'ArrowDown' && currentIndex < paginatedTrades.length - 1) {
+          handleSetActiveTradeId(paginatedTrades[currentIndex + 1].id);
+        }
+      }
+    };
+    
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [activeTradeId, paginatedTrades]);
 
   const totalPages = Math.max(Math.ceil(filteredTrades.length / itemsPerPage), 1);
 
@@ -399,10 +421,11 @@ export default function TradesTable({
         next.delete(activeTradeId);
         return next;
       });
-      setActiveTradeId(null);
+      handleSetActiveTradeId(null);
     }
   };
 
+  // Bulk Delete
   const handleDeleteSelected = async () => {
     if (selectedTrades.size === 0) return;
 
@@ -430,8 +453,26 @@ export default function TradesTable({
       setTrades(prev => prev.filter(t => !selectedTrades.has(t.id)));
       setSelectedTrades(new Set());
       if (activeTradeId && selectedTrades.has(activeTradeId)) {
-        setActiveTradeId(null);
+        handleSetActiveTradeId(null);
       }
+    }
+  };
+
+  // Bulk Tag
+  const handleBulkTagApply = async (data: any) => {
+    try {
+      const res = await api.post('/api/trades/bulk-tags', {
+        tradeIds: Array.from(selectedTrades),
+        ...data
+      });
+      if (res.data?.success) {
+        notify.success(isEn ? 'Tags applied successfully' : 'برچسب‌ها با موفقیت اعمال شدند');
+        onRefresh?.();
+        setSelectedTrades(new Set());
+      }
+    } catch (err: any) {
+      notify.error(isEn ? 'Failed to apply tags' : 'خطا در اعمال برچسب‌ها');
+      console.error(err);
     }
   };
 
@@ -732,7 +773,7 @@ export default function TradesTable({
             paginatedTrades={paginatedTrades}
             selectedTrades={selectedTrades}
             activeTradeId={activeTradeId}
-            setActiveTradeId={setActiveTradeId}
+            setActiveTradeId={handleSetActiveTradeId}
             handleSelectAll={handleSelectAll}
             handleSelectRow={handleSelectRow}
             selectedTimezone={selectedTimezone}
@@ -752,7 +793,7 @@ export default function TradesTable({
           selectedTrades={selectedTrades}
           setSelectedTrades={setSelectedTrades}
           activeTradeId={activeTradeId}
-          setActiveTradeId={setActiveTradeId}
+          setActiveTradeId={handleSetActiveTradeId}
           handleSelectRow={handleSelectRow}
           selectedTimezone={selectedTimezone}
           usdToToman={usdToToman}
@@ -792,7 +833,7 @@ export default function TradesTable({
         <DetailPanel
           key={activeTrade.id}
           activeTrade={activeTrade}
-          setActiveTradeId={setActiveTradeId}
+          setActiveTradeId={handleSetActiveTradeId}
           tradingConcepts={tradingConcepts}
           allEmotions={allEmotions}
           onSaveEmotionConfigurations={handleSaveEmotionConfigurations}
@@ -825,13 +866,17 @@ export default function TradesTable({
           </div>
           <div className="divider-vertical"></div>
           <div className="action-buttons">
+            <button className="btn btn-secondary" onClick={() => setIsBulkTagModalOpen(true)} style={{ color: '#fff', borderColor: '#475569' }}>
+              <span className="material-symbols-outlined">sell</span>
+              {isEn ? 'Tag Selected' : 'برچسب‌گذاری گروهی'}
+            </button>
             <button className="btn btn-danger" onClick={handleDeleteSelected}>
               <span className="material-symbols-outlined">delete</span>
-              حذف گروهی
+              {isEn ? 'Bulk Delete' : 'حذف گروهی'}
             </button>
             <button className="btn-cancel-selection" onClick={() => setSelectedTrades(new Set())}>
               <span className="material-symbols-outlined">close</span>
-              لغو انتخاب
+              {isEn ? 'Clear Selection' : 'لغو انتخاب'}
             </button>
           </div>
         </div>
@@ -926,6 +971,13 @@ export default function TradesTable({
           searchQuery: searchQuery,
           dateFilter: dateFilter,
         }}
+      />
+      <BulkTagModal
+        isOpen={isBulkTagModalOpen}
+        onClose={() => setIsBulkTagModalOpen(false)}
+        selectedCount={selectedTrades.size}
+        tradingConcepts={tradingConcepts}
+        onApply={handleBulkTagApply}
       />
     </div>
   );

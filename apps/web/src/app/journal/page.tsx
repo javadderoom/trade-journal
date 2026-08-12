@@ -97,7 +97,7 @@ export default function JournalPage() {
     };
 
     loadDayData();
-    fetchTrades(false); // Reload all trades in store
+    fetchTrades({ isManualRefresh: false }); // Reload all trades in store
   }, [selectedDate, fetchTrades]);
 
   // Sync calendar picker header when selected date or locale changes

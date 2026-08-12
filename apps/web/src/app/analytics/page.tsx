@@ -52,7 +52,7 @@ export default function JournalPage() {
 
   // Load trades and accounts if empty
   useEffect(() => {
-    fetchTrades(false, selectedAccountId);
+    fetchTrades({ isManualRefresh: false, accountId: selectedAccountId });
   }, [selectedAccountId]);
 
 

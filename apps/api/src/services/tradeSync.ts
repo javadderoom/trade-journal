@@ -347,8 +347,13 @@ export async function getTradesForAccount(params: {
   sortKey?: string;
   sortDir?: 'asc' | 'desc';
   plan?: string;
-}): Promise<TradeListRow[]> {
-  const { userId, accountId } = params;
+  search?: string;
+  symbol?: string;
+  direction?: 'BUY' | 'SELL';
+  status?: 'OPEN' | 'CLOSED';
+  dates?: string[];
+}): Promise<{ items: TradeListRow[], totalCount: number }> {
+  const { userId, accountId, search, symbol, direction, status, dates } = params;
   const limit = Math.min(Math.max(params.limit ?? 100, 1), 500);
   const offset = Math.max(params.offset ?? 0, 0);
 
@@ -384,72 +389,120 @@ export async function getTradesForAccount(params: {
     dateLimit.setMonth(dateLimit.getMonth() - 6);
   }
 
-  const trades = await prisma.trade.findMany({
-    where: {
-      user_id: userId,
-      ...(filterAccount ? { account_id: accountId } : {}),
-      ...(dateLimit ? { open_time: { gte: dateLimit } } : {}),
-    },
-    orderBy: { [sortCol]: sortDir },
-    skip: offset,
-    take: limit,
-    select: {
-      id: true,
-      account_id: true,
-      ticket: true,
-      symbol: true,
-      direction: true,
-      open_time: true,
-      close_time: true,
-      open_price: true,
-      close_price: true,
-      lot_size: true,
-      stop_loss: true,
-      take_profit: true,
-      profit_usd: true,
-      commission: true,
-      swap: true,
-      pips: true,
-      r_multiple: true,
-      import_source: true,
-      account: { select: { account_type: true } },
-      annotation: {
-        select: {
-          htf_bias: true,
-          session: true,
-          thesis: true,
-          expectation: true,
-          lesson: true,
-          conviction: true,
-          emotion: true,
-          notes: true,
-          screenshots: true,
+  // Build the where clause
+  const whereClause: any = {
+    user_id: userId,
+    ...(filterAccount ? { account_id: accountId } : {}),
+    ...(dateLimit ? { open_time: { gte: dateLimit } } : {}),
+  };
+
+  if (symbol && symbol !== 'همه نمادها' && symbol !== 'All Symbols') {
+    if (symbol.startsWith('main:')) {
+      const mainPair = symbol.substring(5);
+      whereClause.symbol = { contains: mainPair, mode: 'insensitive' };
+    } else {
+      whereClause.symbol = symbol;
+    }
+  }
+
+  if (direction) {
+    whereClause.direction = direction;
+  }
+
+  if (status === 'OPEN') {
+    whereClause.close_time = null;
+  } else if (status === 'CLOSED') {
+    whereClause.close_time = { not: null };
+  }
+
+  if (dates && dates.length > 0) {
+    whereClause.OR = dates.map(dateStr => {
+      // Create a date range for the specific date
+      const startDate = new Date(`${dateStr}T00:00:00.000Z`);
+      const endDate = new Date(`${dateStr}T23:59:59.999Z`);
+      return {
+        close_time: {
+          gte: startDate,
+          lte: endDate
+        }
+      };
+    });
+  }
+
+  if (search) {
+    whereClause.OR = [
+      ...(whereClause.OR || []),
+      { symbol: { contains: search, mode: 'insensitive' } },
+      { ticket: { contains: search, mode: 'insensitive' } },
+      { annotation: { notes: { contains: search, mode: 'insensitive' } } }
+    ];
+  }
+
+  const [totalCount, trades] = await Promise.all([
+    prisma.trade.count({ where: whereClause }),
+    prisma.trade.findMany({
+      where: whereClause,
+      orderBy: { [sortCol]: sortDir },
+      skip: offset,
+      take: limit,
+      select: {
+        id: true,
+        account_id: true,
+        ticket: true,
+        symbol: true,
+        direction: true,
+        open_time: true,
+        close_time: true,
+        open_price: true,
+        close_price: true,
+        lot_size: true,
+        stop_loss: true,
+        take_profit: true,
+        profit_usd: true,
+        commission: true,
+        swap: true,
+        pips: true,
+        r_multiple: true,
+        import_source: true,
+        account: { select: { account_type: true } },
+        annotation: {
+          select: {
+            htf_bias: true,
+            session: true,
+            thesis: true,
+            expectation: true,
+            lesson: true,
+            conviction: true,
+            emotion: true,
+            notes: true,
+            screenshots: true,
+          },
         },
-      },
-      setup: { select: { concept: { select: { id: true, name: true, color: true, icon: true } } } },
-      triggers: { select: { concept: { select: { id: true, name: true, color: true, icon: true } } } },
-      confluences: { select: { concept: { select: { id: true, name: true, color: true, icon: true } } } },
-      plan: {
-        select: {
-          max_risk: true,
-          expected_rr: true,
-          entry_condition: true,
-          invalidation: true,
-          target_zone: true,
-          expected_hold_time: true,
-          plan_followed: true,
-          entry_timing_correct: true,
-          emotions_affected: true,
-          managed_according_to_rules: true,
+        setup: { select: { concept: { select: { id: true, name: true, color: true, icon: true } } } },
+        triggers: { select: { concept: { select: { id: true, name: true, color: true, icon: true } } } },
+        confluences: { select: { concept: { select: { id: true, name: true, color: true, icon: true } } } },
+        plan: {
+          select: {
+            max_risk: true,
+            expected_rr: true,
+            entry_condition: true,
+            invalidation: true,
+            target_zone: true,
+            expected_hold_time: true,
+            plan_followed: true,
+            entry_timing_correct: true,
+            emotions_affected: true,
+            managed_according_to_rules: true,
+          }
+        },
+        events: {
+          orderBy: { timestamp: 'asc' }
         }
       },
-      events: {
-        orderBy: { timestamp: 'asc' }
-      }
-    },
-  });
+    })
+  ]);
 
-  return trades.map((t: any) => ({
+  const items = trades.map((t: any) => ({
     id: t.id,
     accountId: t.account_id,
     ticket: t.ticket,
@@ -507,4 +560,5 @@ export async function getTradesForAccount(params: {
     importSource: t.import_source,
     accountType: t.account.account_type,
   }));
+  return { items, totalCount };
 }
