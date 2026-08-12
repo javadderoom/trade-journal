@@ -21,9 +21,13 @@ For every user request, analyze the required cognitive effort. At the very top o
 ## Language and Communication
 - **ALWAYS communicate and respond in ENGLISH.**
 - **NEVER** write or respond in Farsi (Persian) or any other language, even if the user prompts in that language.
+- **Answer Before Acting**: If the user asks a question (e.g., "can we do X?"), ALWAYS answer the question and ask for confirmation before taking any action or modifying files. Do not silently implement a feature if the user only asked if it is possible.
 
 ## Database Migration Rules
 - **Migration Plan Required**: Every time a database schema change is made (e.g., modifying `schema.prisma`), a proper migration plan must be formulated and executed to generate migration files.
 - Avoid using `prisma db push` in isolation, as it bypasses migration file generation and causes the local database to drift from the migration history.
 - Always use `prisma migrate dev --name <migration_name>` (or `prisma migrate diff`) to generate proper migration files so they can be safely checked into version control and applied to the production database during deployment.
 - **Destructive Operations**: NEVER use `--force`, `--accept-data-loss`, or run `prisma migrate reset` automatically without pausing to request explicit permission from the user. Any operation that causes data loss must be thoroughly explained and approved by the user first.
+
+## UI Components
+- **Confirm Dialogs**: NEVER use the native browser `window.confirm`. ALWAYS use the custom `notify.confirm` dialog powered by the `Toaster` component (e.g., `import { notify } from '@/lib/notify'`).

@@ -7,6 +7,8 @@ import { TradePreviewCard, TradePreviewProps } from './TradePreviewCard';
 import { CommentSection } from './CommentSection';
 import { FollowButton } from './FollowButton';
 import { ReportModal } from './ReportModal';
+import { useAuthStore } from '@/lib/auth';
+import { notify } from '@/lib/notify';
 
 export interface PostProps {
   id: string;
@@ -26,6 +28,7 @@ export interface PostProps {
   isLikedByMe?: boolean;
   isBookmarked?: boolean;
   media?: { id: string; url: string; sortOrder: number }[];
+  status?: 'ACTIVE' | 'HIDDEN' | 'DELETED';
 }
 
 export function CommunityPostCard({ post }: { post: PostProps }) {
@@ -37,6 +40,18 @@ export function CommunityPostCard({ post }: { post: PostProps }) {
   const [likeCount, setLikeCount] = useState(post._count.likesRel);
   const [isBookmarked, setIsBookmarked] = useState(post.isBookmarked || false);
   const [showReportModal, setShowReportModal] = useState(false);
+
+  const { user: authUser } = useAuthStore();
+  const isAuthor = authUser?.id === post.author.id;
+  const [showOptions, setShowOptions] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editContent, setEditContent] = useState(post.content);
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [isRemovedLocally, setIsRemovedLocally] = useState(false);
+
+  const isArchived = post.status === 'HIDDEN';
+
+  if (isRemovedLocally) return null;
 
   const handleBookmark = async () => {
     try {
@@ -50,6 +65,42 @@ export function CommunityPostCard({ post }: { post: PostProps }) {
 
   const handleReportClick = () => {
     setShowReportModal(true);
+  };
+
+  const handleSaveEdit = async () => {
+    if (!editContent.trim()) return;
+    setIsUpdating(true);
+    try {
+      await api.put(`/api/community/feed/${post.id}`, { content: editContent });
+      post.content = editContent;
+      setIsEditing(false);
+      setShowOptions(false);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  const handleStatusChange = async (status: 'ACTIVE' | 'HIDDEN' | 'DELETED') => {
+    if (status === 'DELETED') {
+      const ok = await notify.confirm({
+        title: isFa ? 'تایید حذف' : 'Confirm Delete',
+        message: isFa ? 'آیا از حذف این پست اطمینان دارید؟' : 'Are you sure you want to delete this post?',
+        confirmLabel: isFa ? 'حذف پست' : 'Delete Post',
+        danger: true
+      });
+      if (!ok) return;
+    }
+    
+    setIsUpdating(true);
+    try {
+      await api.put(`/api/community/feed/${post.id}/status`, { status });
+      setIsRemovedLocally(true);
+    } catch (e) {
+      console.error(e);
+      setIsUpdating(false);
+    }
   };
 
   const handleLike = async () => {
@@ -97,10 +148,72 @@ export function CommunityPostCard({ post }: { post: PostProps }) {
             </Link>
             <FollowButton targetId={post.author.id} targetType="USER" />
           </div>
-          <span className={styles.time}>· {formatTime(post.createdAt)}</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginLeft: isFa ? '0' : 'auto', marginRight: isFa ? 'auto' : '0' }}>
+            <span className={styles.time}>{formatTime(post.createdAt)}</span>
+            {isAuthor && (
+              <div style={{ position: 'relative' }}>
+                <button 
+                  onClick={() => setShowOptions(!showOptions)}
+                  style={{ background: 'none', border: 'none', color: 'var(--muted)', cursor: 'pointer', padding: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%' }}
+                >
+                  <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>more_horiz</span>
+                </button>
+                {showOptions && (
+                  <div style={{ position: 'absolute', top: '100%', right: isFa ? 'auto' : 0, left: isFa ? 0 : 'auto', zIndex: 10, background: 'var(--surface-container)', border: '1px solid var(--border)', borderRadius: '8px', padding: '8px', minWidth: '150px', display: 'flex', flexDirection: 'column', gap: '4px', boxShadow: '0 4px 12px rgba(0,0,0,0.2)' }}>
+                    <button onClick={() => { setIsEditing(true); setShowOptions(false); }} style={{ background: 'none', border: 'none', padding: '8px 12px', textAlign: isFa ? 'right' : 'left', cursor: 'pointer', color: 'var(--text)', borderRadius: '4px', display: 'flex', alignItems: 'center', gap: '8px' }} className="menu-btn">
+                      <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>edit</span>
+                      {isFa ? 'ویرایش' : 'Edit'}
+                    </button>
+                    {isArchived ? (
+                      <button onClick={() => handleStatusChange('ACTIVE')} style={{ background: 'none', border: 'none', padding: '8px 12px', textAlign: isFa ? 'right' : 'left', cursor: 'pointer', color: 'var(--text)', borderRadius: '4px', display: 'flex', alignItems: 'center', gap: '8px' }} className="menu-btn">
+                        <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>unarchive</span>
+                        {isFa ? 'خروج از بایگانی' : 'Un-archive'}
+                      </button>
+                    ) : (
+                      <button onClick={() => handleStatusChange('HIDDEN')} style={{ background: 'none', border: 'none', padding: '8px 12px', textAlign: isFa ? 'right' : 'left', cursor: 'pointer', color: 'var(--text)', borderRadius: '4px', display: 'flex', alignItems: 'center', gap: '8px' }} className="menu-btn">
+                        <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>archive</span>
+                        {isFa ? 'بایگانی' : 'Archive'}
+                      </button>
+                    )}
+                    <button onClick={() => handleStatusChange('DELETED')} style={{ background: 'none', border: 'none', padding: '8px 12px', textAlign: isFa ? 'right' : 'left', cursor: 'pointer', color: 'var(--error)', borderRadius: '4px', display: 'flex', alignItems: 'center', gap: '8px' }} className="menu-btn">
+                      <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>delete</span>
+                      {isFa ? 'حذف' : 'Delete'}
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
         </div>
 
-        {post.content && <div className={styles.body}>{post.content}</div>}
+        {isEditing ? (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '12px' }}>
+            <textarea 
+              value={editContent}
+              onChange={(e) => setEditContent(e.target.value)}
+              style={{ width: '100%', minHeight: '100px', background: 'var(--surface-container-high)', border: '1px solid var(--border)', borderRadius: '8px', padding: '12px', color: 'var(--text)', resize: 'vertical' }}
+              disabled={isUpdating}
+            />
+            <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+              <button 
+                onClick={() => { setIsEditing(false); setEditContent(post.content); }}
+                style={{ background: 'none', border: '1px solid var(--border)', padding: '6px 16px', borderRadius: '6px', color: 'var(--text)', cursor: 'pointer' }}
+                disabled={isUpdating}
+              >
+                {isFa ? 'لغو' : 'Cancel'}
+              </button>
+              <button 
+                onClick={handleSaveEdit}
+                style={{ background: 'var(--primary)', border: 'none', padding: '6px 16px', borderRadius: '6px', color: '#000', fontWeight: 600, cursor: 'pointer' }}
+                disabled={isUpdating || !editContent.trim()}
+              >
+                {isUpdating ? (isFa ? 'در حال ذخیره...' : 'Saving...') : (isFa ? 'ذخیره' : 'Save')}
+              </button>
+            </div>
+          </div>
+        ) : (
+          post.content && <div className={styles.body}>{post.content}</div>
+        )}
 
         {post.symbols && post.symbols.length > 0 && (
           <div className={styles.symbols}>
@@ -114,9 +227,18 @@ export function CommunityPostCard({ post }: { post: PostProps }) {
 
         {post.media && post.media.length > 0 && (
           <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginTop: '12px' }}>
-            {post.media.map(m => (
-              <img key={m.id} src={`${api.defaults.baseURL || 'http://localhost:3000'}${m.url}`} alt="Post media" style={{ maxWidth: '100%', maxHeight: '400px', borderRadius: '8px', objectFit: 'contain' }} />
-            ))}
+            {post.media.map(m => {
+              const url = `${api.defaults.baseURL || 'http://localhost:3000'}${m.url}`;
+              const isVideo = m.url.match(/\.(mp4|webm|ogg|mov)$/i);
+              if (isVideo) {
+                return (
+                  <video key={m.id} src={url} controls style={{ maxWidth: '100%', maxHeight: '400px', borderRadius: '8px', objectFit: 'contain' }} />
+                );
+              }
+              return (
+                <img key={m.id} src={url} alt="Post media" style={{ maxWidth: '100%', maxHeight: '400px', borderRadius: '8px', objectFit: 'contain' }} />
+              );
+            })}
           </div>
         )}
 

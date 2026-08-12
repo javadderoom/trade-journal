@@ -22,13 +22,13 @@ interface UserProfile {
   };
 }
 
-export default function UserProfilePage({ params }: { params: { locale: string; id: string } }) {
-  const { id } = params;
+export default function UserProfilePage({ params }: { params: Promise<{ locale: string; id: string }> }) {
+  const { id } = React.use(params);
   const { user: authUser } = useAuthStore();
   const { language } = useTranslation();
   const isFa = language === 'fa';
   
-  const [activeTab, setActiveTab] = useState<'posts' | 'saved'>('posts');
+  const [activeTab, setActiveTab] = useState<'posts' | 'saved' | 'archived'>('posts');
 
   const { data: profile, error, isLoading } = useSWR<UserProfile>(`/api/community/user/${id}`, fetcher);
 
@@ -51,9 +51,9 @@ export default function UserProfilePage({ params }: { params: { locale: string; 
   }
 
   // Determine feed URL based on active tab
-  const feedUrl = activeTab === 'saved' 
-    ? '/api/community/feed?type=bookmarks' 
-    : `/api/community/feed?userId=${id}`;
+  let feedUrl = `/api/community/feed?userId=${id}`;
+  if (activeTab === 'saved') feedUrl = '/api/community/feed?type=bookmarks';
+  if (activeTab === 'archived') feedUrl = '/api/community/feed?type=archived';
 
   const joinDate = new Date(profile.created_at).toLocaleDateString(isFa ? 'fa-IR' : 'en-US', {
     month: 'long',
@@ -148,6 +148,30 @@ export default function UserProfilePage({ params }: { params: { locale: string; 
             >
               {isFa ? 'ذخیره‌شده‌ها' : 'Saved'}
               {activeTab === 'saved' && (
+                <motion.div
+                  layoutId="profileTab"
+                  style={{
+                    position: 'absolute', bottom: -1, left: 0, right: 0, height: 2,
+                    backgroundColor: 'var(--primary)', borderRadius: '2px 2px 0 0'
+                  }}
+                  transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                />
+              )}
+            </button>
+          )}
+
+          {isOwnProfile && (
+            <button 
+              onClick={() => setActiveTab('archived')}
+              style={{
+                background: 'none', border: 'none', cursor: 'pointer', padding: '12px 0',
+                fontWeight: activeTab === 'archived' ? 700 : 500,
+                color: activeTab === 'archived' ? 'var(--text)' : 'var(--muted)',
+                position: 'relative'
+              }}
+            >
+              {isFa ? 'بایگانی‌شده‌ها' : 'Archived'}
+              {activeTab === 'archived' && (
                 <motion.div
                   layoutId="profileTab"
                   style={{

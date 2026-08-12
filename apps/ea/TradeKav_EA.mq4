@@ -68,7 +68,7 @@ int OnInit()
       Print("TradeKav EA initialized. Last ticket: ", g_lastTicket);
    }
 
-   CreateSyncButton();
+
 
    return (INIT_SUCCEEDED);
 }
@@ -79,7 +79,7 @@ int OnInit()
 void OnDeinit(const int reason)
 {
    EventKillTimer();
-   ObjectDelete(0, "btnSyncNow");
+
 }
 
 //+------------------------------------------------------------------+
@@ -90,36 +90,7 @@ void OnTimer()
    SyncAll();
 }
 
-//+------------------------------------------------------------------+
-//| Chart event — manual sync button                                  |
-//+------------------------------------------------------------------+
-void OnChartEvent(const int id, const long &lparam, const double &dparam, const string &sparam)
-{
-   if (id == CHARTEVENT_OBJECT_CLICK && sparam == "btnSyncNow")
-   {
-      Print("Manual sync triggered...");
-      SyncAll();
-      ObjectSetInteger(0, "btnSyncNow", OBJPROP_STATE, false);
-   }
-}
 
-//+------------------------------------------------------------------+
-//| Create the manual sync button on chart                            |
-//+------------------------------------------------------------------+
-void CreateSyncButton()
-{
-   ObjectCreate(0, "btnSyncNow", OBJ_BUTTON, 0, 0, 0);
-   ObjectSetInteger(0, "btnSyncNow", OBJPROP_XDISTANCE, 10);
-   ObjectSetInteger(0, "btnSyncNow", OBJPROP_YDISTANCE, 30);
-   ObjectSetInteger(0, "btnSyncNow", OBJPROP_XSIZE, 120);
-   ObjectSetInteger(0, "btnSyncNow", OBJPROP_YSIZE, 30);
-   ObjectSetInteger(0, "btnSyncNow", OBJPROP_CORNER, CORNER_RIGHT_UPPER);
-   ObjectSetString(0, "btnSyncNow", OBJPROP_TEXT, "Sync Now");
-   ObjectSetInteger(0, "btnSyncNow", OBJPROP_COLOR, clrWhite);
-   ObjectSetInteger(0, "btnSyncNow", OBJPROP_BGCOLOR, clrDarkGreen);
-   ObjectSetInteger(0, "btnSyncNow", OBJPROP_FONTSIZE, 10);
-   ObjectSetInteger(0, "btnSyncNow", OBJPROP_HIDDEN, false);
-}
 
 //+------------------------------------------------------------------+
 //| Combined sync — single API call for both open + closed trades     |

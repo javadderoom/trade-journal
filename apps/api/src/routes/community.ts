@@ -22,9 +22,12 @@ router.get('/feed', optionalAuthenticate, async (req: any, res) => {
         const { type } = req.query;
         const userId = req.user?.userId || req.user?.id; // Support both standard and extended token formats
         
-        let whereClause = {};
+        let whereClause: any = { status: 'ACTIVE' };
         
-        if (type === 'following') {
+        if (type === 'archived') {
+            if (!userId) return res.status(401).json({ error: 'Auth required' });
+            whereClause = { status: 'HIDDEN', authorId: userId };
+        } else if (type === 'following') {
             if (!userId) {
                 return res.status(401).json({ error: 'Authentication required for following feed' });
             }
@@ -36,6 +39,7 @@ router.get('/feed', optionalAuthenticate, async (req: any, res) => {
             const followedSymbolIds = symbolFollows.map(f => f.symbolId);
 
             whereClause = {
+                status: 'ACTIVE',
                 OR: [
                     { authorId: { in: followedUserIds } },
                     { symbols: { some: { symbolId: { in: followedSymbolIds } } } }
@@ -43,11 +47,12 @@ router.get('/feed', optionalAuthenticate, async (req: any, res) => {
             };
         } else if (type === 'bookmarks') {
             if (!userId) return res.status(401).json({ error: 'Auth required' });
-            whereClause = { bookmarks: { some: { userId } } };
+            whereClause = { status: 'ACTIVE', bookmarks: { some: { userId } } };
         } else if (req.query.userId) {
-            whereClause = { authorId: req.query.userId };
+            whereClause = { status: 'ACTIVE', authorId: req.query.userId };
         } else if (req.query.symbol) {
             whereClause = {
+                status: 'ACTIVE',
                 symbols: { some: { symbol: { symbol: (req.query.symbol as string).toUpperCase() } } }
             };
         }
@@ -266,6 +271,58 @@ router.post('/feed/upload-media', authenticate, upload.array('media', 5), async 
     } catch (error) {
         console.error("Error uploading media:", error);
         res.status(500).json({ error: 'Failed to upload media' });
+    }
+});
+
+// Edit Post
+router.put('/feed/:id', authenticate, async (req: any, res) => {
+    try {
+        const { id } = req.params;
+        const { content } = req.body;
+        const userId = req.user?.userId || req.user?.id;
+
+        if (!content || !content.trim()) {
+            return res.status(400).json({ error: 'Content is required' });
+        }
+
+        const post = await prisma.communityPost.findUnique({ where: { id } });
+        if (!post) return res.status(404).json({ error: 'Post not found' });
+        if (post.authorId !== userId) return res.status(403).json({ error: 'Forbidden' });
+
+        const updated = await prisma.communityPost.update({
+            where: { id },
+            data: { content, updatedAt: new Date() }
+        });
+        res.json(updated);
+    } catch (e) {
+        console.error("Error editing post:", e);
+        res.status(500).json({ error: 'Failed to edit post' });
+    }
+});
+
+// Change Post Status (Archive/Restore/Delete)
+router.put('/feed/:id/status', authenticate, async (req: any, res) => {
+    try {
+        const { id } = req.params;
+        const { status } = req.body; // 'ACTIVE', 'HIDDEN', 'DELETED'
+        const userId = req.user?.userId || req.user?.id;
+
+        if (!['ACTIVE', 'HIDDEN', 'DELETED'].includes(status)) {
+            return res.status(400).json({ error: 'Invalid status' });
+        }
+
+        const post = await prisma.communityPost.findUnique({ where: { id } });
+        if (!post) return res.status(404).json({ error: 'Post not found' });
+        if (post.authorId !== userId) return res.status(403).json({ error: 'Forbidden' });
+
+        const updated = await prisma.communityPost.update({
+            where: { id },
+            data: { status }
+        });
+        res.json(updated);
+    } catch (e) {
+        console.error("Error updating post status:", e);
+        res.status(500).json({ error: 'Failed to update status' });
     }
 });
 

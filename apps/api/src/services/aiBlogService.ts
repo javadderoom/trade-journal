@@ -89,6 +89,11 @@ CRITICAL TONE RULES (HUMANIZE YOUR WRITING):
 - Use varied sentence lengths. Make some sentences very short for impact.
 - Start paragraphs directly with the point, without filler intro sentences.
 
+IMAGE PROMPT RULES:
+- Generally, the "featured_image_prompt" should be CONCEPTUAL and METAPHORICAL, avoiding generic literal prompts (e.g., avoid "a monitor with charts" or "a trader looking at a screen").
+- Think of creative, symbolic imagery. For example, for "demo vs real trading", suggest "a wooden practice dummy facing off against a real battle-hardened warrior". For "market volatility", suggest "a small ship navigating through a massive, stormy ocean wave".
+- EXCEPTION: If the article is specifically about the TradeKav platform features, software UI, or explicitly requires a direct representation (like a "journal environment" or "trading dashboard UI"), you MAY use literal, high-quality, modern product photography or UI prompts.
+
 Use clean HTML for the content (<h1>, <h2>, <h3>, <ul>, <li>, <p>, <strong>). Do NOT use markdown.
 ${internalLinksContext}
 ${categoryTagContext}
@@ -101,7 +106,7 @@ Return ONLY a raw JSON object (without any markdown formatting like \`\`\`json) 
   "content": "...", // The full HTML article
   "excerpt": "...", // A 2 sentence meta description
   "reading_time": 10, // Estimated reading time in minutes
-  "featured_image_prompt": "...", // A prompt for an AI image generator to create the cover
+  "featured_image_prompt": "...", // A highly conceptual and metaphorical prompt for an AI image generator to create the cover
   "category": { "name": "...", "slug": "..." }, // The main category you chose or created
   "sub_category": { "name": "...", "slug": "..." }, // Optional: A sub-category under the main category. Leave null if not needed.
   "tags": [ { "name": "...", "slug": "..." }, ... ] // 3 to 5 tags you chose or created

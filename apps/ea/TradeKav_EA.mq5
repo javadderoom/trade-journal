@@ -87,18 +87,7 @@ void OnTimer()
    SyncAll();
 }
 
-//+------------------------------------------------------------------+
-//| Chart event — manual sync button                                   |
-//+------------------------------------------------------------------+
-void OnChartEvent(const int id, const long &lparam, const double &dparam, const string &sparam)
-{
-   if(id == CHARTEVENT_OBJECT_CLICK && sparam == "btnSyncNow")
-   {
-      Print("Manual sync triggered...");
-      SyncAll();
-      ObjectSetInteger(0, "btnSyncNow", OBJPROP_STATE, false);
-   }
-}
+
 
 //+------------------------------------------------------------------+
 //| Combined sync — single API call for both open + closed trades     |

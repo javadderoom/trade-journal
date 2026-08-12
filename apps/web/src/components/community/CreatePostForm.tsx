@@ -89,8 +89,8 @@ export function CreatePostForm({ onPostCreated }: { onPostCreated: () => void })
               </button>
             )}
             <label style={{ cursor: 'pointer', color: 'var(--primary)', marginLeft: '10px' }}>
-              📷 {mediaFiles.length > 0 ? (isFa ? `${mediaFiles.length} تصویر` : `${mediaFiles.length} Images`) : (isFa ? 'افزودن تصویر' : 'Add Media')}
-              <input type="file" multiple accept="image/*" onChange={handleMediaChange} style={{ display: 'none' }} />
+              📷 {mediaFiles.length > 0 ? (isFa ? `${mediaFiles.length} فایل` : `${mediaFiles.length} Files`) : (isFa ? 'افزودن مدیا' : 'Add Media')}
+              <input type="file" multiple accept="image/*,video/mp4,video/webm,video/ogg,video/quicktime" onChange={handleMediaChange} style={{ display: 'none' }} />
             </label>
             {mediaFiles.length > 0 && (
               <button title={isFa ? "حذف تصویر" : "Clear Media"} onClick={() => setMediaFiles([])} style={{ color: 'var(--error)', marginLeft: '4px' }}>
