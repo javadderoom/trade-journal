@@ -58,7 +58,8 @@ export async function fetchHistoricalCandles(
 export async function fetchTradeChartCandles(
   symbol: string,
   openTime: string,
-  closeTime: string | null
+  closeTime: string | null,
+  requestedTimeframe?: Timeframe | 'auto'
 ): Promise<CandleData[]> {
   const normSymbol = symbol.toUpperCase().trim();
   const openTs = Math.floor(new Date(openTime).getTime() / 1000);
@@ -70,21 +71,29 @@ export async function fetchTradeChartCandles(
   let timeframe: Timeframe = '15m';
   let candleSeconds = 900; // 15m default
   
-  if (durationMinutes <= 60) {
-    timeframe = '1m';
-    candleSeconds = 60;
-  } else if (durationMinutes <= 360) { // 6 hours
-    timeframe = '5m';
-    candleSeconds = 300;
-  } else if (durationMinutes <= 1440) { // 24 hours
-    timeframe = '15m';
-    candleSeconds = 900;
-  } else if (durationMinutes <= 7200) { // 5 days
-    timeframe = '1h';
-    candleSeconds = 3600;
+  if (requestedTimeframe && requestedTimeframe !== 'auto') {
+    timeframe = requestedTimeframe as Timeframe;
+    const mapping: Record<Timeframe, number> = {
+      '1m': 60, '5m': 300, '15m': 900, '1h': 3600, '4h': 14400, '1d': 86400
+    };
+    candleSeconds = mapping[timeframe] || 900;
   } else {
-    timeframe = '4h';
-    candleSeconds = 14400;
+    if (durationMinutes <= 60) {
+      timeframe = '1m';
+      candleSeconds = 60;
+    } else if (durationMinutes <= 360) { // 6 hours
+      timeframe = '5m';
+      candleSeconds = 300;
+    } else if (durationMinutes <= 1440) { // 24 hours
+      timeframe = '15m';
+      candleSeconds = 900;
+    } else if (durationMinutes <= 7200) { // 5 days
+      timeframe = '1h';
+      candleSeconds = 3600;
+    } else {
+      timeframe = '4h';
+      candleSeconds = 14400;
+    }
   }
 
   const availableTimeframes: { tf: Timeframe; sec: number }[] = [

@@ -11,7 +11,7 @@ export const formatCurrency = (val: number, decimals = 2, showPlus = false): str
     const sign = val < 0 ? '-' : showPlus ? '+' : '';
     return `${sign}$${absVal}`;
   }
-  return formatPersianCurrency(val);
+  return formatPersianCurrency(val, showPlus);
 };
 
 export const getNetPnl = (trade: { profitUsd: number; commission?: number | null; swap?: number | null }): number =>

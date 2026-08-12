@@ -89,8 +89,8 @@ export function formatNum(num: number | string): string {
 /**
  * Formats net profit/loss into a currency string using Persian digits (e.g. +$۳۷۵.۰۰ or -$۲۰۰.۰۰)
  */
-export function formatPersianCurrency(val: number): string {
-  const prefix = val > 0 ? '+' : val < 0 ? '-' : '';
+export function formatPersianCurrency(val: number, showPlus = false): string {
+  const prefix = val < 0 ? '-' : (val > 0 && showPlus) ? '+' : '';
   const absVal = Math.abs(val).toFixed(2);
 
   // Format thousand separator
@@ -111,14 +111,14 @@ export function formatPersianCurrency(val: number): string {
  * Formats a USD profit/loss value as Iranian Tomans.
  * Abbreviates large numbers: 1,000,000+ → X میلیون تومان, 1,000+ → X هزار تومان
  */
-export function formatToman(usd: number, usdToToman: number): string {
+export function formatToman(usd: number, usdToToman: number, showPlus = false): string {
   try {
     if (useAppStore.getState().language === 'en') {
       return '';
     }
   } catch (e) {}
 
-  const prefix = usd > 0 ? '+' : usd < 0 ? '-' : '';
+  const prefix = usd < 0 ? '-' : (usd > 0 && showPlus) ? '+' : '';
   const tomans = Math.abs(usd) * usdToToman;
 
   let display: string;
