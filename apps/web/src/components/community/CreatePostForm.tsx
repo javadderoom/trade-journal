@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import styles from './CreatePostForm.module.scss';
 import { api } from '@/lib/api';
 import { useAuthStore } from '@/lib/auth';
@@ -16,10 +16,20 @@ export function CreatePostForm({ onPostCreated }: { onPostCreated: () => void })
   const { language } = useTranslation();
   const isFa = language === 'fa';
 
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
   const handleMediaChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const files = Array.from(e.target.files).slice(0, 5); // limit to 5
       setMediaFiles(prev => [...prev, ...files].slice(0, 5));
+    }
+  };
+
+  const handleInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setContent(e.target.value);
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+      textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 300)}px`;
     }
   };
 
@@ -48,6 +58,9 @@ export function CreatePostForm({ onPostCreated }: { onPostCreated: () => void })
       setAttachedTrade(null);
       setMediaFiles([]);
       setIsAnonymous(false);
+      if (textareaRef.current) {
+        textareaRef.current.style.height = 'auto';
+      }
       onPostCreated();
     } catch (error) {
       console.error('Failed to create post:', error);
@@ -69,38 +82,55 @@ export function CreatePostForm({ onPostCreated }: { onPostCreated: () => void })
       </div>
       <div className={styles.form}>
         <textarea
+          ref={textareaRef}
           className={styles.textarea}
           placeholder={isFa ? "ایده‌ها، تحلیل‌ها یا موقعیت‌های معاملاتی خود را به اشتراک بگذارید..." : "Share your trading thoughts, analysis, or setups..."}
           value={content}
-          onChange={(e) => setContent(e.target.value)}
+          onChange={handleInput}
+          rows={1}
         />
+        
+        {(attachedTrade || mediaFiles.length > 0) && (
+          <div className={styles.previewArea}>
+            {attachedTrade && (
+              <div className={styles.previewPill}>
+                <span className="material-symbols-outlined">analytics</span>
+                <span>{attachedTrade.symbol}</span>
+                <button title={isFa ? "حذف" : "Remove"} onClick={() => setAttachedTrade(null)}>&times;</button>
+              </div>
+            )}
+            {mediaFiles.length > 0 && (
+              <div className={styles.previewPill}>
+                <span className="material-symbols-outlined">image</span>
+                <span>{isFa ? `${mediaFiles.length} فایل` : `${mediaFiles.length} files`}</span>
+                <button title={isFa ? "حذف" : "Remove"} onClick={() => setMediaFiles([])}>&times;</button>
+              </div>
+            )}
+          </div>
+        )}
+
         <div className={styles.actions}>
           <div className={styles.tools}>
             <button 
               title={isFa ? "پیوست معامله" : "Attach Trade"} 
               onClick={() => setShowModal(true)}
-              style={attachedTrade ? { color: 'var(--text)', backgroundColor: 'var(--primary-container)', padding: '4px 8px', borderRadius: '4px' } : {}}
+              className={attachedTrade ? styles.toolActive : styles.toolBtn}
             >
-              🔗 {attachedTrade ? (isFa ? `پیوست شده: ${attachedTrade.symbol}` : `Attached: ${attachedTrade.symbol}`) : (isFa ? 'پیوست معامله' : 'Attach Trade')}
+              <span className="material-symbols-outlined">analytics</span>
             </button>
-            {attachedTrade && (
-              <button title={isFa ? "حذف" : "Remove"} onClick={() => setAttachedTrade(null)} style={{ color: 'var(--error)' }}>
-                &times;
-              </button>
-            )}
-            <label style={{ cursor: 'pointer', color: 'var(--primary)', marginLeft: '10px' }}>
-              📷 {mediaFiles.length > 0 ? (isFa ? `${mediaFiles.length} فایل` : `${mediaFiles.length} Files`) : (isFa ? 'افزودن مدیا' : 'Add Media')}
+            
+            <label className={styles.toolBtn} title={isFa ? 'افزودن مدیا' : 'Add Media'}>
+              <span className="material-symbols-outlined">image</span>
               <input type="file" multiple accept="image/*,video/mp4,video/webm,video/ogg,video/quicktime" onChange={handleMediaChange} style={{ display: 'none' }} />
             </label>
-            {mediaFiles.length > 0 && (
-              <button title={isFa ? "حذف تصویر" : "Clear Media"} onClick={() => setMediaFiles([])} style={{ color: 'var(--error)', marginLeft: '4px' }}>
-                &times;
-              </button>
-            )}
-            <label style={{ display: 'flex', alignItems: 'center', gap: '4px', marginLeft: '10px', fontSize: '0.9rem', color: 'var(--text-muted)', cursor: 'pointer' }}>
-              <input type="checkbox" checked={isAnonymous} onChange={(e) => setIsAnonymous(e.target.checked)} />
-              {isFa ? 'ناشناس' : 'Anonymous'}
-            </label>
+
+            <button 
+              className={isAnonymous ? styles.toolActive : styles.toolBtn}
+              onClick={() => setIsAnonymous(!isAnonymous)}
+              title={isFa ? 'ارسال ناشناس' : 'Post Anonymously'}
+            >
+              <span className="material-symbols-outlined">{isAnonymous ? 'visibility_off' : 'visibility'}</span>
+            </button>
           </div>
           <button 
             className={styles.submitBtn} 
