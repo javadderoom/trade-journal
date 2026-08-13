@@ -365,7 +365,7 @@ router.get('/accounts', authenticate, async (req: AuthRequest, res: Response) =>
 router.post('/accounts', authenticate, checkAccountLimit, async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user!.userId;
-    const { broker_name, account_number, currency, description, account_type, initial_balance } = req.body;
+    const { broker_name, account_number, currency, broker_tz, description, account_type, initial_balance } = req.body;
 
     if (!broker_name) {
       return res.status(400).json({ error: 'نام بروکر الزامی است' });
@@ -377,6 +377,7 @@ router.post('/accounts', authenticate, checkAccountLimit, async (req: AuthReques
         broker_name,
         account_number: account_number || null,
         currency: currency || 'USD',
+        broker_tz: broker_tz || 'EET',
         account_type: account_type === 'DEMO' ? 'DEMO' : 'LIVE',
         initial_balance: initial_balance !== undefined ? parseFloat(initial_balance) : null,
       },
@@ -396,7 +397,7 @@ router.put('/accounts/:id', authenticate, async (req: AuthRequest, res: Response
   try {
     const accountId = req.params.id as string;
     const userId = req.user!.userId;
-    const { broker_name, account_number, currency, account_type, initial_balance } = req.body;
+    const { broker_name, account_number, currency, broker_tz, account_type, initial_balance } = req.body;
 
     const account = await prisma.account.findFirst({
       where: { id: accountId, user_id: userId },
@@ -411,6 +412,7 @@ router.put('/accounts/:id', authenticate, async (req: AuthRequest, res: Response
         ...(broker_name !== undefined ? { broker_name } : {}),
         ...(account_number !== undefined ? { account_number } : {}),
         ...(currency !== undefined ? { currency } : {}),
+        ...(broker_tz !== undefined ? { broker_tz } : {}),
         ...(account_type !== undefined ? { account_type: account_type === 'DEMO' ? 'DEMO' : 'LIVE' } : {}),
         ...(initial_balance !== undefined ? { initial_balance: initial_balance === null ? null : parseFloat(initial_balance) } : {}),
       },

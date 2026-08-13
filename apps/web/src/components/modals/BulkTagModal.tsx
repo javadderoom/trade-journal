@@ -71,16 +71,17 @@ export default function BulkTagModal({
   };
 
   return (
-    <div className="modal-overlay animate-fade-in" onClick={onClose} style={{ zIndex: 9999 }}>
-      <div className="modal-content animate-slide-up" onClick={e => e.stopPropagation()} style={{ maxWidth: '500px', width: '90%' }}>
+    <div className="lightbox-overlay" style={{ display: 'flex' }} onClick={onClose}>
+      <div className="manual-trade-modal" onClick={e => e.stopPropagation()} style={{ maxWidth: '500px', width: '90%' }}>
         <div className="modal-header">
-          <h2>{isEn ? 'Bulk Assign Tags' : 'تخصیص گروهی برچسب‌ها'}</h2>
-          <button className="icon-btn" onClick={onClose}>
+          <h3>{isEn ? 'Bulk Assign Tags' : 'تخصیص گروهی برچسب‌ها'}</h3>
+          <button className="close-btn" onClick={onClose}>
             <span className="material-symbols-outlined">close</span>
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="modal-body">
+        <form onSubmit={handleSubmit} className="modal-form">
+          <div className="modal-body">
           <p style={{ color: 'var(--text-secondary)', marginBottom: '16px' }}>
             {isEn 
               ? `You are applying changes to ${selectedCount} selected trades.` 
@@ -184,7 +185,8 @@ export default function BulkTagModal({
             </div>
           </div>
 
-          <div className="modal-actions" style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '24px' }}>
+          </div>
+          <div className="modal-footer" style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '24px' }}>
             <button type="button" className="btn btn-secondary" onClick={onClose} disabled={isSubmitting}>
               {p.cancel}
             </button>

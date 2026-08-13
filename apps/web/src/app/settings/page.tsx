@@ -29,6 +29,7 @@ interface BrokerAccount {
   broker_name: string | null;
   account_number: string | null;
   currency: string;
+  broker_tz?: string;
   account_type: string;
   initial_balance: number | null;
   created_at: string;
@@ -192,10 +193,11 @@ export default function SettingsPage() {
     broker_name: '',
     account_number: '',
     currency: 'USD',
+    broker_tz: 'EET',
     account_type: 'LIVE',
     initial_balance: '',
   });
-  const [editAccount, setEditAccount] = useState({ broker_name: '', account_number: '', currency: 'USD', account_type: 'LIVE', initial_balance: '' });
+  const [editAccount, setEditAccount] = useState({ broker_name: '', account_number: '', currency: 'USD', broker_tz: 'EET', account_type: 'LIVE', initial_balance: '' });
 
   // ─── Subscription state ──────────────────────────────────────────────────
   const [subscription, setSubscription] = useState<any>(null);
@@ -365,7 +367,7 @@ export default function SettingsPage() {
     try {
       await api.post('/api/settings/accounts', newAccount);
       setShowAddAccount(false);
-      setNewAccount({ broker_name: '', account_number: '', currency: 'USD', account_type: 'LIVE', initial_balance: '' });
+      setNewAccount({ broker_name: '', account_number: '', currency: 'USD', broker_tz: 'EET', account_type: 'LIVE', initial_balance: '' });
       fetchAccounts();
       notify.success(t('settings.accountCreateSuccess'));
     } catch (err: any) {
@@ -791,6 +793,19 @@ export default function SettingsPage() {
                         </div>
                       </div>
                       <div className="form-field">
+                        <label>{language === 'fa' ? 'منطقه زمانی بروکر' : 'Broker Timezone'}</label>
+                        <select
+                          value={editAccount.broker_tz}
+                          onChange={(e) => setEditAccount({ ...editAccount, broker_tz: e.target.value })}
+                          className="settings-input"
+                          style={{ direction: 'ltr', width: '100%', padding: '8px', borderRadius: '8px', background: 'rgba(255, 255, 255, 0.05)', border: '1px solid rgba(255, 255, 255, 0.1)', color: 'white' }}
+                        >
+                          <option value="EET">EET (UTC+2 / UTC+3 DST) - MetaTrader Standard</option>
+                          <option value="GMT">GMT (UTC+0) - No DST</option>
+                          <option value="EST">EST (UTC-5 / UTC-4 DST) - New York</option>
+                        </select>
+                      </div>
+                      <div className="form-field">
                         <label>{t('settings.accountType')}</label>
                         <div className="toggle-group">
                           {['DEMO', 'LIVE'].map((t2) => (
@@ -870,6 +885,7 @@ export default function SettingsPage() {
                               broker_name: acc.broker_name || '',
                               account_number: acc.account_number || '',
                               currency: acc.currency,
+                              broker_tz: acc.broker_tz || 'EET',
                               account_type: acc.account_type || 'LIVE',
                               initial_balance: acc.initial_balance !== null ? String(acc.initial_balance) : '',
                             });
@@ -972,6 +988,19 @@ export default function SettingsPage() {
                         >{c}</button>
                       ))}
                     </div>
+                  </div>
+                  <div className="form-field">
+                    <label>{language === 'fa' ? 'منطقه زمانی بروکر' : 'Broker Timezone'}</label>
+                    <select
+                      value={newAccount.broker_tz}
+                      onChange={(e) => setNewAccount({ ...newAccount, broker_tz: e.target.value })}
+                      className="settings-input"
+                      style={{ direction: 'ltr', width: '100%', padding: '8px', borderRadius: '8px', background: 'rgba(255, 255, 255, 0.05)', border: '1px solid rgba(255, 255, 255, 0.1)', color: 'white' }}
+                    >
+                      <option value="EET">EET (UTC+2 / UTC+3 DST) - MetaTrader Standard</option>
+                      <option value="GMT">GMT (UTC+0) - No DST</option>
+                      <option value="EST">EST (UTC-5 / UTC-4 DST) - New York</option>
+                    </select>
                   </div>
                   <div className="form-field">
                     <label>{t('settings.accountType')}</label>

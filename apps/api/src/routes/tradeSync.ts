@@ -1,5 +1,5 @@
 import { Router, Response } from 'express';
-import { getTradesForAccount, syncTradesFromEA, syncTradeAggregates, prisma } from '../services/tradeSync';
+import { getTradesForAccount, syncTradesFromEA, syncTradeAggregates, prisma, parseBrokerDate } from '../services/tradeSync';
 import { detectMistakes } from '../services/mistakeDetector';
 import multer from 'multer';
 import path from 'node:path';
@@ -1146,33 +1146,7 @@ const trade = await prisma.trade.findFirst({
 
 const uploadMemory = multer({ storage: multer.memoryStorage() });
 
-function parseMT4Date(dateStr: string): Date | null {
-  const cleanStr = dateStr.trim();
-  if (!cleanStr) return null;
-
-  // Try standard JS date parser first (replace dot separators if any)
-  const stdDate = new Date(cleanStr.replace(/\./g, '/'));
-  if (!isNaN(stdDate.getTime())) return stdDate;
-
-  // Custom parsing logic for safety
-  const parts = cleanStr.split(/\s+/);
-  if (parts.length < 2) return null;
-
-  const dateParts = parts[0].split(/[\.\-\/]/);
-  const timeParts = parts[1].split(':');
-  if (dateParts.length < 3 || timeParts.length < 2) return null;
-
-  const year = parseInt(dateParts[0], 10);
-  const month = parseInt(dateParts[1], 10) - 1; // 0-indexed
-  const day = parseInt(dateParts[2], 10);
-
-  const hour = parseInt(timeParts[0], 10);
-  const minute = parseInt(timeParts[1], 10);
-  const second = timeParts.length > 2 ? parseInt(timeParts[2], 10) : 0;
-
-  const d = new Date(year, month, day, hour, minute, second);
-  return isNaN(d.getTime()) ? null : d;
-}
+// parseBrokerDate is imported from services
 
 function findHeaderMapping(cells: string[]): Record<string, number> | null {
   const mapping: Record<string, number> = {};
@@ -1337,8 +1311,8 @@ router.post('/import-mt4', authenticate, checkImportPermission, uploadMemory.sin
             const openTimeStr = (mapping['openTime'] !== undefined && mapping['openTime'] < cellTexts.length) ? cellTexts[mapping['openTime']] : '';
             const closeTimeStr = (mapping['closeTime'] !== undefined && mapping['closeTime'] < cellTexts.length) ? cellTexts[mapping['closeTime']] : '';
             
-            const openTime = openTimeStr ? parseMT4Date(openTimeStr) : null;
-            const closeTime = closeTimeStr ? parseMT4Date(closeTimeStr) : null;
+            const openTime = openTimeStr ? parseBrokerDate(openTimeStr, account.broker_tz) : null;
+            const closeTime = closeTimeStr ? parseBrokerDate(closeTimeStr, account.broker_tz) : null;
             
             // Positions must have both open time and close time populated to import closed trades
             if (!openTime || !closeTime) continue;
