@@ -58,6 +58,7 @@ export function FollowButton({ targetId, targetType }: FollowButtonProps) {
   };
 
   if (!user) return null;
+  if (targetType === 'USER' && targetId === 'anonymous') return null;
   if (targetType === 'USER' && user.id === targetId) return null;
 
   return (

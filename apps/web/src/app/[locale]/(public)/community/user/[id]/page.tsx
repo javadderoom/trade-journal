@@ -7,6 +7,7 @@ import { useAuthStore } from '@/lib/auth';
 import { useTranslation } from '@/store/useAppStore';
 import { CommunityFeed } from '@/components/community/CommunityFeed';
 import { FollowButton } from '@/components/community/FollowButton';
+import { UserConnectionsModal } from '@/components/community/UserConnectionsModal';
 import { motion } from 'framer-motion';
 
 interface UserProfile {
@@ -29,6 +30,7 @@ export default function UserProfilePage({ params }: { params: Promise<{ locale: 
   const isFa = language === 'fa';
   
   const [activeTab, setActiveTab] = useState<'posts' | 'saved' | 'archived'>('posts');
+  const [connectionsModal, setConnectionsModal] = useState<'followers' | 'following' | null>(null);
 
   const { data: profile, error, isLoading } = useSWR<UserProfile>(`/api/community/user/${id}`, fetcher);
 
@@ -82,7 +84,7 @@ export default function UserProfilePage({ params }: { params: Promise<{ locale: 
           )}
 
           {profile.avatar_url ? (
-            <img src={profile.avatar_url} alt={profile.name} style={{ width: '96px', height: '96px', borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--surface-variant)' }} />
+            <img src={profile.avatar_url} alt={profile.name || ''} style={{ width: '96px', height: '96px', borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--surface-variant)' }} />
           ) : (
             <div style={{ width: '96px', height: '96px', borderRadius: '50%', backgroundColor: 'var(--primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '32px', fontWeight: 'bold', color: 'white' }}>
               {profile.name?.charAt(0).toUpperCase() || '?'}
@@ -92,11 +94,21 @@ export default function UserProfilePage({ params }: { params: Promise<{ locale: 
           <h1 style={{ margin: '16px 0 4px 0', fontSize: '24px' }}>{profile.name}</h1>
           
           <div style={{ display: 'flex', gap: '16px', color: 'var(--muted)', fontSize: '14px', marginTop: '12px' }}>
-            <div style={{ display: 'flex', gap: '4px' }}>
+            <div 
+              onClick={() => setConnectionsModal('followers')}
+              style={{ display: 'flex', gap: '4px', cursor: 'pointer' }}
+              onMouseEnter={e => e.currentTarget.style.textDecoration = 'underline'}
+              onMouseLeave={e => e.currentTarget.style.textDecoration = 'none'}
+            >
               <strong style={{ color: 'var(--text)' }}>{profile._count.communityFollowers}</strong>
               <span>{isFa ? 'دنبال‌کننده' : 'Followers'}</span>
             </div>
-            <div style={{ display: 'flex', gap: '4px' }}>
+            <div 
+              onClick={() => setConnectionsModal('following')}
+              style={{ display: 'flex', gap: '4px', cursor: 'pointer' }}
+              onMouseEnter={e => e.currentTarget.style.textDecoration = 'underline'}
+              onMouseLeave={e => e.currentTarget.style.textDecoration = 'none'}
+            >
               <strong style={{ color: 'var(--text)' }}>{profile._count.communityFollowing}</strong>
               <span>{isFa ? 'دنبال‌شونده' : 'Following'}</span>
             </div>
@@ -191,6 +203,14 @@ export default function UserProfilePage({ params }: { params: Promise<{ locale: 
         </div>
 
       </div>
+      
+      {connectionsModal && (
+        <UserConnectionsModal 
+          userId={id} 
+          type={connectionsModal} 
+          onClose={() => setConnectionsModal(null)} 
+        />
+      )}
     </div>
   );
 }

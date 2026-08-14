@@ -528,7 +528,7 @@ router.put('/settings/announcement-banner', async (req: AuthRequest, res: Respon
 const eaStorage = multer.diskStorage({
   destination: (req, file, cb) => {
     // Save to apps/web/public/downloads
-    const destDir = path.join(process.cwd(), '../../web/public/downloads');
+    const destDir = path.join(process.cwd(), '../web/public/downloads');
     if (!fs.existsSync(destDir)) {
       fs.mkdirSync(destDir, { recursive: true });
     }
@@ -558,6 +558,38 @@ router.post('/ea/upload', eaUpload.single('file'), (req: AuthRequest, res: Respo
   } catch (err) {
     console.error('EA upload error:', err);
     res.status(500).json({ error: 'Failed to upload EA' });
+  }
+});
+
+/**
+ * GET /api/admin/ea/files
+ * List currently uploaded EA files
+ */
+router.get('/ea/files', (req: AuthRequest, res: Response) => {
+  try {
+    const destDir = path.join(process.cwd(), '../web/public/downloads');
+    if (!fs.existsSync(destDir)) {
+      return res.json([]);
+    }
+    
+    const files = fs.readdirSync(destDir);
+    const fileStats = files.map(file => {
+      const filePath = path.join(destDir, file);
+      const stats = fs.statSync(filePath);
+      return {
+        name: file,
+        size: stats.size,
+        mtime: stats.mtime
+      };
+    });
+    
+    // Sort by modified time descending (newest first)
+    fileStats.sort((a, b) => b.mtime.getTime() - a.mtime.getTime());
+    
+    res.json(fileStats);
+  } catch (err) {
+    console.error('Failed to list EA files:', err);
+    res.status(500).json({ error: 'Failed to list EA files' });
   }
 });
 

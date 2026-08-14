@@ -100,10 +100,27 @@ export function CreatePostForm({ onPostCreated }: { onPostCreated: () => void })
               </div>
             )}
             {mediaFiles.length > 0 && (
-              <div className={styles.previewPill}>
-                <span className="material-symbols-outlined">image</span>
-                <span>{isFa ? `${mediaFiles.length} فایل` : `${mediaFiles.length} files`}</span>
-                <button title={isFa ? "حذف" : "Remove"} onClick={() => setMediaFiles([])}>&times;</button>
+              <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginTop: attachedTrade ? '8px' : '0' }}>
+                {mediaFiles.map((file, index) => {
+                  const isVideo = file.type.startsWith('video/');
+                  const url = URL.createObjectURL(file);
+                  return (
+                    <div key={index} style={{ position: 'relative', width: '80px', height: '80px', borderRadius: '8px', overflow: 'hidden', border: '1px solid var(--border)' }}>
+                      {isVideo ? (
+                        <video src={url} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                      ) : (
+                        <img src={url} alt={`preview-${index}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                      )}
+                      <button 
+                        onClick={() => setMediaFiles(prev => prev.filter((_, i) => i !== index))}
+                        style={{ position: 'absolute', top: '2px', right: '2px', background: 'rgba(0,0,0,0.7)', color: 'white', border: 'none', borderRadius: '50%', width: '20px', height: '20px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px' }}
+                        title={isFa ? "حذف" : "Remove"}
+                      >
+                        &times;
+                      </button>
+                    </div>
+                  );
+                })}
               </div>
             )}
           </div>

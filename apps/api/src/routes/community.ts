@@ -772,7 +772,11 @@ router.get('/symbol/:name', async (req, res) => {
         });
         
         if (!sym) {
-            return res.status(404).json({ error: 'Symbol not found' });
+            return res.json({
+                id: 'untracked',
+                symbol: name.toUpperCase(),
+                _count: { posts: 0, followers: 0 }
+            });
         }
         
         res.json(sym);
@@ -811,6 +815,32 @@ router.get('/user/:id', async (req: any, res) => {
     } catch (error) {
         console.error("Error fetching user profile:", error);
         res.status(500).json({ error: 'Failed to fetch user profile' });
+    }
+});
+
+// Get followers of a user
+router.get('/user/:id/followers', async (req, res) => {
+    try {
+        const followers = await prisma.communityFollow.findMany({
+            where: { followingId: req.params.id },
+            include: { follower: { select: { id: true, name: true, avatar_url: true } } }
+        });
+        res.json(followers.map((f: any) => f.follower));
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to fetch followers' });
+    }
+});
+
+// Get followings of a user
+router.get('/user/:id/following', async (req, res) => {
+    try {
+        const following = await prisma.communityFollow.findMany({
+            where: { followerId: req.params.id },
+            include: { following: { select: { id: true, name: true, avatar_url: true } } }
+        });
+        res.json(following.map((f: any) => f.following));
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to fetch following' });
     }
 });
 

@@ -19,6 +19,7 @@ export default function AdminSidebar() {
     { href: '/admin2/receipts', label: 'تایید پرداخت‌ها', icon: 'payments' },
     { href: '/admin2/coupons', label: 'کدهای تخفیف', icon: 'sell' },
     { href: '/admin2/blog', label: 'مدیریت وبلاگ', icon: 'article' },
+    { href: '/admin2/reports', label: 'گزارش کامیونیتی', icon: 'flag' },
     { href: '/admin2/experts', label: 'مدیریت اکسپرت', icon: 'upload_file' },
     { href: '/admin2/market-data', label: 'دیتای بازار', icon: 'monitoring' },
     { href: '/admin2/support', label: 'پشتیبانی تیکت‌ها', icon: 'support_agent' },

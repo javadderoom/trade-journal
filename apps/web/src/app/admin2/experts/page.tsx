@@ -30,6 +30,28 @@ export default function AdminExpertsPage() {
   // Upload state
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  
+  // EA files state
+  const [eaFiles, setEaFiles] = useState<any[]>([]);
+  const [isLoadingFiles, setIsLoadingFiles] = useState(false);
+
+  const fetchEaFiles = async () => {
+    try {
+      setIsLoadingFiles(true);
+      const res = await api.get('/api/admin/ea/files');
+      setEaFiles(res.data);
+    } catch (error) {
+      console.error('Failed to fetch EA files', error);
+    } finally {
+      setIsLoadingFiles(false);
+    }
+  };
+
+  useEffect(() => {
+    if (activeTab === 'upload' && user?.role === 'ADMIN') {
+      fetchEaFiles();
+    }
+  }, [activeTab, user]);
 
   const fetchLogs = async (p = 1) => {
     try {
@@ -75,6 +97,7 @@ export default function AdminExpertsPage() {
       });
       notify.success('فایل با موفقیت آپلود شد!');
       if (fileInputRef.current) fileInputRef.current.value = '';
+      fetchEaFiles(); // Refresh list after upload
     } catch (error: any) {
       notify.error(error.response?.data?.error || 'خطا در آپلود فایل');
     } finally {
@@ -111,22 +134,56 @@ export default function AdminExpertsPage() {
       </div>
 
       {activeTab === 'upload' && (
-        <div className="admin-panel-card">
-          <div className="card-header-actions">
-            <h3>آپلود نسخه جدید اکسپرت</h3>
-          </div>
-          <p style={{ marginBottom: '16px', color: '#a0aec0', fontSize: '0.88rem' }}>
-            فایل‌های .mq4، .mq5، .ex4 یا .ex5 را اینجا آپلود کنید.
-          </p>
-          <form onSubmit={handleUpload} className="admin-form-grid" style={{ maxWidth: 400 }}>
-            <div className="form-group">
-              <label>انتخاب فایل</label>
-              <input type="file" ref={fileInputRef} accept=".ex4,.ex5,.mq4,.mq5" />
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+          <div className="admin-panel-card">
+            <div className="card-header-actions">
+              <h3>آپلود نسخه جدید اکسپرت</h3>
             </div>
-            <button type="submit" className="admin-btn" disabled={isUploading}>
-              {isUploading ? 'در حال آپلود...' : 'آپلود فایل'}
-            </button>
-          </form>
+            <p style={{ marginBottom: '16px', color: '#a0aec0', fontSize: '0.88rem' }}>
+              فایل‌های .mq4، .mq5، .ex4 یا .ex5 را اینجا آپلود کنید.
+            </p>
+            <form onSubmit={handleUpload} className="admin-form-grid" style={{ maxWidth: 400 }}>
+              <div className="form-group">
+                <label>انتخاب فایل</label>
+                <input type="file" ref={fileInputRef} accept=".ex4,.ex5,.mq4,.mq5" />
+              </div>
+              <button type="submit" className="admin-btn" disabled={isUploading}>
+                {isUploading ? 'در حال آپلود...' : 'آپلود فایل'}
+              </button>
+            </form>
+          </div>
+          
+          <div className="admin-panel-card">
+            <div className="card-header-actions">
+              <h3>فایل‌های موجود در سرور</h3>
+            </div>
+            {isLoadingFiles ? (
+              <p style={{ color: '#a0aec0' }}>در حال بارگذاری...</p>
+            ) : eaFiles.length === 0 ? (
+              <p style={{ color: '#a0aec0', padding: '20px 0', textAlign: 'center' }}>هیچ فایلی آپلود نشده است.</p>
+            ) : (
+              <div className="admin-table-wrapper" style={{ marginTop: '16px' }}>
+                <table className="admin-table">
+                  <thead>
+                    <tr>
+                      <th>نام فایل</th>
+                      <th>حجم فایل</th>
+                      <th>تاریخ آخرین ویرایش</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {eaFiles.map(file => (
+                      <tr key={file.name}>
+                        <td dir="ltr" style={{ textAlign: 'right', fontWeight: 'bold' }}>{file.name}</td>
+                        <td dir="ltr" style={{ textAlign: 'right' }}>{(file.size / 1024).toFixed(1)} KB</td>
+                        <td dir="ltr" style={{ textAlign: 'right' }}>{new Date(file.mtime).toLocaleString('fa-IR')}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
         </div>
       )}
 

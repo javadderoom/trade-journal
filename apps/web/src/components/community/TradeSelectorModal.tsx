@@ -6,8 +6,8 @@ import styles from './TradeSelectorModal.module.scss';
 export interface MinimalTrade {
   id: string;
   symbol: string;
-  entry_time: string;
-  result_r: number;
+  open_time: string;
+  r_multiple: number;
 }
 
 export function TradeSelectorModal({ 
@@ -53,10 +53,10 @@ export function TradeSelectorModal({
             >
               <div className={styles.symbolInfo}>
                 <span className={styles.symbol}>{trade.symbol}</span>
-                <span className={styles.date}>{new Date(trade.entry_time).toLocaleDateString()}</span>
+                <span className={styles.date}>{new Date(trade.open_time).toLocaleDateString()}</span>
               </div>
-              <div className={`${styles.result} ${trade.result_r >= 0 ? styles.profit : styles.loss}`}>
-                {trade.result_r > 0 ? '+' : ''}{trade.result_r?.toFixed(2)}R
+              <div className={`${styles.result} ${trade.r_multiple >= 0 ? styles.profit : styles.loss}`}>
+                {trade.r_multiple > 0 ? '+' : ''}{trade.r_multiple?.toFixed(2)}R
               </div>
             </div>
           ))}

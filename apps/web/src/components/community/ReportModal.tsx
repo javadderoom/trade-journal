@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { api } from '@/lib/api';
+import { notify } from '@/lib/notify';
 import styles from './ReportModal.module.scss';
 import { useTranslation } from '@/store/useAppStore';
 
@@ -38,11 +39,11 @@ export function ReportModal({ targetId, targetType, onClose }: ReportModalProps)
         note
       });
       
-      alert(isFa ? 'گزارش با موفقیت ثبت شد.' : 'Report submitted successfully.');
+      notify.success(isFa ? 'گزارش با موفقیت ثبت شد.' : 'Report submitted successfully.');
       onClose();
     } catch (error) {
       console.error('Failed to submit report:', error);
-      alert(isFa ? 'ثبت گزارش با خطا مواجه شد. لطفاً دوباره تلاش کنید.' : 'Failed to submit report. Please try again later.');
+      notify.error(isFa ? 'ثبت گزارش با خطا مواجه شد. لطفاً دوباره تلاش کنید.' : 'Failed to submit report. Please try again later.');
       setIsSubmitting(false);
     }
   };

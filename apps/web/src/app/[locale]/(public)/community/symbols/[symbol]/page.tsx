@@ -48,7 +48,7 @@ export default async function SymbolPage({ params }: { params: { locale: string,
             </div>
           </div>
           <div>
-            <FollowButton targetId={symbolData.id} targetType="SYMBOL" />
+            <FollowButton targetId={symbolData.symbol} targetType="SYMBOL" />
           </div>
         </div>
 
