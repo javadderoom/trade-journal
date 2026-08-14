@@ -1,15 +1,13 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import useSWR from 'swr';
-import { fetcher } from '@/lib/api';
+import { api } from '@/lib/api';
 import { notify } from '@/lib/notify';
+import LoadingButton from '@/components/ui/LoadingButton';
 
-// Define types based on what we saw in the API route
 interface CacheStatus {
   symbol: string;
   timeframe: string;
-  provider: string;
   category: string;
   candleCount: number;
   lastFetched: string;
@@ -21,7 +19,7 @@ interface JobStatus {
   isRunning: boolean;
   lastRunTime: string | null;
   lastRunResult: any | null;
-  nextRunTime: Date | null;
+  nextRunTime: string | null;
 }
 
 interface MarketDataStatus {
@@ -33,214 +31,191 @@ interface MarketDataStatus {
 }
 
 export default function MarketDataAdminPage() {
-  const { data, error, mutate } = useSWR<MarketDataStatus>('/api/admin/market-data/status', fetcher);
-  
-  const [isPolling, setIsPolling] = useState(false);
-  const [refreshingSymbol, setRefreshingSymbol] = useState<string | null>(null);
+  const [data, setData] = useState<MarketDataStatus | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState<string | null>(null);
 
-  // Poll job status if a job is running
-  useSWR(
-    isPolling ? '/api/admin/market-data/refresh/status' : null,
-    fetcher,
-    {
-      refreshInterval: 5000,
-      onSuccess: (jobData: JobStatus) => {
-        if (!jobData.isRunning) {
-          setIsPolling(false);
-          setRefreshingSymbol(null);
-          mutate(); // Re-fetch main status
-          notify.success('به‌روزرسانی دیتای بازار با موفقیت انجام شد.');
-        }
-      }
+  const fetchStatus = async () => {
+    try {
+      const res = await api.get('/api/admin/market-data/status');
+      setData(res.data);
+    } catch (err: any) {
+      notify.error(err.response?.data?.error || 'Failed to fetch status');
+    } finally {
+      setLoading(false);
     }
-  );
+  };
 
-  // Sync initial polling state if API says job is running
   useEffect(() => {
-    if (data?.job?.isRunning) {
-      setIsPolling(true);
-    }
+    fetchStatus();
+    // Poll every 10 seconds if job is running
+    const interval = setInterval(() => {
+      if (data?.job?.isRunning) {
+        fetchStatus();
+      }
+    }, 10000);
+    return () => clearInterval(interval);
   }, [data?.job?.isRunning]);
 
-  const handleRefreshAll = async () => {
+  const handleRefresh = async (symbol?: string) => {
+    setRefreshing(symbol || 'ALL');
     try {
-      setRefreshingSymbol('all');
-      await fetch('/api/admin/market-data/refresh', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({}),
-      });
-      notify.success('درخواست به‌روزرسانی کل دیتای بازار ارسال شد.');
-      setIsPolling(true);
+      const payload = symbol ? { symbol } : {};
+      await api.post('/api/admin/market-data/refresh', payload);
+      notify.success(symbol ? `Refresh started for ${symbol}` : 'Full refresh started');
+      fetchStatus();
     } catch (err: any) {
-      setRefreshingSymbol(null);
-      notify.error(err.message || 'خطا در ارسال درخواست به‌روزرسانی');
+      notify.error(err.response?.data?.error || 'Failed to trigger refresh');
+    } finally {
+      setRefreshing(null);
     }
   };
 
-  const handleRefreshSymbol = async (symbol: string) => {
-    try {
-      setRefreshingSymbol(symbol);
-      await fetch('/api/admin/market-data/refresh', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ symbol }),
-      });
-      notify.success(`درخواست به‌روزرسانی برای نماد ${symbol} ارسال شد.`);
-      mutate(); // Re-fetch immediately to reflect changes
-      setRefreshingSymbol(null);
-    } catch (err: any) {
-      setRefreshingSymbol(null);
-      notify.error(err.message || `خطا در به‌روزرسانی نماد ${symbol}`);
-    }
-  };
-
-  if (error) {
-    return (
-      <div className="admin-panel-card">
-        <p style={{ color: '#f56565' }}>خطا در دریافت اطلاعات دیتای بازار</p>
-      </div>
-    );
+  if (loading && !data) {
+    return <div style={{ padding: '40px', textAlign: 'center', color: '#a0aec0' }}>Loading market data status...</div>;
   }
 
-  if (!data) {
-    return (
-      <div style={{ textAlign: 'center', padding: '40px' }}>
-        <span className="material-symbols-outlined" style={{ animation: 'spin 1s linear infinite' }}>sync</span>
-      </div>
-    );
-  }
-
-  const { cache, job, totalPairs } = data;
+  if (!data) return null;
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-      {/* Job Status Card */}
-      <div className="admin-panel-card">
-        <div className="card-header-actions">
-          <h3>وضعیت سرویس همگام‌سازی</h3>
-          <button
-            className="admin-btn"
-            onClick={handleRefreshAll}
-            disabled={isPolling || refreshingSymbol === 'all'}
-          >
-            <span className="material-symbols-outlined" style={isPolling ? { animation: 'spin 1s linear infinite' } : {}}>
-              {isPolling ? 'sync' : 'cloud_download'}
-            </span>
-            <span>{isPolling ? 'در حال به‌روزرسانی...' : 'به‌روزرسانی کل کش'}</span>
-          </button>
+    <div className="admin-panel-card">
+      <div className="card-header-actions">
+        <div style={{ display: 'flex', flexDirection: 'column' }}>
+          <h3 style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span className="material-symbols-outlined" style={{ color: '#06b6d4' }}>monitoring</span>
+            کش دیتای بازار (Market Data Cache)
+          </h3>
+          <p style={{ color: '#a0aec0', fontSize: '0.85rem', marginTop: '4px' }}>
+            مدیریت کش نمودارهای تاریخی Twelve Data
+          </p>
         </div>
+        <LoadingButton
+          className="admin-btn"
+          onClick={() => handleRefresh()}
+          disabled={refreshing !== null || data.job.isRunning}
+          isLoading={data.job.isRunning}
+          style={{ background: '#06b6d4' }}
+        >
+          <span className="material-symbols-outlined">sync</span>
+          <span>{data.job.isRunning ? 'در حال بروزرسانی...' : 'بروزرسانی کل کش'}</span>
+        </LoadingButton>
+      </div>
 
-        <div className="admin-stats-grid" style={{ marginBottom: 0 }}>
-          <div className="stat-card">
-            <div className={`stat-icon-wrap ${isPolling ? 'pending' : ''}`}>
-              <span className="material-symbols-outlined" style={isPolling ? { animation: 'spin 1s linear infinite' } : {}}>
-                {isPolling ? 'autorenew' : 'done_all'}
-              </span>
-            </div>
-            <div className="stat-info">
-              <span className="stat-label">وضعیت کار پس‌زمینه</span>
-              <span className="stat-value" style={{ fontSize: '1.2rem', color: isPolling ? '#ffb300' : '#e2e8f0' }}>
-                {isPolling ? 'در حال اجرا...' : 'آماده'}
+      <div style={{ display: 'flex', gap: '20px', marginBottom: '24px', flexWrap: 'wrap' }}>
+        <div className="stat-card" style={{ flex: 1, padding: '16px', minWidth: '200px' }}>
+          <div className="stat-info">
+            <span className="stat-label">وضعیت کرون جاب</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <div style={{
+                width: '12px', height: '12px', borderRadius: '50%',
+                background: data.job.isRunning ? '#fbbf24' : '#34d399',
+                animation: data.job.isRunning ? 'pulse 2s infinite' : 'none'
+              }}></div>
+              <span className="stat-value" style={{ fontSize: '1.2rem', color: '#fff' }}>
+                {data.job.isRunning ? 'در حال اجرا' : 'آماده به کار'}
               </span>
             </div>
           </div>
-          
-          <div className="stat-card">
-            <div className="stat-icon-wrap" style={{ background: 'rgba(66, 153, 225, 0.1)', color: '#4299e1' }}>
-              <span className="material-symbols-outlined">schedule</span>
-            </div>
-            <div className="stat-info">
-              <span className="stat-label">آخرین اجرای موفق</span>
-              <span className="stat-value" style={{ fontSize: '1.2rem' }}>
-                {job.lastRunTime ? new Date(job.lastRunTime).toLocaleString('fa-IR') : 'هرگز'}
-              </span>
-            </div>
+        </div>
+        <div className="stat-card" style={{ flex: 1, padding: '16px', minWidth: '200px' }}>
+          <div className="stat-info">
+            <span className="stat-label">زمان اجرای بعدی</span>
+            <span className="stat-value" style={{ fontSize: '1.1rem', color: '#fff', direction: 'ltr' }}>
+              {data.job.nextRunTime ? new Date(data.job.nextRunTime).toLocaleString('fa-IR') : 'نامشخص'}
+            </span>
           </div>
-
-          <div className="stat-card">
-            <div className="stat-icon-wrap" style={{ background: 'rgba(16, 185, 129, 0.1)', color: '#10b981' }}>
-              <span className="material-symbols-outlined">database</span>
-            </div>
-            <div className="stat-info">
-              <span className="stat-label">جفت ارزهای فعال</span>
-              <span className="stat-value">{totalPairs}</span>
-            </div>
+        </div>
+        <div className="stat-card" style={{ flex: 1, padding: '16px', minWidth: '200px' }}>
+          <div className="stat-info">
+            <span className="stat-label">تعداد جفت‌ارزهای تحت نظر</span>
+            <span className="stat-value" style={{ fontSize: '1.2rem', color: '#fff' }}>
+              {data.totalPairs} جفت‌ارز
+            </span>
           </div>
         </div>
       </div>
 
-      {/* Cache Table */}
-      <div className="admin-panel-card">
-        <div className="card-header-actions">
-          <h3>وضعیت کش کندل‌ها</h3>
+      {data.job.lastRunResult && (
+        <div style={{ background: '#1e293b', border: '1px solid #334155', borderRadius: '12px', padding: '20px', marginBottom: '24px' }}>
+          <h4 style={{ color: '#fff', marginBottom: '16px', fontSize: '1rem' }}>خلاصه اجرای قبلی</h4>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '16px', color: '#cbd5e1' }}>
+            <div><span style={{ color: '#94a3b8', display: 'block', fontSize: '0.85rem' }}>مدت زمان</span> {Math.round(data.job.lastRunResult.duration / 1000)}s</div>
+            <div><span style={{ color: '#34d399', display: 'block', fontSize: '0.85rem' }}>موفق</span> {data.job.lastRunResult.successes}</div>
+            <div><span style={{ color: '#f43f5e', display: 'block', fontSize: '0.85rem' }}>ناموفق</span> {data.job.lastRunResult.failures}</div>
+            <div><span style={{ color: '#fbbf24', display: 'block', fontSize: '0.85rem' }}>صرف‌نظر شده (آپدیت بود)</span> {data.job.lastRunResult.skipped}</div>
+          </div>
+          {data.job.lastRunResult.errors && data.job.lastRunResult.errors.length > 0 && (
+            <div style={{ marginTop: '16px', padding: '12px', background: 'rgba(244, 63, 94, 0.1)', border: '1px solid rgba(244, 63, 94, 0.2)', borderRadius: '6px', color: '#fb7185', maxHeight: '150px', overflowY: 'auto' }}>
+              <div style={{ fontWeight: 'bold', marginBottom: '8px' }}>خطاها:</div>
+              <ul style={{ paddingLeft: '20px', direction: 'ltr' }}>
+                {data.job.lastRunResult.errors.map((e: any, i: number) => (
+                  <li key={i} style={{ marginBottom: '4px' }}>{e.symbol} ({e.timeframe}): {e.error}</li>
+                ))}
+              </ul>
+            </div>
+          )}
         </div>
+      )}
 
-        <div className="admin-table-wrapper">
-          <table className="admin-table">
-            <thead>
-              <tr>
-                <th>نماد (Symbol)</th>
-                <th>منبع داده</th>
-                <th>بازار</th>
-                <th>تایم‌فریم</th>
-                <th>تعداد کندل</th>
-                <th>آخرین به‌روزرسانی</th>
-                <th>وضعیت</th>
-                <th>عملیات</th>
+      <div className="admin-table-wrapper">
+        <table className="admin-table">
+          <thead>
+            <tr>
+              <th>نماد (Symbol)</th>
+              <th>دسته‌بندی</th>
+              {data.timeframes.map(tf => (
+                <th key={tf} style={{ textAlign: 'center' }}>{tf}</th>
+              ))}
+              <th style={{ textAlign: 'left' }}>عملیات</th>
+            </tr>
+          </thead>
+          <tbody>
+            {data.symbols.map(symbol => (
+              <tr key={symbol.name}>
+                <td style={{ direction: 'ltr', fontWeight: 'bold', color: '#fff' }}>{symbol.name}</td>
+                <td>
+                  <span style={{ fontSize: '0.75rem', textTransform: 'uppercase', padding: '4px 8px', background: '#334155', color: '#cbd5e1', borderRadius: '4px' }}>
+                    {symbol.category}
+                  </span>
+                </td>
+                {data.timeframes.map(tf => {
+                  const cache = data.cache.find(c => c.symbol === symbol.name && c.timeframe === tf);
+                  if (!cache) return <td key={tf} style={{ textAlign: 'center', color: '#475569' }}>-</td>;
+                  
+                  return (
+                    <td key={tf} style={{ textAlign: 'center' }}>
+                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
+                        <div
+                          title={cache.isStale ? 'منقضی شده (Stale)' : 'بروز (Fresh)'}
+                          style={{
+                            width: '8px', height: '8px', borderRadius: '50%',
+                            background: cache.isStale ? '#f43f5e' : '#10b981'
+                          }}
+                        ></div>
+                        <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>
+                          {cache.candleCount > 0 ? `${(cache.candleCount / 1000).toFixed(1)}k` : '0'}
+                        </span>
+                      </div>
+                    </td>
+                  );
+                })}
+                <td style={{ textAlign: 'left' }}>
+                  <button
+                    onClick={() => handleRefresh(symbol.name)}
+                    disabled={refreshing !== null || data.job.isRunning}
+                    className="admin-btn btn-secondary"
+                    style={{ padding: '6px', minWidth: 'unset', width: '36px', height: '36px', display: 'inline-flex', justifyContent: 'center', alignItems: 'center' }}
+                    title="بروزرسانی اجباری این نماد"
+                  >
+                    <span className={`material-symbols-outlined ${refreshing === symbol.name ? 'spin' : ''}`} style={{ fontSize: '1.2rem', margin: 0 }}>
+                      sync
+                    </span>
+                  </button>
+                </td>
               </tr>
-            </thead>
-            <tbody>
-              {cache.length === 0 ? (
-                <tr>
-                  <td colSpan={8} style={{ textAlign: 'center', padding: '40px', color: '#a0aec0' }}>
-                    هیچ داده‌ای یافت نشد.
-                  </td>
-                </tr>
-              ) : (
-                cache.map((c) => (
-                  <tr key={`${c.symbol}-${c.timeframe}`}>
-                    <td style={{ direction: 'ltr', textAlign: 'left', fontWeight: 'bold' }}>{c.symbol}</td>
-                    <td>
-                      <span className={`badge ${c.provider === 'twelveData' ? 'standard' : 'pro'}`}>
-                        {c.provider === 'twelveData' ? 'Twelve Data' : 'London Strategic Edge'}
-                      </span>
-                    </td>
-                    <td>{c.category === 'Crypto' ? 'کریپتو' : 'فارکس'}</td>
-                    <td style={{ direction: 'ltr', textAlign: 'left' }}>{c.timeframe}</td>
-                    <td>{c.candleCount.toLocaleString('en-US')}</td>
-                    <td style={{ direction: 'ltr', textAlign: 'left' }}>
-                      {c.candleCount > 0 ? new Date(c.lastFetched).toLocaleString('fa-IR') : '-'}
-                    </td>
-                    <td>
-                      {c.candleCount === 0 ? (
-                        <span className="badge rejected">خالی</span>
-                      ) : c.isStale ? (
-                        <span className="badge pending">نیاز به آپدیت</span>
-                      ) : (
-                        <span className="badge approved">به‌روز</span>
-                      )}
-                    </td>
-                    <td>
-                      <button
-                        className="admin-btn btn-secondary"
-                        style={{ padding: '4px 8px', fontSize: '0.75rem' }}
-                        onClick={() => handleRefreshSymbol(c.symbol)}
-                        disabled={refreshingSymbol === c.symbol || refreshingSymbol === 'all'}
-                      >
-                        {refreshingSymbol === c.symbol ? (
-                          <span className="material-symbols-outlined" style={{ animation: 'spin 1s linear infinite', fontSize: '16px' }}>sync</span>
-                        ) : (
-                          'آپدیت دستی'
-                        )}
-                      </button>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
+            ))}
+          </tbody>
+        </table>
       </div>
     </div>
   );

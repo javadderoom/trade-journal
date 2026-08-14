@@ -27,6 +27,12 @@ export default function Admin2UsersPage() {
   const [searchInput, setSearchInput] = useState('');
   const [search, setSearch] = useState('');
 
+  const [selectedUserForPlan, setSelectedUserForPlan] = useState<AdminUser | null>(null);
+  const [customPlanOverride, setCustomPlanOverride] = useState({
+    plan: 'STANDARD',
+    durationDays: 30,
+  });
+
   const fetchUsers = useCallback(async (p = 1, s = '') => {
     setLoading(true);
     try {
@@ -63,6 +69,27 @@ export default function Admin2UsersPage() {
   const clearSearch = () => {
     setSearchInput('');
     setSearch('');
+  };
+
+  const handleManualPlanOverride = async () => {
+    if (!selectedUserForPlan) return;
+    const ok = await notify.confirm({
+      title: 'تغییر پلن کاربر',
+      message: `آیا از تغییر پلن کاربر "${selectedUserForPlan.name || selectedUserForPlan.email}" به ${customPlanOverride.plan === 'FREE' ? 'رایگان' : customPlanOverride.plan === 'STANDARD' ? 'استاندارد' : 'حرفه‌ای'} اطمینان دارید؟`,
+      confirmLabel: 'تغییر پلن',
+    });
+    if (!ok) return;
+    try {
+      await api.put(`/api/admin/users/${selectedUserForPlan.id}/plan`, {
+        plan: customPlanOverride.plan,
+        durationDays: customPlanOverride.durationDays,
+      });
+      setSelectedUserForPlan(null);
+      fetchUsers(page, search);
+      notify.success('پلن کاربر با موفقیت تغییر یافت');
+    } catch (err: any) {
+      notify.error(err.response?.data?.error || 'خطا در تغییر پلن');
+    }
   };
 
   return (
@@ -142,6 +169,7 @@ export default function Admin2UsersPage() {
                   <td>
                     <button
                       className="admin-btn btn-secondary"
+                      onClick={() => setSelectedUserForPlan(u)}
                       style={{ padding: '6px 12px', fontSize: '0.78rem' }}
                     >
                       تغییر پلن
@@ -176,6 +204,48 @@ export default function Admin2UsersPage() {
           >
             بعدی
           </button>
+        </div>
+      )}
+
+      {/* Manual Override Plan Modal Overlay */}
+      {selectedUserForPlan && (
+        <div className="admin-overlay" onClick={() => setSelectedUserForPlan(null)}>
+          <div className="admin-modal-card" onClick={(e) => e.stopPropagation()}>
+            <h4>تغییر دستی پلن کاربر: {selectedUserForPlan.name || selectedUserForPlan.email}</h4>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '16px' }}>
+              <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                <label style={{ fontSize: '0.8rem', color: '#a0aec0' }}>پلن انتخابی</label>
+                <select
+                  value={customPlanOverride.plan}
+                  onChange={(e) => setCustomPlanOverride({ ...customPlanOverride, plan: e.target.value })}
+                  style={{ background: '#0b0d19', border: '1px solid rgba(255,255,255,0.1)', padding: '10px', color: '#fff', borderRadius: '6px' }}
+                >
+                  <option value="FREE">رایگان (FREE)</option>
+                  <option value="STANDARD">استاندارد (STANDARD)</option>
+                  <option value="PRO">حرفه‌ای (PRO)</option>
+                </select>
+              </div>
+
+              {customPlanOverride.plan !== 'FREE' && (
+                <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                  <label style={{ fontSize: '0.8rem', color: '#a0aec0' }}>مدت اعتبار (روز)</label>
+                  <input
+                    type="number"
+                    min="1"
+                    value={customPlanOverride.durationDays}
+                    onChange={(e) => setCustomPlanOverride({ ...customPlanOverride, durationDays: Number(e.target.value) })}
+                    style={{ background: '#0b0d19', border: '1px solid rgba(255,255,255,0.1)', padding: '10px', color: '#fff', borderRadius: '6px' }}
+                  />
+                </div>
+              )}
+
+              <div className="receipt-modal-actions" style={{ display: 'flex', gap: '8px', marginTop: '16px' }}>
+                <button className="admin-btn" onClick={handleManualPlanOverride}>اعمال تغییر</button>
+                <button className="admin-btn btn-secondary" onClick={() => setSelectedUserForPlan(null)}>انصراف</button>
+              </div>
+            </div>
+          </div>
         </div>
       )}
     </div>

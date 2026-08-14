@@ -17,6 +17,7 @@ import './BlogEditor.scss';
 
 export default function BlogEditor({ initialData, locale, onSuccess, onCancel }: { initialData?: any, locale: 'fa' | 'en', onSuccess: () => void, onCancel: () => void }) {
   const [loading, setLoading] = useState(false);
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
   const [postId, setPostId] = useState(initialData?.id || null);
   const [title, setTitle] = useState(initialData?.title || '');
   const [slug, setSlug] = useState(initialData?.slug || '');
@@ -137,17 +138,15 @@ export default function BlogEditor({ initialData, locale, onSuccess, onCancel }:
     const formData = new FormData();
     formData.append('image', file);
     
-    setLoading(true);
+    setIsUploadingImage(true);
     try {
-      const res = await api.post('/api/admin/blog/upload-image', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
+      const res = await api.post('/api/admin/blog/upload-image', formData);
       setCoverImage(res.data.url);
       notify.success('تصویر با موفقیت آپلود شد');
-    } catch (err) {
-      notify.error('خطا در آپلود تصویر');
+    } catch (err: any) {
+      notify.error(err.response?.data?.error || 'خطا در آپلود تصویر');
     } finally {
-      setLoading(false);
+      setIsUploadingImage(false);
     }
   };
 
@@ -325,10 +324,12 @@ export default function BlogEditor({ initialData, locale, onSuccess, onCancel }:
         <label>لینک تصویر کاور (Cover Image)</label>
         <div style={{ display: 'flex', gap: '10px' }}>
           <input type="text" className="input-field" value={coverImage} onChange={(e) => setCoverImage(e.target.value)} style={{ direction: 'ltr', textAlign: 'left', flex: 1 }} />
-          <label className="btn btn-secondary" style={{ display: 'flex', alignItems: 'center', cursor: 'pointer', padding: '0 20px', whiteSpace: 'nowrap' }}>
-            <span className="material-symbols-outlined" style={{ marginRight: '5px' }}>upload</span>
-            آپلود
-            <input type="file" accept="image/*" style={{ display: 'none' }} onChange={handleImageUpload} disabled={loading} />
+          <label className="btn btn-secondary" style={{ display: 'flex', alignItems: 'center', cursor: 'pointer', padding: '0 20px', whiteSpace: 'nowrap', opacity: isUploadingImage ? 0.7 : 1 }}>
+            <span className="material-symbols-outlined" style={{ marginRight: '5px' }}>
+              {isUploadingImage ? 'hourglass_empty' : 'upload'}
+            </span>
+            {isUploadingImage ? 'در حال آپلود...' : 'آپلود'}
+            <input type="file" accept="image/*" style={{ display: 'none' }} onChange={handleImageUpload} disabled={isUploadingImage} />
           </label>
         </div>
       </div>

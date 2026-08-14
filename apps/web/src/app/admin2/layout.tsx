@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '../../lib/auth';
 import AdminSidebar from '@/components/admin2/AdminSidebar';
-import '../admin/admin.scss';
+import './admin2.scss';
 
 export default function Admin2Layout({ children }: { children: React.ReactNode }) {
   const router = useRouter();

@@ -172,6 +172,7 @@
 .posts-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
+  grid-auto-flow: dense;
   gap: 32px;
   
   @media (max-width: 992px) {
