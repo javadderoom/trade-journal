@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import useSWR from 'swr';
-import axios from 'axios';
+import { fetcher } from '@/lib/api';
 import styles from './TradeSelectorModal.module.scss';
 
 export interface MinimalTrade {
@@ -10,8 +10,6 @@ export interface MinimalTrade {
   result_r: number;
 }
 
-const fetcher = (url: string) => axios.get(url, { withCredentials: true }).then(res => res.data);
-
 export function TradeSelectorModal({ 
   onClose, 
   onSelect 
@@ -19,7 +17,7 @@ export function TradeSelectorModal({
   onClose: () => void, 
   onSelect: (trade: MinimalTrade) => void 
 }) {
-  const { data, error, isLoading } = useSWR<{ items: MinimalTrade[] }>('http://localhost:3000/api/trades?limit=20', fetcher);
+  const { data, error, isLoading } = useSWR<{ items: MinimalTrade[] }>('/api/trades?limit=20', fetcher);
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
   const trades = data?.items || [];

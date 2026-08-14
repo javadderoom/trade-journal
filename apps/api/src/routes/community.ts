@@ -103,6 +103,9 @@ router.get('/feed', optionalAuthenticate, async (req: any, res) => {
                     name: 'کاربر ناشناس',
                     avatar_url: null
                 };
+                if (postWithoutTrade.authorId !== userId) {
+                    delete postWithoutTrade.authorId;
+                }
             }
             
             return {
@@ -365,6 +368,9 @@ router.get('/feed/bookmarks', authenticate, async (req: any, res) => {
                     name: 'کاربر ناشناس',
                     avatar_url: null
                 };
+                if (postWithoutTrade.authorId !== userId) {
+                    delete postWithoutTrade.authorId;
+                }
             }
             
             return {

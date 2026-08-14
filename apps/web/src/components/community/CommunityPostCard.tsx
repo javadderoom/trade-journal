@@ -42,7 +42,7 @@ export function CommunityPostCard({ post }: { post: PostProps }) {
   const [showReportModal, setShowReportModal] = useState(false);
 
   const { user: authUser } = useAuthStore();
-  const isAuthor = authUser?.id === post.author.id;
+  const isAuthor = authUser && (authUser.id === (post as any).authorId || authUser.id === post.author.id);
   const [showOptions, setShowOptions] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editContent, setEditContent] = useState(post.content);
