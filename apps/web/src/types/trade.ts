@@ -24,6 +24,8 @@ export interface Trade {
   mfePrice?: number | null;
   maeR?: number | null;
   mfeR?: number | null;
+  exitEfficiencyPct?: number | null;
+  moneyLeftOnTableR?: number | null;
   annotation?: {
     htfBias?: 'BUY' | 'SELL' | null;
     session?: 'ASIA' | 'LONDON' | 'NEW_YORK' | 'OVERLAP' | null;

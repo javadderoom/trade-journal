@@ -94,6 +94,10 @@ export default function AnalyticsShowcase({ isEn }: AnalyticsShowcaseProps) {
                   <span className="val text-green">+2.85R</span>
                 </div>
                 <div className="side-stat">
+                  <span className="lbl">{isEn ? 'Avg Exit Efficiency' : 'میانگین کارایی خروج'}</span>
+                  <span className="val text-blue">82%</span>
+                </div>
+                <div className="side-stat">
                   <span className="lbl">{isEn ? 'Max Drawdown' : 'حداکثر افت سرمایه'}</span>
                   <span className="val text-red">-4.2%</span>
                 </div>

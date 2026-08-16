@@ -29,6 +29,8 @@ export interface MaeMfeResult {
   mfe_r: number;
   sl_efficiency_pct: number;
   tp_efficiency_pct: number;
+  exit_efficiency_pct: number;
+  money_left_on_table_r: number;
 }
 
 /**
@@ -95,16 +97,21 @@ export function calculateMaeMfe(input: MaeMfeInput): MaeMfeResult {
   const maeR = riskPips > 0 ? parseFloat((maePips / riskPips).toFixed(2)) : 0;
   const mfeR = riskPips > 0 ? parseFloat((mfePips / riskPips).toFixed(2)) : 0;
 
-  // 3. Efficiency Calculations
-  // SL Efficiency: % of risk room used (100% means price touched SL exactly)
-  const slEfficiency = riskPips > 0 ? Math.min(100, Math.round((maePips / riskPips) * 100)) : 0;
-
-  // TP Efficiency: Realized profit vs peak unrealized MFE profit
+  // 3. Efficiency & Exit Calculations
   const realizedPips = direction === 'BUY'
     ? (closePrice - openPrice) * pipMult
     : (openPrice - closePrice) * pipMult;
 
-  const tpEfficiency = mfePips > 0 ? Math.max(0, Math.min(100, Math.round((realizedPips / mfePips) * 100))) : 0;
+  const realizedR = riskPips > 0 ? realizedPips / riskPips : 0;
+
+  // SL Efficiency: % of risk room used (100% means price touched SL exactly)
+  const slEfficiency = riskPips > 0 ? Math.min(100, Math.round((maePips / riskPips) * 100)) : 0;
+
+  // TP Efficiency / Exit Efficiency: Realized profit vs peak unrealized MFE profit
+  const exitEfficiencyPct = mfePips > 0 ? Math.max(0, Math.min(100, Math.round((realizedPips / mfePips) * 100))) : 0;
+
+  // Money Left on Table (R-multiples): MFE R minus Realized R
+  const moneyLeftOnTableR = parseFloat(Math.max(0, mfeR - realizedR).toFixed(2));
 
   return {
     mae_pips: parseFloat(maePips.toFixed(1)),
@@ -114,6 +121,8 @@ export function calculateMaeMfe(input: MaeMfeInput): MaeMfeResult {
     mae_r: maeR,
     mfe_r: mfeR,
     sl_efficiency_pct: slEfficiency,
-    tp_efficiency_pct: tpEfficiency,
+    tp_efficiency_pct: exitEfficiencyPct,
+    exit_efficiency_pct: exitEfficiencyPct,
+    money_left_on_table_r: moneyLeftOnTableR,
   };
 }

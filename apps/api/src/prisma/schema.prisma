@@ -129,6 +129,8 @@ model Trade {
   mfe_price     Float? // Price point of maximum favorable excursion
   mae_r         Float? // MAE in R-multiples
   mfe_r         Float? // MFE in R-multiples
+  exit_efficiency_pct   Float? // Percentage of peak MFE captured at exit
+  money_left_on_table_r Float? // Uncaptured peak profit in R-multiples
   ticket        String? // MT4/MT5 deal ticket for deduplication
   import_source ImportSource @default(MANUAL)
   created_at    DateTime     @default(now())

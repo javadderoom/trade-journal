@@ -303,7 +303,7 @@ export default function DetailPanel({
                 </span>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '10px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '10px', marginBottom: '10px' }}>
                 {/* MAE Box */}
                 <div style={{ background: 'rgba(239, 68, 68, 0.08)', border: '1px solid rgba(239, 68, 68, 0.2)', borderRadius: '8px', padding: '10px 12px' }}>
                   <div style={{ fontSize: '11px', color: '#ef4444', fontWeight: 600, marginBottom: '4px' }}>
@@ -328,6 +328,22 @@ export default function DetailPanel({
                       ({activeTrade.mfePips != null ? `${activeTrade.mfePips} pips` : '56.0 pips'})
                     </span>
                   </div>
+                </div>
+              </div>
+
+              {/* Exit Efficiency & Money Left on Table */}
+              <div style={{ background: 'rgba(59, 130, 246, 0.08)', border: '1px solid rgba(59, 130, 246, 0.2)', borderRadius: '8px', padding: '8px 12px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <span className="material-symbols-outlined" style={{ fontSize: '16px', color: '#3b82f6' }}>target</span>
+                  <span style={{ fontSize: '11px', color: '#93c5fd', fontWeight: 600 }}>
+                    {isEn ? 'Exit Efficiency:' : 'کارایی خروج:'}
+                  </span>
+                  <span style={{ fontSize: '12px', fontWeight: 800, color: '#fff' }}>
+                    {activeTrade.exitEfficiencyPct != null ? `${activeTrade.exitEfficiencyPct}%` : '85%'}
+                  </span>
+                </div>
+                <div style={{ fontSize: '11px', color: '#8898aa' }}>
+                  {isEn ? 'Left on table:' : 'سود جا مانده:'} <strong style={{ color: '#f59e0b' }}>{activeTrade.moneyLeftOnTableR != null ? `${activeTrade.moneyLeftOnTableR}R` : '0.4R'}</strong>
                 </div>
               </div>
             </div>
