@@ -123,6 +123,12 @@ model Trade {
   swap          Float // Aggregated: sum of all execution swaps
   pips          Float // Aggregated: pips from last exit
   r_multiple    Float // Aggregated: R-multiple from last exit
+  mae_pips      Float? // Maximum Adverse Excursion in pips
+  mfe_pips      Float? // Maximum Favorable Excursion in pips
+  mae_price     Float? // Price point of maximum adverse excursion
+  mfe_price     Float? // Price point of maximum favorable excursion
+  mae_r         Float? // MAE in R-multiples
+  mfe_r         Float? // MFE in R-multiples
   ticket        String? // MT4/MT5 deal ticket for deduplication
   import_source ImportSource @default(MANUAL)
   created_at    DateTime     @default(now())

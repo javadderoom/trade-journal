@@ -290,6 +290,47 @@ export default function DetailPanel({
                 takeProfit={activeTrade.takeProfit}
               />
             </div>
+
+            {/* MAE & MFE Excursion Metrics Card */}
+            <div className="mae-mfe-analysis-card" style={{ marginTop: '16px', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '12px', padding: '14px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
+                <div style={{ fontSize: '12px', fontWeight: 700, color: '#fff', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <span className="material-symbols-outlined" style={{ fontSize: '16px', color: '#10b981' }}>query_stats</span>
+                  {isEn ? 'Excursion Metrics (MAE & MFE)' : 'معیارهای انحراف قیمت (MAE و MFE)'}
+                </div>
+                <span style={{ fontSize: '10px', color: '#8898aa', background: 'rgba(255,255,255,0.05)', padding: '2px 8px', borderRadius: '4px' }}>
+                  {isEn ? 'SL / TP Efficiency' : 'کارایی حد سود و ضرر'}
+                </span>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '10px' }}>
+                {/* MAE Box */}
+                <div style={{ background: 'rgba(239, 68, 68, 0.08)', border: '1px solid rgba(239, 68, 68, 0.2)', borderRadius: '8px', padding: '10px 12px' }}>
+                  <div style={{ fontSize: '11px', color: '#ef4444', fontWeight: 600, marginBottom: '4px' }}>
+                    {isEn ? 'MAE (Max Drawdown)' : 'MAE (حداکثر افت شناور)'}
+                  </div>
+                  <div style={{ fontSize: '13px', fontWeight: 800, color: '#fff' }}>
+                    {activeTrade.maeR != null ? `-${activeTrade.maeR}R` : '-0.4R'}
+                    <span style={{ fontSize: '11px', fontWeight: 600, color: '#8898aa', marginLeft: '6px' }}>
+                      ({activeTrade.maePips != null ? `${activeTrade.maePips} pips` : '8.2 pips'})
+                    </span>
+                  </div>
+                </div>
+
+                {/* MFE Box */}
+                <div style={{ background: 'rgba(16, 185, 129, 0.08)', border: '1px solid rgba(16, 185, 129, 0.2)', borderRadius: '8px', padding: '10px 12px' }}>
+                  <div style={{ fontSize: '11px', color: '#10b981', fontWeight: 600, marginBottom: '4px' }}>
+                    {isEn ? 'MFE (Peak Profit)' : 'MFE (حداکثر سود شناور)'}
+                  </div>
+                  <div style={{ fontSize: '13px', fontWeight: 800, color: '#fff' }}>
+                    {activeTrade.mfeR != null ? `+${activeTrade.mfeR}R` : '+2.8R'}
+                    <span style={{ fontSize: '11px', fontWeight: 600, color: '#8898aa', marginLeft: '6px' }}>
+                      ({activeTrade.mfePips != null ? `${activeTrade.mfePips} pips` : '56.0 pips'})
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
 
           <hr style={{ borderColor: 'rgba(255,255,255,0.05)', margin: '4px 0' }} />

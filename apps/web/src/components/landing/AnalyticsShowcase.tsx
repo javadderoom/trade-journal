@@ -83,15 +83,19 @@ export default function AnalyticsShowcase({ isEn }: AnalyticsShowcaseProps) {
               <div className="stat-side-list">
                 <div className="side-stat">
                   <span className="lbl">{isEn ? 'Profit Factor' : 'ضریب سود'}</span>
-                  <span className="val text-green font-mono">2.34</span>
+                  <span className="val text-green">2.34</span>
+                </div>
+                <div className="side-stat">
+                  <span className="lbl">{isEn ? 'Avg MAE (Max Drawdown)' : 'میانگین افت (MAE)'}</span>
+                  <span className="val text-red">-0.45R</span>
+                </div>
+                <div className="side-stat">
+                  <span className="lbl">{isEn ? 'Avg MFE (Peak Profit)' : 'میانگین اوج سود (MFE)'}</span>
+                  <span className="val text-green">+2.85R</span>
                 </div>
                 <div className="side-stat">
                   <span className="lbl">{isEn ? 'Max Drawdown' : 'حداکثر افت سرمایه'}</span>
-                  <span className="val text-red font-mono">-4.2%</span>
-                </div>
-                <div className="side-stat">
-                  <span className="lbl">{isEn ? 'Avg Win / Loss' : 'میانگین سود/زیان'}</span>
-                  <span className="val font-mono">2.1 : 1</span>
+                  <span className="val text-red">-4.2%</span>
                 </div>
               </div>
             </div>

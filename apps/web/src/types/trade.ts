@@ -18,6 +18,12 @@ export interface Trade {
   swap: number;
   pips: number;
   rMultiple: number;
+  maePips?: number | null;
+  mfePips?: number | null;
+  maePrice?: number | null;
+  mfePrice?: number | null;
+  maeR?: number | null;
+  mfeR?: number | null;
   annotation?: {
     htfBias?: 'BUY' | 'SELL' | null;
     session?: 'ASIA' | 'LONDON' | 'NEW_YORK' | 'OVERLAP' | null;
