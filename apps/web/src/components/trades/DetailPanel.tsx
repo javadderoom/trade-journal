@@ -305,10 +305,10 @@ export default function DetailPanel({
               // For losing trades, MAE R reflects actual stop loss exit (e.g. 1.0R or widened -1.5R); for winning trades, it reflects the drawdown fraction
               const dynamicMaeR = activeTrade.maeR ?? (tradeR < 0 ? Math.max(1.0, parseFloat(Math.abs(tradeR).toFixed(2))) : parseFloat((dynamicMaePips / (rawRiskPips || 1)).toFixed(2)));
 
-              const dynamicMfePips = activeTrade.mfePips ?? (tradePips > 0 ? parseFloat((tradePips * 1.2).toFixed(1)) : parseFloat((rawRiskPips * 0.35).toFixed(1)));
-              const dynamicMfeR = activeTrade.mfeR ?? (tradeR > 0 ? parseFloat((Math.max(tradeR * 1.1, dynamicMfePips / (rawRiskPips || 1))).toFixed(2)) : parseFloat((dynamicMfePips / (rawRiskPips || 1)).toFixed(2)));
+              const dynamicMfePips = activeTrade.mfePips ?? (tradePips > 0 ? parseFloat(tradePips.toFixed(1)) : parseFloat((rawRiskPips * 0.35).toFixed(1)));
+              const dynamicMfeR = activeTrade.mfeR ?? (tradeR > 0 ? parseFloat(tradeR.toFixed(2)) : parseFloat((dynamicMfePips / (rawRiskPips || 1)).toFixed(2)));
 
-              const dynamicExitEff = activeTrade.exitEfficiencyPct ?? (dynamicMfePips > 0 && tradePips > 0 ? Math.min(100, Math.round((tradePips / dynamicMfePips) * 100)) : (tradePips <= 0 ? 0 : 80));
+              const dynamicExitEff = activeTrade.exitEfficiencyPct ?? (tradePips > 0 && dynamicMfePips > 0 ? Math.min(100, Math.round((tradePips / dynamicMfePips) * 100)) : (tradePips <= 0 ? 0 : 100));
               const dynamicMoneyLeftR = activeTrade.moneyLeftOnTableR ?? (dynamicMfeR > tradeR ? parseFloat((dynamicMfeR - Math.max(0, tradeR)).toFixed(2)) : 0);
 
               return (
@@ -329,9 +329,9 @@ export default function DetailPanel({
                       <div style={{ fontSize: '11px', color: '#ef4444', fontWeight: 600, marginBottom: '4px' }}>
                         {isEn ? 'MAE (Max Drawdown)' : 'MAE (حداکثر افت شناور)'}
                       </div>
-                      <div style={{ fontSize: '13px', fontWeight: 800, color: '#fff' }}>
-                        -{dynamicMaeR}R
-                        <span style={{ fontSize: '11px', fontWeight: 600, color: '#8898aa', marginLeft: '6px' }}>
+                      <div style={{ fontSize: '13px', fontWeight: 800, color: '#fff', direction: 'ltr', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <span>-{dynamicMaeR}R</span>
+                        <span style={{ fontSize: '11px', fontWeight: 600, color: '#8898aa' }}>
                           ({dynamicMaePips} pips)
                         </span>
                       </div>
@@ -342,9 +342,9 @@ export default function DetailPanel({
                       <div style={{ fontSize: '11px', color: '#10b981', fontWeight: 600, marginBottom: '4px' }}>
                         {isEn ? 'MFE (Peak Profit)' : 'MFE (حداکثر سود شناور)'}
                       </div>
-                      <div style={{ fontSize: '13px', fontWeight: 800, color: '#fff' }}>
-                        +{dynamicMfeR}R
-                        <span style={{ fontSize: '11px', fontWeight: 600, color: '#8898aa', marginLeft: '6px' }}>
+                      <div style={{ fontSize: '13px', fontWeight: 800, color: '#fff', direction: 'ltr', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <span>+{dynamicMfeR}R</span>
+                        <span style={{ fontSize: '11px', fontWeight: 600, color: '#8898aa' }}>
                           ({dynamicMfePips} pips)
                         </span>
                       </div>

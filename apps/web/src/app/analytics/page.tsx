@@ -369,10 +369,10 @@ export default function JournalPage() {
       const maePips = t.maePips ?? (tradePips < 0 ? Math.abs(tradePips) : riskPips * 0.2);
       const maeR = t.maeR ?? (tradeR < 0 ? Math.max(1.0, Math.abs(tradeR)) : (riskPips > 0 ? maePips / riskPips : 0.2));
 
-      const mfePips = t.mfePips ?? (tradePips > 0 ? tradePips * 1.2 : riskPips * 0.35);
-      const mfeR = t.mfeR ?? (tradeR > 0 ? Math.max(tradeR * 1.1, mfePips / (riskPips || 1)) : (riskPips > 0 ? mfePips / riskPips : 0.35));
+      const mfePips = t.mfePips ?? (tradePips > 0 ? tradePips : riskPips * 0.35);
+      const mfeR = t.mfeR ?? (tradeR > 0 ? tradeR : (riskPips > 0 ? mfePips / riskPips : 0.35));
 
-      const exitEff = t.exitEfficiencyPct ?? (mfePips > 0 && tradePips > 0 ? Math.min(100, Math.round((tradePips / mfePips) * 100)) : (tradePips <= 0 ? 0 : 80));
+      const exitEff = t.exitEfficiencyPct ?? (mfePips > 0 && tradePips > 0 ? Math.min(100, Math.round((tradePips / mfePips) * 100)) : (tradePips <= 0 ? 0 : 100));
       const moneyLeftR = t.moneyLeftOnTableR ?? (mfeR > tradeR ? mfeR - Math.max(0, tradeR) : 0);
 
       sumMaeR += maeR;
@@ -593,10 +593,10 @@ export default function JournalPage() {
       const maePips = t.maePips ?? (tradePips < 0 ? Math.abs(tradePips) : riskPips * 0.2);
       const maeR = t.maeR ?? (tradeR < 0 ? Math.max(1.0, Math.abs(tradeR)) : (riskPips > 0 ? maePips / riskPips : 0.2));
 
-      const mfePips = t.mfePips ?? (tradePips > 0 ? tradePips * 1.2 : riskPips * 0.35);
-      const mfeR = t.mfeR ?? (tradeR > 0 ? Math.max(tradeR * 1.1, mfePips / (riskPips || 1)) : (riskPips > 0 ? mfePips / riskPips : 0.35));
+      const mfePips = t.mfePips ?? (tradePips > 0 ? tradePips : riskPips * 0.35);
+      const mfeR = t.mfeR ?? (tradeR > 0 ? tradeR : (riskPips > 0 ? mfePips / riskPips : 0.35));
 
-      const exitEff = t.exitEfficiencyPct ?? (mfePips > 0 && tradePips > 0 ? Math.min(100, Math.round((tradePips / mfePips) * 100)) : (tradePips <= 0 ? 0 : 80));
+      const exitEff = t.exitEfficiencyPct ?? (mfePips > 0 && tradePips > 0 ? Math.min(100, Math.round((tradePips / mfePips) * 100)) : (tradePips <= 0 ? 0 : 100));
       const moneyLeftR = t.moneyLeftOnTableR ?? (mfeR > tradeR ? mfeR - Math.max(0, tradeR) : 0);
 
       sumMaeR += maeR;
@@ -926,9 +926,9 @@ export default function JournalPage() {
                 <div style={{ fontSize: '11px', color: '#ef4444', fontWeight: 600, marginBottom: '4px' }}>
                   {isEn ? 'Average MAE (Drawdown)' : 'میانگین افت نامطلوب (MAE)'}
                 </div>
-                <div style={{ fontSize: '18px', fontWeight: 800, color: '#fff' }}>
-                  -{filteredExcursionStats.avgMaeR}R
-                  <span style={{ fontSize: '12px', fontWeight: 600, color: '#8898aa', marginLeft: '6px' }}>
+                <div style={{ fontSize: '18px', fontWeight: 800, color: '#fff', direction: 'ltr', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <span>-{filteredExcursionStats.avgMaeR}R</span>
+                  <span style={{ fontSize: '12px', fontWeight: 600, color: '#8898aa' }}>
                     ({filteredExcursionStats.avgMaePips} pips)
                   </span>
                 </div>
@@ -942,9 +942,9 @@ export default function JournalPage() {
                 <div style={{ fontSize: '11px', color: '#10b981', fontWeight: 600, marginBottom: '4px' }}>
                   {isEn ? 'Average MFE (Peak Profit)' : 'میانگین اوج سود (MFE)'}
                 </div>
-                <div style={{ fontSize: '18px', fontWeight: 800, color: '#fff' }}>
-                  +{filteredExcursionStats.avgMfeR}R
-                  <span style={{ fontSize: '12px', fontWeight: 600, color: '#8898aa', marginLeft: '6px' }}>
+                <div style={{ fontSize: '18px', fontWeight: 800, color: '#fff', direction: 'ltr', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <span>+{filteredExcursionStats.avgMfeR}R</span>
+                  <span style={{ fontSize: '12px', fontWeight: 600, color: '#8898aa' }}>
                     ({filteredExcursionStats.avgMfePips} pips)
                   </span>
                 </div>

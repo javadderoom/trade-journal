@@ -14,6 +14,8 @@ import { notify } from '../../lib/notify';
 import Link from 'next/link';
 import { useSubscriptionStatus } from '../../hooks/useSubscriptionStatus';
 import SubscriptionBanners from '../../components/SubscriptionBanners';
+import WorstEmotionAlert from '../../components/trades/WorstEmotionAlert';
+import { useTradesEmotions } from '../../hooks/useTradesEmotions';
 
 export default function TradesPage() {
   const { t, language } = useTranslation();
@@ -21,7 +23,9 @@ export default function TradesPage() {
 
   const [autoOpenTradeId, setAutoOpenTradeId] = useState<string | null>(null);
   const [dateFilter, setDateFilter] = useState<string | null>(null);
+  const [tableSearchQuery, setTableSearchQuery] = useState<string>('');
   const { subStatus, dismissedRejectionId, setDismissedRejectionId, refetch: fetchSubStatus } = useSubscriptionStatus();
+  const { emotions: fetchedEmotions } = useTradesEmotions();
 
   // Mistake detection state
   const [mistakeReview, setMistakeReview] = useState<{
@@ -181,10 +185,19 @@ export default function TradesPage() {
         dismissedRejectionId={dismissedRejectionId}
         onDismissRejection={setDismissedRejectionId}
       />
+      <WorstEmotionAlert
+        trades={trades}
+        emotionsList={fetchedEmotions}
+        usdToToman={usdToToman}
+        onFilterEmotion={(emotion) => {
+          setTableSearchQuery(emotion);
+        }}
+      />
       <TradesTable
         initialTrades={trades}
         initialUsdToToman={usdToToman}
         initialDateFilter={dateFilter}
+        initialSearchQuery={tableSearchQuery}
         onRefresh={() => fetchTrades({ isManualRefresh: true })}
         onImportMT4={handleImportMT4}
         onAddManualTrade={handleAddManualTrade}

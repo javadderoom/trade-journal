@@ -29,6 +29,7 @@ interface TradesTableProps {
   initialTrades: Trade[];
   initialUsdToToman?: number;
   initialDateFilter?: string | null;
+  initialSearchQuery?: string | null;
   onRefresh?: () => void;
   onAddManualTrade?: () => void;
   onImportMT4?: () => void;
@@ -87,6 +88,7 @@ export default function TradesTable({
   onDeleteTrade,
   onDeleteMultipleTrades,
   initialActiveTradeId,
+  initialSearchQuery,
   accounts = [],
   selectedAccountId = 'all',
   onAccountIdChange,
@@ -183,8 +185,15 @@ export default function TradesTable({
   const { fetchTrades, totalCount: storeTotalCount } = useTradeStore();
 
   // Filter states
-  const [searchQuery, setSearchQuery] = useState('');
-  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState(initialSearchQuery || '');
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState(initialSearchQuery || '');
+
+  useEffect(() => {
+    if (initialSearchQuery !== undefined && initialSearchQuery !== null) {
+      setSearchQuery(initialSearchQuery);
+      setDebouncedSearchQuery(initialSearchQuery);
+    }
+  }, [initialSearchQuery]);
 
   useEffect(() => {
     const handler = setTimeout(() => {
