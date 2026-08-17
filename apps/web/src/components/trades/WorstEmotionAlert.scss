@@ -1,5 +1,6 @@
 .worst-emotion-alert {
   position: relative;
+  margin-top: 16px;
   margin-bottom: 20px;
   padding: 16px 20px;
   background: linear-gradient(135deg, rgba(239, 68, 68, 0.12) 0%, rgba(245, 158, 11, 0.06) 50%, rgba(17, 24, 39, 0.7) 100%);
@@ -29,6 +30,8 @@
     direction: rtl;
     text-align: right;
     font-family: 'Vazirmatn', inherit;
+    margin-left: 16px;
+    margin-right: 0;
 
     .alert-close-btn {
       left: 12px;
@@ -39,6 +42,8 @@
   &.ltr {
     direction: ltr;
     text-align: left;
+    margin-right: 16px;
+    margin-left: 0;
 
     .alert-close-btn {
       right: 12px;

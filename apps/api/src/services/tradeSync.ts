@@ -440,12 +440,13 @@ export async function getTradesForAccount(params: {
   sortDir?: 'asc' | 'desc';
   plan?: string;
   search?: string;
+  emotion?: string;
   symbol?: string;
   direction?: 'BUY' | 'SELL';
   status?: 'OPEN' | 'CLOSED';
   dates?: string[];
 }): Promise<{ items: TradeListRow[], totalCount: number }> {
-  const { userId, accountId, search, symbol, direction, status, dates } = params;
+  const { userId, accountId, search, emotion, symbol, direction, status, dates } = params;
   const limit = Math.min(Math.max(params.limit ?? 100, 1), 500);
   const offset = Math.max(params.offset ?? 0, 0);
 
@@ -481,54 +482,78 @@ export async function getTradesForAccount(params: {
     dateLimit.setMonth(dateLimit.getMonth() - 6);
   }
 
-  // Build the where clause
-  const whereClause: any = {
-    user_id: userId,
-    ...(filterAccount ? { account_id: accountId } : {}),
-    ...(dateLimit ? { open_time: { gte: dateLimit } } : {}),
-  };
+  // Build the andConditions array to safely combine all filters
+  const andConditions: any[] = [];
+
+  if (filterAccount) {
+    andConditions.push({ account_id: accountId });
+  }
+
+  if (dateLimit) {
+    andConditions.push({ open_time: { gte: dateLimit } });
+  }
 
   if (symbol && symbol !== 'همه نمادها' && symbol !== 'All Symbols') {
     if (symbol.startsWith('main:')) {
       const mainPair = symbol.substring(5);
-      whereClause.symbol = { contains: mainPair, mode: 'insensitive' };
+      andConditions.push({ symbol: { contains: mainPair, mode: 'insensitive' } });
     } else {
-      whereClause.symbol = symbol;
+      andConditions.push({ symbol });
     }
   }
 
   if (direction) {
-    whereClause.direction = direction;
+    andConditions.push({ direction });
   }
 
   if (status === 'OPEN') {
-    whereClause.close_time = null;
+    andConditions.push({ close_time: null });
   } else if (status === 'CLOSED') {
-    whereClause.close_time = { not: null };
+    andConditions.push({ close_time: { not: null } });
   }
 
   if (dates && dates.length > 0) {
-    whereClause.OR = dates.map(dateStr => {
-      // Create a date range for the specific date
-      const startDate = new Date(`${dateStr}T00:00:00.000Z`);
-      const endDate = new Date(`${dateStr}T23:59:59.999Z`);
-      return {
-        close_time: {
-          gte: startDate,
-          lte: endDate
-        }
-      };
+    andConditions.push({
+      OR: dates.map(dateStr => {
+        const startDate = new Date(`${dateStr}T00:00:00.000Z`);
+        const endDate = new Date(`${dateStr}T23:59:59.999Z`);
+        return {
+          close_time: {
+            gte: startDate,
+            lte: endDate
+          }
+        };
+      })
     });
   }
 
-  if (search) {
-    whereClause.OR = [
-      ...(whereClause.OR || []),
-      { symbol: { contains: search, mode: 'insensitive' } },
-      { ticket: { contains: search, mode: 'insensitive' } },
-      { annotation: { notes: { contains: search, mode: 'insensitive' } } }
-    ];
+  if (emotion && emotion.trim()) {
+    andConditions.push({
+      annotation: {
+        emotion: { equals: emotion.trim(), mode: 'insensitive' }
+      }
+    });
   }
+
+  if (search && search.trim()) {
+    const q = search.trim();
+    andConditions.push({
+      OR: [
+        { symbol: { contains: q, mode: 'insensitive' } },
+        { ticket: { contains: q, mode: 'insensitive' } },
+        { annotation: { emotion: { contains: q, mode: 'insensitive' } } },
+        { annotation: { notes: { contains: q, mode: 'insensitive' } } },
+        { annotation: { thesis: { contains: q, mode: 'insensitive' } } },
+        { annotation: { lesson: { contains: q, mode: 'insensitive' } } },
+        { setup: { concept: { name: { contains: q, mode: 'insensitive' } } } },
+      ]
+    });
+  }
+
+  const whereClause: any = {
+    user_id: userId,
+    ...(andConditions.length > 0 ? { AND: andConditions } : {})
+  };
 
   const [totalCount, trades] = await Promise.all([
     prisma.trade.count({ where: whereClause }),

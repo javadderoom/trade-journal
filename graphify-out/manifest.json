@@ -5,8 +5,8 @@
     "semantic_hash": ""
   },
   "apps/api/src/routes/tradeSync.ts": {
-    "mtime": 1786995878.2640178,
-    "ast_hash": "9adf23069a08877f9c28b97b71330857",
+    "mtime": 1787002686.9821532,
+    "ast_hash": "99aed640bdf3257bcd6839faa4d2c447",
     "semantic_hash": ""
   },
   "apps/api/src/server.ts": {
@@ -20,8 +20,8 @@
     "semantic_hash": ""
   },
   "apps/api/src/services/tradeSync.ts": {
-    "mtime": 1786994603.8483026,
-    "ast_hash": "039bd137bfbbce819ff2f9447eed3b46",
+    "mtime": 1787002670.928137,
+    "ast_hash": "b2b1b91b01e748dd3a902ac7722d79d5",
     "semantic_hash": ""
   },
   "apps/api/src/types/index.ts": {
@@ -150,8 +150,8 @@
     "semantic_hash": ""
   },
   "apps/web/src/utils/tradeHelpers.ts": {
-    "mtime": 1786550428.0988517,
-    "ast_hash": "99e4f9c8de10a23f450f1ace21a36268",
+    "mtime": 1787003065.6299248,
+    "ast_hash": "9660d5d85a91d3f5d88f2ec81f4932b3",
     "semantic_hash": ""
   },
   "apps/web/src/components/restored_scss_chunks.json": {
@@ -235,8 +235,8 @@
     "semantic_hash": ""
   },
   "apps/web/src/store/useTradeStore.ts": {
-    "mtime": 1786996313.999503,
-    "ast_hash": "ae28c0e856a1ce5de39805e3f1318c05",
+    "mtime": 1787002826.4341762,
+    "ast_hash": "ba5b5bf68d7b39921edbcbde9488f368",
     "semantic_hash": ""
   },
   "apps/web/public/logo.png": {
@@ -2055,8 +2055,8 @@
     "semantic_hash": ""
   },
   "apps/web/src/components/trades/WorstEmotionAlert.tsx": {
-    "mtime": 1786991008.580124,
-    "ast_hash": "f018ba69676e2063f65dd7f9b339376f",
+    "mtime": 1787003127.9015343,
+    "ast_hash": "a9fa4af26bfbe037177ab5f0c5972012",
     "semantic_hash": ""
   },
   ".impeccable/critique/2026-08-10T13-53-49Z__apps-web-src-app-locale-public-community.md": {
@@ -2092,6 +2092,11 @@
   "apps/api/src/prisma/migrations/20260817191943_add_market_conditions/migration.sql": {
     "mtime": 1786994383.7902892,
     "ast_hash": "1569da18c4bf13f368f9d5ce344d4078",
+    "semantic_hash": ""
+  },
+  "plans/trader-decision-making-features.md": {
+    "mtime": 1787002012.1875217,
+    "ast_hash": "9f9a893881c5e9b26ff219607ff508e2",
     "semantic_hash": ""
   }
 }

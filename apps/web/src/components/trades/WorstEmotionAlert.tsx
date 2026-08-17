@@ -72,7 +72,7 @@ export default function WorstEmotionAlert({
 
     for (const [emo, stats] of Object.entries(groupMap)) {
       if (stats.totalPnl < 0 && stats.tradeCount > 0) {
-        const label = getEmotionLabel(emo, emotionsList);
+        const label = getEmotionLabel(emo, emotionsList, language);
         const emoji = getEmotionEmoji(emo, emotionsList);
         const winRate = (stats.winCount / stats.tradeCount) * 100;
 
@@ -94,7 +94,7 @@ export default function WorstEmotionAlert({
     // Sort by lowest (most negative) PnL
     negativeEmotions.sort((a, b) => a.totalPnl - b.totalPnl);
     return negativeEmotions[0];
-  }, [trades, emotionsList]);
+  }, [trades, emotionsList, language]);
 
   // 2. Check session storage dismissal
   useEffect(() => {
@@ -118,12 +118,17 @@ export default function WorstEmotionAlert({
   if (!worstEmotion) return null;
   if (dismissedEmotion === worstEmotion.emotion) return null;
 
+  const currentEmotionLabel = getEmotionLabel(worstEmotion.emotion, emotionsList, language);
+
   // 3. Formulate specific psychological advice & messages
   const getCoachingContent = (stat: EmotionStat) => {
-    const rawKey = stat.emotion.toUpperCase();
-    const formattedLoss = formatCurrency(stat.totalPnl);
-    const formattedWinRate = isEn ? `${stat.winRate.toFixed(0)}%` : `${toPersianDigits(stat.winRate.toFixed(0))}٪`;
-    const formattedCount = isEn ? `${stat.tradeCount}` : toPersianDigits(stat.tradeCount);
+    const raw = stat.emotion.trim();
+    let rawKey = raw.toUpperCase();
+    if (raw === 'انتقامی') rawKey = 'REVENGE';
+    else if (raw === 'فومو' || raw === 'فومو (عجول)') rawKey = 'FOMO';
+    else if (raw === 'مضطرب') rawKey = 'ANXIOUS';
+    else if (raw === 'با اطمینان' || raw === 'باطمینان') rawKey = 'CONFIDENT';
+    else if (raw === 'خنثی') rawKey = 'NEUTRAL';
 
     switch (rawKey) {
       case 'REVENGE':
@@ -163,10 +168,10 @@ export default function WorstEmotionAlert({
         };
       default:
         return {
-          title: isEn ? `Performance Alert: ${stat.label}` : `هشدار عملکرد: ${stat.label}`,
+          title: isEn ? `Performance Alert: ${currentEmotionLabel}` : `هشدار عملکرد: ${currentEmotionLabel}`,
           advice: isEn
-            ? `Trades tagged with "${stat.label}" are your largest source of emotional drawdown. Review these trades in detail to identify and eliminate repeating errors.`
-            : `معاملات با برچسب احساسی «${stat.label}» بیشترین زیان را در سابقه شما ایجاد کرده‌اند. این معاملات را بررسی کنید تا خطاهای تکراری متوقف شوند.`,
+            ? `Trades tagged with "${currentEmotionLabel}" are your largest source of emotional drawdown. Review these trades in detail to identify and eliminate repeating errors.`
+            : `معاملات با برچسب احساسی «${currentEmotionLabel}» بیشترین زیان را در سابقه شما ایجاد کرده‌اند. این معاملات را بررسی کنید تا خطاهای تکراری متوقف شوند.`,
         };
     }
   };
@@ -178,34 +183,31 @@ export default function WorstEmotionAlert({
     ? `${worstEmotion.winRate.toFixed(0)}%`
     : `${toPersianDigits(worstEmotion.winRate.toFixed(0))}٪`;
   const formattedCount = isEn
-    ? `${worstEmotion.tradeCount} trades`
+    ? `${worstEmotion.tradeCount} Trades`
     : `${toPersianDigits(worstEmotion.tradeCount)} معامله`;
 
   return (
     <div className={`worst-emotion-alert ${isEn ? 'ltr' : 'rtl'}`}>
-      {/* Icon Badge */}
+      {/* Icon with pulsing indicator */}
       <div className="alert-icon-wrapper">
-        <span className="emotion-emoji">{worstEmotion.emoji}</span>
+        <span className="material-symbols-outlined alert-main-icon">warning</span>
         <span className="pulse-dot"></span>
       </div>
 
-      {/* Main Alert Body */}
+      {/* Main Alert Content */}
       <div className="alert-body">
         <div className="alert-header">
-          <span className="alert-title">
-            <span className="material-symbols-outlined" style={{ fontSize: '1.2rem', color: '#ef4444' }}>
-              warning
+          <h4 className="alert-title">
+            <span>{coaching.title}</span>
+          </h4>
+
+          <div className="alert-metrics-pills">
+            <span className="alert-tag-badge">
+              {worstEmotion.emoji} {currentEmotionLabel}
             </span>
-            {coaching.title}
-          </span>
 
-          <span className="alert-tag-badge">
-            {worstEmotion.emoji} {worstEmotion.label}
-          </span>
-
-          <div className="metrics-pills">
-            <span className="pill loss-pill">
-              <span className="material-symbols-outlined" style={{ fontSize: '0.9rem' }}>
+            <span className="pill pnl-pill loss">
+              <span className="material-symbols-outlined" style={{ fontSize: '13px' }}>
                 trending_down
               </span>
               <span dir="ltr">{formattedLoss}</span>
@@ -225,11 +227,11 @@ export default function WorstEmotionAlert({
         <div className="alert-message">
           {isEn ? (
             <>
-              Your worst-performing emotion is <strong className="loss-highlight">{worstEmotion.label}</strong>, which has cost you <strong className="loss-highlight">{formattedLoss}</strong> across {worstEmotion.tradeCount} trades. {coaching.advice}
+              Your worst-performing emotion is <strong className="loss-highlight">{currentEmotionLabel}</strong>, which has cost you <strong className="loss-highlight">{formattedLoss}</strong> across {worstEmotion.tradeCount} trades. {coaching.advice}
             </>
           ) : (
             <>
-              بیشترین آسیب روانی به معاملات شما از احساس <strong className="loss-highlight">«{worstEmotion.label}»</strong> بوده که مجموعاً <strong className="loss-highlight">{formattedLoss}</strong> {tomanLoss ? `(${tomanLoss})` : ''} به حساب شما ضرر زده است. {coaching.advice}
+              بیشترین آسیب روانی به معاملات شما از احساس <strong className="loss-highlight">«{currentEmotionLabel}»</strong> بوده که مجموعاً <strong className="loss-highlight">{formattedLoss}</strong> {tomanLoss ? `(${tomanLoss})` : ''} به حساب شما ضرر زده است. {coaching.advice}
             </>
           )}
         </div>

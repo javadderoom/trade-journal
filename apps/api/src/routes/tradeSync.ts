@@ -158,6 +158,7 @@ router.get('/', authenticate, async (req: AuthRequest, res: Response) => {
     const offset = offsetRaw ? Number.parseInt(offsetRaw, 10) : undefined;
 
     const search = body.search as string | undefined;
+    const emotion = body.emotion as string | undefined;
     const symbol = body.symbol as string | undefined;
     const direction = body.direction as 'BUY' | 'SELL' | undefined;
     const status = body.status as 'OPEN' | 'CLOSED' | undefined;
@@ -172,6 +173,7 @@ router.get('/', authenticate, async (req: AuthRequest, res: Response) => {
       sortDir,
       plan: req.user?.plan,
       search,
+      emotion,
       symbol,
       direction,
       status,

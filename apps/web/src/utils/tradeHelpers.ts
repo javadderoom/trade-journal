@@ -26,24 +26,65 @@ export const getEmotionEmoji = (emotion: string | null, emotionsList?: { value: 
   return _getEmotionEmoji(emotion);
 };
 
-export const getEmotionLabel = (emotion: string | null, emotionsList?: { value: string; label: string; emoji?: string }[]): string => {
+export const getEmotionLabel = (
+  emotion: string | null,
+  emotionsList?: { value: string; label: string; emoji?: string }[],
+  forcedLang?: string
+): string => {
   if (!emotion) return '';
-  const lang = useAppStore.getState().language;
-  const standardMap: Record<string, string> = {
-    CONFIDENT: lang === 'en' ? 'Confident' : 'با اطمینان',
-    NEUTRAL: lang === 'en' ? 'Neutral' : 'خنثی',
-    ANXIOUS: lang === 'en' ? 'Anxious' : 'مضطرب',
-    FOMO: lang === 'en' ? 'FOMO' : 'فومو (عجول)',
-    REVENGE: lang === 'en' ? 'Revenge' : 'انتقامی',
-    UNKNOWN: lang === 'en' ? 'Unknown' : 'نامشخص',
+  const lang = forcedLang || useAppStore.getState().language;
+  const isEn = lang === 'en';
+  const trimmed = emotion.trim();
+  const upper = trimmed.toUpperCase();
+
+  const persianToEnglish: Record<string, string> = {
+    'انتقامی': 'Revenge',
+    'فومو': 'FOMO',
+    'فومو (عجول)': 'FOMO',
+    'مضطرب': 'Anxious',
+    'خنثی': 'Neutral',
+    'با اطمینان': 'Confident',
+    'باطمینان': 'Confident',
+    'نامشخص': 'Unknown',
   };
-  if (standardMap[emotion]) {
-    return standardMap[emotion];
+
+  const englishToPersian: Record<string, string> = {
+    CONFIDENT: 'با اطمینان',
+    NEUTRAL: 'خنثی',
+    ANXIOUS: 'مضطرب',
+    FOMO: 'فومو (عجول)',
+    REVENGE: 'انتقامی',
+    UNKNOWN: 'نامشخص',
+  };
+
+  if (isEn) {
+    if (persianToEnglish[trimmed]) return persianToEnglish[trimmed];
+    if (upper === 'REVENGE') return 'Revenge';
+    if (upper === 'FOMO') return 'FOMO';
+    if (upper === 'ANXIOUS') return 'Anxious';
+    if (upper === 'CONFIDENT') return 'Confident';
+    if (upper === 'NEUTRAL') return 'Neutral';
+    if (upper === 'UNKNOWN') return 'Unknown';
+  } else {
+    if (englishToPersian[upper]) return englishToPersian[upper];
+    if (persianToEnglish[trimmed]) return trimmed;
   }
+
   if (emotionsList) {
-    const found = emotionsList.find(e => e.value === emotion);
-    return found ? found.label : emotion;
+    const found = emotionsList.find(
+      e => e.value === trimmed || e.value.toUpperCase() === upper || e.label === trimmed
+    );
+    if (found) {
+      if (isEn && persianToEnglish[found.label]) {
+        return persianToEnglish[found.label];
+      }
+      if (!isEn && englishToPersian[found.value.toUpperCase()]) {
+        return englishToPersian[found.value.toUpperCase()];
+      }
+      return found.label;
+    }
   }
+
   return emotion;
 };
 

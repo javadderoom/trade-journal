@@ -192,6 +192,7 @@ interface FetchTradesParams {
   sortKey?: string;
   sortDir?: 'asc' | 'desc';
   search?: string;
+  emotion?: string;
   symbol?: string;
   direction?: 'BUY' | 'SELL';
   status?: 'OPEN' | 'CLOSED';
@@ -228,6 +229,7 @@ export const useTradeStore = create<TradeState>((set, get) => ({
         sortKey = 'date',
         sortDir = 'desc',
         search,
+        emotion,
         symbol,
         direction,
         status,
@@ -249,6 +251,7 @@ export const useTradeStore = create<TradeState>((set, get) => ({
       });
 
       if (search) queryParams.append('search', search);
+      if (emotion) queryParams.append('emotion', emotion);
       if (symbol) queryParams.append('symbol', symbol);
       if (direction) queryParams.append('direction', direction);
       if (status) queryParams.append('status', status);
