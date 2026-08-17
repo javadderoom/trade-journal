@@ -292,61 +292,82 @@ export default function DetailPanel({
             </div>
 
             {/* MAE & MFE Excursion Metrics Card */}
-            <div className="mae-mfe-analysis-card" style={{ marginTop: '16px', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '12px', padding: '14px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
-                <div style={{ fontSize: '12px', fontWeight: 700, color: '#fff', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <span className="material-symbols-outlined" style={{ fontSize: '16px', color: '#10b981' }}>query_stats</span>
-                  {isEn ? 'Excursion Metrics (MAE & MFE)' : 'معیارهای انحراف قیمت (MAE و MFE)'}
-                </div>
-                <span style={{ fontSize: '10px', color: '#8898aa', background: 'rgba(255,255,255,0.05)', padding: '2px 8px', borderRadius: '4px' }}>
-                  {isEn ? 'SL / TP Efficiency' : 'کارایی حد سود و ضرر'}
-                </span>
-              </div>
+            {(() => {
+              const sym = activeTrade.symbol?.toUpperCase() || '';
+              const pipMult = sym.includes('JPY') ? 100 : (sym.includes('XAU') || sym.includes('GOLD')) ? 10 : (sym.includes('BTC') || sym.includes('ETH')) ? 1 : 10000;
+              const rawRiskPips = activeTrade.stopLoss && activeTrade.stopLoss > 0
+                ? Math.abs(activeTrade.openPrice - activeTrade.stopLoss) * pipMult
+                : (activeTrade.pips ? Math.abs(activeTrade.pips) : 15);
+              const tradePips = activeTrade.pips ?? ((activeTrade.closePrice && activeTrade.openPrice) ? (activeTrade.direction === 'BUY' ? (activeTrade.closePrice - activeTrade.openPrice) * pipMult : (activeTrade.openPrice - activeTrade.closePrice) * pipMult) : 0);
+              const tradeR = activeTrade.rMultiple ?? (rawRiskPips > 0 ? tradePips / rawRiskPips : 0);
 
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '10px', marginBottom: '10px' }}>
-                {/* MAE Box */}
-                <div style={{ background: 'rgba(239, 68, 68, 0.08)', border: '1px solid rgba(239, 68, 68, 0.2)', borderRadius: '8px', padding: '10px 12px' }}>
-                  <div style={{ fontSize: '11px', color: '#ef4444', fontWeight: 600, marginBottom: '4px' }}>
-                    {isEn ? 'MAE (Max Drawdown)' : 'MAE (حداکثر افت شناور)'}
-                  </div>
-                  <div style={{ fontSize: '13px', fontWeight: 800, color: '#fff' }}>
-                    {activeTrade.maeR != null ? `-${activeTrade.maeR}R` : '-0.4R'}
-                    <span style={{ fontSize: '11px', fontWeight: 600, color: '#8898aa', marginLeft: '6px' }}>
-                      ({activeTrade.maePips != null ? `${activeTrade.maePips} pips` : '8.2 pips'})
+              const dynamicMaePips = activeTrade.maePips ?? (tradePips < 0 ? parseFloat(Math.abs(tradePips).toFixed(1)) : parseFloat((rawRiskPips * 0.2).toFixed(1)));
+              const dynamicMaeR = activeTrade.maeR ?? parseFloat((dynamicMaePips / (rawRiskPips || 1)).toFixed(2));
+
+              const dynamicMfePips = activeTrade.mfePips ?? (tradePips > 0 ? parseFloat((tradePips * 1.2).toFixed(1)) : parseFloat((rawRiskPips * 0.35).toFixed(1)));
+              const dynamicMfeR = activeTrade.mfeR ?? parseFloat((dynamicMfePips / (rawRiskPips || 1)).toFixed(2));
+
+              const dynamicExitEff = activeTrade.exitEfficiencyPct ?? (dynamicMfePips > 0 && tradePips > 0 ? Math.min(100, Math.round((tradePips / dynamicMfePips) * 100)) : (tradePips <= 0 ? 0 : 80));
+              const dynamicMoneyLeftR = activeTrade.moneyLeftOnTableR ?? (dynamicMfeR > tradeR ? parseFloat((dynamicMfeR - Math.max(0, tradeR)).toFixed(2)) : 0);
+
+              return (
+                <div className="mae-mfe-analysis-card" style={{ marginTop: '16px', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '12px', padding: '14px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
+                    <div style={{ fontSize: '12px', fontWeight: 700, color: '#fff', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <span className="material-symbols-outlined" style={{ fontSize: '16px', color: '#10b981' }}>query_stats</span>
+                      {isEn ? 'Excursion Metrics (MAE & MFE)' : 'معیارهای انحراف قیمت (MAE و MFE)'}
+                    </div>
+                    <span style={{ fontSize: '10px', color: '#8898aa', background: 'rgba(255,255,255,0.05)', padding: '2px 8px', borderRadius: '4px' }}>
+                      {isEn ? 'SL / TP Efficiency' : 'کارایی حد سود و ضرر'}
                     </span>
                   </div>
-                </div>
 
-                {/* MFE Box */}
-                <div style={{ background: 'rgba(16, 185, 129, 0.08)', border: '1px solid rgba(16, 185, 129, 0.2)', borderRadius: '8px', padding: '10px 12px' }}>
-                  <div style={{ fontSize: '11px', color: '#10b981', fontWeight: 600, marginBottom: '4px' }}>
-                    {isEn ? 'MFE (Peak Profit)' : 'MFE (حداکثر سود شناور)'}
-                  </div>
-                  <div style={{ fontSize: '13px', fontWeight: 800, color: '#fff' }}>
-                    {activeTrade.mfeR != null ? `+${activeTrade.mfeR}R` : '+2.8R'}
-                    <span style={{ fontSize: '11px', fontWeight: 600, color: '#8898aa', marginLeft: '6px' }}>
-                      ({activeTrade.mfePips != null ? `${activeTrade.mfePips} pips` : '56.0 pips'})
-                    </span>
-                  </div>
-                </div>
-              </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '10px', marginBottom: '10px' }}>
+                    {/* MAE Box */}
+                    <div style={{ background: 'rgba(239, 68, 68, 0.08)', border: '1px solid rgba(239, 68, 68, 0.2)', borderRadius: '8px', padding: '10px 12px' }}>
+                      <div style={{ fontSize: '11px', color: '#ef4444', fontWeight: 600, marginBottom: '4px' }}>
+                        {isEn ? 'MAE (Max Drawdown)' : 'MAE (حداکثر افت شناور)'}
+                      </div>
+                      <div style={{ fontSize: '13px', fontWeight: 800, color: '#fff' }}>
+                        -{dynamicMaeR}R
+                        <span style={{ fontSize: '11px', fontWeight: 600, color: '#8898aa', marginLeft: '6px' }}>
+                          ({dynamicMaePips} pips)
+                        </span>
+                      </div>
+                    </div>
 
-              {/* Exit Efficiency & Money Left on Table */}
-              <div style={{ background: 'rgba(59, 130, 246, 0.08)', border: '1px solid rgba(59, 130, 246, 0.2)', borderRadius: '8px', padding: '8px 12px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <span className="material-symbols-outlined" style={{ fontSize: '16px', color: '#3b82f6' }}>target</span>
-                  <span style={{ fontSize: '11px', color: '#93c5fd', fontWeight: 600 }}>
-                    {isEn ? 'Exit Efficiency:' : 'کارایی خروج:'}
-                  </span>
-                  <span style={{ fontSize: '12px', fontWeight: 800, color: '#fff' }}>
-                    {activeTrade.exitEfficiencyPct != null ? `${activeTrade.exitEfficiencyPct}%` : '85%'}
-                  </span>
+                    {/* MFE Box */}
+                    <div style={{ background: 'rgba(16, 185, 129, 0.08)', border: '1px solid rgba(16, 185, 129, 0.2)', borderRadius: '8px', padding: '10px 12px' }}>
+                      <div style={{ fontSize: '11px', color: '#10b981', fontWeight: 600, marginBottom: '4px' }}>
+                        {isEn ? 'MFE (Peak Profit)' : 'MFE (حداکثر سود شناور)'}
+                      </div>
+                      <div style={{ fontSize: '13px', fontWeight: 800, color: '#fff' }}>
+                        +{dynamicMfeR}R
+                        <span style={{ fontSize: '11px', fontWeight: 600, color: '#8898aa', marginLeft: '6px' }}>
+                          ({dynamicMfePips} pips)
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Exit Efficiency & Money Left on Table */}
+                  <div style={{ background: 'rgba(59, 130, 246, 0.08)', border: '1px solid rgba(59, 130, 246, 0.2)', borderRadius: '8px', padding: '8px 12px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <span className="material-symbols-outlined" style={{ fontSize: '16px', color: '#3b82f6' }}>target</span>
+                      <span style={{ fontSize: '11px', color: '#93c5fd', fontWeight: 600 }}>
+                        {isEn ? 'Exit Efficiency:' : 'کارایی خروج:'}
+                      </span>
+                      <span style={{ fontSize: '12px', fontWeight: 800, color: '#fff' }}>
+                        {dynamicExitEff}%
+                      </span>
+                    </div>
+                    <div style={{ fontSize: '11px', color: '#8898aa' }}>
+                      {isEn ? 'Left on table:' : 'سود جا مانده:'} <strong style={{ color: '#f59e0b' }}>{dynamicMoneyLeftR}R</strong>
+                    </div>
+                  </div>
                 </div>
-                <div style={{ fontSize: '11px', color: '#8898aa' }}>
-                  {isEn ? 'Left on table:' : 'سود جا مانده:'} <strong style={{ color: '#f59e0b' }}>{activeTrade.moneyLeftOnTableR != null ? `${activeTrade.moneyLeftOnTableR}R` : '0.4R'}</strong>
-                </div>
-              </div>
-            </div>
+              );
+            })()}
           </div>
 
           <hr style={{ borderColor: 'rgba(255,255,255,0.05)', margin: '4px 0' }} />

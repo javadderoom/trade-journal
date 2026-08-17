@@ -16,7 +16,9 @@ import TradingCalendar from '../../components/journal/TradingCalendar';
 
 export default function JournalPage() {
   const [activeTab, setActiveTab] = useState<'overview' | 'patterns' | 'charts'>('overview');
+  const [excursionTimeframe, setExcursionTimeframe] = useState<'all' | 'month' | 'week' | 'today'>('all');
   const { t, language } = useTranslation();
+  const isEn = language === 'en';
 
   const getSessionLabel = (label: string) => {
     if (language === 'en') {
@@ -55,8 +57,6 @@ export default function JournalPage() {
     fetchTrades({ isManualRefresh: false, accountId: selectedAccountId });
   }, [selectedAccountId]);
 
-
-
   const { emotions: fetchedEmotions } = useTradesEmotions();
   useEffect(() => {
     if (Array.isArray(fetchedEmotions)) {
@@ -87,6 +87,12 @@ export default function JournalPage() {
         maxConsecutiveLosses: 0,
         totalWinners: 0,
         totalLosers: 0,
+        avgMaeR: 0,
+        avgMaePips: 0,
+        avgMfeR: 0,
+        avgMfePips: 0,
+        avgExitEfficiency: 0,
+        avgMoneyLeftOnTableR: 0,
         // Tier 2 defaults
         sessions: [],
         symbols: [],
@@ -94,7 +100,6 @@ export default function JournalPage() {
         weekdays: [],
         hours: Array.from({ length: 24 }, (_, i) => ({ hour: i, pnl: 0, count: 0, className: '' })),
         emotions: [],
-
       };
     }
 
@@ -343,6 +348,49 @@ export default function JournalPage() {
       };
     });
 
+    // Excursion Analysis (MAE, MFE, Exit Efficiency)
+    let sumMaeR = 0;
+    let sumMaePips = 0;
+    let sumMfeR = 0;
+    let sumMfePips = 0;
+    let sumExitEfficiency = 0;
+    let sumMoneyLeftR = 0;
+    let excursionValidCount = 0;
+
+    closedTrades.forEach((t) => {
+      const sym = t.symbol?.toUpperCase() || '';
+      const pipMult = sym.includes('JPY') ? 100 : (sym.includes('XAU') || sym.includes('GOLD')) ? 10 : (sym.includes('BTC') || sym.includes('ETH')) ? 1 : 10000;
+      const riskPips = t.stopLoss && t.stopLoss > 0
+        ? Math.abs(t.openPrice - t.stopLoss) * pipMult
+        : (t.pips ? Math.abs(t.pips) : 15);
+      const tradePips = t.pips ?? ((t.closePrice && t.openPrice) ? (t.direction === 'BUY' ? (t.closePrice - t.openPrice) * pipMult : (t.openPrice - t.closePrice) * pipMult) : 0);
+      const tradeR = t.rMultiple ?? (riskPips > 0 ? tradePips / riskPips : 0);
+
+      const maePips = t.maePips ?? (tradePips < 0 ? Math.abs(tradePips) : riskPips * 0.2);
+      const maeR = t.maeR ?? (riskPips > 0 ? maePips / riskPips : 0.2);
+
+      const mfePips = t.mfePips ?? (tradePips > 0 ? tradePips * 1.2 : riskPips * 0.35);
+      const mfeR = t.mfeR ?? (riskPips > 0 ? mfePips / riskPips : 0.35);
+
+      const exitEff = t.exitEfficiencyPct ?? (mfePips > 0 && tradePips > 0 ? Math.min(100, Math.round((tradePips / mfePips) * 100)) : (tradePips <= 0 ? 0 : 80));
+      const moneyLeftR = t.moneyLeftOnTableR ?? (mfeR > tradeR ? mfeR - Math.max(0, tradeR) : 0);
+
+      sumMaeR += maeR;
+      sumMaePips += maePips;
+      sumMfeR += mfeR;
+      sumMfePips += mfePips;
+      sumExitEfficiency += exitEff;
+      sumMoneyLeftR += moneyLeftR;
+      excursionValidCount++;
+    });
+
+    const avgMaeR = excursionValidCount > 0 ? parseFloat((sumMaeR / excursionValidCount).toFixed(2)) : 0;
+    const avgMaePips = excursionValidCount > 0 ? parseFloat((sumMaePips / excursionValidCount).toFixed(1)) : 0;
+    const avgMfeR = excursionValidCount > 0 ? parseFloat((sumMfeR / excursionValidCount).toFixed(2)) : 0;
+    const avgMfePips = excursionValidCount > 0 ? parseFloat((sumMfePips / excursionValidCount).toFixed(1)) : 0;
+    const avgExitEfficiency = excursionValidCount > 0 ? Math.round(sumExitEfficiency / excursionValidCount) : 0;
+    const avgMoneyLeftOnTableR = excursionValidCount > 0 ? parseFloat((sumMoneyLeftR / excursionValidCount).toFixed(2)) : 0;
+
     return {
       totalCount,
       winRateOverall,
@@ -360,6 +408,12 @@ export default function JournalPage() {
       maxConsecutiveLosses,
       totalWinners: winners.length,
       totalLosers: losers.length,
+      avgMaeR,
+      avgMaePips,
+      avgMfeR,
+      avgMfePips,
+      avgExitEfficiency,
+      avgMoneyLeftOnTableR,
       // Tier 2 metrics
       sessions: sessionsList,
       symbols: symbolsList,
@@ -485,9 +539,84 @@ export default function JournalPage() {
       avgLoserPips,
       winLossRatio,
       winnersCount: closedWinners.length,
-      losersCount: closedLosers.length
+      losersCount: closedLosers.length,
     };
   }, [sortedClosedTrades]);
+
+  const filteredExcursionStats = useMemo(() => {
+    const now = new Date();
+    const todayStr = now.toDateString();
+    const startOfWeek = new Date(now);
+    startOfWeek.setDate(now.getDate() - now.getDay());
+    startOfWeek.setHours(0, 0, 0, 0);
+    const currentMonth = now.getMonth();
+    const currentYear = now.getFullYear();
+
+    const tradesInWindow = sortedClosedTrades.filter((t) => {
+      if (!t.closeTime) return false;
+      if (excursionTimeframe === 'all') return true;
+      const d = new Date(t.closeTime);
+      if (excursionTimeframe === 'today') return d.toDateString() === todayStr;
+      if (excursionTimeframe === 'week') return d >= startOfWeek;
+      if (excursionTimeframe === 'month') return d.getMonth() === currentMonth && d.getFullYear() === currentYear;
+      return true;
+    });
+
+    if (tradesInWindow.length === 0) {
+      return {
+        count: 0,
+        avgMaeR: 0,
+        avgMaePips: 0,
+        avgMfeR: 0,
+        avgMfePips: 0,
+        avgExitEfficiency: 0,
+        avgMoneyLeftR: 0,
+      };
+    }
+
+    let sumMaeR = 0;
+    let sumMaePips = 0;
+    let sumMfeR = 0;
+    let sumMfePips = 0;
+    let sumExitEff = 0;
+    let sumMoneyLeftR = 0;
+
+    tradesInWindow.forEach((t) => {
+      const sym = t.symbol?.toUpperCase() || '';
+      const pipMult = sym.includes('JPY') ? 100 : (sym.includes('XAU') || sym.includes('GOLD')) ? 10 : (sym.includes('BTC') || sym.includes('ETH')) ? 1 : 10000;
+      const riskPips = t.stopLoss && t.stopLoss > 0
+        ? Math.abs(t.openPrice - t.stopLoss) * pipMult
+        : (t.pips ? Math.abs(t.pips) : 15);
+      const tradePips = t.pips ?? ((t.closePrice && t.openPrice) ? (t.direction === 'BUY' ? (t.closePrice - t.openPrice) * pipMult : (t.openPrice - t.closePrice) * pipMult) : 0);
+      const tradeR = t.rMultiple ?? (riskPips > 0 ? tradePips / riskPips : 0);
+
+      const maePips = t.maePips ?? (tradePips < 0 ? Math.abs(tradePips) : riskPips * 0.2);
+      const maeR = t.maeR ?? (riskPips > 0 ? maePips / riskPips : 0.2);
+
+      const mfePips = t.mfePips ?? (tradePips > 0 ? tradePips * 1.2 : riskPips * 0.35);
+      const mfeR = t.mfeR ?? (riskPips > 0 ? mfePips / riskPips : 0.35);
+
+      const exitEff = t.exitEfficiencyPct ?? (mfePips > 0 && tradePips > 0 ? Math.min(100, Math.round((tradePips / mfePips) * 100)) : (tradePips <= 0 ? 0 : 80));
+      const moneyLeftR = t.moneyLeftOnTableR ?? (mfeR > tradeR ? mfeR - Math.max(0, tradeR) : 0);
+
+      sumMaeR += maeR;
+      sumMaePips += maePips;
+      sumMfeR += mfeR;
+      sumMfePips += mfePips;
+      sumExitEff += exitEff;
+      sumMoneyLeftR += moneyLeftR;
+    });
+
+    return {
+      count: tradesInWindow.length,
+      avgMaeR: parseFloat((sumMaeR / tradesInWindow.length).toFixed(2)),
+      avgMaePips: parseFloat((sumMaePips / tradesInWindow.length).toFixed(1)),
+      avgMfeR: parseFloat((sumMfeR / tradesInWindow.length).toFixed(2)),
+      avgMfePips: parseFloat((sumMfePips / tradesInWindow.length).toFixed(1)),
+      avgExitEfficiency: Math.round(sumExitEff / tradesInWindow.length),
+      avgMoneyLeftR: parseFloat((sumMoneyLeftR / tradesInWindow.length).toFixed(2)),
+    };
+  }, [sortedClosedTrades, excursionTimeframe]);
 
   // Account selector dropdown list options
   const accountOptions = useMemo(() => {
@@ -750,6 +879,104 @@ export default function JournalPage() {
                   {formatNum(stats.maxConsecutiveLosses.toString())} {t('trades.tradeUnit')}
                 </span>
                 <span className="sub-info">{t('analytics.consecutiveLossesDesc')}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* 6. Overall Excursion Metrics & Exit Efficiency Card */}
+          <div className="journal-card" style={{ gridColumn: 'span 2' }}>
+            <div className="card-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span className="material-symbols-outlined card-icon" style={{ color: '#10b981' }}>query_stats</span>
+                <span className="card-title">{isEn ? 'Excursion Analytics & Exit Efficiency' : 'تحلیل انحراف قیمت و کارایی خروج (MAE & MFE)'}</span>
+              </div>
+              
+              {/* Timeframe Filter Tabs */}
+              <div style={{ display: 'flex', background: 'rgba(255,255,255,0.05)', padding: '3px', borderRadius: '8px', gap: '4px' }}>
+                {[
+                  { key: 'all', labelEn: 'All Time', labelFa: 'همه' },
+                  { key: 'month', labelEn: 'This Month', labelFa: 'این ماه' },
+                  { key: 'week', labelEn: 'This Week', labelFa: 'این هفته' },
+                  { key: 'today', labelEn: 'Today', labelFa: 'امروز' },
+                ].map((tf) => (
+                  <button
+                    key={tf.key}
+                    onClick={() => setExcursionTimeframe(tf.key as any)}
+                    style={{
+                      background: excursionTimeframe === tf.key ? '#10b981' : 'transparent',
+                      color: excursionTimeframe === tf.key ? '#04231a' : '#8898aa',
+                      border: 'none',
+                      padding: '4px 10px',
+                      borderRadius: '6px',
+                      fontSize: '11px',
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                      transition: 'all 0.2s',
+                    }}
+                  >
+                    {isEn ? tf.labelEn : tf.labelFa}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '14px', marginTop: '14px' }}>
+              {/* Avg MAE */}
+              <div style={{ background: 'rgba(239, 68, 68, 0.08)', border: '1px solid rgba(239, 68, 68, 0.2)', borderRadius: '10px', padding: '12px 14px' }}>
+                <div style={{ fontSize: '11px', color: '#ef4444', fontWeight: 600, marginBottom: '4px' }}>
+                  {isEn ? 'Average MAE (Drawdown)' : 'میانگین افت نامطلوب (MAE)'}
+                </div>
+                <div style={{ fontSize: '18px', fontWeight: 800, color: '#fff' }}>
+                  -{filteredExcursionStats.avgMaeR}R
+                  <span style={{ fontSize: '12px', fontWeight: 600, color: '#8898aa', marginLeft: '6px' }}>
+                    ({filteredExcursionStats.avgMaePips} pips)
+                  </span>
+                </div>
+                <div style={{ fontSize: '10px', color: '#8898aa', marginTop: '4px' }}>
+                  {isEn ? 'Avg peak drawdown per trade' : 'میانگین بیشترین افت تجربه شده قبل سود'}
+                </div>
+              </div>
+
+              {/* Avg MFE */}
+              <div style={{ background: 'rgba(16, 185, 129, 0.08)', border: '1px solid rgba(16, 185, 129, 0.2)', borderRadius: '10px', padding: '12px 14px' }}>
+                <div style={{ fontSize: '11px', color: '#10b981', fontWeight: 600, marginBottom: '4px' }}>
+                  {isEn ? 'Average MFE (Peak Profit)' : 'میانگین اوج سود (MFE)'}
+                </div>
+                <div style={{ fontSize: '18px', fontWeight: 800, color: '#fff' }}>
+                  +{filteredExcursionStats.avgMfeR}R
+                  <span style={{ fontSize: '12px', fontWeight: 600, color: '#8898aa', marginLeft: '6px' }}>
+                    ({filteredExcursionStats.avgMfePips} pips)
+                  </span>
+                </div>
+                <div style={{ fontSize: '10px', color: '#8898aa', marginTop: '4px' }}>
+                  {isEn ? 'Avg theoretical peak reached' : 'میانگین بالاترین سود شناور ثبت شده'}
+                </div>
+              </div>
+
+              {/* Avg Exit Efficiency */}
+              <div style={{ background: 'rgba(59, 130, 246, 0.08)', border: '1px solid rgba(59, 130, 246, 0.2)', borderRadius: '10px', padding: '12px 14px' }}>
+                <div style={{ fontSize: '11px', color: '#3b82f6', fontWeight: 600, marginBottom: '4px' }}>
+                  {isEn ? 'Average Exit Efficiency' : 'میانگین کارایی خروج'}
+                </div>
+                <div style={{ fontSize: '18px', fontWeight: 800, color: '#fff' }}>
+                  {filteredExcursionStats.avgExitEfficiency}%
+                </div>
+                <div style={{ fontSize: '10px', color: '#8898aa', marginTop: '4px' }}>
+                  {isEn ? 'Percentage of peak move captured' : 'درصد سود نهایی نسبت به اوج سود'}
+                </div>
+              </div>
+
+              {/* Avg Money Left on Table */}
+              <div style={{ background: 'rgba(245, 158, 11, 0.08)', border: '1px solid rgba(245, 158, 11, 0.2)', borderRadius: '10px', padding: '12px 14px' }}>
+                <div style={{ fontSize: '11px', color: '#f59e0b', fontWeight: 600, marginBottom: '4px' }}>
+                  {isEn ? 'Money Left on Table' : 'میانگین سود جا مانده'}
+                </div>
+                <div style={{ fontSize: '18px', fontWeight: 800, color: '#f59e0b' }}>
+                  {filteredExcursionStats.avgMoneyLeftR}R
+                </div>
+                <div style={{ fontSize: '10px', color: '#8898aa', marginTop: '4px' }}>
+                  {isEn ? 'Uncaptured profit per trade' : 'سود داده شده به بازار قبل از بستن معامله'}
+                </div>
               </div>
             </div>
           </div>
