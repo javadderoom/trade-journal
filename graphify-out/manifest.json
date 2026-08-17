@@ -5,8 +5,8 @@
     "semantic_hash": ""
   },
   "apps/api/src/routes/tradeSync.ts": {
-    "mtime": 1786608452.5447402,
-    "ast_hash": "332a6574331c78f6b146333bda14f66c",
+    "mtime": 1786995878.2640178,
+    "ast_hash": "9adf23069a08877f9c28b97b71330857",
     "semantic_hash": ""
   },
   "apps/api/src/server.ts": {
@@ -20,8 +20,8 @@
     "semantic_hash": ""
   },
   "apps/api/src/services/tradeSync.ts": {
-    "mtime": 1786608430.1187732,
-    "ast_hash": "8ae97e947715c9a3ccf4135776e253c1",
+    "mtime": 1786994603.8483026,
+    "ast_hash": "039bd137bfbbce819ff2f9447eed3b46",
     "semantic_hash": ""
   },
   "apps/api/src/types/index.ts": {
@@ -195,8 +195,8 @@
     "semantic_hash": ""
   },
   "apps/web/src/components/trades/DetailPanel.tsx": {
-    "mtime": 1786986790.8359568,
-    "ast_hash": "cf9181334a4f4bb3a97acf2244c10f97",
+    "mtime": 1786997410.060252,
+    "ast_hash": "85e98be1d6cd1d5ba0081e4060981f03",
     "semantic_hash": ""
   },
   "apps/web/src/components/trades/FilterBar.tsx": {
@@ -220,8 +220,8 @@
     "semantic_hash": ""
   },
   "apps/web/src/components/trades/TradesTable.tsx": {
-    "mtime": 1786991090.6553814,
-    "ast_hash": "71f8634bcb46542638ac47e58555641f",
+    "mtime": 1786997454.697023,
+    "ast_hash": "561a33b4680874390b2e27f21518020f",
     "semantic_hash": ""
   },
   "apps/web/src/components/ui/Select.tsx": {
@@ -235,8 +235,8 @@
     "semantic_hash": ""
   },
   "apps/web/src/store/useTradeStore.ts": {
-    "mtime": 1786555072.163167,
-    "ast_hash": "447896969387da9a90c8fd7280187a72",
+    "mtime": 1786996313.999503,
+    "ast_hash": "ae28c0e856a1ce5de39805e3f1318c05",
     "semantic_hash": ""
   },
   "apps/web/public/logo.png": {
@@ -1190,8 +1190,8 @@
     "semantic_hash": ""
   },
   "apps/api/src/validators/trade.ts": {
-    "mtime": 1786295996.8641145,
-    "ast_hash": "07450d97648861cb5e5ffff6e0c04307",
+    "mtime": 1786995340.45085,
+    "ast_hash": "0c21b9a3c0a04ef62a44246169d440da",
     "semantic_hash": ""
   },
   "apps/web/src/app/analytics/loading.tsx": {
@@ -1325,8 +1325,8 @@
     "semantic_hash": ""
   },
   "apps/web/src/types/trade.ts": {
-    "mtime": 1786907205.707284,
-    "ast_hash": "0631d88b9301af53fe00a3bd18341843",
+    "mtime": 1786995994.3369493,
+    "ast_hash": "a554fc61691e4497016849ee3fc96ec4",
     "semantic_hash": ""
   },
   "apps/web/src/utils/otp.ts": {
@@ -1775,8 +1775,8 @@
     "semantic_hash": ""
   },
   "apps/web/src/components/trades/TradeReviewPage.tsx": {
-    "mtime": 1786295996.9007967,
-    "ast_hash": "8dfe4cffa0257cf1141f0ec6c8aade99",
+    "mtime": 1786996386.6617284,
+    "ast_hash": "b40b711d1e5db6bf07eec58df3df384b",
     "semantic_hash": ""
   },
   "apps/api/audit_output.txt": {
@@ -2087,6 +2087,11 @@
   "apps/web/public/hero_trade_chart.png": {
     "mtime": 1786720260.192343,
     "ast_hash": "88bda264f5d69406c33756b296b57aed",
+    "semantic_hash": ""
+  },
+  "apps/api/src/prisma/migrations/20260817191943_add_market_conditions/migration.sql": {
+    "mtime": 1786994383.7902892,
+    "ast_hash": "1569da18c4bf13f368f9d5ce344d4078",
     "semantic_hash": ""
   }
 }

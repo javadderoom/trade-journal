@@ -1,4 +1,5 @@
 export type Timeframe = 'M1' | 'M5' | 'M15' | 'M30' | 'H1' | 'H4' | 'D1' | 'W1' | 'MN1';
+export type MarketCondition = 'TRENDING' | 'TRENDING_RANGE' | 'SIDEWAYS';
 
 export interface Trade {
   id: string;
@@ -29,6 +30,7 @@ export interface Trade {
   annotation?: {
     htfBias?: 'BUY' | 'SELL' | null;
     session?: 'ASIA' | 'LONDON' | 'NEW_YORK' | 'OVERLAP' | null;
+    marketCondition?: MarketCondition | null;
     analysisTimeframe?: Timeframe | null;
     entryTimeframe?: Timeframe | null;
     thesis?: string | null;

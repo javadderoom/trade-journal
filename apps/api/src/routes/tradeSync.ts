@@ -302,6 +302,7 @@ router.post('/', authenticate, checkTradeLimit, async (req: AuthRequest, res: Re
       symbol, direction, lotSize, openPrice, openTime,
       stopLoss, takeProfit, closePrice, closeTime,
       profitUsd, commission, swap, accountId, emotion, notes,
+      htfBias, session, marketCondition, analysisTimeframe, entryTimeframe, thesis, expectation, lesson, conviction,
     } = parsed.data;
 
     const userId = req.user!.userId;
@@ -398,6 +399,15 @@ pips: pips,
             trade_id: trade.id,
             emotion: emotion ?? null,
             notes: notes ?? null,
+            market_condition: marketCondition ?? null,
+            htf_bias: htfBias ?? null,
+            session: session ?? null,
+            analysis_timeframe: analysisTimeframe ?? null,
+            entry_timeframe: entryTimeframe ?? null,
+            thesis: thesis ?? null,
+            expectation: expectation ?? null,
+            lesson: lesson ?? null,
+            conviction: conviction ?? null,
           },
         });
 
@@ -471,7 +481,7 @@ router.put('/:id', authenticate, async (req: AuthRequest, res: Response) => {
       notes, emotion, stopLoss, takeProfit, accountId,
       closeTime, closePrice, profitUsd, commission, swap,
       symbol, direction, lotSize, openPrice, openTime,
-      htfBias, session, analysisTimeframe, entryTimeframe, thesis, expectation, lesson, conviction,
+      htfBias, session, marketCondition, analysisTimeframe, entryTimeframe, thesis, expectation, lesson, conviction,
       setupId, triggerIds, confluenceIds, plan
     } = parsed.data;
 
@@ -593,6 +603,7 @@ const updated = await prisma.$transaction(async (tx) => {
        if (emotion !== undefined) annotationData.emotion = emotion;
        if (htfBias !== undefined) annotationData.htf_bias = htfBias;
        if (session !== undefined) annotationData.session = session;
+       if (marketCondition !== undefined) annotationData.market_condition = marketCondition;
        if (analysisTimeframe !== undefined) annotationData.analysis_timeframe = analysisTimeframe;
        if (entryTimeframe !== undefined) annotationData.entry_timeframe = entryTimeframe;
        if (thesis !== undefined) annotationData.thesis = thesis;

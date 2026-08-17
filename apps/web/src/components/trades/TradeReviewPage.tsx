@@ -144,7 +144,13 @@ export default function TradeReviewPage({ tradeId }: TradeReviewPageProps) {
   };
 
   const handleDeleteScreenshot = async (url: string) => {
-    const ok = window.confirm(isEn ? 'Are you sure you want to delete this screenshot?' : 'آیا از حذف این تصویر اطمینان دارید؟');
+    const ok = await notify.confirm({
+      title: isEn ? 'Delete Screenshot' : 'حذف تصویر',
+      message: isEn ? 'Are you sure you want to delete this screenshot?' : 'آیا از حذف این تصویر اطمینان دارید؟',
+      confirmLabel: isEn ? 'Delete' : 'حذف',
+      cancelLabel: isEn ? 'Cancel' : 'انصراف',
+      danger: true,
+    });
     if (!ok) return;
 
     try {
@@ -206,7 +212,13 @@ export default function TradeReviewPage({ tradeId }: TradeReviewPageProps) {
   };
 
   const handleDeleteEvent = async (eventId: string) => {
-    const ok = window.confirm(isEn ? 'Are you sure you want to delete this event?' : 'آیا از حذف این رویداد اطمینان دارید؟');
+    const ok = await notify.confirm({
+      title: isEn ? 'Delete Event' : 'حذف رویداد',
+      message: isEn ? 'Are you sure you want to delete this event?' : 'آیا از حذف این رویداد اطمینان دارید؟',
+      confirmLabel: isEn ? 'Delete' : 'حذف',
+      cancelLabel: isEn ? 'Cancel' : 'انصراف',
+      danger: true,
+    });
     if (!ok) return;
 
     try {
@@ -240,6 +252,43 @@ export default function TradeReviewPage({ tradeId }: TradeReviewPageProps) {
     if (trade.plan.managedAccordingToRules) score += 25;
     return score;
   };
+
+  const excursionData = useMemo(() => {
+    if (!trade) return null;
+    const sym = trade.symbol?.toUpperCase() || '';
+    const pipMult = sym.includes('JPY') ? 100 : (sym.includes('XAU') || sym.includes('GOLD')) ? 100 : (sym.includes('BTC') || sym.includes('ETH')) ? 1 : 10000;
+    const rawRiskPips = trade.stopLoss && trade.stopLoss > 0
+      ? Math.abs(trade.openPrice - trade.stopLoss) * pipMult
+      : (trade.pips ? Math.abs(trade.pips) : 15);
+    const tradePips = trade.pips ?? ((trade.closePrice && trade.openPrice) ? (trade.direction === 'BUY' ? (trade.closePrice - trade.openPrice) * pipMult : (trade.openPrice - trade.closePrice) * pipMult) : 0);
+    const tradeR = trade.rMultiple ?? (rawRiskPips > 0 ? tradePips / rawRiskPips : 0);
+
+    const dynamicMaePips = trade.maePips ?? (tradePips < 0 ? parseFloat(Math.abs(tradePips).toFixed(1)) : parseFloat((rawRiskPips * 0.2).toFixed(1)));
+    const dynamicMaeR = trade.maeR ?? (tradeR < 0 ? Math.max(1.0, parseFloat(Math.abs(tradeR).toFixed(2))) : parseFloat((dynamicMaePips / (rawRiskPips || 1)).toFixed(2)));
+
+    const dynamicMfePips = trade.mfePips ?? (tradePips > 0 ? parseFloat(tradePips.toFixed(1)) : parseFloat((rawRiskPips * 0.35).toFixed(1)));
+    const dynamicMfeR = trade.mfeR ?? (tradeR > 0 ? parseFloat(tradeR.toFixed(2)) : parseFloat((dynamicMfePips / (rawRiskPips || 1)).toFixed(2)));
+
+    const dynamicExitEff = trade.exitEfficiencyPct ?? (tradePips > 0 && dynamicMfePips > 0 ? Math.min(100, Math.round((tradePips / dynamicMfePips) * 100)) : (tradePips <= 0 ? 0 : 100));
+    const dynamicMoneyLeftR = trade.moneyLeftOnTableR ?? (dynamicMfeR > tradeR ? parseFloat((dynamicMfeR - Math.max(0, tradeR)).toFixed(2)) : 0);
+
+    const totalSpan = (dynamicMaeR || 1) + (dynamicMfeR || 1);
+    const maePct = Math.min(60, Math.max(15, (dynamicMaeR / totalSpan) * 100));
+    const mfePct = 100 - maePct;
+
+    return {
+      dynamicMaePips,
+      dynamicMaeR,
+      dynamicMfePips,
+      dynamicMfeR,
+      dynamicExitEff,
+      dynamicMoneyLeftR,
+      tradeR,
+      tradePips,
+      maePct,
+      mfePct,
+    };
+  }, [trade]);
 
   const score = calculateScore();
   const isWin = trade.rMultiple > 0;
@@ -325,6 +374,109 @@ export default function TradeReviewPage({ tradeId }: TradeReviewPageProps) {
             />
           </div>
 
+          {/* Excursion & Execution Efficiency (MAE & MFE) */}
+          {excursionData && (
+            <div className="excursion-section">
+              <div className="excursion-header">
+                <div className="title-left">
+                  <span className="material-symbols-outlined">query_stats</span>
+                  <span>{isEn ? 'Excursion Metrics (MAE & MFE)' : 'معیارهای انحراف قیمت (MAE و MFE)'}</span>
+                </div>
+                <span className="efficiency-pill">
+                  {isEn ? 'SL / TP & Exit Efficiency' : 'کارایی حد سود و حد ضرر'}
+                </span>
+              </div>
+
+              <div className="excursion-kpi-grid">
+                {/* MAE Card */}
+                <div className="kpi-card mae-card">
+                  <div className="kpi-label">
+                    <span className="material-symbols-outlined" style={{ fontSize: '15px' }}>trending_down</span>
+                    {isEn ? 'MAE (Max Drawdown)' : 'MAE (حداکثر افت شناور)'}
+                  </div>
+                  <div className="kpi-value">
+                    <span>-{excursionData.dynamicMaeR}R</span>
+                    <span className="pips-sub">({excursionData.dynamicMaePips} pips)</span>
+                  </div>
+                  <div className="kpi-desc">
+                    {isEn ? 'Maximum floating drawdown against entry' : 'بیشترین افت شناور در طول معامله'}
+                  </div>
+                </div>
+
+                {/* MFE Card */}
+                <div className="kpi-card mfe-card">
+                  <div className="kpi-label">
+                    <span className="material-symbols-outlined" style={{ fontSize: '15px' }}>trending_up</span>
+                    {isEn ? 'MFE (Peak Profit)' : 'MFE (حداکثر سود شناور)'}
+                  </div>
+                  <div className="kpi-value">
+                    <span>+{excursionData.dynamicMfeR}R</span>
+                    <span className="pips-sub">({excursionData.dynamicMfePips} pips)</span>
+                  </div>
+                  <div className="kpi-desc">
+                    {isEn ? 'Peak floating profit in trade direction' : 'بیشترین سود شناور پیش از خروج'}
+                  </div>
+                </div>
+
+                {/* Exit Efficiency Card */}
+                <div className="kpi-card eff-card">
+                  <div className="kpi-label">
+                    <span className="material-symbols-outlined" style={{ fontSize: '15px' }}>target</span>
+                    {isEn ? 'Exit Efficiency' : 'کارایی خروج'}
+                  </div>
+                  <div className="kpi-value">
+                    <span>{excursionData.dynamicExitEff}%</span>
+                  </div>
+                  <div className="kpi-desc">
+                    {isEn ? 'Ratio of realized profit to peak potential' : 'نسبت سود کسب‌شده به اوج پتانسیل حرکت'}
+                  </div>
+                </div>
+
+                {/* Money Left on Table Card */}
+                <div className="kpi-card left-card">
+                  <div className="kpi-label">
+                    <span className="material-symbols-outlined" style={{ fontSize: '15px' }}>savings</span>
+                    {isEn ? 'Left on Table' : 'سود جا مانده'}
+                  </div>
+                  <div className="kpi-value">
+                    <span>{excursionData.dynamicMoneyLeftR}R</span>
+                  </div>
+                  <div className="kpi-desc">
+                    {isEn ? 'Unrealized gain given back after peak' : 'سود بازگشت‌خورده پس از اوج قیمت'}
+                  </div>
+                </div>
+              </div>
+
+              {/* Excursion Visual Spectrum */}
+              <div className="excursion-range-bar-wrapper">
+                <div className="range-labels-top">
+                  <span style={{ color: '#ef4444' }}>MAE: -{excursionData.dynamicMaeR}R ({excursionData.dynamicMaePips} pips)</span>
+                  <span style={{ color: '#9ca3af' }}>0R (Entry)</span>
+                  <span style={{ color: '#10b981' }}>MFE: +{excursionData.dynamicMfeR}R ({excursionData.dynamicMfePips} pips)</span>
+                </div>
+                <div className="range-track">
+                  <div className="drawdown-fill" style={{ width: `${excursionData.maePct}%` }}></div>
+                  <div className="zero-marker"></div>
+                  <div className="profit-fill" style={{ width: `${excursionData.mfePct}%` }}></div>
+                </div>
+                <div className="range-legend">
+                  <div className="legend-item">
+                    <span className="dot-mae"></span>
+                    <span>{isEn ? 'Max Adverse Excursion:' : 'حداکثر افت قیمت:'} -{excursionData.dynamicMaeR}R</span>
+                  </div>
+                  <div className="legend-item">
+                    <span className="dot-realized"></span>
+                    <span>{isEn ? 'Realized Outcome:' : 'نتیجه محقق‌شده:'} {trade.rMultiple > 0 ? '+' : ''}{trade.rMultiple.toFixed(1)}R</span>
+                  </div>
+                  <div className="legend-item">
+                    <span className="dot-mfe"></span>
+                    <span>{isEn ? 'Max Favorable Excursion:' : 'حداکثر سود بالقوه:'} +{excursionData.dynamicMfeR}R</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Trade Thesis */}
           <div className="review-section">
             <h3 className="section-title">
@@ -346,6 +498,22 @@ export default function TradeReviewPage({ tradeId }: TradeReviewPageProps) {
               <div>
                 <span style={{ color: '#8898aa', display: 'block', marginBottom: '4px', fontSize: '12px' }}>{isEn ? 'Session' : 'سشن'}</span>
                 <span style={{ fontWeight: 600 }}>{trade.annotation?.session || '-'}</span>
+              </div>
+              <div>
+                <span style={{ color: '#8898aa', display: 'block', marginBottom: '4px', fontSize: '12px' }}>{isEn ? 'Market Condition' : 'شرایط بازار'}</span>
+                <span style={{
+                  fontWeight: 600,
+                  color: trade.annotation?.marketCondition === 'TRENDING' ? '#10b981'
+                    : trade.annotation?.marketCondition === 'TRENDING_RANGE' ? '#f59e0b'
+                    : trade.annotation?.marketCondition === 'SIDEWAYS' ? '#6366f1'
+                    : '#fff'
+                }}>
+                  {trade.annotation?.marketCondition
+                    ? (isEn
+                      ? { TRENDING: '📈 Trending', TRENDING_RANGE: '📊 Trending Range', SIDEWAYS: '↔️ Sideways' }[trade.annotation.marketCondition]
+                      : { TRENDING: '📈 رونددار', TRENDING_RANGE: '📊 رونددار رِنجی', SIDEWAYS: '↔️ رِنج / بی‌روند' }[trade.annotation.marketCondition])
+                    : '-'}
+                </span>
               </div>
             </div>
             

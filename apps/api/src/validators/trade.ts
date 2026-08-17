@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { Direction, TradingSession, Timeframe } from '@prisma/client';
+import { Direction, TradingSession, Timeframe, MarketCondition } from '@prisma/client';
 
 const MAX_STRING_LENGTH = 255;
 const MAX_NOTES_LENGTH = 5000;
@@ -37,6 +37,7 @@ export const createTradeSchema = z.object({
   // New structured rationale
   htfBias: z.nativeEnum(Direction).nullable().optional(),
   session: z.nativeEnum(TradingSession).nullable().optional(),
+  marketCondition: z.nativeEnum(MarketCondition).nullable().optional(),
   analysisTimeframe: z.nativeEnum(Timeframe).nullable().optional(),
   entryTimeframe: z.nativeEnum(Timeframe).nullable().optional(),
   thesis: z.string().max(MAX_NOTES_LENGTH).nullable().optional(),
@@ -70,6 +71,7 @@ export const updateTradeSchema = z.object({
   // New structured rationale
   htfBias: z.nativeEnum(Direction).nullable().optional(),
   session: z.nativeEnum(TradingSession).nullable().optional(),
+  marketCondition: z.nativeEnum(MarketCondition).nullable().optional(),
   analysisTimeframe: z.nativeEnum(Timeframe).nullable().optional(),
   entryTimeframe: z.nativeEnum(Timeframe).nullable().optional(),
   thesis: z.string().max(MAX_NOTES_LENGTH).nullable().optional(),

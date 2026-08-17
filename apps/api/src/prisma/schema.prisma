@@ -162,6 +162,7 @@ model TradeAnnotation {
 
   htf_bias           Direction?
   session            TradingSession?
+  market_condition   MarketCondition?
   analysis_timeframe Timeframe?
   entry_timeframe    Timeframe?
 
@@ -176,6 +177,12 @@ model TradeAnnotation {
 
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
+}
+
+enum MarketCondition {
+  TRENDING
+  TRENDING_RANGE
+  SIDEWAYS
 }
 
 enum TradingSession {

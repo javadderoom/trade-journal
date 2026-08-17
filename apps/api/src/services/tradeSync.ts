@@ -561,6 +561,7 @@ export async function getTradesForAccount(params: {
           select: {
             htf_bias: true,
             session: true,
+            market_condition: true,
             thesis: true,
             expectation: true,
             lesson: true,
@@ -615,6 +616,7 @@ export async function getTradesForAccount(params: {
     annotation: t.annotation ? {
       htfBias: t.annotation.htf_bias,
       session: t.annotation.session,
+      marketCondition: t.annotation.market_condition,
       thesis: t.annotation.thesis,
       expectation: t.annotation.expectation,
       lesson: t.annotation.lesson,

@@ -27,7 +27,7 @@ interface DetailPanelProps {
 
   isUploading: boolean;
   setLightboxUrl: (url: string | null) => void;
-  updateActiveTradeField: (key: keyof Trade | 'emotion' | 'notes' | 'screenshots' | 'htfBias' | 'session' | 'analysisTimeframe' | 'entryTimeframe' | 'thesis' | 'expectation' | 'lesson' | 'conviction' | 'setup' | 'triggers' | 'confluences' | 'plan', value: any) => void;
+  updateActiveTradeField: (key: keyof Trade | 'emotion' | 'notes' | 'screenshots' | 'htfBias' | 'session' | 'marketCondition' | 'analysisTimeframe' | 'entryTimeframe' | 'thesis' | 'expectation' | 'lesson' | 'conviction' | 'setup' | 'triggers' | 'confluences' | 'plan', value: any) => void;
   handleSaveDetails: (e: React.FormEvent) => void | Promise<void>;
   handleDeleteClick: () => void;
   handleScreenshotUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
@@ -290,85 +290,44 @@ export default function DetailPanel({
                 takeProfit={activeTrade.takeProfit}
               />
             </div>
+          </div>
 
-            {/* MAE & MFE Excursion Metrics Card */}
-            {(() => {
-              const sym = activeTrade.symbol?.toUpperCase() || '';
-              const pipMult = sym.includes('JPY') ? 100 : (sym.includes('XAU') || sym.includes('GOLD')) ? 100 : (sym.includes('BTC') || sym.includes('ETH')) ? 1 : 10000;
-              const rawRiskPips = activeTrade.stopLoss && activeTrade.stopLoss > 0
-                ? Math.abs(activeTrade.openPrice - activeTrade.stopLoss) * pipMult
-                : (activeTrade.pips ? Math.abs(activeTrade.pips) : 15);
-              const tradePips = activeTrade.pips ?? ((activeTrade.closePrice && activeTrade.openPrice) ? (activeTrade.direction === 'BUY' ? (activeTrade.closePrice - activeTrade.openPrice) * pipMult : (activeTrade.openPrice - activeTrade.closePrice) * pipMult) : 0);
-              const tradeR = activeTrade.rMultiple ?? (rawRiskPips > 0 ? tradePips / rawRiskPips : 0);
+          <hr style={{ borderColor: 'rgba(255,255,255,0.05)', margin: '4px 0' }} />
 
-              const dynamicMaePips = activeTrade.maePips ?? (tradePips < 0 ? parseFloat(Math.abs(tradePips).toFixed(1)) : parseFloat((rawRiskPips * 0.2).toFixed(1)));
-              // For losing trades, MAE R reflects actual stop loss exit (e.g. 1.0R or widened -1.5R); for winning trades, it reflects the drawdown fraction
-              const dynamicMaeR = activeTrade.maeR ?? (tradeR < 0 ? Math.max(1.0, parseFloat(Math.abs(tradeR).toFixed(2))) : parseFloat((dynamicMaePips / (rawRiskPips || 1)).toFixed(2)));
-
-              const dynamicMfePips = activeTrade.mfePips ?? (tradePips > 0 ? parseFloat(tradePips.toFixed(1)) : parseFloat((rawRiskPips * 0.35).toFixed(1)));
-              const dynamicMfeR = activeTrade.mfeR ?? (tradeR > 0 ? parseFloat(tradeR.toFixed(2)) : parseFloat((dynamicMfePips / (rawRiskPips || 1)).toFixed(2)));
-
-              const dynamicExitEff = activeTrade.exitEfficiencyPct ?? (tradePips > 0 && dynamicMfePips > 0 ? Math.min(100, Math.round((tradePips / dynamicMfePips) * 100)) : (tradePips <= 0 ? 0 : 100));
-              const dynamicMoneyLeftR = activeTrade.moneyLeftOnTableR ?? (dynamicMfeR > tradeR ? parseFloat((dynamicMfeR - Math.max(0, tradeR)).toFixed(2)) : 0);
-
-              return (
-                <div className="mae-mfe-analysis-card" style={{ marginTop: '16px', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '12px', padding: '14px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
-                    <div style={{ fontSize: '12px', fontWeight: 700, color: '#fff', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      <span className="material-symbols-outlined" style={{ fontSize: '16px', color: '#10b981' }}>query_stats</span>
-                      {isEn ? 'Excursion Metrics (MAE & MFE)' : 'معیارهای انحراف قیمت (MAE و MFE)'}
-                    </div>
-                    <span style={{ fontSize: '10px', color: '#8898aa', background: 'rgba(255,255,255,0.05)', padding: '2px 8px', borderRadius: '4px' }}>
-                      {isEn ? 'SL / TP Efficiency' : 'کارایی حد سود و ضرر'}
-                    </span>
-                  </div>
-
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '10px', marginBottom: '10px' }}>
-                    {/* MAE Box */}
-                    <div style={{ background: 'rgba(239, 68, 68, 0.08)', border: '1px solid rgba(239, 68, 68, 0.2)', borderRadius: '8px', padding: '10px 12px' }}>
-                      <div style={{ fontSize: '11px', color: '#ef4444', fontWeight: 600, marginBottom: '4px' }}>
-                        {isEn ? 'MAE (Max Drawdown)' : 'MAE (حداکثر افت شناور)'}
-                      </div>
-                      <div style={{ fontSize: '13px', fontWeight: 800, color: '#fff', direction: 'ltr', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                        <span>-{dynamicMaeR}R</span>
-                        <span style={{ fontSize: '11px', fontWeight: 600, color: '#8898aa' }}>
-                          ({dynamicMaePips} pips)
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* MFE Box */}
-                    <div style={{ background: 'rgba(16, 185, 129, 0.08)', border: '1px solid rgba(16, 185, 129, 0.2)', borderRadius: '8px', padding: '10px 12px' }}>
-                      <div style={{ fontSize: '11px', color: '#10b981', fontWeight: 600, marginBottom: '4px' }}>
-                        {isEn ? 'MFE (Peak Profit)' : 'MFE (حداکثر سود شناور)'}
-                      </div>
-                      <div style={{ fontSize: '13px', fontWeight: 800, color: '#fff', direction: 'ltr', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                        <span>+{dynamicMfeR}R</span>
-                        <span style={{ fontSize: '11px', fontWeight: 600, color: '#8898aa' }}>
-                          ({dynamicMfePips} pips)
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Exit Efficiency & Money Left on Table */}
-                  <div style={{ background: 'rgba(59, 130, 246, 0.08)', border: '1px solid rgba(59, 130, 246, 0.2)', borderRadius: '8px', padding: '8px 12px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      <span className="material-symbols-outlined" style={{ fontSize: '16px', color: '#3b82f6' }}>target</span>
-                      <span style={{ fontSize: '11px', color: '#93c5fd', fontWeight: 600 }}>
-                        {isEn ? 'Exit Efficiency:' : 'کارایی خروج:'}
-                      </span>
-                      <span style={{ fontSize: '12px', fontWeight: 800, color: '#fff' }}>
-                        {dynamicExitEff}%
-                      </span>
-                    </div>
-                    <div style={{ fontSize: '11px', color: '#8898aa' }}>
-                      {isEn ? 'Left on table:' : 'سود جا مانده:'} <strong style={{ color: '#f59e0b' }}>{dynamicMoneyLeftR}R</strong>
-                    </div>
-                  </div>
-                </div>
-              );
-            })()}
+          {/* Market Condition */}
+          <div className="form-group">
+            <label style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <span className="material-symbols-outlined" style={{ fontSize: '16px', color: '#8898aa' }}>waterfall_chart</span>
+              {isEn ? 'Market Condition' : 'شرایط بازار'}
+            </label>
+            <div className="tags-container" style={{ gap: '6px', marginTop: '6px' }}>
+              {([
+                { value: 'TRENDING', labelEn: 'Trending', labelFa: 'رونددار', icon: '📈' },
+                { value: 'TRENDING_RANGE', labelEn: 'Trending Range', labelFa: 'رونددار رِنجی', icon: '📊' },
+                { value: 'SIDEWAYS', labelEn: 'Sideways', labelFa: 'رِنج / بی‌روند', icon: '↔️' },
+              ] as const).map(cond => {
+                const isSelected = activeTrade.annotation?.marketCondition === cond.value;
+                return (
+                  <span
+                    key={cond.value}
+                    className={`tag ${isSelected ? 'selected' : ''}`}
+                    style={{
+                      borderLeft: `3px solid ${cond.value === 'TRENDING' ? '#10b981' : cond.value === 'TRENDING_RANGE' ? '#f59e0b' : '#6366f1'}`,
+                      cursor: 'pointer',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '5px',
+                    }}
+                    onClick={() => {
+                      updateActiveTradeField('marketCondition', isSelected ? null : cond.value);
+                    }}
+                  >
+                    <span>{cond.icon}</span>
+                    {isEn ? cond.labelEn : cond.labelFa}
+                  </span>
+                );
+              })}
+            </div>
           </div>
 
           <hr style={{ borderColor: 'rgba(255,255,255,0.05)', margin: '4px 0' }} />
