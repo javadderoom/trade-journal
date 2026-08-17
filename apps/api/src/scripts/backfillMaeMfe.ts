@@ -1,7 +1,5 @@
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '../services/tradeSync';
 import { calculateMaeMfe } from '../services/maeMfeService';
-
-const prisma = new PrismaClient();
 
 async function backfillMaeMfe() {
   console.log('🚀 Starting MAE, MFE & Exit Efficiency backfill...');
