@@ -359,7 +359,7 @@ export default function JournalPage() {
 
     closedTrades.forEach((t) => {
       const sym = t.symbol?.toUpperCase() || '';
-      const pipMult = sym.includes('JPY') ? 100 : (sym.includes('XAU') || sym.includes('GOLD')) ? 10 : (sym.includes('BTC') || sym.includes('ETH')) ? 1 : 10000;
+      const pipMult = sym.includes('JPY') ? 100 : (sym.includes('XAU') || sym.includes('GOLD')) ? 100 : (sym.includes('BTC') || sym.includes('ETH')) ? 1 : 10000;
       const riskPips = t.stopLoss && t.stopLoss > 0
         ? Math.abs(t.openPrice - t.stopLoss) * pipMult
         : (t.pips ? Math.abs(t.pips) : 15);
@@ -367,10 +367,10 @@ export default function JournalPage() {
       const tradeR = t.rMultiple ?? (riskPips > 0 ? tradePips / riskPips : 0);
 
       const maePips = t.maePips ?? (tradePips < 0 ? Math.abs(tradePips) : riskPips * 0.2);
-      const maeR = t.maeR ?? (riskPips > 0 ? maePips / riskPips : 0.2);
+      const maeR = t.maeR ?? (tradeR < 0 ? Math.max(1.0, Math.abs(tradeR)) : (riskPips > 0 ? maePips / riskPips : 0.2));
 
       const mfePips = t.mfePips ?? (tradePips > 0 ? tradePips * 1.2 : riskPips * 0.35);
-      const mfeR = t.mfeR ?? (riskPips > 0 ? mfePips / riskPips : 0.35);
+      const mfeR = t.mfeR ?? (tradeR > 0 ? Math.max(tradeR * 1.1, mfePips / (riskPips || 1)) : (riskPips > 0 ? mfePips / riskPips : 0.35));
 
       const exitEff = t.exitEfficiencyPct ?? (mfePips > 0 && tradePips > 0 ? Math.min(100, Math.round((tradePips / mfePips) * 100)) : (tradePips <= 0 ? 0 : 80));
       const moneyLeftR = t.moneyLeftOnTableR ?? (mfeR > tradeR ? mfeR - Math.max(0, tradeR) : 0);
@@ -583,7 +583,7 @@ export default function JournalPage() {
 
     tradesInWindow.forEach((t) => {
       const sym = t.symbol?.toUpperCase() || '';
-      const pipMult = sym.includes('JPY') ? 100 : (sym.includes('XAU') || sym.includes('GOLD')) ? 10 : (sym.includes('BTC') || sym.includes('ETH')) ? 1 : 10000;
+      const pipMult = sym.includes('JPY') ? 100 : (sym.includes('XAU') || sym.includes('GOLD')) ? 100 : (sym.includes('BTC') || sym.includes('ETH')) ? 1 : 10000;
       const riskPips = t.stopLoss && t.stopLoss > 0
         ? Math.abs(t.openPrice - t.stopLoss) * pipMult
         : (t.pips ? Math.abs(t.pips) : 15);
@@ -591,10 +591,10 @@ export default function JournalPage() {
       const tradeR = t.rMultiple ?? (riskPips > 0 ? tradePips / riskPips : 0);
 
       const maePips = t.maePips ?? (tradePips < 0 ? Math.abs(tradePips) : riskPips * 0.2);
-      const maeR = t.maeR ?? (riskPips > 0 ? maePips / riskPips : 0.2);
+      const maeR = t.maeR ?? (tradeR < 0 ? Math.max(1.0, Math.abs(tradeR)) : (riskPips > 0 ? maePips / riskPips : 0.2));
 
       const mfePips = t.mfePips ?? (tradePips > 0 ? tradePips * 1.2 : riskPips * 0.35);
-      const mfeR = t.mfeR ?? (riskPips > 0 ? mfePips / riskPips : 0.35);
+      const mfeR = t.mfeR ?? (tradeR > 0 ? Math.max(tradeR * 1.1, mfePips / (riskPips || 1)) : (riskPips > 0 ? mfePips / riskPips : 0.35));
 
       const exitEff = t.exitEfficiencyPct ?? (mfePips > 0 && tradePips > 0 ? Math.min(100, Math.round((tradePips / mfePips) * 100)) : (tradePips <= 0 ? 0 : 80));
       const moneyLeftR = t.moneyLeftOnTableR ?? (mfeR > tradeR ? mfeR - Math.max(0, tradeR) : 0);

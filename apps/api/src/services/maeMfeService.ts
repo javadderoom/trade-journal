@@ -13,7 +13,9 @@ export interface MaeMfeInput {
   openPrice: number;
   closePrice: number;
   stopLoss?: number | null;
+  initialStopLoss?: number | null;
   takeProfit?: number | null;
+  realizedR?: number | null;
   symbol: string;
   candles?: CandlePriceRange[];
   peakHighPrice?: number;
@@ -31,15 +33,16 @@ export interface MaeMfeResult {
   tp_efficiency_pct: number;
   exit_efficiency_pct: number;
   money_left_on_table_r: number;
+  sl_widened: boolean;
 }
 
 /**
- * Derives pip multiplier for a given financial symbol (e.g. JPY pairs = 100, Gold = 10, FX = 10000)
+ * Derives pip multiplier for a given financial symbol (e.g. JPY pairs = 100, Gold = 100, FX = 10000)
  */
 export function getPipMultiplier(symbol: string): number {
   const sym = symbol.toUpperCase();
   if (sym.includes('JPY')) return 100;
-  if (sym.includes('XAU') || sym.includes('GOLD')) return 10;
+  if (sym.includes('XAU') || sym.includes('GOLD')) return 100; // Gold: $0.01 = 1 pip/point ($5.10 = 510 pips)
   if (sym.includes('BTC') || sym.includes('ETH')) return 1;
   return 10000; // Standard Forex pair (EURUSD, GBPUSD, etc.)
 }
@@ -48,7 +51,7 @@ export function getPipMultiplier(symbol: string): number {
  * Calculates MAE and MFE values, price levels, R-multiples, and SL/TP efficiencies.
  */
 export function calculateMaeMfe(input: MaeMfeInput): MaeMfeResult {
-  const { direction, openPrice, closePrice, stopLoss, takeProfit, symbol, candles, peakHighPrice, peakLowPrice } = input;
+  const { direction, openPrice, closePrice, stopLoss, initialStopLoss, takeProfit, realizedR, symbol, candles, peakHighPrice, peakLowPrice } = input;
   const pipMult = getPipMultiplier(symbol);
 
   // 1. Determine peak high and lowest low price during the trade lifetime
@@ -85,33 +88,51 @@ export function calculateMaeMfe(input: MaeMfeInput): MaeMfeResult {
     mfePips = Math.max(0, (openPrice - minLow) * pipMult);
   }
 
-  // 2. Calculate initial risk in pips for R-multiple conversion
-  let riskPips = 0;
-  if (stopLoss && stopLoss > 0) {
-    riskPips = Math.abs(openPrice - stopLoss) * pipMult;
+  // 2. Initial Planned Risk vs Modified/Widened Stop Loss
+  const baseSl = initialStopLoss ?? stopLoss;
+  let initialRiskPips = 0;
+  if (baseSl && baseSl > 0) {
+    initialRiskPips = Math.abs(openPrice - baseSl) * pipMult;
   } else {
-    // Default fallback risk estimation based on MAE or exit distance
-    riskPips = Math.max(maePips, Math.abs(openPrice - closePrice) * pipMult, 10);
+    initialRiskPips = Math.max(maePips, Math.abs(openPrice - closePrice) * pipMult, 15);
   }
 
-  const maeR = riskPips > 0 ? parseFloat((maePips / riskPips).toFixed(2)) : 0;
-  const mfeR = riskPips > 0 ? parseFloat((mfePips / riskPips).toFixed(2)) : 0;
+  // Check if Stop Loss was widened (moved further into loss than initial SL)
+  let slWidened = false;
+  if (initialStopLoss && stopLoss && initialStopLoss !== stopLoss) {
+    const initialDist = Math.abs(openPrice - initialStopLoss);
+    const finalDist = Math.abs(openPrice - stopLoss);
+    if (finalDist > initialDist) {
+      slWidened = true;
+    }
+  }
+
+  // Calculate MAE in R (if trade stopped out at initial SL, maeR is exactly 1.0R; if widened, it reflects the expanded ratio)
+  let maeR = 0;
+  if (realizedR !== undefined && realizedR !== null && realizedR < 0) {
+    // For losing trade, if SL was widened, MAE equals the true negative multiple (e.g. -1.5R); if standard SL hit, it's 1.0R
+    maeR = Math.max(1.0, parseFloat(Math.abs(realizedR).toFixed(2)));
+  } else {
+    maeR = initialRiskPips > 0 ? parseFloat((maePips / initialRiskPips).toFixed(2)) : 0;
+  }
+
+  const mfeR = initialRiskPips > 0 ? parseFloat((mfePips / initialRiskPips).toFixed(2)) : 0;
 
   // 3. Efficiency & Exit Calculations
   const realizedPips = direction === 'BUY'
     ? (closePrice - openPrice) * pipMult
     : (openPrice - closePrice) * pipMult;
 
-  const realizedR = riskPips > 0 ? realizedPips / riskPips : 0;
+  const tradeRealizedR = realizedR ?? (initialRiskPips > 0 ? realizedPips / initialRiskPips : 0);
 
   // SL Efficiency: % of risk room used (100% means price touched SL exactly)
-  const slEfficiency = riskPips > 0 ? Math.min(100, Math.round((maePips / riskPips) * 100)) : 0;
+  const slEfficiency = initialRiskPips > 0 ? Math.min(100, Math.round((maePips / initialRiskPips) * 100)) : 0;
 
   // TP Efficiency / Exit Efficiency: Realized profit vs peak unrealized MFE profit
   const exitEfficiencyPct = mfePips > 0 ? Math.max(0, Math.min(100, Math.round((realizedPips / mfePips) * 100))) : 0;
 
   // Money Left on Table (R-multiples): MFE R minus Realized R
-  const moneyLeftOnTableR = parseFloat(Math.max(0, mfeR - realizedR).toFixed(2));
+  const moneyLeftOnTableR = parseFloat(Math.max(0, mfeR - (tradeRealizedR ?? 0)).toFixed(2));
 
   return {
     mae_pips: parseFloat(maePips.toFixed(1)),
@@ -124,5 +145,6 @@ export function calculateMaeMfe(input: MaeMfeInput): MaeMfeResult {
     tp_efficiency_pct: exitEfficiencyPct,
     exit_efficiency_pct: exitEfficiencyPct,
     money_left_on_table_r: moneyLeftOnTableR,
+    sl_widened: slWidened,
   };
 }

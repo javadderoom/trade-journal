@@ -37,6 +37,7 @@ async function backfillMaeMfe() {
       closePrice: trade.close_price ?? trade.open_price,
       stopLoss: trade.stop_loss,
       takeProfit: trade.take_profit,
+      realizedR: trade.r_multiple,
       symbol: trade.symbol,
     });
 

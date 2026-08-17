@@ -294,7 +294,7 @@ export default function DetailPanel({
             {/* MAE & MFE Excursion Metrics Card */}
             {(() => {
               const sym = activeTrade.symbol?.toUpperCase() || '';
-              const pipMult = sym.includes('JPY') ? 100 : (sym.includes('XAU') || sym.includes('GOLD')) ? 10 : (sym.includes('BTC') || sym.includes('ETH')) ? 1 : 10000;
+              const pipMult = sym.includes('JPY') ? 100 : (sym.includes('XAU') || sym.includes('GOLD')) ? 100 : (sym.includes('BTC') || sym.includes('ETH')) ? 1 : 10000;
               const rawRiskPips = activeTrade.stopLoss && activeTrade.stopLoss > 0
                 ? Math.abs(activeTrade.openPrice - activeTrade.stopLoss) * pipMult
                 : (activeTrade.pips ? Math.abs(activeTrade.pips) : 15);
@@ -302,10 +302,11 @@ export default function DetailPanel({
               const tradeR = activeTrade.rMultiple ?? (rawRiskPips > 0 ? tradePips / rawRiskPips : 0);
 
               const dynamicMaePips = activeTrade.maePips ?? (tradePips < 0 ? parseFloat(Math.abs(tradePips).toFixed(1)) : parseFloat((rawRiskPips * 0.2).toFixed(1)));
-              const dynamicMaeR = activeTrade.maeR ?? parseFloat((dynamicMaePips / (rawRiskPips || 1)).toFixed(2));
+              // For losing trades, MAE R reflects actual stop loss exit (e.g. 1.0R or widened -1.5R); for winning trades, it reflects the drawdown fraction
+              const dynamicMaeR = activeTrade.maeR ?? (tradeR < 0 ? Math.max(1.0, parseFloat(Math.abs(tradeR).toFixed(2))) : parseFloat((dynamicMaePips / (rawRiskPips || 1)).toFixed(2)));
 
               const dynamicMfePips = activeTrade.mfePips ?? (tradePips > 0 ? parseFloat((tradePips * 1.2).toFixed(1)) : parseFloat((rawRiskPips * 0.35).toFixed(1)));
-              const dynamicMfeR = activeTrade.mfeR ?? parseFloat((dynamicMfePips / (rawRiskPips || 1)).toFixed(2));
+              const dynamicMfeR = activeTrade.mfeR ?? (tradeR > 0 ? parseFloat((Math.max(tradeR * 1.1, dynamicMfePips / (rawRiskPips || 1))).toFixed(2)) : parseFloat((dynamicMfePips / (rawRiskPips || 1)).toFixed(2)));
 
               const dynamicExitEff = activeTrade.exitEfficiencyPct ?? (dynamicMfePips > 0 && tradePips > 0 ? Math.min(100, Math.round((tradePips / dynamicMfePips) * 100)) : (tradePips <= 0 ? 0 : 80));
               const dynamicMoneyLeftR = activeTrade.moneyLeftOnTableR ?? (dynamicMfeR > tradeR ? parseFloat((dynamicMfeR - Math.max(0, tradeR)).toFixed(2)) : 0);
