@@ -5,8 +5,8 @@
     "semantic_hash": ""
   },
   "apps/api/src/routes/tradeSync.ts": {
-    "mtime": 1787002686.9821532,
-    "ast_hash": "99aed640bdf3257bcd6839faa4d2c447",
+    "mtime": 1787045180.0546288,
+    "ast_hash": "dbd997149d5f65c39f3e8ad5f79b8f77",
     "semantic_hash": ""
   },
   "apps/api/src/server.ts": {
@@ -50,8 +50,8 @@
     "semantic_hash": ""
   },
   "apps/web/src/app/trades/page.tsx": {
-    "mtime": 1786991127.6997702,
-    "ast_hash": "f73c51bbbd9b685366c3620a8b522418",
+    "mtime": 1787048590.791705,
+    "ast_hash": "a7c51f84cc89beed8d92fc28987834c5",
     "semantic_hash": ""
   },
   "apps/web/src/utils/farsi.ts": {
@@ -150,8 +150,8 @@
     "semantic_hash": ""
   },
   "apps/web/src/utils/tradeHelpers.ts": {
-    "mtime": 1786550428.0988517,
-    "ast_hash": "99e4f9c8de10a23f450f1ace21a36268",
+    "mtime": 1787003065.6299248,
+    "ast_hash": "9660d5d85a91d3f5d88f2ec81f4932b3",
     "semantic_hash": ""
   },
   "apps/web/src/components/restored_scss_chunks.json": {
@@ -190,8 +190,8 @@
     "semantic_hash": ""
   },
   "apps/web/src/components/trades/DesktopTable.tsx": {
-    "mtime": 1786557323.7796187,
-    "ast_hash": "79a715e36d8abfaf0cbf1fe152c6b15c",
+    "mtime": 1787049091.6586368,
+    "ast_hash": "e67ffb39c2600e30774b4a41d8644196",
     "semantic_hash": ""
   },
   "apps/web/src/components/trades/DetailPanel.tsx": {
@@ -200,13 +200,13 @@
     "semantic_hash": ""
   },
   "apps/web/src/components/trades/FilterBar.tsx": {
-    "mtime": 1786295996.9007967,
-    "ast_hash": "0c6aa250e867dd901e8b30d446aea796",
+    "mtime": 1787043126.60429,
+    "ast_hash": "040446f33a8c12f1150171cc0bde757b",
     "semantic_hash": ""
   },
   "apps/web/src/components/trades/MobileCardsList.tsx": {
-    "mtime": 1786295996.9007967,
-    "ast_hash": "1ea3db412468d16c14a2a53cb28273e3",
+    "mtime": 1787049105.1948876,
+    "ast_hash": "d7361c8ffa3ab3c9dd3a00722aaaf1b7",
     "semantic_hash": ""
   },
   "apps/web/src/components/trades/SummaryBar.tsx": {
@@ -220,8 +220,8 @@
     "semantic_hash": ""
   },
   "apps/web/src/components/trades/TradesTable.tsx": {
-    "mtime": 1786997454.697023,
-    "ast_hash": "561a33b4680874390b2e27f21518020f",
+    "mtime": 1787043136.7552807,
+    "ast_hash": "b52363c99266535866b14f67ebb39afd",
     "semantic_hash": ""
   },
   "apps/web/src/components/ui/Select.tsx": {
@@ -1595,8 +1595,8 @@
     "semantic_hash": ""
   },
   "apps/web/src/components/settings/ConceptsSettings.tsx": {
-    "mtime": 1786295996.8943765,
-    "ast_hash": "40569942d7190833fd1269cfdf1715a6",
+    "mtime": 1787049074.3769684,
+    "ast_hash": "840b060902fc66780f6257697217e279",
     "semantic_hash": ""
   },
   "apps/web/src/components/tools/PipCalculator.tsx": {
@@ -1770,13 +1770,13 @@
     "semantic_hash": ""
   },
   "apps/web/src/components/trades/TradeInspectPage.tsx": {
-    "mtime": 1786295996.9007967,
-    "ast_hash": "ffc2afb201bd0c84e2518ab401fbc087",
+    "mtime": 1787045376.0132487,
+    "ast_hash": "0b52fb5e515465aeb3a5555586882fc5",
     "semantic_hash": ""
   },
   "apps/web/src/components/trades/TradeReviewPage.tsx": {
-    "mtime": 1786996386.6617284,
-    "ast_hash": "b40b711d1e5db6bf07eec58df3df384b",
+    "mtime": 1787049116.1155665,
+    "ast_hash": "b87c520098231b9c3b3cccde24f88dcd",
     "semantic_hash": ""
   },
   "apps/api/audit_output.txt": {
@@ -2050,13 +2050,13 @@
     "semantic_hash": ""
   },
   "apps/web/src/components/modals/BulkTagModal.tsx": {
-    "mtime": 1786604835.4132981,
-    "ast_hash": "4905ecec4461dfe95d6040680bf9d1f4",
+    "mtime": 1787049133.048622,
+    "ast_hash": "38896307df6e4523a20d794acda45ed3",
     "semantic_hash": ""
   },
   "apps/web/src/components/trades/WorstEmotionAlert.tsx": {
-    "mtime": 1786991008.580124,
-    "ast_hash": "f018ba69676e2063f65dd7f9b339376f",
+    "mtime": 1787041916.8018286,
+    "ast_hash": "cb0b7c72059643a0f3a1039173bbefad",
     "semantic_hash": ""
   },
   ".impeccable/critique/2026-08-10T13-53-49Z__apps-web-src-app-locale-public-community.md": {

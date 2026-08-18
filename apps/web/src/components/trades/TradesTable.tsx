@@ -202,8 +202,8 @@ export default function TradesTable({
     return () => clearTimeout(handler);
   }, [searchQuery]);
 
-  const [selectedSymbol, setSelectedSymbol] = useState(t('filters.allSymbols'));
-  const [selectedDirection, setSelectedDirection] = useState(t('filters.allDirections'));
+  const [selectedSymbol, setSelectedSymbol] = useState<string>('ALL');
+  const [selectedDirection, setSelectedDirection] = useState<'ALL' | 'BUY' | 'SELL'>('ALL');
   const [selectedStatus, setSelectedStatus] = useState<'ALL' | 'OPEN' | 'CLOSED'>('ALL');
   const [isAdvancedFiltersOpen, setIsAdvancedFiltersOpen] = useState(false);
   const [allEmotions, setAllEmotions] = useState<{ value: string; label: string; emoji?: string }[]>(() => getDefaultEmotions(language));
@@ -230,8 +230,10 @@ export default function TradesTable({
   // Extract unique filter options
   const symbolOptions = useMemo(() => {
     const symbols = new Set<string>();
-    trades.forEach(t => symbols.add(t.symbol));
-    return [t('filters.allSymbols'), ...Array.from(symbols)];
+    trades.forEach(t => {
+      if (t.symbol) symbols.add(t.symbol);
+    });
+    return Array.from(symbols);
   }, [trades]);
   const { concepts: tradingConcepts } = useTradingConcepts();
 
@@ -292,8 +294,8 @@ export default function TradesTable({
       sortKey,
       sortDir,
       search: debouncedSearchQuery,
-      symbol: selectedSymbol !== t('filters.allSymbols') ? selectedSymbol : undefined,
-      direction: selectedDirection !== t('filters.allDirections') ? (selectedDirection === t('filters.buy') ? 'BUY' : 'SELL') : undefined,
+      symbol: (selectedSymbol && selectedSymbol !== 'ALL') ? selectedSymbol : undefined,
+      direction: (selectedDirection && selectedDirection !== 'ALL') ? selectedDirection : undefined,
       status: selectedStatus !== 'ALL' ? selectedStatus : undefined,
       dates: filterDatesArray
     });
@@ -658,7 +660,7 @@ export default function TradesTable({
             )}
 
             {/* Symbol Filter */}
-            {selectedSymbol !== t('filters.allSymbols') && (
+            {selectedSymbol !== 'ALL' && (
               <div className="active-filter-badge">
                 <span className="material-symbols-outlined badge-icon-lead">toll</span>
                 <span className="badge-text">
@@ -666,7 +668,7 @@ export default function TradesTable({
                 </span>
                 <button 
                   onClick={() => {
-                    setSelectedSymbol(t('filters.allSymbols'));
+                    setSelectedSymbol('ALL');
                     setCurrentPage(1);
                   }}
                   className="badge-clear-btn"
@@ -678,15 +680,15 @@ export default function TradesTable({
             )}
 
             {/* Direction Filter */}
-            {selectedDirection !== t('filters.allDirections') && (
+            {selectedDirection !== 'ALL' && (
               <div className="active-filter-badge">
                 <span className="material-symbols-outlined badge-icon-lead">swap_vert</span>
                 <span className="badge-text">
-                  {`${t('filters.badgeDirection')} ${selectedDirection === t('filters.buy') ? t('filters.badgeBuy') : t('filters.badgeSell')}`}
+                  {`${t('filters.badgeDirection')} ${selectedDirection === 'BUY' ? t('filters.buy') : t('filters.sell')}`}
                 </span>
                 <button 
                   onClick={() => {
-                    setSelectedDirection(t('filters.allDirections'));
+                    setSelectedDirection('ALL');
                     setCurrentPage(1);
                   }}
                   className="badge-clear-btn"

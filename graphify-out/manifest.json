@@ -5,8 +5,8 @@
     "semantic_hash": ""
   },
   "apps/api/src/routes/tradeSync.ts": {
-    "mtime": 1787002686.9821532,
-    "ast_hash": "99aed640bdf3257bcd6839faa4d2c447",
+    "mtime": 1787045180.0546288,
+    "ast_hash": "dbd997149d5f65c39f3e8ad5f79b8f77",
     "semantic_hash": ""
   },
   "apps/api/src/server.ts": {
@@ -50,8 +50,8 @@
     "semantic_hash": ""
   },
   "apps/web/src/app/trades/page.tsx": {
-    "mtime": 1786991127.6997702,
-    "ast_hash": "f73c51bbbd9b685366c3620a8b522418",
+    "mtime": 1787048590.791705,
+    "ast_hash": "a7c51f84cc89beed8d92fc28987834c5",
     "semantic_hash": ""
   },
   "apps/web/src/utils/farsi.ts": {
@@ -190,23 +190,23 @@
     "semantic_hash": ""
   },
   "apps/web/src/components/trades/DesktopTable.tsx": {
-    "mtime": 1786557323.7796187,
-    "ast_hash": "79a715e36d8abfaf0cbf1fe152c6b15c",
+    "mtime": 1787049376.6026547,
+    "ast_hash": "18a68962723e3bd27c8d5af357fef5ef",
     "semantic_hash": ""
   },
   "apps/web/src/components/trades/DetailPanel.tsx": {
-    "mtime": 1786997410.060252,
-    "ast_hash": "85e98be1d6cd1d5ba0081e4060981f03",
+    "mtime": 1787049317.8413832,
+    "ast_hash": "eef95646c797187dfbd8fc4ea09098d4",
     "semantic_hash": ""
   },
   "apps/web/src/components/trades/FilterBar.tsx": {
-    "mtime": 1786295996.9007967,
-    "ast_hash": "0c6aa250e867dd901e8b30d446aea796",
+    "mtime": 1787043126.60429,
+    "ast_hash": "040446f33a8c12f1150171cc0bde757b",
     "semantic_hash": ""
   },
   "apps/web/src/components/trades/MobileCardsList.tsx": {
-    "mtime": 1786295996.9007967,
-    "ast_hash": "1ea3db412468d16c14a2a53cb28273e3",
+    "mtime": 1787049398.8778727,
+    "ast_hash": "aebf585cdb9dd4befb06940d56507cb9",
     "semantic_hash": ""
   },
   "apps/web/src/components/trades/SummaryBar.tsx": {
@@ -220,8 +220,8 @@
     "semantic_hash": ""
   },
   "apps/web/src/components/trades/TradesTable.tsx": {
-    "mtime": 1786997454.697023,
-    "ast_hash": "561a33b4680874390b2e27f21518020f",
+    "mtime": 1787043136.7552807,
+    "ast_hash": "b52363c99266535866b14f67ebb39afd",
     "semantic_hash": ""
   },
   "apps/web/src/components/ui/Select.tsx": {
@@ -1595,8 +1595,8 @@
     "semantic_hash": ""
   },
   "apps/web/src/components/settings/ConceptsSettings.tsx": {
-    "mtime": 1786295996.8943765,
-    "ast_hash": "40569942d7190833fd1269cfdf1715a6",
+    "mtime": 1787049443.6154041,
+    "ast_hash": "48dbd42dcff6f4f8becbfa3275a1501f",
     "semantic_hash": ""
   },
   "apps/web/src/components/tools/PipCalculator.tsx": {
@@ -1770,13 +1770,13 @@
     "semantic_hash": ""
   },
   "apps/web/src/components/trades/TradeInspectPage.tsx": {
-    "mtime": 1786295996.9007967,
-    "ast_hash": "ffc2afb201bd0c84e2518ab401fbc087",
+    "mtime": 1787045376.0132487,
+    "ast_hash": "0b52fb5e515465aeb3a5555586882fc5",
     "semantic_hash": ""
   },
   "apps/web/src/components/trades/TradeReviewPage.tsx": {
-    "mtime": 1786996386.6617284,
-    "ast_hash": "b40b711d1e5db6bf07eec58df3df384b",
+    "mtime": 1787049423.8535614,
+    "ast_hash": "f34148bd8d903ad5d4eca6bf29c47f35",
     "semantic_hash": ""
   },
   "apps/api/audit_output.txt": {
@@ -2050,13 +2050,13 @@
     "semantic_hash": ""
   },
   "apps/web/src/components/modals/BulkTagModal.tsx": {
-    "mtime": 1786604835.4132981,
-    "ast_hash": "4905ecec4461dfe95d6040680bf9d1f4",
+    "mtime": 1787050239.491056,
+    "ast_hash": "9b5361df97ccbf42508bcd5209d41496",
     "semantic_hash": ""
   },
   "apps/web/src/components/trades/WorstEmotionAlert.tsx": {
-    "mtime": 1787003127.9015343,
-    "ast_hash": "a9fa4af26bfbe037177ab5f0c5972012",
+    "mtime": 1787041916.8018286,
+    "ast_hash": "cb0b7c72059643a0f3a1039173bbefad",
     "semantic_hash": ""
   },
   ".impeccable/critique/2026-08-10T13-53-49Z__apps-web-src-app-locale-public-community.md": {
@@ -2097,6 +2097,11 @@
   "plans/trader-decision-making-features.md": {
     "mtime": 1787002012.1875217,
     "ast_hash": "9f9a893881c5e9b26ff219607ff508e2",
+    "semantic_hash": ""
+  },
+  "apps/web/src/components/ui/ConceptIcon.tsx": {
+    "mtime": 1787049292.016129,
+    "ast_hash": "43c0b452826bf971c84037f2b8a1fef0",
     "semantic_hash": ""
   }
 }

@@ -3,6 +3,7 @@ import { useTranslation } from '../../store/useAppStore';
 import { getSharedTranslations } from '../../locales/components';
 import LoadingButton from '../ui/LoadingButton';
 import { TradingConcept } from '../../hooks/useTradingConcepts';
+import ConceptIcon from '../ui/ConceptIcon';
 
 interface BulkTagModalProps {
   isOpen: boolean;
@@ -129,7 +130,7 @@ export default function BulkTagModal({
                 <option value="">{isEn ? '-- Select Setup (Optional) --' : '-- انتخاب ستاپ (اختیاری) --'}</option>
                 <option value="none">{isEn ? 'No Setup (Clear)' : 'بدون ستاپ (حذف)'}</option>
                 {tradingConcepts.filter(c => c.allowed_roles.includes('SETUP')).map(c => (
-                  <option key={c.id} value={c.id}>{c.name}</option>
+                  <option key={c.id} value={c.id}>{c.icon ? `${c.icon} ` : ''}{c.name}</option>
                 ))}
               </select>
             </div>
@@ -151,9 +152,13 @@ export default function BulkTagModal({
                     padding: '4px 12px',
                     borderRadius: '16px',
                     cursor: 'pointer',
-                    fontSize: '12px'
+                    fontSize: '12px',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '4px'
                   }}
                 >
+                  {c.icon && <ConceptIcon icon={c.icon} size={14} />}
                   {c.name}
                 </button>
               ))}
@@ -176,9 +181,13 @@ export default function BulkTagModal({
                     padding: '4px 12px',
                     borderRadius: '16px',
                     cursor: 'pointer',
-                    fontSize: '12px'
+                    fontSize: '12px',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '4px'
                   }}
                 >
+                  {c.icon && <ConceptIcon icon={c.icon} size={14} />}
                   {c.name}
                 </button>
               ))}

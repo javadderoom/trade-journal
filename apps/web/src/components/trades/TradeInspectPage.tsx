@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Trade } from '../../types/trade';
 import { useTranslation, useAppStore } from '../../store/useAppStore';
 import { getSharedTranslations } from '../../locales/components';
+import { api } from '../../lib/api';
 import { notify } from '../../lib/notify';
 import LoadingButton from '../ui/LoadingButton';
 import { useTradeStore } from '../../store/useTradeStore';
@@ -25,25 +26,60 @@ export default function TradeInspectPage({ tradeId }: TradeInspectPageProps) {
   
   const { trades, fetchTrades, updateTrade } = useTradeStore();
   const [trade, setTrade] = useState<Trade | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const accounts = useAppStore(state => state.accounts || []);
 
   useEffect(() => {
+    let isMounted = true;
     const existing = trades.find(t => t.id === tradeId);
     if (existing) {
       setTrade(existing);
-    } else {
-      fetchTrades().then(() => {
-        const found = useTradeStore.getState().trades.find(t => t.id === tradeId);
-        if (found) setTrade(found);
-      });
+      setLoading(false);
+      return;
     }
-  }, [tradeId, trades, fetchTrades]);
 
-  if (!trade) {
+    setLoading(true);
+    setError(null);
+    api.get(`/api/trades/${tradeId}`)
+      .then(res => {
+        if (!isMounted) return;
+        if (res.data) {
+          setTrade(res.data);
+        } else {
+          setError(isEn ? 'Trade not found' : 'معامله یافت نشد');
+        }
+      })
+      .catch(err => {
+        console.error('Failed to load trade inspect data:', err);
+        if (isMounted) setError(isEn ? 'Trade not found or unauthorized' : 'معامله یافت نشد یا دسترسی غیرمجاز است');
+      })
+      .finally(() => {
+        if (isMounted) setLoading(false);
+      });
+
+    return () => { isMounted = false; };
+  }, [tradeId, trades, isEn]);
+
+  if (loading) {
     return (
-      <div style={{ padding: '40px', textAlign: 'center', color: '#8898aa' }}>
-        {isEn ? 'Loading trade data...' : 'در حال دریافت اطلاعات معامله...'}
+      <div style={{ padding: '60px 20px', textAlign: 'center', color: '#8898aa', minHeight: '60vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '16px' }}>
+        <div style={{ width: '36px', height: '36px', border: '3px solid rgba(255,255,255,0.1)', borderTopColor: '#3b82f6', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></div>
+        <span>{isEn ? 'Loading trade data...' : 'در حال دریافت اطلاعات معامله...'}</span>
+      </div>
+    );
+  }
+
+  if (error || !trade) {
+    return (
+      <div style={{ padding: '60px 20px', textAlign: 'center', color: '#8898aa', minHeight: '60vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '16px' }}>
+        <span className="material-symbols-outlined" style={{ fontSize: '48px', color: '#ef4444' }}>error</span>
+        <h3 style={{ color: '#fff', margin: 0 }}>{error || (isEn ? 'Trade not found' : 'معامله یافت نشد')}</h3>
+        <button className="btn btn-secondary" onClick={() => router.push('/trades')}>
+          <span className="material-symbols-outlined">{isEn ? 'arrow_back' : 'arrow_forward'}</span>
+          {isEn ? 'Back to Trades' : 'بازگشت به معاملات'}
+        </button>
       </div>
     );
   }

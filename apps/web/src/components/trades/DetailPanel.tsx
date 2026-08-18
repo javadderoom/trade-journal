@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { Trade } from '../../types/trade';
 import { TradingConcept } from '../../hooks/useTradingConcepts';
+import ConceptIcon from '../ui/ConceptIcon';
 
 import TradeChart from './TradeChart';
 import { toPersianDigits, formatToman, normalizeNumericInput } from '../../utils/farsi';
@@ -363,7 +364,7 @@ export default function DetailPanel({
                         }
                       }}
                     >
-                      {concept.icon && <span>{concept.icon}</span>}
+                      {concept.icon && <ConceptIcon icon={concept.icon} size={14} />}
                       {concept.name}
                     </span>
                   );
@@ -400,7 +401,7 @@ export default function DetailPanel({
                         }
                       }}
                     >
-                      {concept.icon && <span>{concept.icon}</span>}
+                      {concept.icon && <ConceptIcon icon={concept.icon} size={14} />}
                       {concept.name}
                     </span>
                   );
@@ -437,7 +438,7 @@ export default function DetailPanel({
                         }
                       }}
                     >
-                      {concept.icon && <span>{concept.icon}</span>}
+                      {concept.icon && <ConceptIcon icon={concept.icon} size={14} />}
                       {concept.name}
                     </span>
                   );

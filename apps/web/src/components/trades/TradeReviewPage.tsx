@@ -11,6 +11,7 @@ import LoadingButton from '../ui/LoadingButton';
 import { getNetPnl, formatCurrency } from '../../utils/tradeHelpers';
 import { useTradeStore } from '../../store/useTradeStore';
 import TradeChart from './TradeChart';
+import ConceptIcon from '../ui/ConceptIcon';
 import './trade-review.scss';
 
 interface TradeReviewPageProps {
@@ -24,6 +25,8 @@ export default function TradeReviewPage({ tradeId }: TradeReviewPageProps) {
   
   const { trades, fetchTrades, updateTrade } = useTradeStore();
   const [trade, setTrade] = useState<Trade | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [lightboxUrl, setLightboxUrl] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
@@ -39,24 +42,72 @@ export default function TradeReviewPage({ tradeId }: TradeReviewPageProps) {
   const [isAddingEvent, setIsAddingEvent] = useState(false);
 
   useEffect(() => {
+    let isMounted = true;
     const existing = trades.find(t => t.id === tradeId);
     if (existing) {
       setTrade(existing);
-    } else {
-      fetchTrades().then(() => {
-        const found = useTradeStore.getState().trades.find(t => t.id === tradeId);
-        if (found) setTrade(found);
-      });
+      setLoading(false);
+      return;
     }
-  }, [tradeId, trades, fetchTrades]);
 
-  if (!trade) {
-    return (
-      <div style={{ padding: '40px', textAlign: 'center', color: '#8898aa' }}>
-        {isEn ? 'Loading trade data...' : 'در حال دریافت اطلاعات معامله...'}
-      </div>
-    );
-  }
+    setLoading(true);
+    setError(null);
+    api.get(`/api/trades/${tradeId}`)
+      .then(res => {
+        if (!isMounted) return;
+        if (res.data) {
+          setTrade(res.data);
+        } else {
+          setError(isEn ? 'Trade not found' : 'معامله یافت نشد');
+        }
+      })
+      .catch(err => {
+        console.error('Failed to load trade review data:', err);
+        if (isMounted) setError(isEn ? 'Trade not found or unauthorized' : 'معامله یافت نشد یا دسترسی غیرمجاز است');
+      })
+      .finally(() => {
+        if (isMounted) setLoading(false);
+      });
+
+    return () => { isMounted = false; };
+  }, [tradeId, trades, isEn]);
+
+  const excursionData = useMemo(() => {
+    if (!trade) return null;
+    const sym = trade.symbol?.toUpperCase() || '';
+    const pipMult = sym.includes('JPY') ? 100 : (sym.includes('XAU') || sym.includes('GOLD')) ? 100 : (sym.includes('BTC') || sym.includes('ETH')) ? 1 : 10000;
+    const rawRiskPips = trade.stopLoss && trade.stopLoss > 0
+      ? Math.abs(trade.openPrice - trade.stopLoss) * pipMult
+      : (trade.pips ? Math.abs(trade.pips) : 15);
+    const tradePips = trade.pips ?? ((trade.closePrice && trade.openPrice) ? (trade.direction === 'BUY' ? (trade.closePrice - trade.openPrice) * pipMult : (trade.openPrice - trade.closePrice) * pipMult) : 0);
+    const tradeR = trade.rMultiple ?? (rawRiskPips > 0 ? tradePips / rawRiskPips : 0);
+
+    const dynamicMaePips = trade.maePips ?? (tradePips < 0 ? parseFloat(Math.abs(tradePips).toFixed(1)) : parseFloat((rawRiskPips * 0.2).toFixed(1)));
+    const dynamicMaeR = trade.maeR ?? (tradeR < 0 ? Math.max(1.0, parseFloat(Math.abs(tradeR).toFixed(2))) : parseFloat((dynamicMaePips / (rawRiskPips || 1)).toFixed(2)));
+
+    const dynamicMfePips = trade.mfePips ?? (tradePips > 0 ? parseFloat(tradePips.toFixed(1)) : parseFloat((rawRiskPips * 0.35).toFixed(1)));
+    const dynamicMfeR = trade.mfeR ?? (tradeR > 0 ? parseFloat(tradeR.toFixed(2)) : parseFloat((dynamicMfePips / (rawRiskPips || 1)).toFixed(2)));
+
+    const dynamicExitEff = trade.exitEfficiencyPct ?? (tradePips > 0 && dynamicMfePips > 0 ? Math.min(100, Math.round((tradePips / dynamicMfePips) * 100)) : (tradePips <= 0 ? 0 : 100));
+    const dynamicMoneyLeftR = trade.moneyLeftOnTableR ?? (dynamicMfeR > tradeR ? parseFloat((dynamicMfeR - Math.max(0, tradeR)).toFixed(2)) : 0);
+
+    const totalSpan = (dynamicMaeR || 1) + (dynamicMfeR || 1);
+    const maePct = Math.min(60, Math.max(15, (dynamicMaeR / totalSpan) * 100));
+    const mfePct = 100 - maePct;
+
+    return {
+      dynamicMaePips,
+      dynamicMaeR,
+      dynamicMfePips,
+      dynamicMfeR,
+      dynamicExitEff,
+      dynamicMoneyLeftR,
+      tradeR,
+      tradePips,
+      maePct,
+      mfePct,
+    };
+  }, [trade]);
 
   const p = {
     ...getSharedTranslations(isEn),
@@ -100,6 +151,7 @@ export default function TradeReviewPage({ tradeId }: TradeReviewPageProps) {
   };
 
   const handleSave = async () => {
+    if (!trade) return;
     setSaving(true);
     try {
       const success = await updateTrade(trade);
@@ -117,6 +169,7 @@ export default function TradeReviewPage({ tradeId }: TradeReviewPageProps) {
   };
 
   const handleScreenshotUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!trade) return;
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -144,6 +197,7 @@ export default function TradeReviewPage({ tradeId }: TradeReviewPageProps) {
   };
 
   const handleDeleteScreenshot = async (url: string) => {
+    if (!trade) return;
     const ok = await notify.confirm({
       title: isEn ? 'Delete Screenshot' : 'حذف تصویر',
       message: isEn ? 'Are you sure you want to delete this screenshot?' : 'آیا از حذف این تصویر اطمینان دارید؟',
@@ -167,6 +221,7 @@ export default function TradeReviewPage({ tradeId }: TradeReviewPageProps) {
   };
 
   const handleAddEvent = async () => {
+    if (!trade) return;
     if (!newEvent.title.trim()) {
       notify.error(isEn ? 'Title is required' : 'عنوان الزامی است');
       return;
@@ -212,6 +267,7 @@ export default function TradeReviewPage({ tradeId }: TradeReviewPageProps) {
   };
 
   const handleDeleteEvent = async (eventId: string) => {
+    if (!trade) return;
     const ok = await notify.confirm({
       title: isEn ? 'Delete Event' : 'حذف رویداد',
       message: isEn ? 'Are you sure you want to delete this event?' : 'آیا از حذف این رویداد اطمینان دارید؟',
@@ -244,7 +300,7 @@ export default function TradeReviewPage({ tradeId }: TradeReviewPageProps) {
   };
 
   const calculateScore = () => {
-    if (!trade.plan) return 0;
+    if (!trade || !trade.plan) return 0;
     let score = 0;
     if (trade.plan.planFollowed) score += 25;
     if (trade.plan.entryTimingCorrect) score += 25;
@@ -252,46 +308,6 @@ export default function TradeReviewPage({ tradeId }: TradeReviewPageProps) {
     if (trade.plan.managedAccordingToRules) score += 25;
     return score;
   };
-
-  const excursionData = useMemo(() => {
-    if (!trade) return null;
-    const sym = trade.symbol?.toUpperCase() || '';
-    const pipMult = sym.includes('JPY') ? 100 : (sym.includes('XAU') || sym.includes('GOLD')) ? 100 : (sym.includes('BTC') || sym.includes('ETH')) ? 1 : 10000;
-    const rawRiskPips = trade.stopLoss && trade.stopLoss > 0
-      ? Math.abs(trade.openPrice - trade.stopLoss) * pipMult
-      : (trade.pips ? Math.abs(trade.pips) : 15);
-    const tradePips = trade.pips ?? ((trade.closePrice && trade.openPrice) ? (trade.direction === 'BUY' ? (trade.closePrice - trade.openPrice) * pipMult : (trade.openPrice - trade.closePrice) * pipMult) : 0);
-    const tradeR = trade.rMultiple ?? (rawRiskPips > 0 ? tradePips / rawRiskPips : 0);
-
-    const dynamicMaePips = trade.maePips ?? (tradePips < 0 ? parseFloat(Math.abs(tradePips).toFixed(1)) : parseFloat((rawRiskPips * 0.2).toFixed(1)));
-    const dynamicMaeR = trade.maeR ?? (tradeR < 0 ? Math.max(1.0, parseFloat(Math.abs(tradeR).toFixed(2))) : parseFloat((dynamicMaePips / (rawRiskPips || 1)).toFixed(2)));
-
-    const dynamicMfePips = trade.mfePips ?? (tradePips > 0 ? parseFloat(tradePips.toFixed(1)) : parseFloat((rawRiskPips * 0.35).toFixed(1)));
-    const dynamicMfeR = trade.mfeR ?? (tradeR > 0 ? parseFloat(tradeR.toFixed(2)) : parseFloat((dynamicMfePips / (rawRiskPips || 1)).toFixed(2)));
-
-    const dynamicExitEff = trade.exitEfficiencyPct ?? (tradePips > 0 && dynamicMfePips > 0 ? Math.min(100, Math.round((tradePips / dynamicMfePips) * 100)) : (tradePips <= 0 ? 0 : 100));
-    const dynamicMoneyLeftR = trade.moneyLeftOnTableR ?? (dynamicMfeR > tradeR ? parseFloat((dynamicMfeR - Math.max(0, tradeR)).toFixed(2)) : 0);
-
-    const totalSpan = (dynamicMaeR || 1) + (dynamicMfeR || 1);
-    const maePct = Math.min(60, Math.max(15, (dynamicMaeR / totalSpan) * 100));
-    const mfePct = 100 - maePct;
-
-    return {
-      dynamicMaePips,
-      dynamicMaeR,
-      dynamicMfePips,
-      dynamicMfeR,
-      dynamicExitEff,
-      dynamicMoneyLeftR,
-      tradeR,
-      tradePips,
-      maePct,
-      mfePct,
-    };
-  }, [trade]);
-
-  const score = calculateScore();
-  const isWin = trade.rMultiple > 0;
 
   const fmtTime = (dateStr: string) => {
     const d = new Date(dateStr);
@@ -312,6 +328,31 @@ export default function TradeReviewPage({ tradeId }: TradeReviewPageProps) {
     }
   };
 
+  if (loading) {
+    return (
+      <div style={{ padding: '60px 20px', textAlign: 'center', color: '#8898aa', minHeight: '60vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '16px' }}>
+        <div style={{ width: '36px', height: '36px', border: '3px solid rgba(255,255,255,0.1)', borderTopColor: '#3b82f6', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></div>
+        <span>{isEn ? 'Loading trade review data...' : 'در حال دریافت اطلاعات بررسی معامله...'}</span>
+      </div>
+    );
+  }
+
+  if (error || !trade) {
+    return (
+      <div style={{ padding: '60px 20px', textAlign: 'center', color: '#8898aa', minHeight: '60vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '16px' }}>
+        <span className="material-symbols-outlined" style={{ fontSize: '48px', color: '#ef4444' }}>error</span>
+        <h3 style={{ color: '#fff', margin: 0 }}>{error || (isEn ? 'Trade not found' : 'معامله یافت نشد')}</h3>
+        <button className="btn btn-secondary" onClick={() => router.push('/trades')}>
+          <span className="material-symbols-outlined">{isEn ? 'arrow_back' : 'arrow_forward'}</span>
+          {isEn ? 'Back to Trades' : 'بازگشت به معاملات'}
+        </button>
+      </div>
+    );
+  }
+
+  const score = calculateScore();
+  const isWin = (trade.rMultiple ?? 0) > 0;
+
   return (
     <div className="trade-review-page">
       {/* 1. Sticky Header */}
@@ -323,7 +364,7 @@ export default function TradeReviewPage({ tradeId }: TradeReviewPageProps) {
           </button>
           
           <div className="symbol-badge">
-            <span className={`direction ${trade.direction.toLowerCase()}`}>{trade.direction}</span>
+            <span className={`direction ${(trade.direction?.toLowerCase() || 'buy')}`}>{trade.direction}</span>
             {trade.symbol}
           </div>
 
@@ -332,14 +373,17 @@ export default function TradeReviewPage({ tradeId }: TradeReviewPageProps) {
               <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>
                 {isWin ? 'trending_up' : 'trending_down'}
               </span>
-              {trade.rMultiple > 0 ? '+' : ''}{trade.rMultiple.toFixed(1)}R
+              {(trade.rMultiple ?? 0) > 0 ? '+' : ''}{(trade.rMultiple ?? 0).toFixed(1)}R
             </span>
             <span>•</span>
             <span>{isWin ? (isEn ? 'Winning Trade' : 'معامله سودده') : (isEn ? 'Losing Trade' : 'معامله زیان‌ده')}</span>
             {trade.setup?.concept && (
               <>
                 <span>•</span>
-                <span>{trade.setup.concept.name}</span>
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                  {trade.setup.concept.icon && <ConceptIcon icon={trade.setup.concept.icon} size={14} />}
+                  {trade.setup.concept.name}
+                </span>
               </>
             )}
             <span>•</span>
@@ -466,7 +510,7 @@ export default function TradeReviewPage({ tradeId }: TradeReviewPageProps) {
                   </div>
                   <div className="legend-item">
                     <span className="dot-realized"></span>
-                    <span>{isEn ? 'Realized Outcome:' : 'نتیجه محقق‌شده:'} {trade.rMultiple > 0 ? '+' : ''}{trade.rMultiple.toFixed(1)}R</span>
+                    <span>{isEn ? 'Realized Outcome:' : 'نتیجه محقق‌شده:'} {(trade.rMultiple ?? 0) > 0 ? '+' : ''}{(trade.rMultiple ?? 0).toFixed(1)}R</span>
                   </div>
                   <div className="legend-item">
                     <span className="dot-mfe"></span>

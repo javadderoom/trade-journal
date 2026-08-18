@@ -462,6 +462,179 @@ pips: pips,
 });
 
 /**
+ * GET /api/trades/:id
+ * Fetches a single trade by ID.
+ */
+router.get('/:id', authenticate, async (req: AuthRequest, res: Response) => {
+  try {
+    const id = req.params.id as string;
+    const userId = req.user!.userId;
+
+    const trade = await prisma.trade.findFirst({
+      where: { id, user_id: userId },
+      include: {
+        annotation: true,
+        account: {
+          select: {
+            id: true,
+            broker_name: true,
+            account_number: true,
+            account_type: true,
+          }
+        },
+        setup: {
+          include: {
+            concept: true,
+          }
+        },
+        triggers: {
+          include: {
+            concept: true,
+          }
+        },
+        confluences: {
+          include: {
+            concept: true,
+          }
+        },
+        plan: true,
+        events: {
+          orderBy: { timestamp: 'asc' },
+        },
+      }
+    });
+
+    if (!trade) {
+      return res.status(404).json({ error: 'معامله یافت نشد' });
+    }
+
+    const isBuy = trade.direction === 'BUY';
+    const isClosed = trade.close_time !== null;
+    const openPrice = trade.open_price ?? 0;
+    const closePrice = trade.close_price ?? null;
+
+    let pips = 0;
+    if (isClosed && closePrice) {
+      const multiplier = trade.symbol.includes('JPY') || trade.symbol.includes('XAU') ? 100 : 10000;
+      pips = isBuy ? (closePrice - openPrice) * multiplier : (openPrice - closePrice) * multiplier;
+    }
+
+    let rMultiple = trade.r_multiple ?? 0;
+    const stopLossVal = trade.stop_loss ?? 0;
+    if (stopLossVal > 0 && openPrice > 0) {
+      const risk = isBuy ? (openPrice - stopLossVal) : (stopLossVal - openPrice);
+      if (risk > 0) {
+        const exitPrice = closePrice ?? openPrice;
+        const reward = isBuy ? (exitPrice - openPrice) : (openPrice - exitPrice);
+        rMultiple = reward / risk;
+      }
+    }
+
+    const formattedTrade = {
+      id: trade.id,
+      accountId: trade.account_id,
+      ticket: trade.ticket,
+      symbol: trade.symbol,
+      direction: trade.direction,
+      openTime: trade.open_time.toISOString(),
+      closeTime: trade.close_time ? trade.close_time.toISOString() : null,
+      openPrice: trade.open_price,
+      closePrice: trade.close_price,
+      lotSize: trade.lot_size,
+      stopLoss: trade.stop_loss,
+      takeProfit: trade.take_profit,
+      profitUsd: trade.profit_usd,
+      commission: trade.commission,
+      swap: trade.swap,
+      pips: trade.pips ?? pips,
+      rMultiple: rMultiple,
+      maePips: trade.mae_pips,
+      maeR: trade.mae_r,
+      mfePips: trade.mfe_pips,
+      mfeR: trade.mfe_r,
+      exitEfficiencyPct: trade.exit_efficiency_pct,
+      moneyLeftOnTableR: trade.money_left_on_table_r,
+      account: trade.account ? {
+        id: trade.account.id,
+        brokerName: trade.account.broker_name,
+        accountNumber: trade.account.account_number,
+        accountType: trade.account.account_type,
+      } : null,
+      annotation: trade.annotation ? {
+        htfBias: trade.annotation.htf_bias ?? null,
+        session: trade.annotation.session ?? null,
+        marketCondition: trade.annotation.market_condition ?? null,
+        analysisTimeframe: trade.annotation.analysis_timeframe ?? null,
+        entryTimeframe: trade.annotation.entry_timeframe ?? null,
+        thesis: trade.annotation.thesis ?? null,
+        expectation: trade.annotation.expectation ?? null,
+        lesson: trade.annotation.lesson ?? null,
+        conviction: trade.annotation.conviction ?? null,
+        emotion: trade.annotation.emotion ?? null,
+        notes: trade.annotation.notes ?? null,
+        screenshots: trade.annotation.screenshots ?? [],
+      } : null,
+      setup: trade.setup ? {
+        conceptId: trade.setup.concept_id,
+        concept: trade.setup.concept ? {
+          id: trade.setup.concept.id,
+          name: trade.setup.concept.name,
+          color: trade.setup.concept.color,
+          icon: trade.setup.concept.icon,
+        } : null,
+      } : null,
+      triggers: trade.triggers?.map(t => ({
+        conceptId: t.concept_id,
+        concept: t.concept ? {
+          id: t.concept.id,
+          name: t.concept.name,
+          color: t.concept.color,
+          icon: t.concept.icon,
+        } : null,
+      })) ?? [],
+      confluences: trade.confluences?.map(c => ({
+        conceptId: c.concept_id,
+        concept: c.concept ? {
+          id: c.concept.id,
+          name: c.concept.name,
+          color: c.concept.color,
+          icon: c.concept.icon,
+        } : null,
+      })) ?? [],
+      plan: trade.plan ? {
+        maxRisk: trade.plan.max_risk,
+        expectedRr: trade.plan.expected_rr,
+        entryCondition: trade.plan.entry_condition,
+        invalidation: trade.plan.invalidation,
+        targetZone: trade.plan.target_zone,
+        expectedHoldTime: trade.plan.expected_hold_time,
+        planFollowed: trade.plan.plan_followed,
+        entryTimingCorrect: trade.plan.entry_timing_correct,
+        emotionsAffected: trade.plan.emotions_affected,
+        managedAccordingToRules: trade.plan.managed_according_to_rules,
+      } : null,
+      events: trade.events?.map(e => ({
+        id: e.id,
+        tradeId: e.trade_id,
+        type: e.type,
+        timestamp: e.timestamp.toISOString(),
+        title: e.title,
+        description: e.description,
+        metadata: e.metadata,
+        attachments: e.attachments,
+        createdAt: e.created_at.toISOString(),
+      })) ?? [],
+      importSource: trade.import_source,
+    };
+
+    res.status(200).json(formattedTrade);
+  } catch (err: any) {
+    console.error('Fetch single trade error:', err);
+    res.status(500).json({ error: 'خطای داخلی سرور' });
+  }
+});
+
+/**
  * PUT /api/trades/:id
  * Updates trade fields — notes, emotion, tags, SL/TP, close/reopen, or core trade data.
  */

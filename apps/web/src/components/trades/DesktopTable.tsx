@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { Trade } from './TradesTable';
+import ConceptIcon from '../ui/ConceptIcon';
 import { toPersianDigits, formatToman } from '../../utils/farsi';
 import { useTranslation } from '../../store/useAppStore';
 import {
@@ -273,14 +274,18 @@ export default function DesktopTable({
                               </span>
                             )}
                             {setup && (
-                              <span key={setup.id} className="tag-mini-pill" style={{ borderLeft: `3px solid ${setup.color || '#3b82f6'}`, backgroundColor: 'rgba(59, 130, 246, 0.1)', padding: '2px 6px', borderRadius: '4px', fontSize: '11px', color: '#fff' }}>
-                                {setup.icon && <span style={{ marginRight: '4px' }}>{setup.icon}</span>}
+                              <span key={setup.id} className="tag-mini-pill" style={{ borderLeft: `3px solid ${setup.color || '#3b82f6'}`, backgroundColor: 'rgba(59, 130, 246, 0.1)', padding: '2px 6px', borderRadius: '4px', fontSize: '11px', color: '#fff', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                                {setup.icon && <ConceptIcon icon={setup.icon} size={12} />}
                                 {setup.name}
                               </span>
                             )}
                             {trade.triggers && trade.triggers.map((t, idx) => (
-                              <span key={`trigger-${idx}`} className="tag-mini-pill" style={{ border: `1px solid ${t.concept.color || '#f59e0b'}`, backgroundColor: 'rgba(245, 158, 11, 0.05)', padding: '1px 5px', borderRadius: '4px', fontSize: '11px', color: '#fff', display: 'flex', alignItems: 'center' }}>
-                                <span className="material-symbols-outlined" style={{ fontSize: '12px', marginRight: '2px', color: t.concept.color || '#f59e0b' }}>bolt</span>
+                              <span key={`trigger-${idx}`} className="tag-mini-pill" style={{ border: `1px solid ${t.concept.color || '#f59e0b'}`, backgroundColor: 'rgba(245, 158, 11, 0.05)', padding: '1px 5px', borderRadius: '4px', fontSize: '11px', color: '#fff', display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
+                                {t.concept.icon ? (
+                                  <ConceptIcon icon={t.concept.icon} size={12} style={{ color: t.concept.color || '#f59e0b' }} />
+                                ) : (
+                                  <span className="material-symbols-outlined" style={{ fontSize: '12px', color: t.concept.color || '#f59e0b' }}>bolt</span>
+                                )}
                                 {t.concept.name}
                               </span>
                             ))}

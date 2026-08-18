@@ -4,12 +4,12 @@
 .trades-workspace {
   display: flex;
   width: 100%;
-  height: calc(100vh - 64px); // Adjust based on header if any, or full height
+  flex: 1;
+  min-height: 0;
   background-color: transparent;
   color: $on-surface;
   font-family: $font-primary;
   overflow: hidden;
-
 }
 
 .trades-main-content {

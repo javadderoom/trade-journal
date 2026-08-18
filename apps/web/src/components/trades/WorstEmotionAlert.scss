@@ -1,5 +1,6 @@
 .worst-emotion-alert {
   position: relative;
+  flex-shrink: 0;
   margin-top: 16px;
   margin-bottom: 20px;
   padding: 16px 20px;
@@ -113,6 +114,7 @@
         font-weight: 600;
       }
 
+      .alert-metrics-pills,
       .metrics-pills {
         display: flex;
         align-items: center;
@@ -122,27 +124,36 @@
         .pill {
           display: inline-flex;
           align-items: center;
-          gap: 4px;
-          padding: 2px 8px;
+          gap: 6px;
+          padding: 3px 10px;
           border-radius: 6px;
           font-size: 0.78rem;
           font-weight: 600;
+          line-height: 1.4;
 
-          &.loss-pill {
+          &.loss,
+          &.loss-pill,
+          &.pnl-pill {
             background: rgba(239, 68, 68, 0.2);
-            color: #ef4444;
+            color: #f87171;
             border: 1px solid rgba(239, 68, 68, 0.35);
+
+            .toman-sub {
+              margin-inline-start: 4px;
+              opacity: 0.85;
+              font-size: 0.74rem;
+            }
           }
 
           &.winrate-pill {
             background: rgba(245, 158, 11, 0.15);
-            color: #f59e0b;
+            color: #fbbf24;
             border: 1px solid rgba(245, 158, 11, 0.3);
           }
 
           &.count-pill {
             background: rgba(107, 114, 128, 0.2);
-            color: #9ca3af;
+            color: #d1d5db;
             border: 1px solid rgba(107, 114, 128, 0.3);
           }
         }

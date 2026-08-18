@@ -207,11 +207,11 @@ export default function WorstEmotionAlert({
             </span>
 
             <span className="pill pnl-pill loss">
-              <span className="material-symbols-outlined" style={{ fontSize: '13px' }}>
+              <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>
                 trending_down
               </span>
               <span dir="ltr">{formattedLoss}</span>
-              {tomanLoss && <span style={{ opacity: 0.85, fontSize: '0.74rem' }}>({tomanLoss})</span>}
+              {tomanLoss && <span className="toman-sub">({tomanLoss})</span>}
             </span>
 
             <span className="pill winrate-pill">

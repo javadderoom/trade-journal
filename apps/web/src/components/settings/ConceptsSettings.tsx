@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { api } from '../../lib/api';
 import { notify } from '../../lib/notify';
 import { useTranslation } from '../../store/useAppStore';
+import ConceptIcon from '../ui/ConceptIcon';
 
 export interface TradingConcept {
   id: string;
@@ -100,7 +101,14 @@ export default function ConceptsSettings() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm(isFa ? 'آیا از حذف این مفهوم اطمینان دارید؟' : 'Are you sure you want to delete this concept?')) return;
+    const ok = await notify.confirm({
+      title: isFa ? 'حذف مفهوم' : 'Delete Concept',
+      message: isFa ? 'آیا از حذف این مفهوم اطمینان دارید؟' : 'Are you sure you want to delete this concept?',
+      confirmLabel: isFa ? 'حذف' : 'Delete',
+      cancelLabel: isFa ? 'انصراف' : 'Cancel',
+      danger: true,
+    });
+    if (!ok) return;
     
     try {
       await api.delete(`/api/trading-concepts/${id}`);
@@ -116,6 +124,8 @@ export default function ConceptsSettings() {
     { value: 'TRIGGER', labelEn: 'Trigger', labelFa: 'تاییدیه (تریگر)' },
     { value: 'CONFLUENCE', labelEn: 'Confluence', labelFa: 'هم‌راستایی (کانفلوئنس)' }
   ];
+
+  const quickEmojis = ['🎯', '⚡', '📈', '📉', '🛡️', '🌊', '🔁', '💥', '🔍', '📊', '🚀', '⭐'];
 
   if (loading) {
     return <div>{isFa ? 'در حال بارگذاری...' : 'Loading...'}</div>;
@@ -148,6 +158,32 @@ export default function ConceptsSettings() {
               placeholder={isFa ? 'مثلا: OB, FVG, MSS...' : 'e.g., OB, FVG, MSS...'}
               style={{ width: '100%', padding: '10px', borderRadius: '6px', background: '#0b0d19', border: '1px solid rgba(255,255,255,0.1)', color: '#fff' }}
             />
+          </div>
+          <div>
+            <label style={{ display: 'block', fontSize: '0.85rem', marginBottom: '6px', color: '#a0aec0' }}>
+              {isFa ? 'آیکون / ایموجی' : 'Icon / Emoji'}
+            </label>
+            <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+              <input 
+                type="text" 
+                value={icon} 
+                onChange={e => setIcon(e.target.value)}
+                placeholder="🎯"
+                style={{ width: '60px', textAlign: 'center', fontSize: '18px', padding: '6px', borderRadius: '6px', background: '#0b0d19', border: '1px solid rgba(255,255,255,0.1)', color: '#fff' }}
+              />
+              <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
+                {quickEmojis.map(em => (
+                  <button
+                    key={em}
+                    type="button"
+                    onClick={() => setIcon(em)}
+                    style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '4px', padding: '2px 6px', cursor: 'pointer', fontSize: '14px' }}
+                  >
+                    {em}
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
           <div>
             <label style={{ display: 'block', fontSize: '0.85rem', marginBottom: '6px', color: '#a0aec0' }}>
@@ -203,7 +239,10 @@ export default function ConceptsSettings() {
         {concepts.map(c => (
           <div key={c.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#0f121d', padding: '15px', borderRadius: '8px', borderLeft: `4px solid ${c.color || '#3b82f6'}` }}>
             <div>
-              <div style={{ fontWeight: 'bold', fontSize: '1rem', marginBottom: '5px' }}>{c.name}</div>
+              <div style={{ fontWeight: 'bold', fontSize: '1rem', marginBottom: '5px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                {c.icon && <ConceptIcon icon={c.icon} size={18} />}
+                <span>{c.name}</span>
+              </div>
               <div style={{ display: 'flex', gap: '8px' }}>
                 {c.allowed_roles.map(r => {
                   const opt = roleOptions.find(ro => ro.value === r);

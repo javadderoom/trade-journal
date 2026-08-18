@@ -179,7 +179,17 @@ export default function TradesPage() {
   };
 
   return (
-    <main style={{ backgroundColor: 'transparent', minHeight: '100%' }}>
+    <main
+      className="trades-page-main"
+      style={{
+        backgroundColor: 'transparent',
+        height: '100vh',
+        maxHeight: '100vh',
+        display: 'flex',
+        flexDirection: 'column',
+        overflow: 'hidden',
+      }}
+    >
       <SubscriptionBanners
         subStatus={subStatus}
         dismissedRejectionId={dismissedRejectionId}

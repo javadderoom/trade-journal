@@ -17,8 +17,8 @@ interface FilterBarProps {
   selectedSymbol: string;
   setSelectedSymbol: (val: string) => void;
   symbolOptions: string[];
-  selectedDirection: string;
-  setSelectedDirection: (val: string) => void;
+  selectedDirection: 'ALL' | 'BUY' | 'SELL';
+  setSelectedDirection: (val: 'ALL' | 'BUY' | 'SELL') => void;
   selectedTimezone: string;
   setSelectedTimezone: (val: string) => void;
   usdToToman: number;
@@ -149,8 +149,8 @@ export default function FilterBar({
                   setCurrentPage(1);
                 }}
                 options={[
-                  { value: t('filters.allSymbols'), label: t('filters.allSymbols') },
-                  ...getSymbolFilterOptions(symbolOptions.filter(s => s !== t('filters.allSymbols')))
+                  { value: 'ALL', label: t('filters.allSymbols') },
+                  ...getSymbolFilterOptions(symbolOptions.filter(s => s !== 'ALL' && s !== t('filters.allSymbols') && s !== 'All Symbols' && s !== 'همه نمادها'))
                 ]}
               />
             </div>
@@ -160,13 +160,13 @@ export default function FilterBar({
               <Select
                 value={selectedDirection}
                 onChange={(val) => {
-                  setSelectedDirection(val);
+                  setSelectedDirection(val as 'ALL' | 'BUY' | 'SELL');
                   setCurrentPage(1);
                 }}
                 options={[
-                  { value: t('filters.allDirections'), label: t('filters.allDirections') },
-                  { value: t('filters.buy'), label: t('filters.buy') },
-                  { value: t('filters.sell'), label: t('filters.sell') },
+                  { value: 'ALL', label: t('filters.allDirections') },
+                  { value: 'BUY', label: t('filters.buy') },
+                  { value: 'SELL', label: t('filters.sell') },
                 ]}
               />
             </div>
@@ -213,8 +213,8 @@ export default function FilterBar({
               className="btn btn-secondary btn-clear"
               onClick={() => {
                 setSearchQuery('');
-                setSelectedSymbol(t('filters.allSymbols'));
-                setSelectedDirection(t('filters.allDirections'));
+                setSelectedSymbol('ALL');
+                setSelectedDirection('ALL');
                 setSelectedStatus('ALL');
                 setCurrentPage(1);
               }}
