@@ -70,7 +70,7 @@ export default function TradeReviewPage({ tradeId }: TradeReviewPageProps) {
       });
 
     return () => { isMounted = false; };
-  }, [tradeId, trades, isEn]);
+  }, [tradeId, isEn]);
 
   const excursionData = useMemo(() => {
     if (!trade) return null;

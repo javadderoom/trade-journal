@@ -190,13 +190,13 @@
     "semantic_hash": ""
   },
   "apps/web/src/components/trades/DesktopTable.tsx": {
-    "mtime": 1787049091.6586368,
-    "ast_hash": "e67ffb39c2600e30774b4a41d8644196",
+    "mtime": 1787049376.6026547,
+    "ast_hash": "18a68962723e3bd27c8d5af357fef5ef",
     "semantic_hash": ""
   },
   "apps/web/src/components/trades/DetailPanel.tsx": {
-    "mtime": 1786997410.060252,
-    "ast_hash": "85e98be1d6cd1d5ba0081e4060981f03",
+    "mtime": 1787049317.8413832,
+    "ast_hash": "eef95646c797187dfbd8fc4ea09098d4",
     "semantic_hash": ""
   },
   "apps/web/src/components/trades/FilterBar.tsx": {
@@ -205,8 +205,8 @@
     "semantic_hash": ""
   },
   "apps/web/src/components/trades/MobileCardsList.tsx": {
-    "mtime": 1787049105.1948876,
-    "ast_hash": "d7361c8ffa3ab3c9dd3a00722aaaf1b7",
+    "mtime": 1787049398.8778727,
+    "ast_hash": "aebf585cdb9dd4befb06940d56507cb9",
     "semantic_hash": ""
   },
   "apps/web/src/components/trades/SummaryBar.tsx": {
@@ -1595,8 +1595,8 @@
     "semantic_hash": ""
   },
   "apps/web/src/components/settings/ConceptsSettings.tsx": {
-    "mtime": 1787049074.3769684,
-    "ast_hash": "840b060902fc66780f6257697217e279",
+    "mtime": 1787049443.6154041,
+    "ast_hash": "48dbd42dcff6f4f8becbfa3275a1501f",
     "semantic_hash": ""
   },
   "apps/web/src/components/tools/PipCalculator.tsx": {
@@ -1775,8 +1775,8 @@
     "semantic_hash": ""
   },
   "apps/web/src/components/trades/TradeReviewPage.tsx": {
-    "mtime": 1787049116.1155665,
-    "ast_hash": "b87c520098231b9c3b3cccde24f88dcd",
+    "mtime": 1787049423.8535614,
+    "ast_hash": "f34148bd8d903ad5d4eca6bf29c47f35",
     "semantic_hash": ""
   },
   "apps/api/audit_output.txt": {
@@ -2050,8 +2050,8 @@
     "semantic_hash": ""
   },
   "apps/web/src/components/modals/BulkTagModal.tsx": {
-    "mtime": 1787049133.048622,
-    "ast_hash": "38896307df6e4523a20d794acda45ed3",
+    "mtime": 1787050239.491056,
+    "ast_hash": "9b5361df97ccbf42508bcd5209d41496",
     "semantic_hash": ""
   },
   "apps/web/src/components/trades/WorstEmotionAlert.tsx": {
@@ -2097,6 +2097,11 @@
   "plans/trader-decision-making-features.md": {
     "mtime": 1787002012.1875217,
     "ast_hash": "9f9a893881c5e9b26ff219607ff508e2",
+    "semantic_hash": ""
+  },
+  "apps/web/src/components/ui/ConceptIcon.tsx": {
+    "mtime": 1787049292.016129,
+    "ast_hash": "43c0b452826bf971c84037f2b8a1fef0",
     "semantic_hash": ""
   }
 }

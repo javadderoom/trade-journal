@@ -60,7 +60,7 @@ export default function TradeInspectPage({ tradeId }: TradeInspectPageProps) {
       });
 
     return () => { isMounted = false; };
-  }, [tradeId, trades, isEn]);
+  }, [tradeId, isEn]);
 
   if (loading) {
     return (

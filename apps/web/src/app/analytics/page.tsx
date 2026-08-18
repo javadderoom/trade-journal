@@ -50,19 +50,12 @@ export default function JournalPage() {
     fetchTrades,
   } = useTradeStore();
 
-  const [customEmotions, setCustomEmotions] = useState<{ value: string; label: string; emoji?: string }[]>([]);
-
   // Load trades and accounts if empty
   useEffect(() => {
     fetchTrades({ isManualRefresh: false, accountId: selectedAccountId });
   }, [selectedAccountId]);
 
-  const { emotions: fetchedEmotions } = useTradesEmotions();
-  useEffect(() => {
-    if (Array.isArray(fetchedEmotions)) {
-      setCustomEmotions(fetchedEmotions);
-    }
-  }, [fetchedEmotions]);
+  const { emotions: customEmotions = [] } = useTradesEmotions();
 
   // Compute Statistics (Tier 1 & Tier 2)
   const stats = useMemo(() => {
