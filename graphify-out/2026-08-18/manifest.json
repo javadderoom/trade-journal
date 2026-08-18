@@ -5,8 +5,8 @@
     "semantic_hash": ""
   },
   "apps/api/src/routes/tradeSync.ts": {
-    "mtime": 1787045180.0546288,
-    "ast_hash": "dbd997149d5f65c39f3e8ad5f79b8f77",
+    "mtime": 1787063219.0322435,
+    "ast_hash": "a4f79dee9b3fdcaad66465a5297efd20",
     "semantic_hash": ""
   },
   "apps/api/src/server.ts": {
@@ -335,8 +335,8 @@
     "semantic_hash": ""
   },
   "apps/web/src/app/analytics/page.tsx": {
-    "mtime": 1786986804.8546557,
-    "ast_hash": "bec15c23ae55411a5860dbaad2e3c4be",
+    "mtime": 1787063077.1958811,
+    "ast_hash": "2c310b291ecd4ccab4bc87d4d4c44562",
     "semantic_hash": ""
   },
   ".agents/skills/impeccable/scripts/command-metadata.json": {
@@ -1770,13 +1770,13 @@
     "semantic_hash": ""
   },
   "apps/web/src/components/trades/TradeInspectPage.tsx": {
-    "mtime": 1787045376.0132487,
-    "ast_hash": "0b52fb5e515465aeb3a5555586882fc5",
+    "mtime": 1787063295.4237723,
+    "ast_hash": "45487f5ada2503a7b0da9c69e8134252",
     "semantic_hash": ""
   },
   "apps/web/src/components/trades/TradeReviewPage.tsx": {
-    "mtime": 1787049423.8535614,
-    "ast_hash": "f34148bd8d903ad5d4eca6bf29c47f35",
+    "mtime": 1787063261.1852794,
+    "ast_hash": "02f3f81cb0725edbf713ddbf1de50849",
     "semantic_hash": ""
   },
   "apps/api/audit_output.txt": {
