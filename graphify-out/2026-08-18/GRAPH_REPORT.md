@@ -1,16 +1,16 @@
 # Graph Report - trade-journal  (2026-08-18)
 
 ## Corpus Check
-- 408 files · ~472,479 words
+- 413 files · ~472,648 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 4019 nodes · 8148 edges · 208 communities (189 shown, 19 thin omitted)
+- 4027 nodes · 8183 edges · 205 communities (187 shown, 18 thin omitted)
 - Extraction: 99% EXTRACTED · 1% INFERRED · 0% AMBIGUOUS · INFERRED: 109 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `5588be25`
+- Built from commit: `6385627a`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -112,7 +112,6 @@
 - [[_COMMUNITY_critique-storage.mjs|critique-storage.mjs]]
 - [[_COMMUNITY_VPS Deployment Guide using Coolify|VPS Deployment Guide using Coolify]]
 - [[_COMMUNITY_sampleCssBackground|sampleCssBackground]]
-- [[_COMMUNITY_showBar|showBar]]
 - [[_COMMUNITY_servicestradeSync.ts|services/tradeSync.ts]]
 - [[_COMMUNITY_DESIGN|DESIGN.md]]
 - [[_COMMUNITY_animate|animate.md]]
@@ -132,7 +131,6 @@
 - [[_COMMUNITY_readConfig|readConfig]]
 - [[_COMMUNITY_palette.mjs|palette.mjs]]
 - [[_COMMUNITY_pin.mjs|pin.mjs]]
-- [[_COMMUNITY_General rules|General rules]]
 - [[_COMMUNITY_apipackage.json|api/package.json]]
 - [[_COMMUNITY_dashboard.ts|dashboard.ts]]
 - [[_COMMUNITY_Self-Hosted Mail Server Setup Guide (Stalwart + Coolify)|Self-Hosted Mail Server Setup Guide (Stalwart + Coolify)]]
@@ -140,7 +138,6 @@
 - [[_COMMUNITY_@prismaclient|@prisma/client]]
 - [[_COMMUNITY_Responsive Design|Responsive Design]]
 - [[_COMMUNITY_Craft Flow|Craft Flow]]
-- [[_COMMUNITY_Generate Combined Critique Report|Generate Combined Critique Report]]
 - [[_COMMUNITY_Product register|Product register]]
 - [[_COMMUNITY_resolveWorkspaceProjectRoot|resolveWorkspaceProjectRoot]]
 - [[_COMMUNITY_normalizeIgnoreValueEntries|normalizeIgnoreValueEntries]]
@@ -220,9 +217,9 @@
 3. `useAuthStore` - 53 edges
 4. `toPersianDigits()` - 51 edges
 5. `api` - 42 edges
-6. `fetch()` - 38 edges
-7. `notify` - 35 edges
-8. `prisma` - 34 edges
+6. `prisma` - 38 edges
+7. `fetch()` - 38 edges
+8. `notify` - 35 edges
 9. `runHook()` - 30 edges
 10. `✅ Done` - 28 edges
 
@@ -241,7 +238,7 @@
 ## Import Cycles
 - None detected.
 
-## Communities (208 total, 19 thin omitted)
+## Communities (205 total, 18 thin omitted)
 
 ### Community 0 - "معامله‌یار — Persian Trading Journal Platform"
 Cohesion: 0.06
@@ -249,19 +246,19 @@ Nodes (34): 10. Key Risks & Mitigations, 11. Suggested Next Steps, 1. Project Ov
 
 ### Community 1 - "live-browser.js"
 Cohesion: 0.03
-Nodes (101): acceptedDomAlreadyClean(), applyGlobalBarLabelState(), applyPlaceholderDimensions(), applyPlaceholderSizingStyles(), averageRgb01(), beginEditPin(), buildAnnotationsForCapture(), buildPinElement() (+93 more)
+Nodes (100): acceptedDomAlreadyClean(), applyGlobalBarLabelState(), averageRgb01(), beginEditPin(), buildAnnotationsForCapture(), buildPinElement(), buildSvelteExpressionTextMap(), buildSveltePropValuesFromLiveElement() (+92 more)
 
 ### Community 2 - "checks.mjs"
-Cohesion: 0.07
-Nodes (35): Admin2Dashboard(), AdminStats, CommunityReport, CommunityReport, GREGORIAN_MONTH_NAMES, GREGORIAN_WEEKDAY_NAMES_SHORT, JALALI_MONTH_NAMES, WEEKDAY_NAMES_EN (+27 more)
+Cohesion: 0.05
+Nodes (66): Admin2Dashboard(), AdminStats, JournalPage(), CommunityReport, CommunityReport, GREGORIAN_MONTH_NAMES, GREGORIAN_WEEKDAY_NAMES_SHORT, JALALI_MONTH_NAMES (+58 more)
 
 ### Community 3 - "el"
 Cohesion: 0.04
 Nodes (84): borderColorsFromStyle(), borderWidthsFromStyle(), checkBorders(), checkClippedOverflow(), checkCreamPalette(), checkElementBorders(), checkElementBordersDOM(), checkElementClippedOverflow() (+76 more)
 
 ### Community 4 - "index.mjs"
-Cohesion: 0.11
-Nodes (19): JournalEditor(), JournalEditorProps, JournalPage(), getSharedTranslations(), ExportModal(), ExportModalProps, ImportAccount, ImportMT4Modal() (+11 more)
+Cohesion: 0.25
+Nodes (7): optionalAuthenticate(), router, upload, uploadDir, CommunityTradePreview, FullTrade, mapTradeToCommunityPreview()
 
 ### Community 5 - "live-inject.mjs"
 Cohesion: 0.07
@@ -272,8 +269,8 @@ Cohesion: 0.06
 Nodes (65): addBrowserFindings(), addVisualContrastFindings(), addVisualContrastResult(), analyzeVisualContrast(), analyzeVisualContrastCandidate(), blendRgba(), browserDesignSystemConfig(), browserFindingsFromMap() (+57 more)
 
 ### Community 7 - "TradesTable.tsx"
-Cohesion: 0.09
-Nodes (62): abortSvelteComponentInjection(), buildInsertPlaceholderSnapshotFromDom(), buildPickedAnchorSnapshot(), cancelEditing(), cancelEditingToPicking(), cancelInsertConfigure(), checkpointPayload(), cleanup() (+54 more)
+Cohesion: 0.10
+Nodes (57): abortSvelteComponentInjection(), buildInsertPlaceholderSnapshotFromDom(), buildPickedAnchorSnapshot(), cancelEditing(), cancelEditingToPicking(), cancelInsertConfigure(), checkpointPayload(), cleanup() (+49 more)
 
 ### Community 8 - "package.json"
 Cohesion: 0.11
@@ -281,7 +278,7 @@ Nodes (18): dependencies, impeccable, devDependencies, agentation, concurrently,
 
 ### Community 9 - "hook-lib.mjs"
 Cohesion: 0.08
-Nodes (35): View, View, ReplayToolbar(), ReplayToolbarProps, EmptyFeedState(), CONTENT, EaSetupHelpPage(), ConceptsSettings() (+27 more)
+Nodes (36): View, View, ReplayToolbar(), ReplayToolbarProps, EmptyFeedState(), CONTENT, EaSetupHelpPage(), AppState (+28 more)
 
 ### Community 10 - "معامله‌یار — Run Commands"
 Cohesion: 0.18
@@ -292,8 +289,8 @@ Cohesion: 0.25
 Nodes (7): compilerOptions, esModuleInterop, module, moduleResolution, skipLibCheck, strict, target
 
 ### Community 12 - "showToast"
-Cohesion: 0.07
-Nodes (34): authenticate(), AuthRequest, optionalAuthenticate(), requireAdmin(), router, eaStorage, eaUpload, router (+26 more)
+Cohesion: 0.08
+Nodes (35): authenticate(), AuthRequest, requireAdmin(), router, eaStorage, eaUpload, router, router (+27 more)
 
 ### Community 13 - "setLiveState"
 Cohesion: 0.11
@@ -336,8 +333,8 @@ Cohesion: 0.07
 Nodes (36): buildSelectorSegment(), checkBorders(), checkBrowserDesignSystemSources(), checkClippedOverflow(), checkElementBorders(), checkElementBordersDOM(), checkElementClippedOverflow(), checkElementClippedOverflowDOM() (+28 more)
 
 ### Community 23 - "hook-before-edit.mjs"
-Cohesion: 0.10
-Nodes (43): appendCssToSvelteStyle(), appendSanitizedCssRule(), applyDeferredSvelteComponentAccepts(), bakeParamValuesInCss(), buildInsertVariantStub(), buildPropContract(), buildPropsScript(), buildVariantStub() (+35 more)
+Cohesion: 0.12
+Nodes (36): appendCssToSvelteStyle(), appendSanitizedCssRule(), bakeParamValuesInCss(), buildInsertVariantStub(), buildPropContract(), buildPropsScript(), buildVariantStub(), componentSessionDir() (+28 more)
 
 ### Community 24 - "manual-apply.mjs"
 Cohesion: 0.08
@@ -360,20 +357,20 @@ Cohesion: 0.05
 Nodes (41): 1. Read the screenshot (if present), 2. Wrap the element, 3. Load the action's reference, 4. Plan three variants: identity first, then mode, then axes, 5. Apply the freeform prompt (if present), 6. Write all variants in a single edit, 7. Parameters (composition-sized, 0–4 per variant), 8. Signal done (+33 more)
 
 ### Community 29 - "design-parser.mjs"
-Cohesion: 0.07
-Nodes (34): metadata, BookmarksFeed(), Comment, CommentNode(), CommentSection(), CommunityFeed(), CommunityPostCard(), PostProps (+26 more)
+Cohesion: 0.06
+Nodes (36): AILogModalProps, metadata, BookmarksFeed(), Comment, CommentNode(), CommentSection(), CommunityFeed(), CommunityPostCard() (+28 more)
 
 ### Community 30 - "✅ Done"
 Cohesion: 0.09
 Nodes (36): applySvelteKitLiveAdapter(), buildSvelteLiveRootComponent(), defaultSvelteLayout(), detectSvelteKitProject(), ensureSvelteLiveRootComponent(), escapeRegExp(), fileIncludes(), findSvelteKitAppHtml() (+28 more)
 
 ### Community 31 - "colorize.md"
-Cohesion: 0.11
-Nodes (24): SubscriptionBanners(), SubscriptionBannersProps, DashboardData, DashboardPage(), EquityCurveSVG, fetchJson(), useExchangeRate(), SubStatus (+16 more)
+Cohesion: 0.10
+Nodes (20): SubscriptionBanners(), SubscriptionBannersProps, DashboardData, DashboardPage(), EquityCurveSVG, fetchJson(), useExchangeRate(), SubStatus (+12 more)
 
 ### Community 32 - "live-accept.mjs"
-Cohesion: 0.08
-Nodes (41): JournalPage(), EMOTION_MAP, EmotionDef, EmotionValue, getDefaultEmotions(), getEmotionEmoji(), getEmotionLabel(), useTradesEmotions() (+33 more)
+Cohesion: 0.07
+Nodes (35): EMOTION_MAP, EmotionDef, EmotionValue, getDefaultEmotions(), getEmotionEmoji(), getEmotionLabel(), TradingConcept, useTradingConcepts() (+27 more)
 
 ### Community 33 - "server.ts"
 Cohesion: 0.10
@@ -404,8 +401,8 @@ Cohesion: 0.10
 Nodes (30): buildUpdateDirective(), compareSemver(), computeUpdateDirective(), contextSourcePath(), contextSourceStatus(), DESIGN_NAMES, FALLBACK_DIRS, fetchLatestSkillVersion() (+22 more)
 
 ### Community 40 - "documentRefForElement"
-Cohesion: 0.13
-Nodes (30): acceptCli(), argVal(), buildCarbonizeReplacement(), decodeHtmlAttr(), deindentContent(), detectCommentSyntax(), escapeRegExp(), expandReplaceRange() (+22 more)
+Cohesion: 0.14
+Nodes (28): acceptCli(), argVal(), buildCarbonizeReplacement(), decodeHtmlAttr(), deindentContent(), detectCommentSyntax(), escapeRegExp(), expandReplaceRange() (+20 more)
 
 ### Community 41 - "handleManualEditActivity"
 Cohesion: 0.12
@@ -428,12 +425,12 @@ Cohesion: 0.13
 Nodes (31): applyMockWrites(), buildCopyEditBatchPrompt(), checkFrameworkSourceSyntax(), chooseCopyEditAgent(), COMMAND_AUTH_CACHE, commandAuthed(), commandExists(), compactBatchForPrompt() (+23 more)
 
 ### Community 46 - "payments.ts"
-Cohesion: 0.11
-Nodes (35): activeElementDeep(), armPageChatForTyping(), attachSteerFocusDebug(), clearSteerAwaitTimer(), collapsePageChat(), expandPageChat(), focusConfigureInput(), focusPageChatInput() (+27 more)
+Cohesion: 0.08
+Nodes (48): activeElementDeep(), armPageChatForTyping(), attachSteerFocusDebug(), clearSteerAwaitTimer(), collapsePageChat(), configureVoiceContext(), expandPageChat(), finishVoiceSession() (+40 more)
 
 ### Community 47 - "[locale]/page.tsx"
-Cohesion: 0.08
-Nodes (26): authenticateAccountToken(), checkAccountLimit(), checkCryptoPermission(), checkImportPermission(), checkSyncPermission(), checkTradeLimit(), PLAN_ACCOUNT_LIMITS, avatarDir (+18 more)
+Cohesion: 0.10
+Nodes (25): authenticateAccountToken(), checkCryptoPermission(), checkImportPermission(), checkSyncPermission(), checkTradeLimit(), PLAN_ACCOUNT_LIMITS, router, uploadMemory (+17 more)
 
 ### Community 48 - "onboard.md"
 Cohesion: 0.11
@@ -452,8 +449,8 @@ Cohesion: 0.14
 Nodes (22): cursorBlockMessage(), bumpEditCount(), clampGroupedToBudget(), clampToBudget(), dedupeAgainstCache(), depthIsSet(), directiveFooter(), ensureFile() (+14 more)
 
 ### Community 52 - "context.mjs"
-Cohesion: 0.09
-Nodes (19): loginLimiter, otpRegisterLimiter, otpRegisterSchema, otpSendLimiter, registerLimiter, router, conceptSchema, router (+11 more)
+Cohesion: 0.11
+Nodes (17): loginLimiter, otpRegisterLimiter, otpRegisterSchema, otpSendLimiter, registerLimiter, router, adapter, main() (+9 more)
 
 ### Community 53 - "routes/auth.ts"
 Cohesion: 0.17
@@ -465,7 +462,7 @@ Nodes (25): Assess Adaptation Challenge, Breakpoints: Content-Driven, Content Ad
 
 ### Community 55 - "Auth Implementation Guide"
 Cohesion: 0.14
-Nodes (24): analyzeSourceHint(), buildCandidatesForOp(), buildContextHintsByRef(), collectSearchFiles(), countOps(), escapeRegExp(), findContextMatches(), findLiteralMatches() (+16 more)
+Nodes (25): analyzeSourceHint(), buildCandidatesForOp(), buildContextHintsByRef(), buildManualEditEvidence(), collectSearchFiles(), countOps(), escapeRegExp(), findContextMatches() (+17 more)
 
 ### Community 56 - "✅ Done"
 Cohesion: 0.08
@@ -484,8 +481,8 @@ Cohesion: 0.11
 Nodes (11): canCreateInsert(), clampPlaceholderSize(), computeInsertPosition(), groupSiblingRows(), hitSiblingInsertGap(), horizontalOverlap(), insertCreateDisabledReason(), insertLineCoords() (+3 more)
 
 ### Community 60 - "routes/tradeSync.ts"
-Cohesion: 0.17
-Nodes (21): summarizeManualDiagnostics(), createManualEditRoutes(), sendJson(), summarizePendingManualEditBatch(), countByPage(), getBufferPath(), readBuffer(), readBufferInternal() (+13 more)
+Cohesion: 0.16
+Nodes (22): summarizeManualDiagnostics(), createManualEditRoutes(), sendJson(), summarizePendingManualEditBatch(), countByPage(), getBufferPath(), readBuffer(), readBufferInternal() (+14 more)
 
 ### Community 61 - "Delight Techniques"
 Cohesion: 0.09
@@ -497,7 +494,7 @@ Nodes (22): checkColors(), checkElementAIPaletteDOM(), checkElementColors(), che
 
 ### Community 63 - "parseAnyColor"
 Cohesion: 0.20
-Nodes (15): main(), gemini, getGeminiModel(), coverDir, coverUpload, generateBlogArticle(), generateSocialCopy(), reviewArticle() (+7 more)
+Nodes (14): main(), gemini, getGeminiModel(), coverDir, coverUpload, generateBlogArticle(), generateSocialCopy(), reviewArticle() (+6 more)
 
 ### Community 64 - "detect-html.mjs"
 Cohesion: 0.13
@@ -516,8 +513,8 @@ Cohesion: 0.10
 Nodes (20): Animate complex properties, Assess What "Extraordinary" Means Here, For data-heavy interfaces, For functional UI, For performance-critical UI, For visual/marketing surfaces, Implement with Discipline, Interact with the device (+12 more)
 
 ### Community 68 - "devDependencies"
-Cohesion: 0.21
-Nodes (13): configureVoiceContext(), finishVoiceSession(), isEmbeddedPreviewBrowser(), releaseVoiceEngine(), startVoice(), steerSpeechRecognitionCtor(), steerVoiceContext(), steerVoiceErrorMessage() (+5 more)
+Cohesion: 0.38
+Nodes (7): applyDeferredSvelteComponentAccepts(), deferredAcceptsPath(), findSvelteComponentManifest(), readDeferredAccepts(), readManifest(), writeDeferredAccept(), applyLegacyDeferredAcceptsOnStartup()
 
 ### Community 69 - "adapt.md"
 Cohesion: 0.22
@@ -532,16 +529,16 @@ Cohesion: 0.10
 Nodes (19): Clean Up, Code Quality, Color & Contrast, Content & Copy, Design System Discovery, Edge Cases & Error States, Final Verification, Forms & Inputs (+11 more)
 
 ### Community 72 - "Handle `generate`"
-Cohesion: 0.10
-Nodes (30): addManualContextText(), applyEditing(), buildLocatorForLeaf(), canRestoreManualEditElement(), collectManualContextPieces(), contextElementForManualEdit(), copyEditContainerContext(), copyEditLeafContext() (+22 more)
+Cohesion: 0.09
+Nodes (32): addManualContextText(), applyEditing(), buildLocatorForLeaf(), canRestoreManualEditElement(), collectManualContextPieces(), contextElementForManualEdit(), copyEditContainerContext(), copyEditLeafContext() (+24 more)
 
 ### Community 73 - "Phase 1: Discovery Interview"
 Cohesion: 0.10
 Nodes (19): compilerOptions, allowJs, esModuleInterop, incremental, isolatedModules, jsx, lib, module (+11 more)
 
 ### Community 74 - "Typography"
-Cohesion: 0.14
-Nodes (11): LogEntry, logError(), logFatal(), logInfo(), LogLevel, logSystem(), logWarn(), adapter (+3 more)
+Cohesion: 0.13
+Nodes (12): parseBrokerDate(), LogEntry, logError(), logFatal(), logInfo(), LogLevel, logSystem(), logWarn() (+4 more)
 
 ### Community 75 - "resolveContext"
 Cohesion: 0.13
@@ -578,6 +575,10 @@ Nodes (15): Anti-Goals, Brief Structure, Constraints, Content & Data, Design Dir
 ### Community 83 - "live.md"
 Cohesion: 0.20
 Nodes (13): extractRegister(), loadContext(), safeRead(), cli(), COMMON_DEV_PORTS, devServerSignals(), gatherSignals(), gitSignals() (+5 more)
+
+### Community 84 - "optimize.md"
+Cohesion: 0.07
+Nodes (15): metadata, AppLayout(), swrConfigValue, CanonicalTag(), ConfirmConfig, NotificationState, Toast, ToastType (+7 more)
 
 ### Community 85 - "context-signals.mjs"
 Cohesion: 0.19
@@ -626,10 +627,6 @@ Nodes (12): 1. Initial VPS Setup & Coolify Installation, 2. DNS Configuration (P
 ### Community 96 - "sampleCssBackground"
 Cohesion: 0.14
 Nodes (13): Animation Performance, Assess Performance Issues, Core Web Vitals Optimization, Cumulative Layout Shift (CLS < 0.1), First Input Delay (FID < 100ms) / INP (< 200ms), Largest Contentful Paint (LCP < 2.5s), Loading Performance, Network Optimization (+5 more)
-
-### Community 97 - "showBar"
-Cohesion: 0.10
-Nodes (20): AdminSidebar(), Admin2Layout(), metadata, CommentSection(), CommentSectionProps, CallbackContent(), AdminExpertsPage(), AppLayout() (+12 more)
 
 ### Community 98 - "services/tradeSync.ts"
 Cohesion: 0.31
@@ -707,13 +704,9 @@ Nodes (7): args, buildWeights(), hashUnit(), pickSeed(), seed, SEEDS, weightedPi
 Cohesion: 0.25
 Nodes (9): __dirname, findHarnessDirs(), generatePinnedSkill(), HARNESS_DIRS, loadCommandMetadata(), pin(), root, unpin() (+1 more)
 
-### Community 117 - "General rules"
-Cohesion: 0.31
-Nodes (10): checkNoSL(), checkRevengeTrade(), checkSLNotRespected(), checkUnusualSize(), checkWeakHour(), checkWeakStrategy(), detectMistakes(), getTeheranHour() (+2 more)
-
 ### Community 118 - "api/package.json"
-Cohesion: 0.33
-Nodes (7): decrypt(), encrypt(), router, syncExchangeTrades(), SyncResult, testConnection(), syncTradeAggregates()
+Cohesion: 0.14
+Nodes (15): decrypt(), encrypt(), checkAccountLimit(), router, avatarDir, avatarStorage, avatarUpload, DEFAULT_CARD_DETAILS (+7 more)
 
 ### Community 119 - "dashboard.ts"
 Cohesion: 0.20
@@ -738,10 +731,6 @@ Nodes (9): cloneDefaultConfig(), detectorSection(), hookSection(), readCache(), 
 ### Community 124 - "Craft Flow"
 Cohesion: 0.36
 Nodes (9): addRules(), applyInlineIgnores(), getSet(), hasDirectives(), isInlineIgnored(), normalizeRule(), parseInlineIgnores(), parseRuleList() (+1 more)
-
-### Community 125 - "Generate Combined Critique Report"
-Cohesion: 0.14
-Nodes (12): AILogModalProps, AdminBlogPage(), BacktestHeader(), SYMBOL_OPTIONS, TIMEFRAME_OPTIONS, api, FilterBar(), FilterBarProps (+4 more)
 
 ### Community 126 - "Product register"
 Cohesion: 0.22
@@ -816,8 +805,8 @@ Cohesion: 0.11
 Nodes (17): 1. DetailPanel — Journal Tab Restructure, 2. DesktopTable — Column Enhancements, 3. MobileCardsList — Card Enhancements, 4. Analytics Page — New Breakdowns, 5. No Changes Needed, Annotation Fields (in `TradeAnnotation`), Changes, Context (+9 more)
 
 ### Community 144 - "Community 144"
-Cohesion: 0.24
-Nodes (13): buildSvelteExpressionTextMap(), buildSveltePropValuesFromLiveElement(), collectTextNodes(), elementMatchesOriginalMarkup(), escapeRegExp(), expressionTextMatcher(), findLiveElementForOriginalMarkup(), findLiveElementFromAnchorSnapshot() (+5 more)
+Cohesion: 0.16
+Nodes (20): applyOriginalAttrsToSvelteAnchor(), applySvelteComponentVariantStyle(), commitAcceptedSvelteComponentToDom(), elementMatchesOriginalMarkup(), extractSvelteComponentStyle(), findInsertAnchorInDom(), findLiveElementForOriginalMarkup(), findLiveElementForSvelteManifest() (+12 more)
 
 ### Community 145 - "Security & Bug Audit Report"
 Cohesion: 0.38
@@ -852,8 +841,8 @@ Cohesion: 0.47
 Nodes (4): metadata, getThread(), ThreadPage(), ThreadReplyForm()
 
 ### Community 156 - "isScreenReaderOnlyTextStyle"
-Cohesion: 0.05
-Nodes (60): applyOriginalAttrsToSvelteAnchor(), applyParamDefaults(), applyParamValue(), applySavedSessionMeta(), applySvelteComponentVariantStyle(), clampVariantIndex(), clearHandled(), closedClipPath() (+52 more)
+Cohesion: 0.06
+Nodes (57): applyParamDefaults(), applyParamValue(), applyPlaceholderDimensions(), applyPlaceholderSizingStyles(), applySavedSessionMeta(), buildPlaceholderResizeHandles(), clampVariantIndex(), clearHandled() (+49 more)
 
 ### Community 157 - "Color & Contrast"
 Cohesion: 0.33
@@ -936,8 +925,8 @@ Cohesion: 0.67
 Nodes (4): postSerializedFindings(), renderBrowserFindings(), scanResultMeta(), serializeFindings()
 
 ### Community 199 - "Community 199"
-Cohesion: 0.07
-Nodes (27): LoginPage(), CacheStatus, JobStatus, MarketDataStatus, ConnectExchangeModal(), ConnectExchangeModalProps, POPULAR_EXCHANGES, RegisterForm() (+19 more)
+Cohesion: 0.06
+Nodes (41): AdminSidebar(), Admin2Layout(), CommentSection(), CommentSectionProps, AdminBlogPage(), CallbackContent(), BacktestHeader(), SYMBOL_OPTIONS (+33 more)
 
 ### Community 203 - "5. Community Post Types"
 Cohesion: 0.29
@@ -960,19 +949,19 @@ Cohesion: 0.50
 Nodes (4): 9. Trade Review Ideas, Failed trade, Lesson, Successful trade
 
 ## Knowledge Gaps
-- **1239 isolated node(s):** `COMMON_DEV_PORTS`, `SCANNABLE_EXT`, `SOURCE_DIRS`, `PRODUCT_NAMES`, `DESIGN_NAMES` (+1234 more)
+- **1238 isolated node(s):** `COMMON_DEV_PORTS`, `SCANNABLE_EXT`, `SOURCE_DIRS`, `PRODUCT_NAMES`, `DESIGN_NAMES` (+1233 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **19 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **18 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `fetch()` connect `handleManualEditActivity` to `live-browser.js`, `live-inject.mjs`, `setLiveState`, `Performance Rules`, `Gesture and Drag Interactions`, `isScreenReaderOnlyTextStyle`, `design-parser.mjs`, `colorize.md`, `detect-url.mjs`, `detect-antipatterns.mjs`, `live.mjs`, `run-browser-debug.js`, `payments.ts`, `routes/auth.ts`, `Polish Systematically`, `parseAnyColor`, `adapt.md`, `Handle `generate``, `resolveContext`?**
-  _High betweenness centrality (0.296) - this node is a cross-community bridge._
+- **Why does `fetch()` connect `handleManualEditActivity` to `live-browser.js`, `live-inject.mjs`, `setLiveState`, `Community 144`, `Performance Rules`, `Gesture and Drag Interactions`, `isScreenReaderOnlyTextStyle`, `design-parser.mjs`, `colorize.md`, `detect-url.mjs`, `detect-antipatterns.mjs`, `live.mjs`, `run-browser-debug.js`, `payments.ts`, `routes/auth.ts`, `Polish Systematically`, `parseAnyColor`, `adapt.md`, `Handle `generate``, `resolveContext`?**
+  _High betweenness centrality (0.291) - this node is a cross-community bridge._
 - **Why does `isPortListening()` connect `live-inject.mjs` to `handleManualEditActivity`?**
-  _High betweenness centrality (0.136) - this node is a cross-community bridge._
+  _High betweenness centrality (0.135) - this node is a cross-community bridge._
 - **Why does `fetchLatestSkillVersion()` connect `detect-antipatterns.mjs` to `handleManualEditActivity`?**
-  _High betweenness centrality (0.075) - this node is a cross-community bridge._
+  _High betweenness centrality (0.074) - this node is a cross-community bridge._
 - **Are the 4 inferred relationships involving `useTranslation()` (e.g. with `UserProfilePage()` and `SettingsPage()`) actually correct?**
   _`useTranslation()` has 4 INFERRED edges - model-reasoned connections that need verification._
 - **Are the 4 inferred relationships involving `useAuthStore` (e.g. with `AdminBlogPage()` and `UserProfilePage()`) actually correct?**
@@ -980,4 +969,4 @@ _Questions this graph is uniquely positioned to answer:_
 - **Are the 3 inferred relationships involving `toPersianDigits()` (e.g. with `Admin2ReportsPage()` and `AdminCommunityReportsPage()`) actually correct?**
   _`toPersianDigits()` has 3 INFERRED edges - model-reasoned connections that need verification._
 - **What connects `COMMON_DEV_PORTS`, `SCANNABLE_EXT`, `SOURCE_DIRS` to the rest of the system?**
-  _1239 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _1238 weakly-connected nodes found - possible documentation gaps or missing edges._

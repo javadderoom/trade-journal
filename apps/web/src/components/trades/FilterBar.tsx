@@ -4,6 +4,7 @@ import React from 'react';
 import Select from '../ui/Select';
 import { getSymbolFilterOptions } from '../../utils/tradeHelpers';
 import { useTranslation } from '../../store/useAppStore';
+import { useTradeStore } from '../../store/useTradeStore';
 
 interface FilterBarProps {
   searchQuery: string;
@@ -51,6 +52,7 @@ export default function FilterBar({
   onAccountIdChange,
 }: FilterBarProps) {
   const { t, language } = useTranslation();
+  const isRefreshing = useTradeStore(state => state.isRefreshing);
 
   return (
     <div className="filters-bar-container">
@@ -112,8 +114,14 @@ export default function FilterBar({
             <span>{t('filters.advancedFilters')}</span>
           </button>
           
-          <button className="icon-btn refresh-btn" title={t('filters.refresh')} onClick={onRefresh}>
-            <span className="material-symbols-outlined">refresh</span>
+          <button
+            type="button"
+            className={`icon-btn refresh-btn ${isRefreshing ? 'is-loading' : ''}`}
+            title={t('filters.refresh')}
+            onClick={onRefresh}
+            disabled={isRefreshing}
+          >
+            <span className={`material-symbols-outlined ${isRefreshing ? 'spin-animation' : ''}`}>refresh</span>
           </button>
         </div>
       </div>

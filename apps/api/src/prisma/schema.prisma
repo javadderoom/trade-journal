@@ -631,12 +631,13 @@ model BacktestSession {
 // ─── Candle Cache ───────────────────────────────────────────────────────────
 
 model CandleCache {
-  id         String   @id @default(uuid())
-  symbol     String
-  timeframe  String
-  candles    Json
-  count      Int
-  fetched_at DateTime @default(now())
+  id             String    @id @default(uuid())
+  symbol         String
+  timeframe      String
+  candles        Json
+  count          Int
+  fetched_at     DateTime  @default(now())
+  last_candle_at DateTime?
 
   @@unique([symbol, timeframe])
   @@index([symbol, timeframe])

@@ -203,6 +203,7 @@ interface TradeState {
   trades: Trade[];
   totalCount: number;
   loading: boolean;
+  isRefreshing: boolean;
   error: string | null;
   setTrades: (trades: Trade[]) => void;
   fetchTrades: (params?: FetchTradesParams) => Promise<void>;
@@ -215,6 +216,7 @@ export const useTradeStore = create<TradeState>((set, get) => ({
   trades: [],
   totalCount: 0,
   loading: false,
+  isRefreshing: false,
   error: null,
 
   setTrades: (trades) => set({ trades }),
@@ -236,7 +238,9 @@ export const useTradeStore = create<TradeState>((set, get) => ({
         dates
       } = params;
 
-      if (!isManualRefresh) {
+      if (isManualRefresh) {
+        set({ isRefreshing: true });
+      } else {
         set({ loading: true });
       }
       set({ error: null });
@@ -332,11 +336,20 @@ export const useTradeStore = create<TradeState>((set, get) => ({
       } else {
         set({ trades: [], totalCount: 0, error: null });
       }
+
+      if (isManualRefresh) {
+        const isEn = useAppStore.getState().language === 'en';
+        notify.success(isEn ? 'Trades list refreshed' : 'لیست معاملات به‌روزرسانی شد');
+      }
     } catch (e: any) {
       console.error('Failed to fetch trades:', e.message);
       set({ error: e.message || 'Failed to load trades' });
+      if (params.isManualRefresh) {
+        const isEn = useAppStore.getState().language === 'en';
+        notify.error(isEn ? 'Failed to refresh trades' : 'خطا در به‌روزرسانی معاملات');
+      }
     } finally {
-      set({ loading: false });
+      set({ loading: false, isRefreshing: false });
     }
   },
 

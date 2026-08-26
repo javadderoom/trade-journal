@@ -6,6 +6,7 @@ import {
   getCandleCacheStatus,
   getJobStatus,
 } from '../services/historicalDataCron';
+import { QuotaExhaustedError } from '../utils/dailyQuota';
 import { SUPPORTED_SYMBOLS, SUPPORTED_TIMEFRAMES } from '../config/symbols';
 
 const router = Router();
@@ -62,7 +63,11 @@ router.post('/refresh', async (req, res) => {
       });
     }
   } catch (err: any) {
-    res.status(500).json({ error: err.message });
+    if (err instanceof QuotaExhaustedError) {
+      res.status(429).json({ error: err.message });
+    } else {
+      res.status(500).json({ error: err.message });
+    }
   }
 });
 

@@ -244,6 +244,27 @@
       background-color: rgba($surface-variant, 0.3);
       border-color: $outline;
     }
+
+    &.refresh-btn {
+      &.is-loading, &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+    }
+  }
+
+  .spin-animation {
+    display: inline-block;
+    animation: spin-refresh 0.75s linear infinite;
+  }
+}
+
+@keyframes spin-refresh {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
   }
 }
 
