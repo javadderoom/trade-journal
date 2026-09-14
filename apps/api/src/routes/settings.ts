@@ -9,7 +9,7 @@ import crypto from 'node:crypto';
 import { DisplayCurrency, Plan } from '@prisma/client';
 import { checkAccountLimit } from '../middleware/checkPlanLimits';
 import { createMemoryUpload, saveUploadedFile, deleteUploadedFile } from '../utils/storage';
-import { getCookieDomain } from './auth';
+import { getCookieDomain, getCookieSameSite } from './auth';
 
 const router = Router();
 
@@ -687,10 +687,11 @@ router.delete('/account', authenticate, async (req: AuthRequest, res: Response) 
     // Invalidate all sessions
     await prisma.refreshToken.deleteMany({ where: { user_id: userId } });
 
+    const sameSite = getCookieSameSite(req);
     res.clearCookie('refreshToken', {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: process.env.NODE_ENV === 'production' ? 'lax' : 'lax',
+      secure: sameSite === 'none' ? true : process.env.NODE_ENV === 'production',
+      sameSite,
       domain: getCookieDomain(req),
       path: '/',
     });

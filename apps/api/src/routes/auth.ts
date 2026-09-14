@@ -44,11 +44,21 @@ export const getCookieDomain = (req?: Request): string | undefined => {
   return undefined;
 };
 
+export const getCookieSameSite = (req?: Request): 'lax' | 'none' => {
+  const host = (req?.get('host') || '').toLowerCase();
+  const origin = (typeof req?.headers?.origin === 'string' ? req.headers.origin : '').toLowerCase();
+  const isTradekav = host.includes('tradekav.ir') || origin.includes('tradekav.ir');
+  // On tradekav.ir subdomains, 'lax' is standard.
+  // On cross-site domains (e.g. *.vercel.app), 'none' with secure is required for cookies to be sent.
+  return isTradekav ? 'lax' : (process.env.NODE_ENV === 'production' ? 'none' : 'lax');
+};
+
 const setRefreshCookie = (res: Response, token: string, req?: Request) => {
+  const sameSite = getCookieSameSite(req);
   res.cookie('refreshToken', token, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: process.env.NODE_ENV === 'production' ? 'lax' : 'lax',
+    secure: sameSite === 'none' ? true : process.env.NODE_ENV === 'production',
+    sameSite,
     domain: getCookieDomain(req),
     maxAge: REFRESH_TOKEN_EXPIRES_DAYS * 24 * 60 * 60 * 1000,
     path: '/',
@@ -56,10 +66,11 @@ const setRefreshCookie = (res: Response, token: string, req?: Request) => {
 };
 
 const clearRefreshCookie = (res: Response, req?: Request) => {
+  const sameSite = getCookieSameSite(req);
   res.clearCookie('refreshToken', {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: process.env.NODE_ENV === 'production' ? 'lax' : 'lax',
+    secure: sameSite === 'none' ? true : process.env.NODE_ENV === 'production',
+    sameSite,
     domain: getCookieDomain(req),
     path: '/',
   });
