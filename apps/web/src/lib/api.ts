@@ -57,7 +57,8 @@ api.interceptors.response.use(
     // If it's a 401 and we haven't retried yet
     if (error.response?.status === 401 && !originalRequest._retry) {
       // Avoid infinite loop if refreshing fails
-      if (originalRequest.url === '/api/auth/refresh' || originalRequest.url === '/api/auth/login') {
+      const reqUrl = (originalRequest.url || '').toLowerCase();
+      if (reqUrl.includes('/api/auth/refresh') || reqUrl.includes('/api/auth/login')) {
         return Promise.reject(error);
       }
 

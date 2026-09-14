@@ -300,18 +300,18 @@
     "semantic_hash": ""
   },
   "apps/web/src/components/layout/AppLayout.tsx": {
-    "mtime": 1786375534.8223255,
-    "ast_hash": "a7dca5988181eda6fe05672dcad98a26",
+    "mtime": 1789425589.181401,
+    "ast_hash": "faad18d5568d62724a26469ddfb1005b",
     "semantic_hash": ""
   },
   "apps/web/src/lib/api.ts": {
-    "mtime": 1784058036.5675547,
-    "ast_hash": "987f4428ca5a0a489542ec3de369d9cd",
+    "mtime": 1789425483.241536,
+    "ast_hash": "bf5af38f7a1b41fc26d7fbcca0ed0ab0",
     "semantic_hash": ""
   },
   "apps/web/src/lib/auth.ts": {
-    "mtime": 1786375534.823325,
-    "ast_hash": "9ebf1988918917a705a6dd434bdfa47d",
+    "mtime": 1789425433.7723956,
+    "ast_hash": "1f3d66da74e1ea69f9a1d10bb8431fbb",
     "semantic_hash": ""
   },
   "apps/api/documents/auth-implementation.md": {

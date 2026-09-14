@@ -199,12 +199,32 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
   // Prevent flash of protected page content while redirecting to login
   if (!user && !isAuthPage && !isPublicPage) {
-    return null;
+    return (
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        height: '100vh',
+        background: '#0B0F19',
+      }}>
+        <PageLoader fullScreen minHeight="100vh" />
+      </div>
+    );
   }
 
   // Prevent flash of auth page content while redirecting to home
   if (user && isAuthPage) {
-    return null;
+    return (
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        height: '100vh',
+        background: '#0B0F19',
+      }}>
+        <PageLoader fullScreen minHeight="100vh" />
+      </div>
+    );
   }
 
   // Public pages (landing) render full-bleed, no app chrome

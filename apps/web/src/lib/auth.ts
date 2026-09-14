@@ -111,7 +111,11 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     } finally {
       set({ user: null, accessToken: null });
       if (typeof window !== 'undefined') {
-        window.location.href = '/login';
+        const path = window.location.pathname;
+        const isAuthPage = path.includes('/login') || path.includes('/register');
+        if (!isAuthPage) {
+          window.location.href = '/login';
+        }
       }
     }
   },
