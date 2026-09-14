@@ -7,8 +7,13 @@ import { getTradesForAccount, TradeListRow } from './tradeQueryService';
 
 export { parseBrokerDate, getTradesForAccount, TradeListRow };
 
+const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient };
 const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
-export const prisma = new PrismaClient({ adapter });
+export const prisma = globalForPrisma.prisma ?? new PrismaClient({ adapter });
+
+if (process.env.NODE_ENV !== 'production' || process.env.VERCEL) {
+  globalForPrisma.prisma = prisma;
+}
 
 /**
  * Sync trades from MT5 EA into the database.

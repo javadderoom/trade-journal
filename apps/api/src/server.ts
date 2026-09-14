@@ -69,6 +69,8 @@ const ALLOWED_ORIGINS: (string | RegExp)[] = [
 if (process.env.NODE_ENV !== 'production') {
   ALLOWED_ORIGINS.push(/^http:\/\/localhost:\d+$/);
 }
+// Allow Vercel preview and production deployments
+ALLOWED_ORIGINS.push(/^https:\/\/.*\.vercel\.app$/);
 
 app.use((req, res, next) => {
   const origin = req.headers.origin;
@@ -118,90 +120,99 @@ app.use('/api/market-data', marketDataRouter);
 app.use('/api/backtest', backtestRouter);
 app.use('/api/internal/ai', aiAutomationRouter);
 
-// Health check
+// Health checks
+app.get('/', (_req, res) => {
+  res.json({ status: 'ok', service: 'tradekav-api', timestamp: new Date().toISOString() });
+});
+app.get('/health', (_req, res) => {
+  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
 app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
-// Cron job: Daily clean up expired tokens, OTPs, and sessions at 03:00 AM
-cron.schedule('0 3 * * *', async () => {
-  try {
-    const now = new Date();
+// Cron jobs: Only schedule background tasks on persistent servers (not in Vercel serverless)
+if (!process.env.VERCEL) {
+  // Cron job: Daily clean up expired tokens, OTPs, and sessions at 03:00 AM
+  cron.schedule('0 3 * * *', async () => {
+    try {
+      const now = new Date();
 
-    const deletedTokens = await prisma.refreshToken.deleteMany({
-      where: { expires_at: { lt: now } },
-    });
+      const deletedTokens = await prisma.refreshToken.deleteMany({
+        where: { expires_at: { lt: now } },
+      });
 
-    const deletedOtps = await prisma.otp.deleteMany({
-      where: {
-        OR: [
-          { expires_at: { lt: now } },
-          { created_at: { lt: new Date(now.getTime() - 24 * 60 * 60 * 1000) } },
-        ],
-      },
-    });
+      const deletedOtps = await prisma.otp.deleteMany({
+        where: {
+          OR: [
+            { expires_at: { lt: now } },
+            { created_at: { lt: new Date(now.getTime() - 24 * 60 * 60 * 1000) } },
+          ],
+        },
+      });
 
-    const deletedSessions = await prisma.checkoutSession.deleteMany({
-      where: { created_at: { lt: new Date(now.getTime() - 24 * 60 * 60 * 1000) } },
-    });
+      const deletedSessions = await prisma.checkoutSession.deleteMany({
+        where: { created_at: { lt: new Date(now.getTime() - 24 * 60 * 60 * 1000) } },
+      });
 
-    console.log(`[Cron] Cleanup: ${deletedTokens.count} tokens, ${deletedOtps.count} OTPs, ${deletedSessions.count} sessions.`);
-  } catch (err) {
-    console.error('[Cron] Cleanup job failed:', err);
-  }
-});
+      console.log(`[Cron] Cleanup: ${deletedTokens.count} tokens, ${deletedOtps.count} OTPs, ${deletedSessions.count} sessions.`);
+    } catch (err) {
+      console.error('[Cron] Cleanup job failed:', err);
+    }
+  });
 
-// Cron job: Daily AI Blog Automation Pipeline at 09:00 AM server time
-cron.schedule('0 9 * * *', () => {
-  runDailyAIBlogPipeline();
-});
+  // Cron job: Daily AI Blog Automation Pipeline at 09:00 AM server time
+  cron.schedule('0 9 * * *', () => {
+    runDailyAIBlogPipeline();
+  });
 
-// Cron job: Sync exchange connections based on subscription plan rates
-// Pro: every 5 minutes, Standard: every 1 hour
-cron.schedule('*/5 * * * *', async () => {
-  try {
-    console.log('[Cron] Starting exchange connections sync...');
-    const activeConnections = await prisma.exchangeConnection.findMany({
-      where: { is_active: true },
-      include: {
-        account: {
-          include: {
-            user: true
+  // Cron job: Sync exchange connections based on subscription plan rates
+  // Pro: every 5 minutes, Standard: every 1 hour
+  cron.schedule('*/5 * * * *', async () => {
+    try {
+      console.log('[Cron] Starting exchange connections sync...');
+      const activeConnections = await prisma.exchangeConnection.findMany({
+        where: { is_active: true },
+        include: {
+          account: {
+            include: {
+              user: true
+            }
           }
         }
-      }
-    });
+      });
 
-    const chunkSize = 5;
-    for (let i = 0; i < activeConnections.length; i += chunkSize) {
-      const chunk = activeConnections.slice(i, i + chunkSize);
-      await Promise.all(
-        chunk.map(async (conn) => {
-          try {
-            const plan = conn.account.user.plan;
-            if (plan === 'FREE') return;
+      const chunkSize = 5;
+      for (let i = 0; i < activeConnections.length; i += chunkSize) {
+        const chunk = activeConnections.slice(i, i + chunkSize);
+        await Promise.all(
+          chunk.map(async (conn) => {
+            try {
+              const plan = conn.account.user.plan;
+              if (plan === 'FREE') return;
 
-            const lastSync = conn.account.last_sync_at;
-            const now = new Date();
+              const lastSync = conn.account.last_sync_at;
+              const now = new Date();
 
-            if (plan === 'STANDARD') {
-              const oneHourAgo = new Date(now.getTime() - 55 * 60 * 1000);
-              if (lastSync && lastSync > oneHourAgo) return;
+              if (plan === 'STANDARD') {
+                const oneHourAgo = new Date(now.getTime() - 55 * 60 * 1000);
+                if (lastSync && lastSync > oneHourAgo) return;
+              }
+
+              console.log(`[Cron] Syncing trades for account ${conn.account_id} (${conn.exchange_id}) - Plan: ${plan}...`);
+              const syncRes = await syncExchangeTrades(conn.account.user_id, conn.account_id);
+              console.log(`[Cron] Sync finished for account ${conn.account_id}: created ${syncRes.created}, skipped ${syncRes.skipped}`);
+            } catch (syncErr: any) {
+              console.error(`[Cron] Failed to sync exchange connection for account ${conn.account_id}:`, syncErr);
             }
-
-            console.log(`[Cron] Syncing trades for account ${conn.account_id} (${conn.exchange_id}) - Plan: ${plan}...`);
-            const syncRes = await syncExchangeTrades(conn.account.user_id, conn.account_id);
-            console.log(`[Cron] Sync finished for account ${conn.account_id}: created ${syncRes.created}, skipped ${syncRes.skipped}`);
-          } catch (syncErr: any) {
-            console.error(`[Cron] Failed to sync exchange connection for account ${conn.account_id}:`, syncErr);
-          }
-        })
-      );
+          })
+        );
+      }
+    } catch (err) {
+      console.error('[Cron] Exchange sync scheduler failed:', err);
     }
-  } catch (err) {
-    console.error('[Cron] Exchange sync scheduler failed:', err);
-  }
-});
+  });
+}
 
 // Global error handlers — prevent silent crashes
 process.on('unhandledRejection', (reason) => {
@@ -209,14 +220,18 @@ process.on('unhandledRejection', (reason) => {
 });
 process.on('uncaughtException', (err) => {
   console.error('[FATAL] Uncaught exception:', err);
-  process.exit(1);
+  if (!process.env.VERCEL) {
+    process.exit(1);
+  }
 });
 
-// Start server
-app.listen(PORT, () => {
-  console.log(`معامله‌یار API running on http://localhost:${PORT}`);
-  console.log(`Trade sync endpoint: POST http://localhost:${PORT}/api/trades/sync`);
-  startHistoricalDataCron();
-});
+// Start server on persistent hosts (Vercel manages the HTTP server lifecycle automatically)
+if (!process.env.VERCEL) {
+  app.listen(PORT, () => {
+    console.log(`معامله‌یار API running on http://localhost:${PORT}`);
+    console.log(`Trade sync endpoint: POST http://localhost:${PORT}/api/trades/sync`);
+    startHistoricalDataCron();
+  });
+}
 
 export default app;
