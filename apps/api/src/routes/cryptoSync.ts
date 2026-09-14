@@ -1,5 +1,4 @@
 import { Router, Response } from 'express';
-import ccxt from 'ccxt';
 import { prisma } from '../services/tradeSync';
 import { authenticate, AuthRequest } from '../middleware/auth';
 import { checkCryptoPermission, checkAccountLimit } from '../middleware/checkPlanLimits';
@@ -8,9 +7,15 @@ import { testConnection, syncExchangeTrades } from '../services/ccxtSync';
 
 const router = Router();
 
+async function getCcxt() {
+  const mod = await import('ccxt');
+  return mod.default || mod;
+}
+
 // GET /api/crypto/exchanges - List all CCXT supported exchanges
 router.get('/exchanges', authenticate, checkCryptoPermission, async (req: AuthRequest, res: Response) => {
   try {
+    const ccxt = await getCcxt();
     // Return all CCXT exchanges
     return res.status(200).json({ exchanges: ccxt.exchanges });
   } catch (err: any) {

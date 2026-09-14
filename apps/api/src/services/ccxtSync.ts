@@ -1,6 +1,10 @@
-import ccxt from 'ccxt';
 import { prisma, syncTradeAggregates } from './tradeSync';
 import { decrypt } from '../lib/encryption';
+
+async function getCcxt() {
+  const mod = await import('ccxt');
+  return mod.default || mod;
+}
 
 
 
@@ -17,6 +21,7 @@ export async function testConnection(params: {
   passphrase?: string;
 }): Promise<boolean> {
   const { exchangeId, apiKey, apiSecret, passphrase } = params;
+  const ccxt = await getCcxt();
   const exchangeClass = (ccxt as any)[exchangeId];
   if (!exchangeClass) {
     throw new Error(`Exchange ${exchangeId} is not supported`);
@@ -64,6 +69,7 @@ export async function syncExchangeTrades(
   const passphrase = connection.passphrase ? decrypt(connection.passphrase) : undefined;
 
   // 2. Initialize exchange
+  const ccxt = await getCcxt();
   const exchangeClass = (ccxt as any)[exchangeId];
   if (!exchangeClass) {
     throw new Error(`Exchange ${exchangeId} is not supported`);
