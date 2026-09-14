@@ -26,23 +26,41 @@ const otpRegisterLimiter = rateLimit(60 * 60 * 1000, 5);
 
 const REFRESH_TOKEN_EXPIRES_DAYS = 30;
 
-const setRefreshCookie = (res: Response, token: string) => {
+/**
+ * Resolves cookie domain dynamically.
+ * - If COOKIE_DOMAIN env is explicitly set, uses it.
+ * - If request host or origin includes 'tradekav.ir', uses '.tradekav.ir'.
+ * - Otherwise (e.g. *.vercel.app, localhost, VPS IP), returns undefined to bind to exact host.
+ */
+export const getCookieDomain = (req?: Request): string | undefined => {
+  if (process.env.COOKIE_DOMAIN !== undefined) {
+    return process.env.COOKIE_DOMAIN || undefined;
+  }
+  const host = (req?.get('host') || '').toLowerCase();
+  const origin = (typeof req?.headers?.origin === 'string' ? req.headers.origin : '').toLowerCase();
+  if (host.includes('tradekav.ir') || origin.includes('tradekav.ir')) {
+    return '.tradekav.ir';
+  }
+  return undefined;
+};
+
+const setRefreshCookie = (res: Response, token: string, req?: Request) => {
   res.cookie('refreshToken', token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: process.env.NODE_ENV === 'production' ? 'lax' : 'lax',
-    domain: process.env.NODE_ENV === 'production' ? '.tradekav.ir' : undefined,
+    domain: getCookieDomain(req),
     maxAge: REFRESH_TOKEN_EXPIRES_DAYS * 24 * 60 * 60 * 1000,
     path: '/',
   });
 };
 
-const clearRefreshCookie = (res: Response) => {
+const clearRefreshCookie = (res: Response, req?: Request) => {
   res.clearCookie('refreshToken', {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: process.env.NODE_ENV === 'production' ? 'lax' : 'lax',
-    domain: process.env.NODE_ENV === 'production' ? '.tradekav.ir' : undefined,
+    domain: getCookieDomain(req),
     path: '/',
   });
 };
@@ -108,7 +126,7 @@ router.post('/register', registerLimiter, async (req: Request, res: Response) =>
       },
     });
 
-    setRefreshCookie(res, refreshToken);
+    setRefreshCookie(res, refreshToken, req);
 
     return res.status(201).json({
       accessToken,
@@ -159,7 +177,7 @@ router.post('/login', loginLimiter, async (req: Request, res: Response) => {
       },
     });
 
-    setRefreshCookie(res, refreshToken);
+    setRefreshCookie(res, refreshToken, req);
 
     return res.json({
       accessToken,
@@ -185,7 +203,7 @@ router.post('/refresh', async (req: Request, res: Response) => {
     });
 
     if (!stored || stored.expires_at < new Date()) {
-      clearRefreshCookie(res);
+      clearRefreshCookie(res, req);
       return res.status(401).json({ error: 'توکن بازیابی منقضی شده است' });
     }
 
@@ -211,7 +229,7 @@ router.post('/refresh', async (req: Request, res: Response) => {
       role: stored.user.role,
     });
 
-    setRefreshCookie(res, newRefreshToken);
+    setRefreshCookie(res, newRefreshToken, req);
 
     return res.json({
       accessToken,
@@ -236,7 +254,7 @@ router.post('/logout', async (req: Request, res: Response) => {
     if (token) {
       await prisma.refreshToken.deleteMany({ where: { token } });
     }
-    clearRefreshCookie(res);
+    clearRefreshCookie(res, req);
     return res.json({ message: 'با موفقیت خارج شدید' });
   } catch (err: any) {
     console.error('Logout error:', err);
@@ -366,7 +384,7 @@ router.post('/otp/verify', rateLimit(2 * 60 * 1000, 5), async (req: Request, res
         },
       });
 
-      setRefreshCookie(res, refreshToken);
+      setRefreshCookie(res, refreshToken, req);
 
       return res.json({
         isNewUser: false,
@@ -468,7 +486,7 @@ router.post('/otp/register', otpRegisterLimiter, async (req: Request, res: Respo
       },
     });
 
-    setRefreshCookie(res, refreshToken);
+    setRefreshCookie(res, refreshToken, req);
 
     return res.status(201).json({
       accessToken,

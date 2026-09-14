@@ -9,6 +9,7 @@ import crypto from 'node:crypto';
 import { DisplayCurrency, Plan } from '@prisma/client';
 import { checkAccountLimit } from '../middleware/checkPlanLimits';
 import { createMemoryUpload, saveUploadedFile, deleteUploadedFile } from '../utils/storage';
+import { getCookieDomain } from './auth';
 
 const router = Router();
 
@@ -690,7 +691,7 @@ router.delete('/account', authenticate, async (req: AuthRequest, res: Response) 
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: process.env.NODE_ENV === 'production' ? 'lax' : 'lax',
-      domain: process.env.NODE_ENV === 'production' ? '.tradekav.ir' : undefined,
+      domain: getCookieDomain(req),
       path: '/',
     });
 

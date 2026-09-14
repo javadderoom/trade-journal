@@ -1,16 +1,16 @@
 # Graph Report - trade-journal  (2026-09-15)
 
 ## Corpus Check
-- 307 files · ~280,775 words
+- 307 files · ~280,866 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 2044 nodes · 3231 edges · 151 communities (131 shown, 20 thin omitted)
+- 2045 nodes · 3236 edges · 152 communities (133 shown, 19 thin omitted)
 - Extraction: 99% EXTRACTED · 1% INFERRED · 0% AMBIGUOUS · INFERRED: 33 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `34f1f38a`
+- Built from commit: `5adf6e65`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -37,6 +37,7 @@
 - [[_COMMUNITY_design-system.mjs|design-system.mjs]]
 - [[_COMMUNITY_live-server.mjs|live-server.mjs]]
 - [[_COMMUNITY_useAuthStore|useAuthStore]]
+- [[_COMMUNITY_Community 22|Community 22]]
 - [[_COMMUNITY_live-wrap.mjs|live-wrap.mjs]]
 - [[_COMMUNITY_design-parser.mjs|design-parser.mjs]]
 - [[_COMMUNITY_live-accept.mjs|live-accept.mjs]]
@@ -186,47 +187,47 @@
 ## Import Cycles
 - 3-file cycle: `apps/web/src/components/trades/FilterBar.tsx -> apps/web/src/store/useTradeStore.ts -> apps/web/src/components/trades/TradesTable.tsx -> apps/web/src/components/trades/FilterBar.tsx`
 
-## Communities (151 total, 20 thin omitted)
+## Communities (152 total, 19 thin omitted)
 
 ### Community 0 - "معامله‌یار — Persian Trading Journal Platform"
 Cohesion: 0.06
 Nodes (34): 10. Key Risks & Mitigations, 11. Suggested Next Steps, 1. Project Overview, 2. System Architecture Overview, 3.1 Frontend, 3.2 Backend, 3.3 Database — PostgreSQL Schema (core tables), 3.4 Infrastructure (+26 more)
 
 ### Community 1 - "live-browser.js"
-Cohesion: 0.09
-Nodes (27): ReplayToolbar(), ReplayToolbarProps, EmptyFeedState(), CONTENT, EaSetupHelpPage(), ConnectExchangeModal(), ConnectExchangeModalProps, POPULAR_EXCHANGES (+19 more)
+Cohesion: 0.14
+Nodes (12): ConnectExchangeModal(), ConnectExchangeModalProps, POPULAR_EXCHANGES, ConceptsSettings(), TradingConcept, BROKER_PRESETS, BrokerAccount, DEFAULT_PRICES (+4 more)
 
 ### Community 2 - "checks.mjs"
-Cohesion: 0.15
-Nodes (20): GREGORIAN_MONTH_NAMES, GREGORIAN_WEEKDAY_NAMES_SHORT, JALALI_MONTH_NAMES, WEEKDAY_NAMES_EN, WEEKDAY_NAMES_FA, WEEKDAY_NAMES_FA_SHORT, EquityChart(), EquityChartProps (+12 more)
+Cohesion: 0.12
+Nodes (24): Admin2Dashboard(), AdminStats, JournalPage(), GREGORIAN_MONTH_NAMES, GREGORIAN_WEEKDAY_NAMES_SHORT, JALALI_MONTH_NAMES, WEEKDAY_NAMES_EN, WEEKDAY_NAMES_FA (+16 more)
 
 ### Community 3 - "el"
 Cohesion: 0.16
-Nodes (13): metadata, BookmarksFeed(), Comment, CommentNode(), CommentSection(), CommunityPostCard(), PostProps, ReportButtonProps (+5 more)
+Nodes (11): metadata, BookmarksFeed(), CommunityPostCard(), PostProps, CreatePostForm(), EmptyFeedState(), PostSkeleton(), TradePreviewCard() (+3 more)
 
 ### Community 4 - "index.mjs"
 Cohesion: 0.29
 Nodes (6): optionalAuthenticate(), router, upload, CommunityTradePreview, FullTrade, mapTradeToCommunityPreview()
 
 ### Community 5 - "live-inject.mjs"
-Cohesion: 0.17
-Nodes (11): JournalPage(), FetchTradesParams, MOCK_TRADES, TradeState, useTradeStore, FilterBar(), FilterBarProps, TradeReviewPage() (+3 more)
+Cohesion: 0.09
+Nodes (19): notify, LoginPage(), CacheStatus, JobStatus, MarketDataStatus, ExportModalProps, ChipDecision, MistakeReviewModal() (+11 more)
 
 ### Community 6 - "resumeSession"
-Cohesion: 0.21
-Nodes (9): FollowButton(), FollowButtonProps, FollowingManager(), UserConnectionsModal(), UserConnectionsModalProps, metadata, UserProfile, UserProfilePage() (+1 more)
+Cohesion: 0.13
+Nodes (13): CommunityFeed(), CommunitySidebar(), FollowButton(), FollowButtonProps, FollowingManager(), metadata, UserConnectionsModal(), UserConnectionsModalProps (+5 more)
 
 ### Community 7 - "TradesTable.tsx"
-Cohesion: 0.27
-Nodes (9): TradingConcept, useTradingConcepts(), BulkTagModal(), BulkTagModalProps, DetailPanelProps, getJalaliDisplayDate(), TradesTable(), ConceptIcon() (+1 more)
+Cohesion: 0.15
+Nodes (19): TradingConcept, useTradingConcepts(), JournalEditor(), JournalEditorProps, getSharedTranslations(), BulkTagModal(), BulkTagModalProps, ExportModal() (+11 more)
 
 ### Community 8 - "package.json"
 Cohesion: 0.11
 Nodes (18): dependencies, impeccable, devDependencies, agentation, concurrently, typescript, name, prisma (+10 more)
 
 ### Community 9 - "hook-lib.mjs"
-Cohesion: 0.12
-Nodes (22): View, View, Conversation, ConversationActivity, ConversationMessage, SupportState, SupportStats, useSupportStore (+14 more)
+Cohesion: 0.09
+Nodes (33): View, View, ReplayToolbar(), ReplayToolbarProps, CONTENT, EaSetupHelpPage(), AppState, TradingAccount (+25 more)
 
 ### Community 10 - "معامله‌یار — Run Commands"
 Cohesion: 0.18
@@ -237,8 +238,8 @@ Cohesion: 0.25
 Nodes (7): compilerOptions, esModuleInterop, module, moduleResolution, skipLibCheck, strict, target
 
 ### Community 12 - "showToast"
-Cohesion: 0.11
-Nodes (22): requireAdmin(), eaUpload, upload, DEFAULT_PRICES, receiptUpload, router, avatarUpload, DEFAULT_CARD_DETAILS (+14 more)
+Cohesion: 0.12
+Nodes (21): eaUpload, upload, DEFAULT_PRICES, receiptUpload, router, avatarUpload, DEFAULT_CARD_DETAILS, DEFAULT_CRYPTO_DETAILS (+13 more)
 
 ### Community 13 - "setLiveState"
 Cohesion: 0.31
@@ -249,8 +250,8 @@ Cohesion: 0.28
 Nodes (3): TopicData, TOPICS_DATA, TopicPageProps
 
 ### Community 16 - "trades/page.tsx"
-Cohesion: 0.50
-Nodes (3): swrConfigValue, AnnouncementBanner(), BannerConfig
+Cohesion: 0.21
+Nodes (6): normalizeSymbol(), redis, rateLimit(), router, historyQuerySchema, router
 
 ### Community 17 - "useTranslation"
 Cohesion: 0.05
@@ -264,25 +265,33 @@ Nodes (34): BacktestChart(), BacktestChartProps, DrawingShape, PositionLines, Po
 Cohesion: 0.67
 Nodes (3): getTrxPrice(), VerificationResult, verifyTronTransaction()
 
+### Community 20 - "live-server.mjs"
+Cohesion: 0.20
+Nodes (9): EquityChart(), EquityChartProps, WeekdayPnlChart(), WeekdayPnlChartProps, TradeState, TradesTableProps, MarketCondition, Timeframe (+1 more)
+
 ### Community 21 - "useAuthStore"
 Cohesion: 0.08
 Nodes (26): dependencies, axios, bcryptjs, ccxt, compression, cookie-parser, csv-parser, depd (+18 more)
+
+### Community 22 - "Community 22"
+Cohesion: 0.53
+Nodes (4): ReportButtonProps, ReportModal(), ReportModalProps, ReportTargetType
 
 ### Community 28 - "live-wrap.mjs"
 Cohesion: 0.05
 Nodes (41): 1. Read the screenshot (if present), 2. Wrap the element, 3. Load the action's reference, 4. Plan three variants: identity first, then mode, then axes, 5. Apply the freeform prompt (if present), 6. Write all variants in a single edit, 7. Parameters (composition-sized, 0–4 per variant), 8. Signal done (+33 more)
 
 ### Community 29 - "design-parser.mjs"
-Cohesion: 0.16
-Nodes (10): CommunityFeed(), CommunitySidebar(), CreatePostForm(), metadata, PostSkeleton(), MinimalTrade, TradeSelectorModal(), getSymbol() (+2 more)
+Cohesion: 0.40
+Nodes (4): NotFound(), TopicSEOPage(), getSymbol(), SymbolPage()
 
 ### Community 32 - "live-accept.mjs"
-Cohesion: 0.11
-Nodes (29): JournalPage(), EMOTION_MAP, EmotionDef, EmotionValue, getDefaultEmotions(), getEmotionEmoji(), getEmotionLabel(), ContactInfo (+21 more)
+Cohesion: 0.13
+Nodes (22): EMOTION_MAP, EmotionDef, EmotionValue, getDefaultEmotions(), getEmotionEmoji(), getEmotionLabel(), DesktopTableProps, MobileCardsList() (+14 more)
 
 ### Community 33 - "server.ts"
-Cohesion: 0.06
-Nodes (48): getSymbolConfig(), isCrypto(), normalizeSymbol(), SUPPORTED_SYMBOLS, SUPPORTED_TIMEFRAMES, SymbolConfig, Timeframe, redis (+40 more)
+Cohesion: 0.07
+Nodes (47): getSymbolConfig(), isCrypto(), SUPPORTED_SYMBOLS, SUPPORTED_TIMEFRAMES, SymbolConfig, Timeframe, router, CachedCandle (+39 more)
 
 ### Community 37 - "compilerOptions"
 Cohesion: 0.06
@@ -318,7 +327,7 @@ Nodes (27): Accessibility Considerations, Anti-reflexes worth defending against,
 
 ### Community 52 - "context.mjs"
 Cohesion: 0.11
-Nodes (15): loginLimiter, otpRegisterLimiter, otpRegisterSchema, otpSendLimiter, registerLimiter, router, conceptSchema, router (+7 more)
+Nodes (18): clearRefreshCookie(), getCookieDomain(), loginLimiter, otpRegisterLimiter, otpRegisterSchema, otpSendLimiter, registerLimiter, router (+10 more)
 
 ### Community 54 - "journal/page.tsx"
 Cohesion: 0.08
@@ -329,16 +338,16 @@ Cohesion: 0.08
 Nodes (24): Component translation rules, Narrative mapping, Pitfalls, Scan mode (approach C: auto-extract, then confirm descriptive language), Schema, Seed mode, Step 1: Confirm seed mode, Step 1: Find the design assets (+16 more)
 
 ### Community 57 - "Polish Systematically"
-Cohesion: 0.09
-Nodes (25): JournalEditor(), JournalEditorProps, getSharedTranslations(), ExportModal(), ExportModalProps, groupByRule(), ImportMistakeEntry, ImportMistakeSummaryModal() (+17 more)
+Cohesion: 0.27
+Nodes (8): groupByRule(), ImportMistakeEntry, ImportMistakeSummaryModal(), ImportMistakeSummaryModalProps, RuleGroup, ManualTradeModal(), ManualTradeModalProps, SuggestedMistake
 
 ### Community 61 - "Delight Techniques"
 Cohesion: 0.09
 Nodes (22): Assess Onboarding Needs, Context Over Ceremony, Contextual Help, Design Onboarding Experiences, Documentation & Help, Empty State Design, Feature Discovery & Adoption, Guided Tours & Walkthroughs (+14 more)
 
 ### Community 63 - "parseAnyColor"
-Cohesion: 0.22
-Nodes (13): main(), gemini, getGeminiModel(), coverUpload, generateBlogArticle(), generateSocialCopy(), reviewArticle(), translateBlogArticle() (+5 more)
+Cohesion: 0.20
+Nodes (14): main(), gemini, getGeminiModel(), coverUpload, router, generateBlogArticle(), generateSocialCopy(), reviewArticle() (+6 more)
 
 ### Community 65 - "Interaction Design"
 Cohesion: 0.10
@@ -361,8 +370,8 @@ Cohesion: 0.10
 Nodes (19): Clean Up, Code Quality, Color & Contrast, Content & Copy, Design System Discovery, Edge Cases & Error States, Final Verification, Forms & Inputs (+11 more)
 
 ### Community 72 - "Handle `generate`"
-Cohesion: 0.15
-Nodes (11): Admin2Layout(), CallbackContent(), BottomNavBar(), NavDrawerItem, PublicHeader(), AuthState, useAuthStore, User (+3 more)
+Cohesion: 0.12
+Nodes (18): AdminSidebar(), Admin2Layout(), CommentSection(), CommentSectionProps, CallbackContent(), Comment, CommentNode(), CommentSection() (+10 more)
 
 ### Community 73 - "Phase 1: Discovery Interview"
 Cohesion: 0.10
@@ -373,8 +382,8 @@ Cohesion: 0.12
 Nodes (13): parseBrokerDate(), LogEntry, logError(), logFatal(), logInfo(), LogLevel, logSystem(), logWarn() (+5 more)
 
 ### Community 75 - "resolveContext"
-Cohesion: 0.27
-Nodes (7): NotFound(), generateMetadata(), ViewTracker(), ViewTrackerProps, getPost(), SinglePostPage(), TopicSEOPage()
+Cohesion: 0.43
+Nodes (5): generateMetadata(), ViewTracker(), ViewTrackerProps, getPost(), SinglePostPage()
 
 ### Community 77 - "Known Issues & Improvements — trade-journal-demo"
 Cohesion: 0.11
@@ -430,7 +439,7 @@ Nodes (13): Animation Performance, Assess Performance Issues, Core Web Vitals Op
 
 ### Community 97 - "Community 97"
 Cohesion: 0.09
-Nodes (23): Admin2Dashboard(), AdminStats, CommunityReport, CommunityReport, CommentSection(), CommentSectionProps, CouponCode, AdminExpertsPage() (+15 more)
+Nodes (17): AILogModalProps, CommunityReport, CommunityReport, AdminBlogPage(), CouponCode, api, failedQueue, ImportAccount (+9 more)
 
 ### Community 100 - "animate.md"
 Cohesion: 0.43
@@ -445,8 +454,8 @@ Cohesion: 0.15
 Nodes (12): Brand & Style, Buttons, Cards & Trade Logs, Chips & Badges, Colors, Components, Elevation & Depth, Input Fields (+4 more)
 
 ### Community 104 - "live.mjs"
-Cohesion: 0.07
-Nodes (23): rateLimit(), router, router, router, router, router, router, router (+15 more)
+Cohesion: 0.09
+Nodes (21): authenticate(), authenticateAccountToken(), requireAdmin(), router, router, router, router, createSessionSchema (+13 more)
 
 ### Community 106 - "ui-core.mjs"
 Cohesion: 0.17
@@ -481,12 +490,12 @@ Cohesion: 0.24
 Nodes (8): dateToTehranDay(), EdgeInsight, generateEdgeInsight(), getMonthDateStrings(), getTehranDateStr(), getTradingSession(), router, WEEKDAY_NAMES
 
 ### Community 117 - "Community 117"
-Cohesion: 0.18
-Nodes (14): AdminSidebar(), SubscriptionBanners(), SubscriptionBannersProps, DashboardData, DashboardPage(), EquityCurveSVG, useExchangeRate(), SubStatus (+6 more)
+Cohesion: 0.20
+Nodes (13): SubscriptionBanners(), SubscriptionBannersProps, DashboardData, DashboardPage(), EquityCurveSVG, useExchangeRate(), SubStatus, useSubscriptionStatus() (+5 more)
 
 ### Community 118 - "api/package.json"
-Cohesion: 0.12
-Nodes (16): authenticate(), authenticateAccountToken(), AuthRequest, checkImportPermission(), checkSyncPermission(), checkTradeLimit(), PLAN_ACCOUNT_LIMITS, router (+8 more)
+Cohesion: 0.16
+Nodes (13): AuthRequest, checkImportPermission(), checkSyncPermission(), checkTradeLimit(), PLAN_ACCOUNT_LIMITS, router, uploadMemory, router (+5 more)
 
 ### Community 119 - "dashboard.ts"
 Cohesion: 0.20
@@ -577,8 +586,8 @@ Cohesion: 0.29
 Nodes (6): Constraints, Failure modes, Flow, $impeccable hooks, Intentional findings, Routing
 
 ### Community 151 - "The Animation Decision Framework"
-Cohesion: 0.14
-Nodes (7): AILogModalProps, AdminBlogPage(), ACCOUNT_CURRENCIES, CURRENCY_PAIRS, Select(), SelectOption, SelectProps
+Cohesion: 0.16
+Nodes (8): ACCOUNT_CURRENCIES, CURRENCY_PAIRS, FilterBar(), FilterBarProps, Select(), SelectOption, SelectProps, getSymbolFilterOptions()
 
 ### Community 153 - "Performance Rules"
 Cohesion: 0.47
@@ -653,8 +662,8 @@ Cohesion: 0.25
 Nodes (8): 28. MVP Implementation Order, Phase 1 — Foundation, Phase 2 — Trade integration, Phase 3 — Forum, Phase 4 — Social graph, Phase 5 — Content utilities, Phase 6 — Moderation, Phase 7 — Advanced Community
 
 ### Community 198 - "Community 198"
-Cohesion: 0.29
-Nodes (7): ConfirmConfig, NotificationState, Toast, ToastType, useNotificationStore, ICON_MAP, Toaster()
+Cohesion: 0.15
+Nodes (10): ConfirmConfig, NotificationState, Toast, ToastType, useNotificationStore, FetchTradesParams, MOCK_TRADES, TradeInspectPageProps (+2 more)
 
 ### Community 201 - "Community 201"
 Cohesion: 0.67
@@ -683,17 +692,17 @@ Nodes (4): 9. Trade Review Ideas, Failed trade, Lesson, Successful trade
 ## Knowledge Gaps
 - **1126 isolated node(s):** `path`, `{ PrismaClient }`, `prisma`, `{ Client }`, `{ PrismaClient }` (+1121 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **20 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **19 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `fetch()` connect `handleManualEditActivity` to `animate.md`, `live.mjs`, `Community 201`, `resolveContext`, `design-system.mjs`, `Performance Rules`, `Gesture and Drag Interactions`, `design-parser.mjs`, `parseAnyColor`?**
-  _High betweenness centrality (0.093) - this node is a cross-community bridge._
+  _High betweenness centrality (0.092) - this node is a cross-community bridge._
 - **Why does `fetchJson()` connect `handleManualEditActivity` to `Community 117`?**
-  _High betweenness centrality (0.042) - this node is a cross-community bridge._
-- **Why does `useTranslation()` connect `live-browser.js` to `live-accept.mjs`, `Community 97`, `checks.mjs`, `el`, `live-inject.mjs`, `resumeSession`, `TradesTable.tsx`, `Handle `generate``, `hook-lib.mjs`, `Community 198`, `trades/page.tsx`, `impeccable-config.mjs`, `optimize.md`, `Community 117`, `Polish Systematically`, `Gesture and Drag Interactions`, `design-parser.mjs`?**
-  _High betweenness centrality (0.033) - this node is a cross-community bridge._
+  _High betweenness centrality (0.040) - this node is a cross-community bridge._
+- **Why does `useTranslation()` connect `hook-lib.mjs` to `live-accept.mjs`, `live-browser.js`, `checks.mjs`, `el`, `Community 97`, `live-inject.mjs`, `resumeSession`, `TradesTable.tsx`, `Handle `generate``, `Community 198`, `impeccable-config.mjs`, `optimize.md`, `Community 117`, `Community 22`, `The Animation Decision Framework`, `Polish Systematically`, `Gesture and Drag Interactions`?**
+  _High betweenness centrality (0.031) - this node is a cross-community bridge._
 - **Are the 4 inferred relationships involving `useTranslation()` (e.g. with `UserProfilePage()` and `SettingsPage()`) actually correct?**
   _`useTranslation()` has 4 INFERRED edges - model-reasoned connections that need verification._
 - **Are the 4 inferred relationships involving `useAuthStore` (e.g. with `AdminBlogPage()` and `UserProfilePage()`) actually correct?**
