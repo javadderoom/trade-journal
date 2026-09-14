@@ -44,16 +44,24 @@ export function proxy(request: NextRequest) {
   const authPaths = ['/login', '/register'];
   const isAuthPage = authPaths.some(path => pathname.startsWith(path));
 
-  const refreshToken = request.cookies.get('refreshToken')?.value;
+  // In cross-subdomain preview environments (e.g. *.vercel.app), the refresh cookie
+  // lives on the API domain, so edge middleware cannot read it. Client-side AppLayout
+  // handles route protection in those environments.
+  const host = (request.headers.get('host') || '').toLowerCase();
+  const isCustomDomain = host.includes('tradekav.ir');
 
-  if (isProtected && !refreshToken) {
-    const loginUrl = new URL('/login', request.url);
-    return NextResponse.redirect(loginUrl);
-  }
+  if (isCustomDomain) {
+    const refreshToken = request.cookies.get('refreshToken')?.value;
 
-  if (isAuthPage && refreshToken) {
-    const homeUrl = new URL('/trades', request.url);
-    return NextResponse.redirect(homeUrl);
+    if (isProtected && !refreshToken) {
+      const loginUrl = new URL('/login', request.url);
+      return NextResponse.redirect(loginUrl);
+    }
+
+    if (isAuthPage && refreshToken) {
+      const homeUrl = new URL('/trades', request.url);
+      return NextResponse.redirect(homeUrl);
+    }
   }
 
   return NextResponse.next();

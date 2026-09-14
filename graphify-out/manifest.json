@@ -300,8 +300,8 @@
     "semantic_hash": ""
   },
   "apps/web/src/components/layout/AppLayout.tsx": {
-    "mtime": 1789425589.181401,
-    "ast_hash": "faad18d5568d62724a26469ddfb1005b",
+    "mtime": 1789426788.9911613,
+    "ast_hash": "c3d297daf2235e1fb5aaa18398a286ce",
     "semantic_hash": ""
   },
   "apps/web/src/lib/api.ts": {
@@ -310,8 +310,8 @@
     "semantic_hash": ""
   },
   "apps/web/src/lib/auth.ts": {
-    "mtime": 1789425433.7723956,
-    "ast_hash": "1f3d66da74e1ea69f9a1d10bb8431fbb",
+    "mtime": 1789426465.9326284,
+    "ast_hash": "717e7b1ff42cf009621decfa0d768934",
     "semantic_hash": ""
   },
   "apps/api/documents/auth-implementation.md": {
@@ -320,8 +320,8 @@
     "semantic_hash": ""
   },
   "apps/web/src/proxy.ts": {
-    "mtime": 1783531199.0125175,
-    "ast_hash": "caf33437f460a4dd61c1fcc78914c854",
+    "mtime": 1789426339.5220542,
+    "ast_hash": "b6da58b7e3c24d73169619950f08d7ff",
     "semantic_hash": ""
   },
   "apps/web/src/run-browser-debug.js": {

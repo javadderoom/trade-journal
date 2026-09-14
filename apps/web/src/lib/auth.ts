@@ -27,6 +27,18 @@ interface AuthState {
 
 let refreshPromise: Promise<string | null> | null = null;
 
+const setSessionCookie = () => {
+  if (typeof document !== 'undefined') {
+    document.cookie = 'refreshToken=1; path=/; max-age=2592000; SameSite=Lax';
+  }
+};
+
+const clearSessionCookie = () => {
+  if (typeof document !== 'undefined') {
+    document.cookie = 'refreshToken=; path=/; max-age=0; SameSite=Lax';
+  }
+};
+
 export const useAuthStore = create<AuthState>((set, get) => ({
   user: null,
   accessToken: null,
@@ -37,6 +49,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       const res = await api.post('/api/auth/login', { email, password });
       const { accessToken, user } = res.data;
       set({ accessToken, user });
+      setSessionCookie();
     } catch (err: any) {
       const errMsg = err.response?.data?.error || 'خطا در ورود به حساب کاربری';
       throw new Error(errMsg);
@@ -58,6 +71,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       if (!res.data.isNewUser) {
         const { accessToken, user } = res.data;
         set({ accessToken, user });
+        setSessionCookie();
       }
       return {
         isNewUser: res.data.isNewUser,
@@ -74,6 +88,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       const res = await api.post('/api/auth/otp/register', { registerToken, name, email, password });
       const { accessToken, user } = res.data;
       set({ accessToken, user });
+      setSessionCookie();
     } catch (err: any) {
       const errMsg = err.response?.data?.error || 'خطا در تکمیل ثبت نام';
       throw new Error(errMsg);
@@ -85,6 +100,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       const res = await api.post('/api/auth/register', { name, email, phone, password });
       const { accessToken, user } = res.data;
       set({ accessToken, user });
+      setSessionCookie();
     } catch (err: any) {
       let errMsg = err.response?.data?.error || 'خطا در ثبت نام کاربر';
       if (err.response?.data?.details) {
@@ -110,6 +126,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       console.warn('Backend logout failed:', err);
     } finally {
       set({ user: null, accessToken: null });
+      clearSessionCookie();
       if (typeof window !== 'undefined') {
         const path = window.location.pathname;
         const isAuthPage = path.includes('/login') || path.includes('/register');
@@ -130,9 +147,11 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         const res = await api.post('/api/auth/refresh');
         const { accessToken, user } = res.data;
         set({ accessToken, user });
+        setSessionCookie();
         return accessToken;
       } catch (err) {
         set({ user: null, accessToken: null });
+        clearSessionCookie();
         return null;
       } finally {
         refreshPromise = null;

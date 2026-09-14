@@ -157,7 +157,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     if (!user && !isAuthPage && !isPublicPage) {
       router.replace('/login');
     } else if (user && isAuthPage) {
-      router.replace('/dashboard');
+      router.replace('/trades');
     }
     // Logged-in users on the landing page are redirected to /dashboard by the
     // LandingPage component itself.
