@@ -50,8 +50,11 @@ const PORT = process.env.PORT || 3000;
 app.use(compression());
 app.use(express.json({ limit: '2mb' }));
 app.use(cookieParser());
-app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
-app.use('/api/uploads', express.static(path.join(__dirname, '../uploads')));
+const uploadStaticDir = process.env.VERCEL
+  ? path.join('/tmp', 'uploads')
+  : path.join(__dirname, '../uploads');
+app.use('/uploads', express.static(uploadStaticDir));
+app.use('/api/uploads', express.static(uploadStaticDir));
 
 // CORS — allow only trusted origins
 const ALLOWED_ORIGINS: (string | RegExp)[] = [

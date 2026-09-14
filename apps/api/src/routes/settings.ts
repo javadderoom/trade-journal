@@ -8,14 +8,12 @@ import fs from 'node:fs';
 import crypto from 'node:crypto';
 import { DisplayCurrency, Plan } from '@prisma/client';
 import { checkAccountLimit } from '../middleware/checkPlanLimits';
+import { getUploadDir } from '../utils/storage';
 
 const router = Router();
 
 // ─── Avatar upload setup ──────────────────────────────────────────────────────
-const avatarDir = path.join(__dirname, '../../uploads/avatars');
-if (!fs.existsSync(avatarDir)) {
-  fs.mkdirSync(avatarDir, { recursive: true });
-}
+const avatarDir = getUploadDir('avatars');
 
 const avatarStorage = multer.diskStorage({
   destination: (_req, _file, cb) => cb(null, avatarDir),

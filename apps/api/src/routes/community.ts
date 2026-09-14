@@ -5,13 +5,11 @@ import { mapTradeToCommunityPreview } from '../services/communityService';
 import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
+import { getUploadDir } from '../utils/storage';
 
 const router = Router();
 
-const uploadDir = path.join(__dirname, '../../uploads/community');
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir, { recursive: true });
-}
+const uploadDir = getUploadDir('community');
 const upload = multer({ dest: uploadDir });
 
 // --- MICRO-POSTS (Feed) ---

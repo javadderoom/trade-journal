@@ -10,6 +10,7 @@ import multer from 'multer';
 import crypto from 'crypto';
 import path from 'path';
 import fs from 'fs';
+import { getUploadDir } from '../utils/storage';
 
 /** Escape HTML special characters to prevent XSS */
 function escapeHtml(str: string | number): string {
@@ -31,10 +32,7 @@ function escapeJsString(str: string): string {
     .replace(/>/g, '\\x3e');
 }
 
-const receiptDir = path.join(__dirname, '../../uploads/receipts');
-if (!fs.existsSync(receiptDir)) {
-  fs.mkdirSync(receiptDir, { recursive: true });
-}
+const receiptDir = getUploadDir('receipts');
 
 const receiptStorage = multer.diskStorage({
   destination: (_req, _file, cb) => cb(null, receiptDir),

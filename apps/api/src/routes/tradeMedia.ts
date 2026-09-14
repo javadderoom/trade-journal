@@ -5,14 +5,12 @@ import fs from 'node:fs';
 import crypto from 'node:crypto';
 import { prisma } from '../services/tradeSync';
 import { authenticate, AuthRequest } from '../middleware/auth';
+import { getUploadDir } from '../utils/storage';
 
 const router = Router();
 
 // Ensure uploads/screenshots folder exists dynamically
-const uploadDir = path.join(__dirname, '../../uploads/screenshots');
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir, { recursive: true });
-}
+const uploadDir = getUploadDir('screenshots');
 
 const storage = multer.diskStorage({
   destination: (_req, _file, cb) => {

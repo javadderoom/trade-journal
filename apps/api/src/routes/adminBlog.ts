@@ -9,12 +9,10 @@ import fs from 'fs';
 import sharp from 'sharp';
 import { triggerBlogWebhook } from '../services/makeWebhook';
 import { generateSocialCopy, translateBlogArticle } from '../services/aiBlogService';
+import { getUploadDir } from '../utils/storage';
 
 // ─── Cover Image Upload Setup ─────────────────────────────────────────────
-const coverDir = path.join(__dirname, '../../uploads/blogs');
-if (!fs.existsSync(coverDir)) {
-  fs.mkdirSync(coverDir, { recursive: true });
-}
+const coverDir = getUploadDir('blogs');
 
 const coverUpload = multer({
   storage: multer.memoryStorage(),
