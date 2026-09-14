@@ -31,3 +31,12 @@ For every user request, analyze the required cognitive effort. At the very top o
 
 ## UI Components
 - **Confirm Dialogs**: NEVER use the native browser `window.confirm`. ALWAYS use the custom `notify.confirm` dialog powered by the `Toaster` component (e.g., `import { notify } from '@/lib/notify'`).
+
+## Commit and Deploy Rules (Required)
+- **Always Provide a "Commit and Deploy" Block**: At the end of every response where code, configuration, or documentation files are modified or verified, the assistant MUST provide a dedicated `### Commit and Deploy` section.
+- **Specific Git Commands**: Explicitly provide the exact git commands:
+  - `git add <file1> <file2> ...` listing each modified file specifically (avoiding blind `git add .` to protect unintended scratch or untracked files).
+  - A conventional, meaningful commit message (`git commit -m "..."`).
+  - The push command: `git push origin main`.
+- **Never Commit Sensitive Secrets**: Never stage `.env` files, credentials, or private API keys.
+- **Deployment Awareness**: Remind that pushing to `main` triggers automated CI/CD builds on Vercel for both the API (`api.tradekav.ir`) and Web (`tradekav.ir`) projects.

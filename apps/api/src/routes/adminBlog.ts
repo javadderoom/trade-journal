@@ -3,7 +3,6 @@ import { prisma } from '../services/tradeSync';
 import { authenticate, requireAdmin, AuthRequest } from '../middleware/auth';
 import { runDailyAIBlogPipeline } from '../services/aiDiscoveryService';
 import { aiLogger } from '../services/aiLogger';
-import sharp from 'sharp';
 import { triggerBlogWebhook } from '../services/makeWebhook';
 import { generateSocialCopy, translateBlogArticle } from '../services/aiBlogService';
 import { createMemoryUpload, saveUploadedBuffer } from '../utils/storage';
@@ -146,14 +145,27 @@ router.post('/upload-image', coverUpload.single('image'), async (req: AuthReques
   try {
     if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
 
-    const webpFilename = `cover_${Date.now()}.webp`;
+    let finalBuffer = req.file.buffer;
+    let mimetype = req.file.mimetype || 'image/jpeg';
+    const ext = mimetype.includes('png') ? 'png' : mimetype.includes('webp') ? 'webp' : 'jpg';
+    let filename = `cover_${Date.now()}.${ext}`;
 
-    const webpBuffer = await sharp(req.file.buffer)
-      .resize({ width: 1200, withoutEnlargement: true })
-      .webp({ quality: 80 })
-      .toBuffer();
+    try {
+      // Dynamically load sharp so missing platform binaries never crash server cold boot
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      const sharpModule = require('sharp');
+      const sharp = sharpModule.default || sharpModule;
+      finalBuffer = await sharp(req.file.buffer)
+        .resize({ width: 1200, withoutEnlargement: true })
+        .webp({ quality: 80 })
+        .toBuffer();
+      mimetype = 'image/webp';
+      filename = `cover_${Date.now()}.webp`;
+    } catch (sharpErr) {
+      console.warn('[Sharp] Image optimization skipped, uploading original file:', sharpErr);
+    }
 
-    const imageUrl = await saveUploadedBuffer(webpBuffer, webpFilename, 'image/webp', 'blogs');
+    const imageUrl = await saveUploadedBuffer(finalBuffer, filename, mimetype, 'blogs');
     res.json({ url: imageUrl });
   } catch (error) {
     console.error('Image processing error:', error);
