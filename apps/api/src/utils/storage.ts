@@ -5,10 +5,17 @@ import multer from 'multer';
 import { put, del } from '@vercel/blob';
 
 /**
+ * Returns the configured Vercel Blob read/write token (supports default or custom prefix).
+ */
+export function getBlobToken(): string | undefined {
+  return process.env.BLOB_READ_WRITE_TOKEN || process.env.BB_READ_WRITE_TOKEN;
+}
+
+/**
  * Checks whether Vercel Blob storage is configured via environment token.
  */
 export function isVercelBlobConfigured(): boolean {
-  return Boolean(process.env.BLOB_READ_WRITE_TOKEN);
+  return Boolean(getBlobToken());
 }
 
 /**
@@ -47,6 +54,7 @@ export async function saveUploadedBuffer(
     const blob = await put(blobPath, buffer, {
       access: 'public',
       contentType: mimetype,
+      token: getBlobToken(),
     });
     return blob.url;
   }
@@ -94,7 +102,8 @@ export async function deleteUploadedFile(fileUrlOrPath: string | null | undefine
 
   try {
     if (fileUrlOrPath.startsWith('http') && fileUrlOrPath.includes('blob.vercel-storage.com')) {
-      await del(fileUrlOrPath);
+      const token = getBlobToken();
+      await del(fileUrlOrPath, token ? { token } : undefined);
       return;
     }
 

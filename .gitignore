@@ -48,3 +48,11 @@ next-env.d.ts
 .codex/auth.json
 .codex/config.toml
 apps/api/temp.txt
+
+# Backups and temporary migration files
+*.dump
+*.sql
+*.tar.gz
+vps_uploads/
+scripts/
+
