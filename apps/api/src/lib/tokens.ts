@@ -8,20 +8,21 @@ export interface AccessTokenPayload {
   role: string;
 }
 
-const JWT_SECRET = process.env.JWT_ACCESS_SECRET;
+const DEV_SECRET = 'dev-only-insecure-jwt-secret-do-not-use-in-production';
 
-if (!JWT_SECRET) {
-  if (process.env.NODE_ENV === 'production') {
-    throw new Error('FATAL: JWT_ACCESS_SECRET environment variable is not set. Refusing to start in production.');
+function getSecret(): string {
+  const secret = process.env.JWT_ACCESS_SECRET;
+  if (!secret) {
+    if (process.env.NODE_ENV === 'production') {
+      throw new Error('JWT_ACCESS_SECRET environment variable is not set. Please configure it in your Vercel Dashboard.');
+    }
+    return DEV_SECRET;
   }
-  console.warn('⚠️  JWT_ACCESS_SECRET not set — using INSECURE dev fallback. Do NOT use in production.');
+  return secret;
 }
 
-const DEV_SECRET = 'dev-only-insecure-jwt-secret-do-not-use-in-production';
-const SECRET = JWT_SECRET || DEV_SECRET;
-
 export const generateAccessToken = (payload: AccessTokenPayload): string => {
-  return jwt.sign(payload, SECRET, {
+  return jwt.sign(payload, getSecret(), {
     expiresIn: (process.env.JWT_ACCESS_EXPIRES_IN || '15m') as any,
   });
 };
@@ -32,5 +33,5 @@ export const generateRefreshToken = (): string => {
 };
 
 export const verifyAccessToken = (token: string): AccessTokenPayload => {
-  return jwt.verify(token, SECRET) as AccessTokenPayload;
+  return jwt.verify(token, getSecret()) as AccessTokenPayload;
 };
