@@ -5,37 +5,11 @@ import fs from 'node:fs';
 import crypto from 'node:crypto';
 import { prisma } from '../services/tradeSync';
 import { authenticate, AuthRequest } from '../middleware/auth';
-import { getUploadDir } from '../utils/storage';
+import { createMemoryUpload, saveUploadedFile, deleteUploadedFile } from '../utils/storage';
 
 const router = Router();
 
-// Ensure uploads/screenshots folder exists dynamically
-const uploadDir = getUploadDir('screenshots');
-
-const storage = multer.diskStorage({
-  destination: (_req, _file, cb) => {
-    cb(null, uploadDir);
-  },
-  filename: (_req, file, cb) => {
-    const ext = path.extname(file.originalname);
-    const filename = `${crypto.randomUUID()}${ext}`;
-    cb(null, filename);
-  },
-});
-
-const upload = multer({
-  storage,
-  limits: { fileSize: 10 * 1024 * 1024 }, // limit 10MB
-  fileFilter: (_req, file, cb) => {
-    const allowedTypes = /jpeg|jpg|png|gif|webp/;
-    const mimetype = allowedTypes.test(file.mimetype);
-    const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
-    if (mimetype && extname) {
-      return cb(null, true);
-    }
-    cb(new Error('Only images (jpg, jpeg, png, gif, webp) are allowed'));
-  },
-});
+const upload = createMemoryUpload(10, [/jpeg|jpg|png|gif|webp/]);
 
 /**
  * POST /api/trades/:id/screenshots
@@ -57,16 +31,12 @@ router.post('/:id/screenshots', authenticate, upload.single('screenshot'), async
     });
 
     if (!trade) {
-      // Remove uploaded file if trade is not found
-      if (fs.existsSync(req.file.path)) {
-        fs.unlinkSync(req.file.path);
-      }
       res.status(404).json({ error: 'Trade not found' });
       return;
     }
 
-    const relativeUrl = `/uploads/screenshots/${req.file.filename}`;
-    const updatedScreenshots = [...(trade.annotation?.screenshots ?? []), relativeUrl];
+    const screenshotUrl = await saveUploadedFile(req.file, 'screenshots');
+    const updatedScreenshots = [...(trade.annotation?.screenshots ?? []), screenshotUrl];
 
     await prisma.tradeAnnotation.upsert({
       where: { trade_id: id },
@@ -108,18 +78,8 @@ router.delete('/:id/screenshots', authenticate, async (req: AuthRequest, res: Re
     // Filter out the URL from the screenshots list
     const updatedScreenshots = (trade.annotation?.screenshots ?? []).filter((s: string) => s !== url);
 
-    // Delete the file from the filesystem if it belongs to this trade's uploads
-    if (url.startsWith('/uploads/screenshots/')) {
-      const filename = url.replace('/uploads/screenshots/', '');
-      const filepath = path.join(__dirname, '../../uploads/screenshots', filename);
-      if (fs.existsSync(filepath)) {
-        try {
-          fs.unlinkSync(filepath);
-        } catch (e) {
-          console.error(`Failed to delete file from disk: ${filepath}`, e);
-        }
-      }
-    }
+    // Delete the file from blob storage or local filesystem
+    await deleteUploadedFile(url);
 
     await prisma.tradeAnnotation.upsert({
       where: { trade_id: id },

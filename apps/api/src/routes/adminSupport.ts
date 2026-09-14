@@ -1,29 +1,13 @@
 import { Router, Response } from 'express';
-import multer from 'multer';
-import path from 'path';
-import crypto from 'crypto';
 import { prisma } from '../services/tradeSync';
 import { authenticate, requireAdmin, AuthRequest } from '../middleware/auth';
+import { createMemoryUpload, saveUploadedFile } from '../utils/storage';
 
 const router = Router();
 router.use(authenticate, requireAdmin);
 
 // ─── File upload config ────────────────────────────────────────────────────────
-const storage = multer.diskStorage({
-  destination: path.join(__dirname, '../../uploads/support'),
-  filename: (_req, file, cb) => cb(null, `${crypto.randomUUID()}${path.extname(file.originalname)}`),
-});
-const upload = multer({
-  storage,
-  limits: { fileSize: 5 * 1024 * 1024 },
-  fileFilter: (_req, file, cb) => {
-    const allowed = /jpeg|jpg|png|gif|webp|pdf/;
-    const ext = allowed.test(path.extname(file.originalname).toLowerCase());
-    const mime = allowed.test(file.mimetype.split('/')[1]);
-    if (ext || mime) return cb(null, true);
-    cb(new Error('File type not allowed'));
-  },
-});
+const upload = createMemoryUpload(5, [/jpeg|jpg|png|gif|webp|pdf/]);
 
 // ─── GET /api/admin/support/stats — dashboard stats ───────────────────────────
 router.get('/stats', async (_req: AuthRequest, res: Response) => {
@@ -139,7 +123,7 @@ router.post(
       }
 
       const files = (req.files as Express.Multer.File[]) || [];
-      const attachments = files.map((f) => `/uploads/support/${f.filename}`);
+      const attachments = await Promise.all(files.map((f) => saveUploadedFile(f, 'support')));
 
       const message = await prisma.message.create({
         data: {

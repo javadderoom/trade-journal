@@ -8,32 +8,12 @@ import fs from 'node:fs';
 import crypto from 'node:crypto';
 import { DisplayCurrency, Plan } from '@prisma/client';
 import { checkAccountLimit } from '../middleware/checkPlanLimits';
-import { getUploadDir } from '../utils/storage';
+import { createMemoryUpload, saveUploadedFile, deleteUploadedFile } from '../utils/storage';
 
 const router = Router();
 
-// ─── Avatar upload setup ──────────────────────────────────────────────────────
-const avatarDir = getUploadDir('avatars');
-
-const avatarStorage = multer.diskStorage({
-  destination: (_req, _file, cb) => cb(null, avatarDir),
-  filename: (_req, file, cb) => {
-    const ext = path.extname(file.originalname);
-    cb(null, `${crypto.randomUUID()}${ext}`);
-  },
-});
-
-const avatarUpload = multer({
-  storage: avatarStorage,
-  limits: { fileSize: 2 * 1024 * 1024 }, // 2MB
-  fileFilter: (_req, file, cb) => {
-    const allowed = /jpeg|jpg|png/;
-    const mimetype = allowed.test(file.mimetype);
-    const extname = allowed.test(path.extname(file.originalname).toLowerCase());
-    if (mimetype && extname) return cb(null, true);
-    cb(new Error('Only JPG/PNG images are allowed'));
-  },
-});
+// ─── Avatar upload setup (Memory buffer for serverless + blob) ────────────────
+const avatarUpload = createMemoryUpload(2, [/jpeg|jpg|png/]);
 
 // ─── Plan limits ──────────────────────────────────────────────────────────────
 const PLAN_ACCOUNT_LIMITS: Record<Plan, number | null> = {
@@ -295,14 +275,10 @@ router.post('/avatar', authenticate, avatarUpload.single('avatar'), async (req: 
 
     // Delete old avatar file if exists
     if (user?.avatar_url) {
-      const oldFilename = user.avatar_url.replace('/uploads/avatars/', '');
-      const oldPath = path.join(avatarDir, oldFilename);
-      if (fs.existsSync(oldPath)) {
-        try { fs.unlinkSync(oldPath); } catch {}
-      }
+      await deleteUploadedFile(user.avatar_url);
     }
 
-    const avatarUrl = `/uploads/avatars/${req.file.filename}`;
+    const avatarUrl = await saveUploadedFile(req.file, 'avatars');
     await prisma.user.update({
       where: { id: userId },
       data: { avatar_url: avatarUrl },

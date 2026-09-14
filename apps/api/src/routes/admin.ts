@@ -5,6 +5,7 @@ import { Plan, ReceiptStatus } from '@prisma/client';
 import multer from 'multer';
 import path from 'node:path';
 import fs from 'node:fs';
+import { isVercelBlobConfigured, saveUploadedBuffer } from '../utils/storage';
 
 const router = Router();
 
@@ -525,36 +526,42 @@ router.put('/settings/announcement-banner', async (req: AuthRequest, res: Respon
 
 // --- EA Management ---
 
-const eaStorage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    // Save to apps/web/public/downloads
-    const destDir = path.join(process.cwd(), '../web/public/downloads');
-    if (!fs.existsSync(destDir)) {
-      fs.mkdirSync(destDir, { recursive: true });
-    }
-    cb(null, destDir);
-  },
-  filename: (req, file, cb) => {
-    // Keep original name (e.g. TradeKav_EA.mq4)
-    cb(null, file.originalname);
-  }
-});
-
 const eaUpload = multer({ 
-  storage: eaStorage,
-  limits: { fileSize: 5 * 1024 * 1024 } // 5MB limit
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 10 * 1024 * 1024 } // 10MB limit
 });
 
 /**
  * POST /api/admin/ea/upload
  * Upload new EA files (.mq4, .mq5, .ex4, .ex5)
  */
-router.post('/ea/upload', eaUpload.single('file'), (req: AuthRequest, res: Response) => {
+router.post('/ea/upload', eaUpload.single('file'), async (req: AuthRequest, res: Response) => {
   try {
     if (!req.file) {
       return res.status(400).json({ error: 'No file uploaded' });
     }
-    res.status(200).json({ message: 'File uploaded successfully', filename: req.file.filename });
+
+    // Save to local web/public/downloads if available
+    const destDir = path.join(process.cwd(), '../web/public/downloads');
+    try {
+      if (!fs.existsSync(destDir)) {
+        fs.mkdirSync(destDir, { recursive: true });
+      }
+      fs.writeFileSync(path.join(destDir, req.file.originalname), req.file.buffer);
+    } catch (e) {
+      console.warn('[EA Upload] Could not write locally:', e);
+    }
+
+    if (isVercelBlobConfigured()) {
+      await saveUploadedBuffer(
+        req.file.buffer,
+        req.file.originalname,
+        req.file.mimetype || 'application/octet-stream',
+        'ea'
+      );
+    }
+
+    res.status(200).json({ message: 'File uploaded successfully', filename: req.file.originalname });
   } catch (err) {
     console.error('EA upload error:', err);
     res.status(500).json({ error: 'Failed to upload EA' });

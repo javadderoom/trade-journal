@@ -9,8 +9,7 @@ import { Plan, SubscriptionStatus } from '@prisma/client';
 import multer from 'multer';
 import crypto from 'crypto';
 import path from 'path';
-import fs from 'fs';
-import { getUploadDir } from '../utils/storage';
+import { createMemoryUpload, saveUploadedFile, deleteUploadedFile } from '../utils/storage';
 
 /** Escape HTML special characters to prevent XSS */
 function escapeHtml(str: string | number): string {
@@ -32,27 +31,7 @@ function escapeJsString(str: string): string {
     .replace(/>/g, '\\x3e');
 }
 
-const receiptDir = getUploadDir('receipts');
-
-const receiptStorage = multer.diskStorage({
-  destination: (_req, _file, cb) => cb(null, receiptDir),
-  filename: (_req, file, cb) => {
-    const ext = path.extname(file.originalname);
-    cb(null, `${crypto.randomUUID()}${ext}`);
-  },
-});
-
-const receiptUpload = multer({
-  storage: receiptStorage,
-  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
-  fileFilter: (_req, file, cb) => {
-    const allowed = /jpeg|jpg|png/;
-    const mimetype = allowed.test(file.mimetype);
-    const extname = allowed.test(path.extname(file.originalname).toLowerCase());
-    if (mimetype && extname) return cb(null, true);
-    cb(new Error('Only JPG/PNG images are allowed'));
-  },
-});
+const receiptUpload = createMemoryUpload(5, [/jpeg|jpg|png/]);
 
 const router = Router();
 
@@ -494,8 +473,8 @@ router.post(
         }
       }
 
-      // File path logic: e.g. /uploads/receipts/filename.png
-      const receiptUrl = `/uploads/receipts/${req.file.filename}`;
+      // Save file to Vercel Blob (or local fallback)
+      const receiptUrl = await saveUploadedFile(req.file, 'receipts');
 
       const receipt = await prisma.manualReceipt.create({
         data: {

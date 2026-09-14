@@ -35,8 +35,8 @@
     "semantic_hash": ""
   },
   "apps/web/package.json": {
-    "mtime": 1786295996.8680658,
-    "ast_hash": "5caa16e2a3cba752079cd9338dbba24e",
+    "mtime": 1789386802.6379411,
+    "ast_hash": "21a2d1fd00e8179cee9ef58df1ac6603",
     "semantic_hash": ""
   },
   "apps/web/src/app/api/exchange-rate/route.ts": {

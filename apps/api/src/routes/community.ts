@@ -2,15 +2,11 @@ import { Router } from 'express';
 import { authenticate, optionalAuthenticate } from '../middleware/auth';
 import { prisma } from '../services/tradeSync';
 import { mapTradeToCommunityPreview } from '../services/communityService';
-import multer from 'multer';
-import path from 'path';
-import fs from 'fs';
-import { getUploadDir } from '../utils/storage';
+import { createMemoryUpload, saveUploadedFile } from '../utils/storage';
 
 const router = Router();
 
-const uploadDir = getUploadDir('community');
-const upload = multer({ dest: uploadDir });
+const upload = createMemoryUpload(10);
 
 // --- MICRO-POSTS (Feed) ---
 
@@ -267,7 +263,8 @@ router.post('/feed/upload-media', authenticate, upload.array('media', 5), async 
             return res.status(400).json({ error: 'No files uploaded' });
         }
         
-        const urls = (req.files as Express.Multer.File[]).map(f => `/uploads/community/${f.filename}`);
+        const files = req.files as Express.Multer.File[];
+        const urls = await Promise.all(files.map(f => saveUploadedFile(f, 'community')));
         res.json({ urls });
     } catch (error) {
         console.error("Error uploading media:", error);

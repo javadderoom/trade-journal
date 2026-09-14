@@ -3,21 +3,13 @@ import { prisma } from '../services/tradeSync';
 import { authenticate, requireAdmin, AuthRequest } from '../middleware/auth';
 import { runDailyAIBlogPipeline } from '../services/aiDiscoveryService';
 import { aiLogger } from '../services/aiLogger';
-import multer from 'multer';
-import path from 'path';
-import fs from 'fs';
 import sharp from 'sharp';
 import { triggerBlogWebhook } from '../services/makeWebhook';
 import { generateSocialCopy, translateBlogArticle } from '../services/aiBlogService';
-import { getUploadDir } from '../utils/storage';
+import { createMemoryUpload, saveUploadedBuffer } from '../utils/storage';
 
 // ─── Cover Image Upload Setup ─────────────────────────────────────────────
-const coverDir = getUploadDir('blogs');
-
-const coverUpload = multer({
-  storage: multer.memoryStorage(),
-  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB
-});
+const coverUpload = createMemoryUpload(10);
 
 const router = Router();
 
@@ -155,14 +147,13 @@ router.post('/upload-image', coverUpload.single('image'), async (req: AuthReques
     if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
 
     const webpFilename = `cover_${Date.now()}.webp`;
-    const outputPath = path.join(coverDir, webpFilename);
 
-    await sharp(req.file.buffer)
+    const webpBuffer = await sharp(req.file.buffer)
       .resize({ width: 1200, withoutEnlargement: true })
       .webp({ quality: 80 })
-      .toFile(outputPath);
+      .toBuffer();
 
-    const imageUrl = `/api/uploads/blogs/${webpFilename}`;
+    const imageUrl = await saveUploadedBuffer(webpBuffer, webpFilename, 'image/webp', 'blogs');
     res.json({ url: imageUrl });
   } catch (error) {
     console.error('Image processing error:', error);
