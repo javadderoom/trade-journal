@@ -10,8 +10,8 @@
     "semantic_hash": ""
   },
   "apps/api/src/server.ts": {
-    "mtime": 1787066854.4020338,
-    "ast_hash": "b3d9c64a3841c5c401cd33be72516bcc",
+    "mtime": 1789381817.559315,
+    "ast_hash": "7e20f484cfc18b0547fcdf15e9e10f42",
     "semantic_hash": ""
   },
   "apps/api/src/services/mt4Parser.ts": {
@@ -20,8 +20,8 @@
     "semantic_hash": ""
   },
   "apps/api/src/services/tradeSync.ts": {
-    "mtime": 1787066718.4842722,
-    "ast_hash": "d7899213375143f486daca0f46a88253",
+    "mtime": 1789381767.5315347,
+    "ast_hash": "3809433967b71f35b160ac0b57a1b0cb",
     "semantic_hash": ""
   },
   "apps/api/src/types/index.ts": {
@@ -1685,8 +1685,8 @@
     "semantic_hash": ""
   },
   "apps/api/src/routes/adminMarketData.ts": {
-    "mtime": 1786295996.8526433,
-    "ast_hash": "c3f56e3ebc9b3556dbed2eed908dc089",
+    "mtime": 1787736094.0153368,
+    "ast_hash": "9e9ffe34521ecd4d4401312d301af8d6",
     "semantic_hash": ""
   },
   "apps/api/src/routes/community.ts": {
@@ -1700,8 +1700,8 @@
     "semantic_hash": ""
   },
   "apps/api/src/services/historicalDataCron.ts": {
-    "mtime": 1786379865.8220088,
-    "ast_hash": "3de87b7be8cb1197bc88f5175a02053d",
+    "mtime": 1787736550.0959022,
+    "ast_hash": "003c77f19a168ada6e0f7a3cb09ff8fa",
     "semantic_hash": ""
   },
   "apps/api/src/services/seedDefaultConcepts.ts": {
@@ -2127,6 +2127,26 @@
   "apps/api/src/services/tradeQueryService.ts": {
     "mtime": 1787066666.5186856,
     "ast_hash": "337163b1d270262eb300ee5859449372",
+    "semantic_hash": ""
+  },
+  "apps/api/api/index.ts": {
+    "mtime": 1789381673.5216417,
+    "ast_hash": "e5875b7ad5223e299dadd33b59430c82",
+    "semantic_hash": ""
+  },
+  "apps/api/src/prisma/migrations/20260826000000_add_candle_cache_last_candle_at/migration.sql": {
+    "mtime": 1787736007.4281826,
+    "ast_hash": "a73b979e53c9067be9c51cc8b7a5b4bb",
+    "semantic_hash": ""
+  },
+  "apps/api/src/utils/dailyQuota.ts": {
+    "mtime": 1787735790.2782333,
+    "ast_hash": "c6eafc0699b1c82b6a4159f5e8107e97",
+    "semantic_hash": ""
+  },
+  "apps/api/vercel.json": {
+    "mtime": 1789381836.244051,
+    "ast_hash": "fe16b8a5561179d9f7cd94a53df04acb",
     "semantic_hash": ""
   }
 }
